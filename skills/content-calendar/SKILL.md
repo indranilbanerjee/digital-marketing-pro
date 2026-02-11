@@ -48,3 +48,4 @@ A structured content calendar containing:
 
 - **content-creator** — Topic ideation, pillar strategy, repurposing workflows, editorial planning
 - **seo-specialist** — Keyword alignment, search trend timing, topic gap identification
+- **social-media-manager** — Platform-specific posting cadence, content format recommendations, hashtag strategy, calendar validation

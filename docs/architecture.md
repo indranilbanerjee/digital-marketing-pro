@@ -1,6 +1,6 @@
 # Technical Architecture Reference
 
-**Digital Marketing Pro** -- Claude Code Plugin v1.4.0
+**Digital Marketing Pro** -- Claude Code Plugin v1.5.0
 
 This document describes the internal architecture of the Digital Marketing Pro plugin for developers and contributors. It covers file structure, the WAT framework mapping, component anatomy, the hook system, script conventions, data persistence, adaptive scoring, and extension points.
 
@@ -11,7 +11,7 @@ This document describes the internal architecture of the Digital Marketing Pro p
 ```
 digital-marketing-pro/
 ├── .claude-plugin/
-│   └── plugin.json                    # Plugin manifest (v1.4.0)
+│   └── plugin.json                    # Plugin manifest (v1.5.0)
 ├── .mcp.json                          # 12 MCP server configurations
 ├── hooks/
 │   └── hooks.json                     # 3 lifecycle hooks
@@ -29,7 +29,7 @@ digital-marketing-pro/
 │   ├── email-specialist.md            # NEW in v1.4.0
 │   ├── cro-specialist.md              # NEW in v1.4.0
 │   └── social-media-manager.md        # NEW in v1.4.0
-├── scripts/                           # 15 Python scripts + requirements
+├── scripts/                           # 24 Python scripts + requirements
 │   ├── setup.py                       # Brand management, initialization
 │   ├── campaign-tracker.py            # Campaign persistence + violation tracking
 │   ├── adaptive-scorer.py             # Context-aware scoring weights
@@ -45,6 +45,15 @@ digital-marketing-pro/
 │   ├── schema-generator.py            # JSON-LD schema markup
 │   ├── utm-generator.py               # UTM parameters + QR codes
 │   ├── guidelines-manager.py          # Brand guidelines CRUD (v1.3.0)
+│   ├── email-subject-tester.py        # Email subject line scoring (v1.5.0)
+│   ├── spam-score-checker.py          # Email spam risk analysis (v1.5.0)
+│   ├── send-time-optimizer.py         # Email send time recommendations (v1.5.0)
+│   ├── sample-size-calculator.py      # A/B test sample size calculator (v1.5.0)
+│   ├── significance-tester.py         # A/B test significance testing (v1.5.0)
+│   ├── form-analyzer.py              # Form conversion optimization (v1.5.0)
+│   ├── hashtag-analyzer.py           # Social hashtag analysis (v1.5.0)
+│   ├── posting-time-analyzer.py      # Social posting time optimization (v1.5.0)
+│   ├── calendar-validator.py         # Content calendar validation (v1.5.0)
 │   └── requirements.txt               # Python dependencies
 ├── skills/                            # 36 skill directories
 │   ├── context-engine/                # Shared intelligence layer
@@ -72,7 +81,7 @@ digital-marketing-pro/
 └── LICENSE
 ```
 
-**Total: 171 files** (158 plugin files + 13 documentation files).
+**Total: 180 files** (167 plugin files + 13 documentation files).
 
 The 13 modules are: content-engine, campaign-orchestrator, paid-advertising, analytics-insights, aeo-geo, audience-intelligence, cro, digital-pr, funnel-architect, growth-engineering, influencer-creator, reputation-management, and emerging-channels.
 
@@ -117,7 +126,7 @@ Multiple agents can collaborate on a single task. For example, the `/dm:campaign
 
 ### Tools (scripts/*.py)
 
-Fifteen Python scripts handle deterministic execution: scoring, formatting, data persistence, and analysis. Every script:
+Twenty-four Python scripts handle deterministic execution: scoring, formatting, data persistence, and analysis. Every script:
 
 - Accepts CLI arguments via argparse
 - Produces JSON output to stdout
@@ -267,9 +276,9 @@ N. Check brand guidelines for content. [Load guidelines/_manifest.json,
 | influencer-manager | Creator partnerships, UGC, briefs | Tier frameworks, FTC compliance | social-post-formatter, content-scorer, brand-voice-scorer |
 | competitive-intel | Competitor analysis, market positioning | Perceptual maps, SWOT, gap analysis | competitor-scraper, keyword-clusterer |
 | pr-outreach | Media relations, press releases, pitches | Newsjacking, PESO model | content-scorer, readability-analyzer, headline-analyzer |
-| email-specialist | Email marketing, deliverability, automation | Lifecycle, RFM, A/B testing | email-preview, content-scorer, readability-analyzer, brand-voice-scorer, headline-analyzer, adaptive-scorer |
-| cro-specialist | CRO, landing pages, A/B testing, pricing | Hypothesis testing, Bayesian analysis | content-scorer, headline-analyzer, readability-analyzer, adaptive-scorer |
-| social-media-manager | Social media, community, content calendars | Platform-native strategy, algorithm signals | social-post-formatter, content-scorer, headline-analyzer, brand-voice-scorer |
+| email-specialist | Email marketing, deliverability, automation | Lifecycle, RFM, A/B testing | email-preview, content-scorer, readability-analyzer, brand-voice-scorer, headline-analyzer, adaptive-scorer, email-subject-tester, spam-score-checker, send-time-optimizer |
+| cro-specialist | CRO, landing pages, A/B testing, pricing | Hypothesis testing, Bayesian analysis | content-scorer, headline-analyzer, readability-analyzer, adaptive-scorer, sample-size-calculator, significance-tester, form-analyzer |
+| social-media-manager | Social media, community, content calendars | Platform-native strategy, algorithm signals | social-post-formatter, content-scorer, headline-analyzer, brand-voice-scorer, hashtag-analyzer, posting-time-analyzer, calendar-validator |
 
 Every agent's Rule 1 mandates loading brand context before producing output. Every agent has a guideline enforcement rule. Every agent references campaign-tracker.py and guidelines-manager.py. These are the three most important architectural invariants in the agent system.
 
@@ -320,7 +329,7 @@ Three lifecycle hooks are defined in `hooks/hooks.json`. They wrap every Claude 
 
 ## 8. Script Architecture
 
-All 15 scripts in `scripts/` follow consistent conventions.
+All 24 scripts in `scripts/` follow consistent conventions.
 
 ### Conventions
 
@@ -334,7 +343,7 @@ All 15 scripts in `scripts/` follow consistent conventions.
 
 | Tier | Dependencies | Scripts |
 |------|-------------|---------|
-| Zero deps (always work) | Python stdlib only | setup.py, campaign-tracker.py, utm-generator.py (basic mode), schema-generator.py, guidelines-manager.py |
+| Zero deps (always work) | Python stdlib only | setup.py, campaign-tracker.py, utm-generator.py (basic mode), schema-generator.py, guidelines-manager.py, email-subject-tester.py, spam-score-checker.py, send-time-optimizer.py, sample-size-calculator.py, significance-tester.py, form-analyzer.py, hashtag-analyzer.py, posting-time-analyzer.py, calendar-validator.py |
 | Lite | nltk, textstat | brand-voice-scorer.py, content-scorer.py, readability-analyzer.py, headline-analyzer.py |
 | Full | + requests, beautifulsoup4, qrcode, Pillow | competitor-scraper.py, utm-generator.py (QR mode), email-preview.py |
 | Optional | + openai, anthropic | ai-visibility-checker.py (API mode) |

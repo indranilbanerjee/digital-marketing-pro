@@ -47,3 +47,4 @@ A structured landing page audit containing:
 
 - **analytics-analyst** — Performance scoring, conversion benchmarking, data-driven recommendations
 - **brand-guardian** — Brand consistency, trust signal assessment, message alignment
+- **cro-specialist** — Conversion scoring, form friction analysis, A/B test sample size calculation, above-fold hierarchy, CTA optimization

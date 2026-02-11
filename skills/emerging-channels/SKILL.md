@@ -188,3 +188,7 @@ Even well-managed communities face toxicity challenges. Build clear community gu
 - **Growth Engineering** -- Community-led growth, viral loops through social features, and referral amplification
 - **CRO** -- Conversion optimization for social storefronts, chatbot funnels, and voice commerce flows
 - **Analytics & Insights** -- Measurement and attribution for emerging channels with limited native analytics
+
+## Agents Used
+
+- **social-media-manager** — Platform-native social commerce strategy, community management, content calendar planning, social listening, UGC curation, and cross-platform engagement optimization

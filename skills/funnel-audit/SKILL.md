@@ -48,3 +48,4 @@ A structured funnel audit containing:
 
 - **marketing-strategist** — Funnel architecture, lead quality analysis, strategic recommendations
 - **analytics-analyst** — Conversion data analysis, benchmarking, impact modeling
+- **cro-specialist** — Conversion bottleneck diagnosis, A/B test recommendations, form and checkout optimization, statistical significance testing

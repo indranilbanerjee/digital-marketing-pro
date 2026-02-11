@@ -61,6 +61,18 @@ Structure CRO outputs as: Current Performance Baseline (metrics with data qualit
   `python "${CLAUDE_PLUGIN_ROOT}/scripts/guidelines-manager.py" --brand {slug} --action get --category messaging`
   When: Before recommending copy changes — use approved value propositions
 
+- **sample-size-calculator.py** — Calculate A/B test sample size requirements
+  `python "${CLAUDE_PLUGIN_ROOT}/scripts/sample-size-calculator.py" --baseline-rate 0.03 --mde 0.005 --significance 0.95 --power 0.80 --daily-traffic 5000`
+  When: Before any A/B test recommendation — calculate required sample size and test duration
+
+- **significance-tester.py** — Test A/B results for statistical significance
+  `python "${CLAUDE_PLUGIN_ROOT}/scripts/significance-tester.py" --control-visitors 10000 --control-conversions 300 --variant-visitors 10000 --variant-conversions 350 --confidence 0.95`
+  When: After test completion — determine if results are statistically significant with p-value and confidence interval
+
+- **form-analyzer.py** — Analyze web forms for conversion optimization
+  `python "${CLAUDE_PLUGIN_ROOT}/scripts/form-analyzer.py" --fields '[{"name":"email","type":"email","required":true},{"name":"company","type":"text","required":true}]'`
+  When: Auditing forms — score field count, friction, and mobile-friendliness with prioritized optimization recommendations
+
 ## MCP Integrations
 
 - **google-analytics** (optional): Conversion funnel data, landing page performance, bounce rates, scroll depth, user flow, event tracking — primary CRO data source

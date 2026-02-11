@@ -67,6 +67,18 @@ Structure social media outputs as: Platform (with format type), Content (formatt
   `python "${CLAUDE_PLUGIN_ROOT}/scripts/guidelines-manager.py" --brand {slug} --action get --category channel-styles`
   When: Before creating content for any platform — load platform-specific rules
 
+- **hashtag-analyzer.py** — Analyze hashtags for social post effectiveness
+  `python "${CLAUDE_PLUGIN_ROOT}/scripts/hashtag-analyzer.py" --hashtags '["marketing","digitalmarketing","seo"]' --platform instagram`
+  When: Before publishing social posts — validate hashtag count, quality, and platform compliance
+
+- **posting-time-analyzer.py** — Recommend optimal social media posting times
+  `python "${CLAUDE_PLUGIN_ROOT}/scripts/posting-time-analyzer.py" --platform instagram --industry saas --audience-type b2b`
+  When: Building content calendars or scheduling posts — optimize for platform-specific engagement windows
+
+- **calendar-validator.py** — Validate content calendar structure
+  `python "${CLAUDE_PLUGIN_ROOT}/scripts/calendar-validator.py" --calendar '[{"date":"2026-03-01","platform":"instagram","content_type":"reel","topic":"Product launch"}]'`
+  When: After creating content calendars — check posting frequency, content variety, gap detection, and platform balance
+
 ## MCP Integrations
 
 - **meta-marketing** (optional): Facebook/Instagram post performance, audience demographics, content insights, Reels analytics, Stories performance

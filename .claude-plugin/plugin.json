@@ -1,7 +1,7 @@
 {
   "name": "digital-marketing-pro",
-  "version": "1.4.0",
-  "description": "Comprehensive digital marketing intelligence system with 13 specialist agents, brand guidelines enforcement, adaptive scoring, MCP integrations for your own marketing accounts, and persistent campaign memory. 13 integrated modules covering strategy, execution, and measurement across all channels, business models, and industries. Agents call 15 Python scripts for deterministic scoring, query 12 MCP servers for live data, enforce brand guidelines, and persist campaign learnings. Import voice guides, restrictions, channel styles, templates, and agency SOPs. Compliance guardrails, AEO/GEO optimization, crisis communication, and emerging channel support.",
+  "version": "1.5.0",
+  "description": "Comprehensive digital marketing intelligence system with 13 specialist agents, brand guidelines enforcement, adaptive scoring, MCP integrations for your own marketing accounts, and persistent campaign memory. 13 integrated modules covering strategy, execution, and measurement across all channels, business models, and industries. Agents call 24 Python scripts for deterministic scoring, query 12 MCP servers for live data, enforce brand guidelines, and persist campaign learnings. Import voice guides, restrictions, channel styles, templates, and agency SOPs. Compliance guardrails, AEO/GEO optimization, crisis communication, and emerging channel support.",
   "author": {
     "name": "Indranil Banerjee",
     "title": "Head of AI Transformation & Group Lead - Digital Marketing",

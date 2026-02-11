@@ -50,3 +50,4 @@ A structured social media strategy containing:
 ## Agents Used
 
 - **content-creator** — Content strategy, pillar development, format recommendations, engagement tactics
+- **social-media-manager** — Platform-native strategy, algorithm optimization, hashtag strategy, posting time optimization, community management

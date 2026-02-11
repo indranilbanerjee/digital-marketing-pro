@@ -1,6 +1,6 @@
 # Digital Marketing Pro — Claude Code & Cowork Plugin
 
-[![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-optional-yellow.svg)](#python-dependencies-optional)
 [![Cowork](https://img.shields.io/badge/cowork-compatible-purple.svg)](docs/claude-interfaces.md#claude-cowork-full-support)
@@ -38,7 +38,7 @@ Digital Marketing Pro transforms Claude into a full-stack marketing intelligence
 - **Brand guidelines enforcement** — import voice guides, restrictions, channel styles, messaging frameworks; automatically applied across all modules
 - **Deliverable templates** and **agency SOPs** — custom output formats and workflow definitions
 - **22 slash commands** for direct access to common workflows
-- **15 Python scripts** for deterministic execution (scoring, analysis, generation, guidelines management)
+- **24 Python scripts** for deterministic execution (scoring, analysis, generation, guidelines management, email testing, A/B testing, social optimization)
 - **12 MCP integrations** for connecting your own marketing accounts (GA4, Search Console, Google Ads, Meta, HubSpot, Mailchimp, etc.)
 - **Persistent brand memory** that learns across sessions
 - **Adaptive scoring** that adjusts to your industry, business model, and goals
@@ -260,11 +260,11 @@ The plugin stores brand data at `~/.claude-marketing/`:
 
 ```
 digital-marketing-pro/
-├── .claude-plugin/plugin.json    # Plugin manifest (v1.4.0)
+├── .claude-plugin/plugin.json    # Plugin manifest (v1.5.0)
 ├── skills/                       # 36 skill directories (13 modules + 22 commands + context engine)
 ├── agents/                       # 13 specialist agents
 ├── hooks/hooks.json              # Session lifecycle, compliance gates, and guideline checks
-├── scripts/                      # 15 Python execution scripts + requirements.txt
+├── scripts/                      # 24 Python execution scripts + requirements.txt
 ├── .mcp.json                     # Optional MCP integrations config
 ├── docs/                         # 11 documentation guides
 ├── README.md

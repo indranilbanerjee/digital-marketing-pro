@@ -69,6 +69,18 @@ Structure email outputs as: Email Type (campaign, automation, transactional), Su
   `python "${CLAUDE_PLUGIN_ROOT}/scripts/guidelines-manager.py" --brand {slug} --action get --category channel-styles`
   When: Before writing — load email-specific tone and format rules
 
+- **email-subject-tester.py** — Score email subject lines for effectiveness
+  `python "${CLAUDE_PLUGIN_ROOT}/scripts/email-subject-tester.py" --subjects '["Subject line 1", "Subject line 2"]'`
+  When: After generating subject line variations — score and rank by predicted open-rate effectiveness
+
+- **spam-score-checker.py** — Check email content for spam risk
+  `python "${CLAUDE_PLUGIN_ROOT}/scripts/spam-score-checker.py" --content "email body text" --subject "Subject line"`
+  When: Before finalizing any email — assess deliverability risk from spam signals
+
+- **send-time-optimizer.py** — Recommend optimal email send times
+  `python "${CLAUDE_PLUGIN_ROOT}/scripts/send-time-optimizer.py" --industry saas --audience-type b2b`
+  When: When designing email sequences or campaigns — recommend send windows based on industry benchmarks
+
 ## MCP Integrations
 
 - **mailchimp** (optional): Email campaign analytics, list health metrics, automation performance, audience insights — primary email platform data source

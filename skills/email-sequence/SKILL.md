@@ -47,3 +47,4 @@ A complete email sequence containing:
 
 - **content-creator** — Email copy, subject lines, narrative arc, CTA strategy
 - **brand-guardian** — Voice consistency, compliance review, regulatory checks
+- **email-specialist** — Deliverability optimization, send timing strategy, subject line scoring, spam risk analysis, A/B test design

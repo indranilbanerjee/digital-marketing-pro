@@ -167,3 +167,7 @@ Avoid launching A/B tests during Black Friday, holiday seasons, or major promoti
 - **Funnel Architect** -- CRO fits within the broader funnel optimization strategy
 - **Growth Engineering** -- Activation and onboarding optimization overlaps with CRO for SaaS products
 - **SEO** -- Page speed and Core Web Vitals affect both rankings and conversion rates
+
+## Agents Used
+
+- **cro-specialist** — Primary agent for all CRO tasks: landing page audits, A/B test design, form optimization, pricing psychology, checkout optimization, statistical significance calculations, and experiment documentation
