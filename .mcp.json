@@ -1,0 +1,107 @@
+{
+  "_readme": "OPTIONAL MCP Integrations — Digital Marketing Pro. These connect to YOUR OWN marketing accounts. The plugin works fully without any of these. To enable an integration, set the required environment variables and the server auto-activates. Only enable what you need.",
+  "mcpServers": {
+    "google-analytics": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-google-analytics"],
+      "env": {
+        "GA_PROPERTY_ID": "${GA_PROPERTY_ID}",
+        "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}"
+      },
+      "description": "Google Analytics 4 — traffic, conversions, audience data for performance reports"
+    },
+    "google-search-console": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-google-search-console"],
+      "env": {
+        "GSC_SITE_URL": "${GSC_SITE_URL}",
+        "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}"
+      },
+      "description": "Google Search Console — ranking data, queries, CTR for SEO audits"
+    },
+    "google-ads": {
+      "command": "npx",
+      "args": ["-y", "mcp-google-ads"],
+      "env": {
+        "GOOGLE_ADS_CUSTOMER_ID": "${GOOGLE_ADS_CUSTOMER_ID}",
+        "GOOGLE_ADS_DEVELOPER_TOKEN": "${GOOGLE_ADS_DEVELOPER_TOKEN}",
+        "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}"
+      },
+      "description": "Google Ads — campaign performance, keyword data, bid optimization"
+    },
+    "meta-marketing": {
+      "command": "npx",
+      "args": ["-y", "mcp-meta-marketing"],
+      "env": {
+        "META_ACCESS_TOKEN": "${META_ACCESS_TOKEN}",
+        "META_AD_ACCOUNT_ID": "${META_AD_ACCOUNT_ID}"
+      },
+      "description": "Meta Business Suite — Facebook/Instagram ads, audience insights, performance"
+    },
+    "hubspot": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-hubspot"],
+      "env": {
+        "HUBSPOT_ACCESS_TOKEN": "${HUBSPOT_ACCESS_TOKEN}"
+      },
+      "description": "HubSpot CRM — contacts, deals, email performance, pipeline data"
+    },
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": "${SLACK_BOT_TOKEN}"
+      },
+      "description": "Slack — send marketing reports, campaign alerts, team notifications"
+    },
+    "google-sheets": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-google-sheets"],
+      "env": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}"
+      },
+      "description": "Google Sheets — export reports, campaign data, content calendars to spreadsheets"
+    },
+    "mailchimp": {
+      "command": "npx",
+      "args": ["-y", "mcp-mailchimp"],
+      "env": {
+        "MAILCHIMP_API_KEY": "${MAILCHIMP_API_KEY}"
+      },
+      "description": "Mailchimp — email campaign analytics, list management, automation data"
+    },
+    "stripe": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-stripe"],
+      "env": {
+        "STRIPE_API_KEY": "${STRIPE_API_KEY}"
+      },
+      "description": "Stripe — revenue data, conversion tracking, LTV calculations"
+    },
+    "linkedin-marketing": {
+      "command": "npx",
+      "args": ["-y", "mcp-linkedin-marketing"],
+      "env": {
+        "LINKEDIN_ACCESS_TOKEN": "${LINKEDIN_ACCESS_TOKEN}",
+        "LINKEDIN_AD_ACCOUNT_ID": "${LINKEDIN_AD_ACCOUNT_ID}"
+      },
+      "description": "LinkedIn Marketing — ad performance, audience targeting, company page analytics"
+    },
+    "semrush": {
+      "command": "npx",
+      "args": ["-y", "mcp-semrush"],
+      "env": {
+        "SEMRUSH_API_KEY": "${SEMRUSH_API_KEY}"
+      },
+      "description": "SEMrush — keyword research, competitor analysis, backlink data, site audit"
+    },
+    "ahrefs": {
+      "command": "npx",
+      "args": ["-y", "mcp-ahrefs"],
+      "env": {
+        "AHREFS_API_KEY": "${AHREFS_API_KEY}"
+      },
+      "description": "Ahrefs — backlink profiles, keyword explorer, content gap analysis"
+    }
+  }
+}

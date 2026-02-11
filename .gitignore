@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Development artifacts
+.memory/
+.mcp_new.json
+mcp_config.json
+
+# Environment
+.env
+.env.local
+*.env
+
+# Credentials (never commit)
+credentials.json
+token.json
+
+# Temporary files
+.tmp/
+*.tmp
+*.bak

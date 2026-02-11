@@ -1,0 +1,57 @@
+{
+  "name": "digital-marketing-pro",
+  "version": "1.2.1",
+  "description": "Comprehensive digital marketing intelligence system with adaptive scoring, MCP integrations for your own marketing accounts, and persistent campaign memory. 13 integrated modules covering strategy, execution, and measurement across all channels, business models, and industries. Compliance guardrails, AEO/GEO optimization, crisis communication, and emerging channel support.",
+  "author": {
+    "name": "Indranil Banerjee",
+    "email": "indranilbanerjee21@gmail.com",
+    "url": "https://www.linkedin.com/in/askneelnow/"
+  },
+  "contributors": [
+    {
+      "name": "Indranil Banerjee",
+      "email": "indranil.banerjee@intglobal.com",
+      "url": "https://techshu.com"
+    }
+  ],
+  "publisher": {
+    "name": "INT TechShu",
+    "url": "https://techshu.com"
+  },
+  "homepage": "https://github.com/indranilbanerjee/digital-marketing-pro",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/indranilbanerjee/digital-marketing-pro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/indranilbanerjee/digital-marketing-pro/issues"
+  },
+  "license": "MIT",
+  "keywords": [
+    "marketing",
+    "digital-marketing",
+    "seo",
+    "aeo",
+    "geo",
+    "content-marketing",
+    "paid-ads",
+    "social-media",
+    "email-marketing",
+    "digital-pr",
+    "cro",
+    "analytics",
+    "influencer-marketing",
+    "brand-strategy",
+    "growth-engineering",
+    "reputation-management",
+    "voice-search",
+    "social-commerce",
+    "retail-media",
+    "campaign-management",
+    "brand-voice",
+    "compliance",
+    "funnel-optimization",
+    "audience-intelligence",
+    "crisis-communication"
+  ]
+}

@@ -1,0 +1,26 @@
+# Digital Marketing Pro — Python Dependencies
+#
+# CORE: Required for NLP scoring and content analysis scripts
+# Install: pip install -r requirements.txt
+#
+# OPTIONAL extras are listed at the bottom — install only what you need.
+# The plugin works without ANY Python dependencies (knowledge-only mode).
+
+# --- Core (brand voice scoring, content scoring, readability) ---
+nltk>=3.8
+textstat>=0.7
+
+# --- Web scraping (competitor analysis) ---
+beautifulsoup4>=4.12
+requests>=2.31
+
+# --- Optional: QR code generation (utm-generator.py --qr) ---
+# pip install qrcode Pillow
+# qrcode>=7.4
+# Pillow>=10.0
+
+# --- Optional: AI visibility checking via APIs (ai-visibility-checker.py --mode api) ---
+# Set OPENAI_API_KEY and/or ANTHROPIC_API_KEY environment variables
+# pip install openai anthropic
+# openai>=1.0
+# anthropic>=0.40

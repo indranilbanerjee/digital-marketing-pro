@@ -1,0 +1,35 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ${CLAUDE_PLUGIN_ROOT}/scripts/setup.py --check-deps --summary || python3 ${CLAUDE_PLUGIN_ROOT}/scripts/setup.py --check-deps --summary || echo Digital Marketing Pro loaded"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "prompt",
+            "command": "First, check the file path being written/edited. If the file is NOT inside a marketing plugin directory (skills/, agents/, scripts/, hooks/, .claude-plugin/) AND is NOT marketing deliverable content (ad copy, email content, social posts, blog articles, landing pages, press releases, or branded marketing content being created for the user), respond 'SKIP' immediately. Do NOT check files in the user's own project directories, config files, source code, or non-marketing outputs — those are always SKIP. Only proceed with the check if this IS marketing content being generated as part of a plugin workflow. In that case, and only if a brand profile exists, briefly verify: (1) content aligns with brand voice guidelines, (2) no industry compliance violations, (3) FTC disclosure included if this is influencer/sponsored content. Keep the check concise — flag only real issues, not stylistic preferences. $ARGUMENTS"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "command": "If marketing work was done this session (campaign plans created, content produced, performance analyses run, strategic decisions made, or brand positioning discussed): 1. Summarize 1-3 key marketing insights or decisions from this session. 2. If an active brand exists (check the session start context for the brand slug), save each insight by running: python \"${CLAUDE_PLUGIN_ROOT}/scripts/campaign-tracker.py\" --brand {slug} --action save-insight --data '{\"type\":\"session_learning\",\"insight\":\"[the insight]\",\"source\":\"session\",\"context\":\"[what work produced this insight]\"}' — replace {slug} with the active brand slug, and fill in the insight and context fields with actual session data. 3. Tell the user: 'Session insights saved. Key takeaways: [list them]. To update brand settings, just ask.' If no brand profile exists or no meaningful marketing work was done, skip silently. $ARGUMENTS"
+          }
+        ]
+      }
+    ]
+  }
+}
