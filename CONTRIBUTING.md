@@ -55,7 +55,7 @@ What the skill delivers.
 Which specialist agents are activated.
 ```
 
-**Module skills** (13 core modules) must include a `## Brand Context (Auto-Applied)` section before `## Required Context`:
+**Module skills** (16 core modules) must include a `## Brand Context (Auto-Applied)` section before `## Required Context`:
 
 ```markdown
 ## Brand Context (Auto-Applied)
@@ -74,7 +74,7 @@ Before producing any marketing output from this module:
 Do not ask the user for information that already exists in their brand profile.
 ```
 
-**Command skills** (19 slash commands) must have an explicit brand loading step as Process step 1:
+**Command skills** (42 slash commands) must have an explicit brand loading step as Process step 1:
 
 ```markdown
 1. **Load brand context**: Read `~/.claude-marketing/brands/_active-brand.json` for the active slug, then load `~/.claude-marketing/brands/{slug}/profile.json`. Apply brand voice, compliance rules for target markets (`skills/context-engine/compliance-rules.md`), and industry context. If no brand exists, ask: "Set up a brand first (/dm:brand-setup)?" — or proceed with defaults.
@@ -107,6 +107,7 @@ How the agent structures its responses.
 - Agents reference context-engine files for compliance, benchmarks, and specs
 - Agents produce structured output (not freeform paragraphs)
 - Agents state assumptions explicitly
+- Agents include 5 additional sections: `## Tools` (scripts), `## MCP Integrations`, `## Memory Operations`, `## Reference Knowledge`, `## Collaboration` (inter-agent handoffs)
 
 ### Python Scripts (scripts/*.py)
 
@@ -146,7 +147,7 @@ Reference files in skill directories (e.g., `kpi-frameworks.md`, `compliance-rul
 
 ### Context Engine Reference Files
 
-The 5 core reference files in `skills/context-engine/` are shared across all modules:
+The 6 core reference files in `skills/context-engine/` are shared across all modules:
 
 | File | Purpose | Update Frequency |
 |------|---------|-----------------|
@@ -155,6 +156,7 @@ The 5 core reference files in `skills/context-engine/` are shared across all mod
 | `platform-specs.md` | 20+ platform character limits, specs | Quarterly |
 | `scoring-rubrics.md` | 7 scoring frameworks (0-100 scale) | Rarely |
 | `intelligence-layer.md` | Adaptive learning system docs | When architecture changes |
+| `guidelines-framework.md` | Brand guidelines structure and enforcement | When guidelines system changes |
 
 When updating these files, ensure all modules that reference them still work correctly.
 
@@ -174,7 +176,7 @@ When updating these files, ensure all modules that reference them still work cor
 - [ ] Scripts exit with code 0 (even on missing optional deps)
 - [ ] Brand context loading path is explicit in all command skills
 - [ ] No hardcoded file paths (use `~/.claude-marketing/` or `${CLAUDE_PLUGIN_ROOT}`)
-- [ ] File count hasn't changed unexpectedly (currently 163 files including docs)
+- [ ] File count hasn't changed unexpectedly (currently 243 files including docs)
 
 ## Code of Conduct
 
