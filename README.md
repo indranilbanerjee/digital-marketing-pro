@@ -1,11 +1,11 @@
 # Digital Marketing Pro — Claude Code & Cowork Plugin
 
-[![Version](https://img.shields.io/badge/version-1.9.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-optional-yellow.svg)](#python-dependencies-optional)
 [![Cowork](https://img.shields.io/badge/cowork-compatible-purple.svg)](docs/claude-interfaces.md#claude-cowork-full-support)
 
-The most comprehensive digital marketing plugin for Claude Code and Claude Cowork. 16 integrated modules covering the entire marketing spectrum from strategy to execution to measurement — including dedicated Technical SEO, Local SEO, and Marketing Automation modules.
+The most comprehensive digital marketing plugin for Claude Code and Claude Cowork. 16 integrated modules covering the entire marketing spectrum from strategy to execution to measurement — including dedicated Technical SEO, Local SEO, and Marketing Automation modules. **v2.0 adds a full execution layer**: publish content, send emails, launch ads, schedule social, sync CRMs, manage persistent memory, and deliver reports — all with human-in-the-loop approval workflows. Multi-client agency operations with credential profiles, portfolio dashboards, and team management.
 
 ## What This Plugin Does
 
@@ -37,13 +37,16 @@ Digital Marketing Pro transforms Claude into a full-stack marketing intelligence
 - **10 business models** supported (B2B SaaS, eCommerce, Local, Agency, Creator, Enterprise, Non-Profit, Marketplace, DTC, B2B Services)
 - **22 industry profiles** with benchmarks and compliance rules
 - **16 privacy law jurisdictions** auto-applied (GDPR, CCPA, PIPL, DPDPA, and more)
-- **13 specialist agents** that activate based on conversation context, call 34 Python scripts for scoring, query MCP servers for live data, enforce brand guidelines, and persist campaign learnings
+- **18 specialist agents**, including 5 new execution agents (execution-coordinator, performance-monitor, CRM manager, memory manager, agency operations), that activate based on conversation context, call 42 Python scripts for scoring, query MCP servers for live data, enforce brand guidelines, and persist campaign learnings
 - **Brand guidelines enforcement** — import voice guides, restrictions, channel styles, messaging frameworks; automatically applied across all modules
 - **Deliverable templates** and **agency SOPs** — custom output formats and workflow definitions
-- **42 slash commands** for direct access to common workflows — covering the complete agency lifecycle from client onboarding to QBRs
-- **34 Python scripts** for deterministic execution (scoring, analysis, generation, guidelines management, email testing, A/B testing, social optimization, technical SEO auditing, local SEO checking, ROI calculation, budget optimization, CLV analysis, revenue forecasting, content repurposing, review response drafting, link profile analysis, ad budget pacing)
-- **18 MCP integrations** for connecting your own marketing accounts (GA4, Search Console, Google Ads, Meta, HubSpot, Mailchimp, TikTok Ads, Shopify, Salesforce, and more)
+- **68 slash commands** for direct access to common workflows — including 26 new execution commands for publishing, CRM, monitoring, memory, communication, agency ops, and team management
+- **42 Python scripts** for deterministic execution (scoring, analysis, generation, guidelines management, email testing, A/B testing, social optimization, technical SEO auditing, local SEO checking, ROI calculation, budget optimization, CLV analysis, revenue forecasting, content repurposing, review response drafting, link profile analysis, ad budget pacing, approval workflow, execution tracking, performance monitoring, CRM sync, credential management, team management, report generation, memory management)
+- **46 MCP integrations** for connecting your own marketing accounts AND executing actions (social publishing, email sending, CRM writes, ad campaign creation, SMS, vector databases, knowledge management, and more)
 - **Persistent brand memory** that learns across sessions
+- **5-layer memory architecture** — session context → vector DB RAG (Pinecone/Qdrant) → temporal knowledge graphs (Graphiti) → universal agent memory (Supermemory) → knowledge base (Notion/Google Drive)
+- **Human-in-the-loop execution** — every write action requires explicit approval with risk-level classification (low/medium/high/critical) and industry-specific compliance gates
+- **Agency operations** — multi-client credential profiles, portfolio health dashboards, SOP library, team role management, white-labeled client reports, executive summaries
 - **Adaptive scoring** that adjusts to your industry, business model, and goals
 
 ## Installation
@@ -85,7 +88,7 @@ On first use, the plugin will:
 The plugin works fully without any Python installation. All marketing knowledge, frameworks, agent capabilities, and slash commands work out of the box.
 
 **Knowledge-only mode (0 MB, no install)** — Default
-All 16 modules, 13 agents, 42 commands, and 117 reference knowledge files work with zero dependencies.
+All 16 modules, 18 agents, 68 commands, and 124 reference knowledge files work with zero dependencies.
 
 **Lite mode (~15 MB)** — Enables scoring scripts
 ```
@@ -251,6 +254,32 @@ All commands use the `/dm:` prefix. If another plugin shares a command name, use
 | `/dm:video-script` | Video marketing script writing for YouTube, TikTok, Reels, and LinkedIn |
 | `/dm:webinar-plan` | End-to-end webinar planning with promotion and nurture strategy |
 | `/dm:switch-brand` | Switch active brand (multi-client) |
+| `/dm:publish-blog` | Publish blog post to WordPress/Webflow with SEO, categories, scheduling |
+| `/dm:send-email-campaign` | Send email campaign via SendGrid/Klaviyo/Customer.io/Brevo/Mailgun |
+| `/dm:launch-ad-campaign` | Create paid ad campaign on Google Ads/Meta/LinkedIn/TikTok with budget safeguards |
+| `/dm:schedule-social` | Schedule posts to Twitter/Instagram/LinkedIn/TikTok/YouTube/Pinterest |
+| `/dm:send-report` | Generate and deliver performance report via Slack, email, or Sheets |
+| `/dm:crm-sync` | Sync marketing contacts/deals to Salesforce/HubSpot/Zoho/Pipedrive |
+| `/dm:lead-import` | Import leads from forms/CSV/manual entry into CRM with deduplication |
+| `/dm:pipeline-update` | Update deal stages, values, and notes in CRM pipeline |
+| `/dm:segment-audience` | Create/update audience segments in CRM or email platform |
+| `/dm:data-export` | Export marketing data to BigQuery, Google Sheets, or Supabase |
+| `/dm:performance-check` | Pull live metrics from all connected platforms, instant performance snapshot |
+| `/dm:campaign-status` | Check status of all active campaigns across platforms |
+| `/dm:anomaly-scan` | Detect anomalies — drops, spikes, overspend, deliverability issues |
+| `/dm:budget-tracker` | Real-time budget tracking across all ad platforms with pacing analysis |
+| `/dm:save-knowledge` | Save brand knowledge to vector DB for future RAG retrieval |
+| `/dm:search-knowledge` | Semantic search across all stored brand knowledge |
+| `/dm:sync-memory` | Batch sync session learnings to persistent memory layer |
+| `/dm:send-sms` | Send SMS/WhatsApp marketing message via Twilio or Brevo |
+| `/dm:send-notification` | Send team notification via Slack or Intercom |
+| `/dm:agency-dashboard` | Portfolio-level view across all client brands |
+| `/dm:client-report` | Generate white-labeled client-facing performance report |
+| `/dm:sop-library` | Manage agency SOPs — create, assign, track compliance |
+| `/dm:credential-switch` | Switch active brand credential profile for multi-client management |
+| `/dm:team-assign` | Assign marketing tasks to team members by role and capacity |
+| `/dm:region-config` | Configure regional/market settings — timezone, language, compliance |
+| `/dm:exec-summary` | Generate C-suite-ready executive summary with portfolio ROI |
 
 ## Persistent Memory
 
@@ -283,12 +312,12 @@ The plugin stores brand data at `~/.claude-marketing/`:
 
 ```
 digital-marketing-pro/
-├── .claude-plugin/plugin.json    # Plugin manifest (v1.9.0)
-├── skills/                       # 59 skill directories (16 modules + 42 commands + context engine)
-├── agents/                       # 13 specialist agents
-├── hooks/hooks.json              # Session lifecycle, compliance gates, and guideline checks
-├── scripts/                      # 34 Python execution scripts + requirements.txt
-├── .mcp.json                     # 18 optional MCP integrations
+├── .claude-plugin/plugin.json    # Plugin manifest (v2.0.0)
+├── skills/                       # 85 skill directories (16 modules + 68 commands + context engine)
+├── agents/                       # 18 specialist agents
+├── hooks/hooks.json              # Session lifecycle, compliance gates, guideline checks, and MCP write safety
+├── scripts/                      # 42 Python execution scripts + requirements.txt
+├── .mcp.json                     # 46 optional MCP integrations
 ├── docs/                         # 11 documentation guides
 ├── README.md
 ├── CHANGELOG.md
@@ -300,7 +329,7 @@ See [Architecture Reference](docs/architecture.md) for the full technical deep-d
 
 ## MCP Integrations (Optional)
 
-The plugin works fully without any external API connections. For users who want to pull live data from their own marketing tools, the `.mcp.json` configuration file includes pre-configured MCP server definitions for 18 marketing platforms.
+The plugin works fully without any external API connections. For users who want to pull live data from their own marketing tools, the `.mcp.json` configuration file includes pre-configured MCP server definitions for 46 marketing platforms.
 
 | Integration | What It Enables |
 |-------------|----------------|

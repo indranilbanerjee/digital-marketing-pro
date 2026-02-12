@@ -145,9 +145,35 @@ Reference files in skill directories (e.g., `kpi-frameworks.md`, `compliance-rul
 - Use tables for comparative data
 - Keep content current — update benchmarks annually
 
+### Execution Command Skills
+
+Execution commands (publishing, CRM, monitoring, communication) follow additional conventions beyond the standard command SKILL.md format:
+
+1. **Approval step required**: Every execution command must include an explicit approval step before any external write operation. The process must include: "Present the execution plan to the user for review. Wait for explicit approval before proceeding."
+2. **Risk level classification**: Execution commands must declare their risk level (low/medium/high/critical) and the corresponding approval requirements from `skills/context-engine/approval-framework.md`.
+3. **Rollback documentation**: Commands that modify external state must describe what happens if execution fails and how to roll back.
+4. **Platform verification**: Commands that write to MCP platforms must verify the correct platform connection is active before executing.
+5. **Execution logging**: All execution commands must log results via `execution-tracker.py --action log-execution`.
+
+### Memory Layer Conventions
+
+When adding or modifying memory/knowledge commands:
+
+1. **Layer selection**: Reference `skills/context-engine/memory-architecture.md` for which memory layer to use for each data type.
+2. **Metadata requirements**: All stored items must include brand slug, timestamp, data type, and source.
+3. **No raw credential storage**: Never store API keys, tokens, or secrets in memory layers.
+
+### Agency Credential Conventions
+
+When working with credential profiles:
+
+1. **Credential profiles store references, not secrets**: `~/.claude-marketing/credentials/{slug}.json` maps brand slugs to environment variable names, never to actual credential values.
+2. **Brand isolation**: Never allow operations that could leak one brand's credentials to another brand's context.
+3. **Validation before execution**: Always validate credential profile completeness before attempting platform operations.
+
 ### Context Engine Reference Files
 
-The 6 core reference files in `skills/context-engine/` are shared across all modules:
+The 13 core reference files in `skills/context-engine/` are shared across all modules:
 
 | File | Purpose | Update Frequency |
 |------|---------|-----------------|
@@ -157,6 +183,13 @@ The 6 core reference files in `skills/context-engine/` are shared across all mod
 | `scoring-rubrics.md` | 7 scoring frameworks (0-100 scale) | Rarely |
 | `intelligence-layer.md` | Adaptive learning system docs | When architecture changes |
 | `guidelines-framework.md` | Brand guidelines structure and enforcement | When guidelines system changes |
+| `execution-workflows.md` | 8 execution type SOPs | When execution patterns change |
+| `approval-framework.md` | 4 risk levels + industry gates | When approval rules change |
+| `platform-publishing-specs.md` | Platform API write specs | Quarterly |
+| `memory-architecture.md` | 5-layer memory system docs | When architecture changes |
+| `crm-integration-guide.md` | CRM field mapping + sync patterns | When CRM integrations change |
+| `agency-operations-guide.md` | Multi-client management patterns | When agency features change |
+| `team-roles-framework.md` | Role definitions + permissions | When team features change |
 
 When updating these files, ensure all modules that reference them still work correctly.
 
@@ -176,7 +209,7 @@ When updating these files, ensure all modules that reference them still work cor
 - [ ] Scripts exit with code 0 (even on missing optional deps)
 - [ ] Brand context loading path is explicit in all command skills
 - [ ] No hardcoded file paths (use `~/.claude-marketing/` or `${CLAUDE_PLUGIN_ROOT}`)
-- [ ] File count hasn't changed unexpectedly (currently 246 files including docs)
+- [ ] File count hasn't changed unexpectedly (currently ~291 files including docs)
 
 ## Code of Conduct
 

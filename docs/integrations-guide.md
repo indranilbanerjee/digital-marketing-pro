@@ -1,8 +1,8 @@
 # Integrations & CRM Guide
 
-> **Digital Marketing Pro** v1.9.0 | For marketing operations managers
+> **Digital Marketing Pro** v2.0.0 | For marketing operations managers
 >
-> This guide covers all 18 MCP integrations available in the plugin, how to configure them, how to manage credentials across multiple clients, and what the plugin can do with or without live connections.
+> This guide covers all 46 MCP integrations available in the plugin, how to configure them, how to manage credentials across multiple clients, and what the plugin can do with or without live connections.
 
 ---
 
@@ -18,6 +18,16 @@
    - [Commerce](#commerce)
    - [SEO & Competitive Intelligence](#seo--competitive-intelligence)
    - [Productivity & Reporting](#productivity--reporting)
+   - [Social Media Publishing (v2.0.0)](#social-media-publishing-v200)
+   - [Email & Marketing Automation (v2.0.0)](#email--marketing-automation-v200)
+   - [CRM Platforms (v2.0.0)](#crm-platforms-v200)
+   - [Analytics & Data (v2.0.0)](#analytics--data-v200)
+   - [Memory & RAG (v2.0.0)](#memory--rag-v200)
+   - [Knowledge Management (v2.0.0)](#knowledge-management-v200)
+   - [CMS & Website (v2.0.0)](#cms--website-v200)
+   - [Communication (v2.0.0)](#communication-v200)
+   - [Project Management & Testing (v2.0.0)](#project-management--testing-v200)
+   - [Database (v2.0.0)](#database-v200)
 4. [Multi-CRM Setup for Agencies](#4-multi-crm-setup-for-agencies)
 5. [What Works Without Integrations](#5-what-works-without-integrations)
 6. [Data Privacy & Security](#6-data-privacy--security)
@@ -34,9 +44,9 @@ In practical terms: instead of you manually pulling a GA4 report, pasting it int
 
 ### How the Plugin Uses MCP
 
-The plugin ships with a `.mcp.json` configuration file that defines 18 MCP server connections. Each one maps to a marketing platform or productivity tool. None of them are active by default. They activate only when you set the required environment variables for that service.
+The plugin ships with a `.mcp.json` configuration file that defines 46 MCP server connections. Each one maps to a marketing platform or productivity tool. None of them are active by default. They activate only when you set the required environment variables for that service.
 
-This is the key design principle: **the plugin works fully without any integrations enabled.** All 16 skill modules, 117 reference knowledge files, scoring scripts, brand voice analysis, compliance checking, and campaign planning features operate entirely offline using built-in benchmarks and reference data. MCP integrations layer real data on top of that foundation.
+This is the key design principle: **the plugin works fully without any integrations enabled.** All 16 skill modules, 124 reference knowledge files, scoring scripts, brand voice analysis, compliance checking, and campaign planning features operate entirely offline using built-in benchmarks and reference data. MCP integrations layer real data on top of that foundation.
 
 ### What Happens Under the Hood
 
@@ -404,17 +414,693 @@ You: Post this week's campaign summary to the #marketing-reports Slack channel.
 
 ---
 
+### Social Media Publishing (v2.0.0)
+
+v2.0.0 adds direct publishing capabilities to six social platforms. These servers support both reading analytics and writing content. All write operations go through the execution safety gate (see `docs/architecture.md`, Section 13).
+
+#### Twitter/X
+
+**What it enables:** Post tweets, manage threads, search content, and upload media. Powers the `schedule-social` and `send-report` commands with direct publishing to Twitter/X.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `TWITTER_API_KEY` | Twitter API key from developer portal |
+| `TWITTER_API_SECRET` | Twitter API secret |
+| `TWITTER_ACCESS_TOKEN` | User access token |
+| `TWITTER_ACCESS_SECRET` | User access secret |
+
+**Where to get credentials:**
+1. Go to developer.twitter.com and create a project and app
+2. Under Keys and Tokens, generate your API Key and Secret
+3. Generate your Access Token and Secret (ensure Read and Write permissions)
+4. Elevated access may be required for media uploads
+
+**Example usage:**
+```
+You: Schedule a tweet announcing our new product launch for tomorrow at 9am EST
+```
+
+---
+
+#### Instagram
+
+**What it enables:** Schedule and publish Instagram posts, Stories, and Reels. Access engagement analytics and audience insights. Powers the `schedule-social` command for Instagram content.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `INSTAGRAM_ACCESS_TOKEN` | Long-lived Instagram Graph API token |
+| `INSTAGRAM_BUSINESS_ACCOUNT_ID` | Your Instagram Business or Creator account ID |
+
+**Where to get credentials:**
+1. Connect your Instagram account to a Facebook Page (required for API access)
+2. Create an app in the Meta Developer Portal with Instagram Graph API permissions
+3. Generate a long-lived token via the token exchange flow (60-day expiry)
+4. Your Business Account ID is available via the Graph API `/me/accounts` endpoint
+
+**Example usage:**
+```
+You: Publish this carousel post to Instagram with the caption we drafted
+```
+
+---
+
+#### LinkedIn Publishing
+
+**What it enables:** Publish posts and articles to LinkedIn company pages, manage content scheduling, and track engagement. Complements the existing LinkedIn Marketing server (which focuses on ads). Powers the `schedule-social` command for LinkedIn organic content.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `LINKEDIN_PUBLISHING_TOKEN` | OAuth 2.0 token with publishing scope |
+| `LINKEDIN_ORG_ID` | Your LinkedIn organization (company page) ID |
+
+**Where to get credentials:**
+1. Use your existing LinkedIn Developer app or create a new one
+2. Request the `w_organization_social` scope for company page posting
+3. Your Org ID is the numeric ID in your LinkedIn company page URL
+
+**Example usage:**
+```
+You: Publish our thought leadership article to our LinkedIn company page
+```
+
+---
+
+#### TikTok Content
+
+**What it enables:** Publish videos to TikTok, manage captions and hashtags, and access content insights. Complements the existing TikTok Ads server. Powers the `schedule-social` command for TikTok organic content.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `TIKTOK_CONTENT_TOKEN` | TikTok Content Posting API access token |
+
+**Where to get credentials:**
+1. Apply for TikTok's Content Posting API access via the TikTok Developer Portal
+2. Create an app and request the `video.publish` scope
+3. Complete the OAuth flow to get your access token
+
+**Example usage:**
+```
+You: Post our 30-second product demo video to TikTok with trending hashtags
+```
+
+---
+
+#### YouTube
+
+**What it enables:** Upload videos, manage video metadata (titles, descriptions, tags, thumbnails), create playlists, and access channel analytics. Powers the `schedule-social` command for YouTube content.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `YOUTUBE_API_KEY` | YouTube Data API key |
+| `GOOGLE_APPLICATION_CREDENTIALS` | Path to Google Cloud service account JSON (same as GA4) |
+
+**Where to get credentials:**
+1. Enable the YouTube Data API v3 in your Google Cloud Console
+2. Use the same service account JSON used for GA4 and Sheets
+3. For uploads, OAuth consent screen approval may be required
+
+**Example usage:**
+```
+You: Upload our webinar recording to YouTube with SEO-optimized title and description
+```
+
+---
+
+#### Pinterest
+
+**What it enables:** Create pins, manage boards, publish rich pins with product metadata, and access pin analytics. Powers the `schedule-social` command for Pinterest content.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `PINTEREST_ACCESS_TOKEN` | Pinterest API v5 access token |
+
+**Where to get credentials:**
+1. Create an app at developers.pinterest.com
+2. Request access to the Pins and Boards scopes
+3. Generate an access token through the OAuth flow
+4. Business account required for analytics access
+
+**Example usage:**
+```
+You: Create pins for our top 5 blog posts and add them to the "Marketing Tips" board
+```
+
+---
+
+### Email & Marketing Automation (v2.0.0)
+
+These servers extend the plugin's email capabilities beyond Mailchimp and ActiveCampaign with full send capabilities and behavioral messaging.
+
+#### SendGrid
+
+**What it enables:** Send transactional and marketing emails, manage contact lists, create email templates, and track delivery metrics. Powers the `send-email-campaign` command for SendGrid users.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `SENDGRID_API_KEY` | SendGrid API key with Mail Send and Marketing permissions |
+
+**Where to get credentials:**
+1. Go to SendGrid > Settings > API Keys
+2. Create a key with "Mail Send" and "Marketing" permissions
+3. Restricted keys are recommended over full access keys
+
+**Example usage:**
+```
+You: Send our product launch email campaign to the "Active Subscribers" segment via SendGrid
+```
+
+---
+
+#### Klaviyo
+
+**What it enables:** eCommerce email and SMS marketing, flow automation, audience segmentation, and predictive analytics. Powers the `send-email-campaign` and `segment-audience` commands for Shopify and eCommerce brands.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `KLAVIYO_API_KEY` | Klaviyo private API key |
+
+**Where to get credentials:**
+1. Go to Klaviyo > Account > Settings > API Keys
+2. Create a private API key
+3. Select the scopes needed (Campaigns, Flows, Lists, Profiles)
+
+**Example usage:**
+```
+You: Create a winback flow in Klaviyo targeting customers who haven't purchased in 90 days
+```
+
+---
+
+#### Customer.io
+
+**What it enables:** Behavioral messaging, event-triggered campaigns, newsletters, and in-app messaging. Powers the `send-email-campaign` command with behavioral targeting.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `CUSTOMERIO_API_KEY` | Customer.io Track API key |
+| `CUSTOMERIO_SITE_ID` | Your Customer.io site ID |
+
+**Where to get credentials:**
+1. Go to Customer.io > Settings > API Credentials
+2. Copy your Site ID and API Key from the Track API section
+
+**Example usage:**
+```
+You: Set up a behavioral campaign for users who viewed pricing but didn't sign up
+```
+
+---
+
+#### Brevo (formerly Sendinblue)
+
+**What it enables:** Email campaigns, SMS marketing, WhatsApp messages, marketing automation, and transactional messaging. Powers the `send-email-campaign`, `send-sms`, and `segment-audience` commands.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `BREVO_API_KEY` | Brevo API v3 key |
+
+**Where to get credentials:**
+1. Go to Brevo > Settings > SMTP & API > API Keys
+2. Generate a new API key (or use an existing v3 key)
+
+**Example usage:**
+```
+You: Send a WhatsApp campaign to our loyalty segment via Brevo
+```
+
+---
+
+#### Mailgun
+
+**What it enables:** Email delivery, validation, mailing list management, and analytics. Powers the `send-email-campaign` command for Mailgun users.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `MAILGUN_API_KEY` | Mailgun API key |
+| `MAILGUN_DOMAIN` | Your verified sending domain |
+
+**Where to get credentials:**
+1. Go to Mailgun > Settings > API Security
+2. Copy your private API key
+3. Your sending domain is listed under Sending > Domains
+
+**Example usage:**
+```
+You: Send our newsletter to the subscriber list via Mailgun
+```
+
+---
+
+### CRM Platforms (v2.0.0)
+
+These servers complement the existing HubSpot and Salesforce integrations with additional CRM platforms.
+
+#### Zoho CRM
+
+**What it enables:** Contact management, deal pipeline tracking, campaign data, and workflow automation. Powers the `crm-sync`, `lead-import`, and `pipeline-update` commands for Zoho users.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `ZOHO_CLIENT_ID` | Zoho API client ID |
+| `ZOHO_CLIENT_SECRET` | Zoho API client secret |
+| `ZOHO_REFRESH_TOKEN` | Zoho OAuth refresh token |
+
+**Where to get credentials:**
+1. Register a self-client at api-console.zoho.com
+2. Generate a refresh token with the scopes: `ZohoCRM.modules.ALL`, `ZohoCRM.settings.ALL`
+3. The refresh token does not expire and handles automatic access token renewal
+
+**Example usage:**
+```
+You: Sync our latest webinar registrants from the CSV into Zoho CRM as leads
+```
+
+---
+
+#### Pipedrive
+
+**What it enables:** Deal pipeline management, contact tracking, activity logging, and sales analytics. Powers the `crm-sync`, `pipeline-update`, and `lead-import` commands for Pipedrive users.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `PIPEDRIVE_API_TOKEN` | Pipedrive personal API token |
+
+**Where to get credentials:**
+1. Go to Pipedrive > Settings > Personal Preferences > API
+2. Copy your personal API token
+
+**Example usage:**
+```
+You: Update all deals in the Negotiation stage that haven't been touched in 14 days
+```
+
+---
+
+### Analytics & Data (v2.0.0)
+
+#### Mixpanel
+
+**What it enables:** Product analytics, event tracking, funnel analysis, retention reports, and user segmentation. Powers the `performance-check` and `anomaly-scan` commands with product-level behavioral data.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `MIXPANEL_API_SECRET` | Mixpanel project API secret |
+| `MIXPANEL_PROJECT_ID` | Your Mixpanel project ID |
+
+**Where to get credentials:**
+1. Go to Mixpanel > Settings > Project Settings
+2. Copy the API Secret and Project ID
+
+**Example usage:**
+```
+You: Show me the conversion funnel from signup to first purchase over the last 30 days
+```
+
+---
+
+#### Amplitude
+
+**What it enables:** Behavioral analytics, cohort analysis, experiment results, and user journey mapping. Powers the `performance-check` and `anomaly-scan` commands with behavioral analytics.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `AMPLITUDE_API_KEY` | Amplitude project API key |
+| `AMPLITUDE_SECRET_KEY` | Amplitude project secret key |
+
+**Where to get credentials:**
+1. Go to Amplitude > Settings > Projects > select your project
+2. Copy the API Key and Secret Key
+
+**Example usage:**
+```
+You: Analyze user retention cohorts for the last 3 months and identify drop-off patterns
+```
+
+---
+
+#### BigQuery
+
+**What it enables:** Run SQL queries against your marketing data warehouse, export data from the plugin, and join datasets across platforms. Powers the `data-export` command for data warehouse operations.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `BIGQUERY_PROJECT_ID` | Your Google Cloud project ID |
+| `GOOGLE_APPLICATION_CREDENTIALS` | Path to Google Cloud service account JSON (same as GA4) |
+
+**Where to get credentials:**
+1. Enable the BigQuery API in your Google Cloud Console
+2. Use the same service account JSON used for GA4 and Sheets
+3. Grant the service account "BigQuery Data Editor" role for write operations
+
+**Example usage:**
+```
+You: Export this month's campaign performance data to our BigQuery marketing dataset
+```
+
+---
+
+### Memory & RAG (v2.0.0)
+
+These servers enable persistent brand knowledge storage and retrieval across sessions. They power the `save-knowledge`, `search-knowledge`, and `sync-memory` commands.
+
+#### Pinecone
+
+**What it enables:** Vector storage and semantic search over brand knowledge archives. Store campaign briefs, content examples, performance insights, and brand guidelines as embeddings for fast retrieval. Ideal for large knowledge bases.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `PINECONE_API_KEY` | Pinecone API key |
+| `PINECONE_ENVIRONMENT` | Pinecone environment (e.g., `us-east-1-aws`) |
+| `PINECONE_INDEX_NAME` | Index name for brand knowledge (defaults to `brand-knowledge`) |
+
+**Where to get credentials:**
+1. Sign up at pinecone.io and create an organization
+2. Create an index (recommended: 1536 dimensions for OpenAI embeddings, or 768 for other models)
+3. Copy your API key from the dashboard
+
+**Example usage:**
+```
+You: Save our Q4 campaign learnings to the knowledge base for future reference
+```
+
+---
+
+#### Qdrant
+
+**What it enables:** Self-hosted or cloud vector search for brand knowledge. Similar to Pinecone but with a self-hosting option for teams that need data residency control. Powers the same RAG features as Pinecone.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `QDRANT_URL` | Qdrant server URL (e.g., `https://your-cluster.qdrant.io` or `http://localhost:6333`) |
+| `QDRANT_API_KEY` | Qdrant API key (required for cloud, optional for self-hosted) |
+
+**Where to get credentials:**
+1. For Qdrant Cloud: sign up at cloud.qdrant.io, create a cluster, and copy your API key
+2. For self-hosted: run `docker run -p 6333:6333 qdrant/qdrant` and set the URL to `http://localhost:6333`
+
+**Example usage:**
+```
+You: Search our knowledge base for everything we know about email subject line performance
+```
+
+---
+
+#### Supermemory
+
+**What it enables:** Cross-session shared memory for all agents. Stores agent learnings, brand observations, and strategic insights that persist between sessions and are accessible to all specialist agents.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `SUPERMEMORY_API_KEY` | Supermemory API key |
+
+**Where to get credentials:**
+1. Sign up at supermemory.ai
+2. Create a workspace and generate an API key
+
+**Example usage:**
+```
+You: Sync everything we learned in this session about our audience to persistent memory
+```
+
+---
+
+#### Graphiti
+
+**What it enables:** Temporal knowledge graph for mapping campaign relationships over time. Tracks how campaigns, audiences, content, and channels relate and evolve. Useful for attribution analysis and understanding what worked historically.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `GRAPHITI_API_URL` | Graphiti server URL |
+| `GRAPHITI_API_KEY` | Graphiti API key |
+
+**Where to get credentials:**
+1. Deploy Graphiti (open-source) or use the hosted service
+2. Generate an API key from the admin dashboard
+
+**Example usage:**
+```
+You: Show me how our email campaigns have influenced deal velocity over the last 6 months
+```
+
+---
+
+### Knowledge Management (v2.0.0)
+
+#### Notion
+
+**What it enables:** Access and manage team documentation, marketing wikis, content databases, and brand asset inventories stored in Notion. Powers the `save-knowledge` and `search-knowledge` commands with structured team documentation.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `NOTION_API_KEY` | Notion internal integration token |
+
+**Where to get credentials:**
+1. Go to notion.so/my-integrations and create a new integration
+2. Copy the Internal Integration Token
+3. Share each Notion database or page you want accessible with the integration (click Share > Invite > select your integration)
+
+**Example usage:**
+```
+You: Pull our content style guide from Notion and apply it to this blog draft
+```
+
+---
+
+#### Google Drive
+
+**What it enables:** Access brand assets, creative files, shared documents, and presentation templates stored in Google Drive. Useful for pulling reference materials into sessions.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `GOOGLE_APPLICATION_CREDENTIALS` | Path to Google Cloud service account JSON (same as GA4) |
+
+**Where to get credentials:**
+1. Enable the Google Drive API in your Google Cloud Console
+2. Use the same service account JSON used for other Google integrations
+3. Share specific Drive folders with the service account email
+
+**Example usage:**
+```
+You: Pull our brand asset guide from Google Drive and check this creative against it
+```
+
+---
+
+### CMS & Website (v2.0.0)
+
+#### Webflow
+
+**What it enables:** Publish and manage content in Webflow CMS collections, update site pages, and manage SEO metadata. Complements the existing WordPress server. Powers the `publish-blog` command for Webflow sites.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `WEBFLOW_API_TOKEN` | Webflow API v2 token |
+| `WEBFLOW_SITE_ID` | Your Webflow site ID |
+
+**Where to get credentials:**
+1. Go to Webflow > Site Settings > Integrations > API Access
+2. Generate a site-level API token
+3. Your Site ID is in the URL when viewing your site in the Webflow dashboard
+
+**Example usage:**
+```
+You: Publish the blog post we drafted to our Webflow CMS with the SEO metadata we defined
+```
+
+---
+
+### Communication (v2.0.0)
+
+#### Twilio
+
+**What it enables:** Send SMS and WhatsApp messages for marketing campaigns, appointment reminders, and transactional notifications. Powers the `send-sms` command.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `TWILIO_ACCOUNT_SID` | Twilio account SID |
+| `TWILIO_AUTH_TOKEN` | Twilio auth token |
+| `TWILIO_PHONE_NUMBER` | Your Twilio phone number (with country code) |
+
+**Where to get credentials:**
+1. Sign up at twilio.com and complete phone verification
+2. Your Account SID and Auth Token are on the Console dashboard
+3. Buy a phone number or use the trial number for testing
+4. For WhatsApp: activate the WhatsApp sandbox or apply for a WhatsApp Business API number
+
+**Example usage:**
+```
+You: Send an SMS campaign to our VIP customer segment with the flash sale announcement
+```
+
+---
+
+#### Intercom
+
+**What it enables:** Customer messaging, support inbox management, article publishing, and user segmentation. Powers the `send-notification` command for customer-facing communications.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `INTERCOM_ACCESS_TOKEN` | Intercom API access token |
+
+**Where to get credentials:**
+1. Go to Intercom > Settings > Integrations > Developer Hub
+2. Create a new app and generate an access token
+3. Select the required permissions (Conversations, Users, Articles)
+
+**Example usage:**
+```
+You: Send an in-app message to users who signed up in the last 7 days about our new feature
+```
+
+---
+
+### Project Management & Testing (v2.0.0)
+
+#### Linear
+
+**What it enables:** Create and manage marketing tasks, track sprint progress, and organize campaign workflows in Linear. Powers the `team-assign` command for task management.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `LINEAR_API_KEY` | Linear personal API key |
+
+**Where to get credentials:**
+1. Go to Linear > Settings > API > Personal API Keys
+2. Create a new key with the scopes you need (Issues, Projects, Teams)
+
+**Example usage:**
+```
+You: Create Linear issues for each task in our product launch campaign plan
+```
+
+---
+
+#### Optimizely
+
+**What it enables:** A/B testing, feature flags, and experimentation management. Powers the `ab-test-plan` command with live experiment data and results.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `OPTIMIZELY_API_TOKEN` | Optimizely personal access token |
+| `OPTIMIZELY_PROJECT_ID` | Your Optimizely project ID |
+
+**Where to get credentials:**
+1. Go to Optimizely > Settings > Account Settings > API Access
+2. Generate a personal access token
+3. Your Project ID is visible in the project settings URL
+
+**Example usage:**
+```
+You: Pull results from our homepage hero experiment and recommend a winner
+```
+
+---
+
+### Database (v2.0.0)
+
+#### Supabase
+
+**What it enables:** PostgreSQL database queries, real-time data subscriptions, and structured data storage. Powers the `data-export` command for teams that use Supabase as their data backend.
+
+**Required environment variables:**
+
+| Variable | Description |
+|---|---|
+| `SUPABASE_URL` | Your Supabase project URL |
+| `SUPABASE_SERVICE_KEY` | Supabase service role key (for server-side access) |
+
+**Where to get credentials:**
+1. Go to your Supabase project > Settings > API
+2. Copy the Project URL and the `service_role` key (not the `anon` key)
+3. The service role key bypasses Row Level Security -- use with care
+
+**Example usage:**
+```
+You: Export our campaign performance table to a CSV and analyze trends
+```
+
+---
+
 ## 4. Multi-CRM Setup for Agencies
 
 ### The Challenge
 
 The `.mcp.json` file supports a single set of credentials per MCP server. If you manage one brand, this is straightforward. But agencies managing multiple clients -- each with their own HubSpot portal, their own GA4 property, their own Meta ad account -- run into a credential management challenge.
 
-### Current Limitation (Stated Honestly)
+### v2.0.0 Credential Profiles
 
-There is no built-in per-brand MCP credential switching in v1.9.0. When you switch brands with `/dm:switch-brand`, the brand profile, voice settings, compliance rules, and campaign history all switch. But the MCP credentials do not automatically change. The environment variables remain whatever was set when the session started.
+v2.0.0 introduces `/dm:credential-switch`, which manages per-brand credential profiles stored at `~/.claude-marketing/credentials/`. Each brand maps to its own set of platform environment variable names, so when you switch brands, the plugin knows which credentials belong to which client.
 
-This is a known gap. Below are four workaround patterns, ordered from simplest to most robust.
+The credential manager (`credential-manager.py`) stores a JSON mapping for each brand slug:
+
+```json
+{
+  "brand_slug": "acme-corp",
+  "profiles": {
+    "google-analytics": {"GA_PROPERTY_ID": "111111111"},
+    "hubspot": {"HUBSPOT_ACCESS_TOKEN": "pat-na1-acme-token"},
+    "mailchimp": {"MAILCHIMP_API_KEY": "abc123-us14"}
+  }
+}
+```
+
+When you run `/dm:credential-switch acme-corp`, the plugin loads the corresponding credential profile and maps the environment variables for that brand's platforms. The actual credential values still need to be set as environment variables on your machine, but the mapping between brand and credential set is now managed automatically.
+
+This eliminates the manual juggling of previous versions. You still have the option of using the patterns below as supplementary approaches for advanced setups.
 
 ---
 
@@ -521,10 +1207,6 @@ source ./clients/techflow/env.sh && claude
 
 ---
 
-### Future Roadmap
-
-Per-brand MCP configuration -- where switching brands with `/dm:switch-brand` would automatically swap the active MCP credentials -- is a potential enhancement for a future plugin version. This would eliminate the manual credential management described above.
-
 ---
 
 ## 5. What Works Without Integrations
@@ -629,6 +1311,8 @@ When connecting MCP integrations that access personal data (especially GA4, HubS
 
 ## Quick Reference: All Environment Variables
 
+### Original Integrations (v1.0--v1.9)
+
 | Integration | Variables | Shared Credential |
 |---|---|---|
 | Google Analytics 4 | `GA_PROPERTY_ID`, `GOOGLE_APPLICATION_CREDENTIALS` | GCP service account |
@@ -644,10 +1328,43 @@ When connecting MCP integrations that access personal data (especially GA4, HubS
 | Google Sheets | `GOOGLE_APPLICATION_CREDENTIALS` | GCP service account |
 | Slack | `SLACK_BOT_TOKEN` | -- |
 
-**Total unique variables:** 17 (because `GOOGLE_APPLICATION_CREDENTIALS` is shared across GA4, GSC, Google Ads, and Sheets).
+### v2.0.0 Integrations
 
-**Minimum setup for maximum coverage:** A single GCP service account JSON file + your GA4 Property ID + GSC Site URL gives you three integrations (GA4, GSC, Sheets) from two environment variables.
+| Integration | Variables | Shared Credential |
+|---|---|---|
+| Twitter/X | `TWITTER_API_KEY`, `TWITTER_API_SECRET`, `TWITTER_ACCESS_TOKEN`, `TWITTER_ACCESS_SECRET` | -- |
+| Instagram | `INSTAGRAM_ACCESS_TOKEN`, `INSTAGRAM_BUSINESS_ACCOUNT_ID` | -- |
+| LinkedIn Publishing | `LINKEDIN_PUBLISHING_TOKEN`, `LINKEDIN_ORG_ID` | -- |
+| TikTok Content | `TIKTOK_CONTENT_TOKEN` | -- |
+| YouTube | `YOUTUBE_API_KEY`, `GOOGLE_APPLICATION_CREDENTIALS` | GCP service account |
+| Pinterest | `PINTEREST_ACCESS_TOKEN` | -- |
+| SendGrid | `SENDGRID_API_KEY` | -- |
+| Klaviyo | `KLAVIYO_API_KEY` | -- |
+| Customer.io | `CUSTOMERIO_API_KEY`, `CUSTOMERIO_SITE_ID` | -- |
+| Brevo | `BREVO_API_KEY` | -- |
+| Mailgun | `MAILGUN_API_KEY`, `MAILGUN_DOMAIN` | -- |
+| Zoho CRM | `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_REFRESH_TOKEN` | -- |
+| Pipedrive | `PIPEDRIVE_API_TOKEN` | -- |
+| Mixpanel | `MIXPANEL_API_SECRET`, `MIXPANEL_PROJECT_ID` | -- |
+| Amplitude | `AMPLITUDE_API_KEY`, `AMPLITUDE_SECRET_KEY` | -- |
+| BigQuery | `BIGQUERY_PROJECT_ID`, `GOOGLE_APPLICATION_CREDENTIALS` | GCP service account |
+| Pinecone | `PINECONE_API_KEY`, `PINECONE_ENVIRONMENT`, `PINECONE_INDEX_NAME` | -- |
+| Qdrant | `QDRANT_URL`, `QDRANT_API_KEY` | -- |
+| Supermemory | `SUPERMEMORY_API_KEY` | -- |
+| Graphiti | `GRAPHITI_API_URL`, `GRAPHITI_API_KEY` | -- |
+| Notion | `NOTION_API_KEY` | -- |
+| Google Drive | `GOOGLE_APPLICATION_CREDENTIALS` | GCP service account |
+| Webflow | `WEBFLOW_API_TOKEN`, `WEBFLOW_SITE_ID` | -- |
+| Twilio | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER` | -- |
+| Intercom | `INTERCOM_ACCESS_TOKEN` | -- |
+| Linear | `LINEAR_API_KEY` | -- |
+| Optimizely | `OPTIMIZELY_API_TOKEN`, `OPTIMIZELY_PROJECT_ID` | -- |
+| Supabase | `SUPABASE_URL`, `SUPABASE_SERVICE_KEY` | -- |
+
+**Total unique variables:** 62 (because `GOOGLE_APPLICATION_CREDENTIALS` is shared across GA4, GSC, Google Ads, Sheets, YouTube, BigQuery, and Google Drive).
+
+**Minimum setup for maximum coverage:** A single GCP service account JSON file + your GA4 Property ID + GSC Site URL gives you up to seven Google integrations (GA4, GSC, Sheets, YouTube, BigQuery, Google Drive, Google Ads) from a shared credential base.
 
 ---
 
-*Digital Marketing Pro v1.9.0 -- Integrations & CRM Guide*
+*Digital Marketing Pro v2.0.0 -- Integrations & CRM Guide*

@@ -4,6 +4,53 @@ All notable changes to the Digital Marketing Pro plugin are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project uses [Semantic Versioning](https://semver.org/).
 
+## [2.0.0] - 2026-02-12
+
+### Added — Execution Layer
+- **26 new slash commands** bringing the total from 42 to 68 — adding a complete execution layer:
+  - **Publishing (5)**: `/dm:publish-blog`, `/dm:send-email-campaign`, `/dm:launch-ad-campaign`, `/dm:schedule-social`, `/dm:send-report`
+  - **CRM & Data (5)**: `/dm:crm-sync`, `/dm:lead-import`, `/dm:pipeline-update`, `/dm:segment-audience`, `/dm:data-export`
+  - **Monitoring (4)**: `/dm:performance-check`, `/dm:campaign-status`, `/dm:anomaly-scan`, `/dm:budget-tracker`
+  - **Memory & Knowledge (3)**: `/dm:save-knowledge`, `/dm:search-knowledge`, `/dm:sync-memory`
+  - **Communication (2)**: `/dm:send-sms`, `/dm:send-notification`
+  - **Agency Operations (4)**: `/dm:agency-dashboard`, `/dm:client-report`, `/dm:sop-library`, `/dm:credential-switch`
+  - **Brand Team (3)**: `/dm:team-assign`, `/dm:region-config`, `/dm:exec-summary`
+- **5 new specialist agents** bringing the total from 13 to 18:
+  - `execution-coordinator` — bridges planning and execution with approval workflow
+  - `performance-monitor-agent` — live data monitoring, anomaly detection, campaign health
+  - `crm-manager` — cross-CRM operations (Salesforce/HubSpot/Zoho/Pipedrive)
+  - `memory-manager` — persistent brand knowledge via RAG, knowledge graphs, cross-session memory
+  - `agency-operations` — multi-client portfolio management, SOPs, credential profiles, team management
+- **8 new Python scripts** bringing the total from 34 to 42:
+  - `approval-manager.py` — approval lifecycle (draft → pending → approved → executed)
+  - `execution-tracker.py` — audit trail for all platform executions
+  - `performance-monitor.py` — metrics aggregation, anomaly detection, baseline management
+  - `memory-manager.py` — vector DB/RAG interface, knowledge graph prep, sync orchestration
+  - `crm-sync.py` — CRM data preparation, field mapping, deduplication
+  - `report-generator.py` — formatted reports for Slack, email, Google Sheets
+  - `credential-manager.py` — per-brand credential profiles for agency multi-client management
+  - `team-manager.py` — team roles, permissions, approval chains, capacity management
+- **7 new reference knowledge files** bringing the total from 117 to 124:
+  - `execution-workflows.md` — standard operating procedures for every execution type
+  - `approval-framework.md` — risk classification, approval rules, rollback procedures
+  - `platform-publishing-specs.md` — platform API requirements and content format specs
+  - `memory-architecture.md` — 5-layer persistent memory system design
+  - `crm-integration-guide.md` — CRM connection patterns, field mapping, deduplication
+  - `agency-operations-guide.md` — multi-client management, portfolio scoring, SOPs, credential isolation
+  - `team-roles-framework.md` — role definitions, permission matrix, approval chains, capacity planning
+- **28 new MCP server integrations** bringing the total from 18 to 46: Twitter/X, Instagram, LinkedIn Publishing, TikTok Content, YouTube, Pinterest, SendGrid, Klaviyo, Customer.io, Brevo, Mailgun, Zoho CRM, Pipedrive, Mixpanel, Amplitude, BigQuery, Pinecone, Qdrant, Supermemory, Graphiti, Notion, Google Drive, Webflow, Twilio, Intercom, Linear, Optimizely, Supabase
+- **Execution safety hook**: New PreToolUse hook with `mcp_.*` matcher that intercepts all MCP write operations — verifies user approval, compliance, budget limits, and consent before allowing any external platform action
+- **Human-in-the-loop approval workflow**: Every execution action classified by risk level (low/medium/high/critical) with industry-specific compliance gates and rollback procedures
+- **5-layer memory architecture**: Session context → Vector DB RAG (Pinecone/Qdrant) → Temporal knowledge graphs (Graphiti) → Universal agent memory (Supermemory) → Knowledge base (Notion/Google Drive)
+- **Agency multi-client operations**: Per-client credential profiles, portfolio health dashboards, SOP library with compliance tracking, team role management with capacity planning
+- **Brand team management**: Team roles and permissions, cross-team workflows, regional/market configuration, executive reporting
+
+### Changed
+- `plugin.json` updated to v2.0.0 with execution layer description and updated counts
+- `.mcp.json` expanded from 18 to 46 server configurations
+- `hooks/hooks.json` extended with MCP write safety interceptor
+- All documentation updated with v2.0.0 counts and new sections
+
 ## [1.9.0] - 2026-02-12
 
 ### Added

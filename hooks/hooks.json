@@ -19,6 +19,15 @@
             "command": "First, check the file path being written/edited. If the file is NOT inside a marketing plugin directory (skills/, agents/, scripts/, hooks/, .claude-plugin/) AND is NOT marketing deliverable content (ad copy, email content, social posts, blog articles, landing pages, press releases, or branded marketing content being created for the user), respond 'SKIP' immediately. Do NOT check files in the user's own project directories, config files, source code, or non-marketing outputs — those are always SKIP. Only proceed with the check if this IS marketing content being generated as part of a plugin workflow. In that case, and only if a brand profile exists, briefly verify: (1) content aligns with brand voice guidelines, (2) no industry compliance violations, (3) FTC disclosure included if this is influencer/sponsored content, (4) if brand guidelines exist at ~/.claude-marketing/brands/{slug}/guidelines/ — check restrictions.md for banned words and restricted claims in the content, flag violations with the specific rule and a suggested alternative. Keep the check concise — flag only real issues, not stylistic preferences. $ARGUMENTS"
           }
         ]
+      },
+      {
+        "matcher": "mcp_.*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "command": "Check if this MCP tool call involves a WRITE operation (creating, publishing, sending, updating, scheduling, or deleting content on an external platform — including CRM record creation, email sending, social posting, ad campaign creation, SMS sending, database writes, or file uploads). If this is a READ-ONLY operation (fetching data, querying analytics, listing items, searching), respond 'SKIP' immediately. For WRITE operations: (1) Verify the user has explicitly approved this specific action in the current conversation — look for clear approval language, (2) Check that content has passed brand compliance review if applicable, (3) Confirm the target platform matches the user's stated intent, (4) For ad campaigns: verify budget is within the brand's stated budget_range from profile.json, (5) For email/SMS: verify list size and consent compliance, (6) For CRM writes: verify data doesn't overwrite existing records without confirmation. If ANY check fails, BLOCK the operation and explain why. If all checks pass, respond 'ALLOW'. $ARGUMENTS"
+          }
+        ]
       }
     ],
     "SessionEnd": [

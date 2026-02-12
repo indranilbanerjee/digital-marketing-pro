@@ -155,6 +155,241 @@
         "ACTIVECAMPAIGN_API_KEY": "${ACTIVECAMPAIGN_API_KEY}"
       },
       "description": "ActiveCampaign — email automation, lead scoring, CRM contacts, automation workflows"
+    },
+    "twitter-x": {
+      "command": "npx",
+      "args": ["-y", "mcp-twitter"],
+      "env": {
+        "TWITTER_API_KEY": "${TWITTER_API_KEY}",
+        "TWITTER_API_SECRET": "${TWITTER_API_SECRET}",
+        "TWITTER_ACCESS_TOKEN": "${TWITTER_ACCESS_TOKEN}",
+        "TWITTER_ACCESS_SECRET": "${TWITTER_ACCESS_SECRET}"
+      },
+      "description": "Twitter/X — post tweets, search content, manage threads, media uploads"
+    },
+    "instagram": {
+      "command": "npx",
+      "args": ["-y", "mcp-instagram"],
+      "env": {
+        "INSTAGRAM_ACCESS_TOKEN": "${INSTAGRAM_ACCESS_TOKEN}",
+        "INSTAGRAM_BUSINESS_ACCOUNT_ID": "${INSTAGRAM_BUSINESS_ACCOUNT_ID}"
+      },
+      "description": "Instagram — publish images/videos, get insights, manage DMs via Graph API"
+    },
+    "linkedin-publishing": {
+      "command": "npx",
+      "args": ["-y", "mcp-linkedin-publishing"],
+      "env": {
+        "LINKEDIN_ACCESS_TOKEN": "${LINKEDIN_ACCESS_TOKEN}"
+      },
+      "description": "LinkedIn — post articles, share updates, company page management"
+    },
+    "tiktok-content": {
+      "command": "npx",
+      "args": ["-y", "mcp-tiktok-content"],
+      "env": {
+        "TIKTOK_ACCESS_TOKEN": "${TIKTOK_ACCESS_TOKEN}"
+      },
+      "description": "TikTok — publish videos/photos, content discovery, creator tools"
+    },
+    "youtube": {
+      "command": "npx",
+      "args": ["-y", "mcp-youtube"],
+      "env": {
+        "YOUTUBE_OAUTH_TOKEN": "${YOUTUBE_OAUTH_TOKEN}"
+      },
+      "description": "YouTube — upload videos, manage playlists, Shorts creation, analytics"
+    },
+    "pinterest": {
+      "command": "npx",
+      "args": ["-y", "mcp-pinterest"],
+      "env": {
+        "PINTEREST_ACCESS_TOKEN": "${PINTEREST_ACCESS_TOKEN}"
+      },
+      "description": "Pinterest — create pins, manage boards, search visual content, analytics"
+    },
+    "sendgrid": {
+      "command": "npx",
+      "args": ["-y", "mcp-sendgrid"],
+      "env": {
+        "SENDGRID_API_KEY": "${SENDGRID_API_KEY}"
+      },
+      "description": "SendGrid — send email campaigns, manage contacts/lists, templates, delivery tracking"
+    },
+    "klaviyo": {
+      "command": "npx",
+      "args": ["-y", "mcp-klaviyo"],
+      "env": {
+        "KLAVIYO_API_KEY": "${KLAVIYO_API_KEY}"
+      },
+      "description": "Klaviyo — email/SMS campaigns, flow performance, audience segmentation, personalization"
+    },
+    "customer-io": {
+      "command": "npx",
+      "args": ["-y", "mcp-customer-io"],
+      "env": {
+        "CUSTOMERIO_API_KEY": "${CUSTOMERIO_API_KEY}"
+      },
+      "description": "Customer.io — behavioral email/SMS, segment generation, campaign creation, customer profiles"
+    },
+    "brevo": {
+      "command": "npx",
+      "args": ["-y", "mcp-brevo"],
+      "env": {
+        "BREVO_API_KEY": "${BREVO_API_KEY}"
+      },
+      "description": "Brevo — email/SMS/WhatsApp marketing, automation workflows, CRM contacts, 26 services"
+    },
+    "mailgun": {
+      "command": "npx",
+      "args": ["-y", "mcp-mailgun"],
+      "env": {
+        "MAILGUN_API_KEY": "${MAILGUN_API_KEY}",
+        "MAILGUN_DOMAIN": "${MAILGUN_DOMAIN}"
+      },
+      "description": "Mailgun — transactional email sending, delivery analytics, domain management"
+    },
+    "zoho-crm": {
+      "command": "npx",
+      "args": ["-y", "mcp-zoho-crm"],
+      "env": {
+        "ZOHO_CLIENT_ID": "${ZOHO_CLIENT_ID}",
+        "ZOHO_CLIENT_SECRET": "${ZOHO_CLIENT_SECRET}",
+        "ZOHO_REFRESH_TOKEN": "${ZOHO_REFRESH_TOKEN}"
+      },
+      "description": "Zoho CRM — full CRUD for leads, contacts, deals, campaigns, workflow automation"
+    },
+    "pipedrive": {
+      "command": "npx",
+      "args": ["-y", "mcp-pipedrive"],
+      "env": {
+        "PIPEDRIVE_API_TOKEN": "${PIPEDRIVE_API_TOKEN}"
+      },
+      "description": "Pipedrive — deal pipeline management, contact CRUD, activity logging, 45+ API operations"
+    },
+    "mixpanel": {
+      "command": "npx",
+      "args": ["-y", "mcp-mixpanel"],
+      "env": {
+        "MIXPANEL_API_TOKEN": "${MIXPANEL_API_TOKEN}"
+      },
+      "description": "Mixpanel — event analytics, funnel analysis, user behavior, A/B test results"
+    },
+    "amplitude": {
+      "command": "npx",
+      "args": ["-y", "mcp-amplitude"],
+      "env": {
+        "AMPLITUDE_API_KEY": "${AMPLITUDE_API_KEY}"
+      },
+      "description": "Amplitude — behavioral analytics, experiment results, cohort analysis, session replay"
+    },
+    "bigquery": {
+      "command": "npx",
+      "args": ["-y", "mcp-bigquery"],
+      "env": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}",
+        "BIGQUERY_PROJECT_ID": "${BIGQUERY_PROJECT_ID}"
+      },
+      "description": "BigQuery — SQL queries on marketing data warehouse, forecasting, cross-platform analytics"
+    },
+    "pinecone": {
+      "command": "npx",
+      "args": ["-y", "@pinecone-database/mcp"],
+      "env": {
+        "PINECONE_API_KEY": "${PINECONE_API_KEY}"
+      },
+      "description": "Pinecone — vector database for brand RAG: store/search brand content, campaign archives, competitive data"
+    },
+    "qdrant": {
+      "command": "npx",
+      "args": ["-y", "mcp-server-qdrant"],
+      "env": {
+        "QDRANT_URL": "${QDRANT_URL}",
+        "QDRANT_API_KEY": "${QDRANT_API_KEY}"
+      },
+      "description": "Qdrant — self-hosted vector search for marketing knowledge, campaign performance embeddings"
+    },
+    "supermemory": {
+      "command": "npx",
+      "args": ["-y", "@supermemoryai/supermemory-mcp"],
+      "env": {
+        "SUPERMEMORY_API_KEY": "${SUPERMEMORY_API_KEY}"
+      },
+      "description": "Supermemory — universal agent memory across sessions, semantic search, auto-deduplication"
+    },
+    "graphiti": {
+      "command": "npx",
+      "args": ["-y", "graphiti-mcp"],
+      "env": {
+        "GRAPHITI_API_KEY": "${GRAPHITI_API_KEY}"
+      },
+      "description": "Zep Graphiti — temporal knowledge graph for campaign timelines, audience evolution, market shifts"
+    },
+    "notion": {
+      "command": "npx",
+      "args": ["-y", "@notionhq/mcp-server"],
+      "env": {
+        "NOTION_API_KEY": "${NOTION_API_KEY}"
+      },
+      "description": "Notion — brand guidelines, campaign docs, team wikis, planning databases, dashboards"
+    },
+    "google-drive": {
+      "command": "npx",
+      "args": ["-y", "mcp-google-drive"],
+      "env": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}"
+      },
+      "description": "Google Drive — read/write Docs, manage asset folders, template library, collaborative editing"
+    },
+    "webflow": {
+      "command": "npx",
+      "args": ["-y", "mcp-webflow"],
+      "env": {
+        "WEBFLOW_API_TOKEN": "${WEBFLOW_API_TOKEN}"
+      },
+      "description": "Webflow — design updates, CMS management, landing page publishing, style editing"
+    },
+    "twilio": {
+      "command": "npx",
+      "args": ["-y", "mcp-twilio"],
+      "env": {
+        "TWILIO_ACCOUNT_SID": "${TWILIO_ACCOUNT_SID}",
+        "TWILIO_AUTH_TOKEN": "${TWILIO_AUTH_TOKEN}"
+      },
+      "description": "Twilio — send SMS/MMS, WhatsApp messages, phone management for marketing campaigns"
+    },
+    "intercom": {
+      "command": "npx",
+      "args": ["-y", "mcp-intercom"],
+      "env": {
+        "INTERCOM_ACCESS_TOKEN": "${INTERCOM_ACCESS_TOKEN}"
+      },
+      "description": "Intercom — customer messaging, conversation search, churn detection, support automation"
+    },
+    "linear": {
+      "command": "npx",
+      "args": ["-y", "mcp-linear"],
+      "env": {
+        "LINEAR_API_KEY": "${LINEAR_API_KEY}"
+      },
+      "description": "Linear — marketing project tracking, task management, sprint planning, team workflows"
+    },
+    "optimizely": {
+      "command": "npx",
+      "args": ["-y", "mcp-optimizely"],
+      "env": {
+        "OPTIMIZELY_API_KEY": "${OPTIMIZELY_API_KEY}"
+      },
+      "description": "Optimizely — A/B test management, feature flags, experiment lifecycle, result analysis"
+    },
+    "supabase": {
+      "command": "npx",
+      "args": ["-y", "mcp-supabase"],
+      "env": {
+        "SUPABASE_URL": "${SUPABASE_URL}",
+        "SUPABASE_KEY": "${SUPABASE_KEY}"
+      },
+      "description": "Supabase — PostgreSQL database for custom marketing data, customer tables, analytics storage"
     }
   }
 }

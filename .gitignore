@@ -51,3 +51,16 @@ node_modules/
 .coverage
 htmlcov/
 .mypy_cache/
+
+# Vector DB cache (memory/RAG layer)
+.pinecone/
+.qdrant/
+.chromadb/
+vector_cache/
+
+# Credential profiles (agency operations)
+credentials/*.json
+
+# Execution logs (local only)
+executions/
+approvals/

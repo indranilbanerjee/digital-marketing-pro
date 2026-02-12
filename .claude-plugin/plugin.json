@@ -1,7 +1,7 @@
 {
   "name": "digital-marketing-pro",
-  "version": "1.9.0",
-  "description": "Comprehensive digital marketing intelligence system with 13 specialist agents, brand guidelines enforcement, adaptive scoring, MCP integrations for your own marketing accounts, and persistent campaign memory. 16 integrated modules covering strategy, execution, and measurement across all channels, business models, and industries — including dedicated Technical SEO, Local SEO, and Marketing Automation modules. 42 slash commands for direct workflow access — covering the complete agency lifecycle from client onboarding to QBRs. 117 reference knowledge files powering deep domain expertise. Agents call 34 Python scripts for deterministic scoring, query 18 MCP servers for live data, enforce brand guidelines, and persist campaign learnings. Import voice guides, restrictions, channel styles, templates, and agency SOPs. Compliance guardrails, AEO/GEO optimization, crisis communication, sales enablement, media planning, video scripting, attribution modeling, and emerging channel support.",
+  "version": "2.0.0",
+  "description": "Comprehensive digital marketing execution system with 18 specialist agents, brand guidelines enforcement, adaptive scoring, MCP integrations for your own marketing accounts, and persistent campaign memory. 16 integrated modules covering strategy, execution, and measurement across all channels, business models, and industries. Full execution layer: publish blogs, send email campaigns, launch ad campaigns, schedule social posts, sync CRM data, manage persistent memory via RAG, send SMS/WhatsApp, and deliver reports — all with human-in-the-loop approval workflow. Agency operations: multi-client credential profiles, portfolio dashboards, SOPs, team management. 68 slash commands for direct workflow access. 124 reference knowledge files powering deep domain expertise. Agents call 42 Python scripts for deterministic scoring, query 46 MCP servers for live data and execution, enforce brand guidelines, and persist campaign learnings across sessions via vector databases and knowledge graphs.",
   "author": {
     "name": "Indranil Banerjee",
     "title": "Head of AI Transformation & Group Lead - Digital Marketing",
@@ -48,6 +48,13 @@
     "compliance",
     "funnel-optimization",
     "audience-intelligence",
-    "crisis-communication"
+    "crisis-communication",
+    "crm",
+    "execution",
+    "publishing",
+    "memory",
+    "rag",
+    "agency-operations",
+    "approval-workflow"
   ]
 }

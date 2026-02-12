@@ -1,6 +1,6 @@
 # Getting Started with Digital Marketing Pro
 
-**Version 1.9.0** | A plugin for Claude Code and Claude Cowork
+**Version 2.0.0** | A plugin for Claude Code and Claude Cowork
 
 Digital Marketing Pro transforms Claude into a marketing command center that knows your brand, understands your industry, and produces strategy and content that sounds like you wrote it. This guide walks you through installation, brand setup, and your first marketing task.
 
@@ -33,7 +33,7 @@ That is it. Everything else is optional.
 **Optional but nice to have:**
 
 - **Python 3.8 or newer** --- unlocks advanced scoring features like brand voice analysis and content readability. The plugin works perfectly without Python; you just get bonus capabilities if it is installed.
-- **No API keys required** --- the plugin ships with 117 reference knowledge files that power all 16 marketing modules. The optional MCP integrations (Google Analytics, Search Console, Meta Ads, and others) use your own account credentials and can be configured later.
+- **No API keys required** --- the plugin ships with 124 reference knowledge files that power all 16 marketing modules. The optional MCP integrations (46 platform connections including Google Analytics, Search Console, Meta Ads, CRMs, email platforms, and others) use your own account credentials and can be configured later.
 
 > **Bottom line:** If you can run Claude Code or Claude Cowork, you can use this plugin right now.
 
@@ -86,10 +86,11 @@ For full details on Cowork capabilities (document creation, visual review, app i
 After running either command, you should see output similar to this:
 
 ```
-Installing plugin: digital-marketing-pro v1.9.0
+Installing plugin: digital-marketing-pro v2.0.0
   - 16 marketing modules loaded
-  - 42 slash commands registered (/dm:*)
-  - 13 specialist agents available
+  - 68 slash commands registered (/dm:*)
+  - 18 specialist agents available
+  - 46 MCP integrations configured
   - 3 event hooks configured (SessionStart, PreToolUse, SessionEnd)
 
 Plugin "digital-marketing-pro" installed successfully.
@@ -396,7 +397,7 @@ printed                  (just ask for things)        session
 
 ## 8. Python Dependencies (Optional)
 
-Digital Marketing Pro is designed to work at full capability without Python. All 16 marketing modules, 13 specialist agents, and 42 slash commands function using the plugin's built-in reference knowledge. Python adds bonus scoring and automation features.
+Digital Marketing Pro is designed to work at full capability without Python. All 16 marketing modules, 18 specialist agents, and 68 slash commands function using the plugin's built-in reference knowledge. Python adds bonus scoring and automation features.
 
 ### Three dependency modes
 
@@ -411,9 +412,9 @@ Digital Marketing Pro is designed to work at full capability without Python. All
 This is what you get out of the box. No setup required.
 
 You have access to:
-- All 16 marketing modules with 117 reference knowledge files
-- All 42 `/dm:` slash commands
-- All 13 specialist agents
+- All 16 marketing modules with 124 reference knowledge files
+- All 68 `/dm:` slash commands
+- All 18 specialist agents
 - Brand profiling, session hooks, and campaign tracking
 - Industry benchmarks, compliance rules, and platform specifications
 
@@ -459,7 +460,7 @@ Python: full (all deps)        (full mode)
 
 ## 9. Available Commands
 
-Digital Marketing Pro provides 42 slash commands, all prefixed with `/dm:`. You can type these directly in your Claude Code session.
+Digital Marketing Pro provides 68 slash commands, all prefixed with `/dm:`. You can type these directly in your Claude Code session.
 
 ### Brand Management
 
@@ -535,6 +536,67 @@ Digital Marketing Pro provides 42 slash commands, all prefixed with `/dm:`. You 
 | `/dm:review-response` | Draft brand-aligned review responses with tone templates and escalation detection |
 | `/dm:webinar-plan` | End-to-end webinar planning with promotion timeline, email sequences, and post-event nurture |
 
+### Execution & Publishing
+
+| Command | What it does |
+|---------|-------------|
+| `/dm:publish-blog` | Publish blog post to WordPress/Webflow with SEO metadata and scheduling |
+| `/dm:send-email-campaign` | Send email campaign via SendGrid/Klaviyo/Brevo with personalization and A/B testing |
+| `/dm:launch-ad-campaign` | Create paid ad campaign on Google/Meta/LinkedIn/TikTok with budget safeguards |
+| `/dm:schedule-social` | Schedule posts to Twitter/Instagram/LinkedIn/TikTok/YouTube/Pinterest |
+| `/dm:send-report` | Generate and deliver performance report via Slack, email, or Sheets |
+
+### CRM & Data
+
+| Command | What it does |
+|---------|-------------|
+| `/dm:crm-sync` | Sync marketing contacts and deals to Salesforce/HubSpot/Zoho/Pipedrive |
+| `/dm:lead-import` | Import leads from forms, CSV, or manual entry into CRM with deduplication |
+| `/dm:pipeline-update` | Update deal stages, values, and notes in CRM pipeline |
+| `/dm:segment-audience` | Create or update audience segments in CRM or email platform |
+| `/dm:data-export` | Export marketing data to BigQuery, Google Sheets, or Supabase |
+
+### Monitoring
+
+| Command | What it does |
+|---------|-------------|
+| `/dm:performance-check` | Pull live metrics from all connected platforms for instant performance snapshot |
+| `/dm:campaign-status` | Check status of all active campaigns with execution history |
+| `/dm:anomaly-scan` | Detect anomalies --- traffic drops, spend spikes, deliverability issues |
+| `/dm:budget-tracker` | Real-time budget tracking across all ad platforms with pacing analysis |
+
+### Memory & Knowledge
+
+| Command | What it does |
+|---------|-------------|
+| `/dm:save-knowledge` | Save brand knowledge to vector database for RAG retrieval |
+| `/dm:search-knowledge` | Semantic search across all stored brand knowledge |
+| `/dm:sync-memory` | Batch sync session learnings and campaign history to persistent memory |
+
+### Communication
+
+| Command | What it does |
+|---------|-------------|
+| `/dm:send-sms` | Send SMS or WhatsApp marketing message via Twilio or Brevo |
+| `/dm:send-notification` | Send team notification via Slack with campaign updates or alerts |
+
+### Agency Operations
+
+| Command | What it does |
+|---------|-------------|
+| `/dm:agency-dashboard` | Portfolio-level view across all clients with KPI health and budget pacing |
+| `/dm:client-report` | Generate white-labeled client-facing performance report |
+| `/dm:sop-library` | Manage agency SOPs --- create, assign to brands, track compliance |
+| `/dm:credential-switch` | Switch active brand credential profile for multi-client management |
+
+### Brand Team Management
+
+| Command | What it does |
+|---------|-------------|
+| `/dm:team-assign` | Assign marketing tasks to team members based on role and capacity |
+| `/dm:region-config` | Configure regional settings --- timezone, language, compliance, currency |
+| `/dm:exec-summary` | Generate C-suite executive summary with portfolio ROI and strategic recommendations |
+
 ### Tip: You do not always need slash commands
 
 Slash commands are useful for structured, templated outputs. But you can also just describe what you need in natural language:
@@ -559,11 +621,17 @@ You are set up and ready to go. Here are some resources for when you want to go 
 
 - **Managing multiple brands** --- If you work with more than one brand or run an agency, see `docs/multi-brand-guide.md` for brand switching, side-by-side comparison, and multi-client workflows.
 
-- **Connecting your marketing tools** --- The plugin supports 18 MCP server integrations (Google Analytics, Search Console, Google Ads, Meta Ads, HubSpot, Mailchimp, LinkedIn, Slack, Stripe, SEMrush, Ahrefs, Sheets, TikTok Ads, Shopify, WordPress, Salesforce, Looker Studio, and ActiveCampaign). See `docs/integrations-guide.md` to connect your accounts.
+- **Execution & Publishing** --- v2.0.0 adds full execution capabilities. Every action goes through an approval workflow (draft → review → approve → execute → monitor). See the execution commands above.
+
+- **CRM Integration** --- Connect Salesforce, HubSpot, Zoho, or Pipedrive for bidirectional data sync. See `docs/integrations-guide.md` for setup.
+
+- **Memory & RAG** --- Store and retrieve brand knowledge across sessions using Pinecone, Qdrant, or Supermemory vector databases. See the Memory & Knowledge commands above.
+
+- **Connecting your marketing tools** --- The plugin supports 46 MCP server integrations spanning analytics, advertising, CRM, email, social publishing, memory/RAG, and more. See `docs/integrations-guide.md` to connect your accounts.
 
 - **KPI-driven strategy** --- Learn how to set up marketing KPI frameworks, build reporting dashboards, and track campaign performance over time in `docs/strategy-and-kpis.md`.
 
-- **Understanding the architecture** --- For a technical deep dive into how the 16 modules, 13 agents, context engine, and hook system work together, see `docs/architecture.md`.
+- **Understanding the architecture** --- For a technical deep dive into how the 16 modules, 18 agents, context engine, and hook system work together, see `docs/architecture.md`.
 
 - **Using Cowork** --- If you are using Claude Cowork (or considering it), see `docs/claude-interfaces.md` for Cowork-specific capabilities like document creation, visual page review, and a comparison with Anthropic's official marketing plugin.
 
@@ -601,4 +669,4 @@ If something is not working as expected:
 
 ---
 
-*Digital Marketing Pro v1.9.0 --- Built for marketing professionals who want strategy and execution that stays on-brand, every time. Works in Claude Code and Claude Cowork.*
+*Digital Marketing Pro v2.0.0 --- Built for marketing professionals who want strategy, execution, and publishing that stays on-brand, every time. Plan it, approve it, execute it, monitor it --- all from Claude Code and Claude Cowork.*
