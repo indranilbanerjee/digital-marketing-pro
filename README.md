@@ -59,16 +59,20 @@ Digital Marketing Pro transforms Claude into a full-stack marketing intelligence
 
 ## Installation
 
-### ⚠️ MCP Server Configuration Required
+### ⚠️ MCP Server Configuration (Optional - Opt-In Only)
 
-This plugin integrates with 67 external services via MCP servers (social media platforms, CRM systems, ad networks, analytics tools, marketing automation platforms, translation services, and more). **MCP integrations are opt-in** and require manual setup:
+This plugin integrates with 67 external services via MCP servers (social media platforms, CRM systems, ad networks, analytics tools, marketing automation platforms, translation services, and more). **MCP integrations are 100% opt-in** and require manual configuration:
+
+**To enable MCP integrations:**
 
 1. Install the plugin first (see options below)
-2. Configure MCP servers by following the [MCP Integration Guide](docs/integrations-guide.md)
-3. Set up API keys and credentials for the platforms you want to use
-4. Restart Claude Desktop to activate the integrations
+2. Navigate to the plugin directory: `~/.claude/plugins/digital-marketing-pro/` (or your installation path)
+3. Copy the example MCP config: `cp .mcp.json.example .mcp.json`
+4. Edit `.mcp.json` and add your API keys and credentials for the platforms you want to use
+5. Follow the [MCP Integration Guide](docs/integrations-guide.md) for detailed setup instructions
+6. Restart Claude Desktop to activate the integrations
 
-**The plugin works fully without MCP servers** — all skills, agents, frameworks, and knowledge files function immediately. You only need MCP configuration if you want to execute actions on external platforms (publish content, send emails, launch ads, sync CRM data, etc.).
+**The plugin works fully WITHOUT MCP servers** — all 115 skills, 25 agents, frameworks, and knowledge files function immediately. MCP is ONLY needed if you want to execute actions on external platforms (publish content, send emails, launch ads, sync CRM data, etc.). Most users will not need MCP configuration.
 
 ### Option A: Add from a local directory
 
