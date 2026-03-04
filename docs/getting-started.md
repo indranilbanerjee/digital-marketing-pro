@@ -487,7 +487,7 @@ This is what you get out of the box. No setup required.
 
 You have access to:
 - All 16 marketing modules with 143 reference knowledge files
-- All 115 `/dm:` slash commands
+- All **118** `/dm:` slash commands
 - All 25 specialist agents
 - Brand profiling, session hooks, and campaign tracking
 - Industry benchmarks, compliance rules, and platform specifications
@@ -565,7 +565,7 @@ Example output:
  ...
 
 Connected: 14 HTTP | Available: 33 npx
-Skills fully unlocked: 87/117 | Skills with enhanced capabilities: 117/117
+Skills fully unlocked: 87/118 | Skills with enhanced capabilities: **118/118**
 ```
 
 ### Setting up a new connector
@@ -740,7 +740,7 @@ Slash commands are useful for structured, templated outputs. But you can also ju
 "I need to respond to negative reviews on Google"
 ```
 
-The plugin's 16 modules will activate based on the intent of your request, whether or not you use a slash command. The 115 commands simply give you a direct shortcut to a specific workflow.
+The plugin's 16 modules will activate based on the intent of your request, whether or not you use a slash command. The 118 commands simply give you a direct shortcut to a specific workflow.
 
 ---
 

@@ -37,11 +37,11 @@ Digital Marketing Pro transforms Claude into a full-stack marketing intelligence
 - **10 business models** supported (B2B SaaS, eCommerce, Local, Agency, Creator, Enterprise, Non-Profit, Marketplace, DTC, B2B Services)
 - **22 industry profiles** with benchmarks and compliance rules
 - **16 privacy law jurisdictions** auto-applied (GDPR, CCPA, PIPL, DPDPA, and more)
-- **25 specialist agents**, including 5 execution agents, 2 predictive intelligence agents, and agents for competitor intelligence, compound intelligence, journey orchestration, quality assurance, and localization, that activate based on conversation context, call 64 Python scripts for scoring, query MCP servers for live data, enforce brand guidelines, and persist campaign learnings
+- **25 specialist agents**, including 5 execution agents, 2 predictive intelligence agents, and agents for competitor intelligence, compound intelligence, journey orchestration, quality assurance, and localization, that activate based on conversation context, call 65 Python scripts for scoring, query MCP servers for live data, enforce brand guidelines, and persist campaign learnings
 - **Brand guidelines enforcement** — import voice guides, restrictions, channel styles, messaging frameworks; automatically applied across all modules
 - **Deliverable templates** and **agency SOPs** — custom output formats and workflow definitions
 - **7 top commands** visible in the Customize panel + **118 slash commands** for direct access to all workflows — including execution, monitoring, predictive intelligence, GEO monitoring, competitor monitoring, SEO execution, creative intelligence, compound intelligence, journey orchestration, synthetic audience testing, evaluation/QA, multilingual support, connector discovery, and more
-- **64 Python scripts** for deterministic execution (scoring, analysis, generation, guidelines management, email testing, A/B testing, social optimization, technical SEO auditing, local SEO checking, ROI calculation, budget optimization, CLV analysis, revenue forecasting, content repurposing, review response drafting, link profile analysis, ad budget pacing, approval workflow, execution tracking, performance monitoring, CRM sync, credential management, team management, report generation, memory management, SEO execution, competitor tracking, GEO tracking, PDF generation, revenue simulation, churn prediction, macro signal tracking, creative fatigue prediction, intelligence graphing, journey engine, growth loop modeling, campaign health monitoring, narrative mapping, audience simulation, hallucination detection, claim verification, output validation, eval running, quality tracking, eval config management, prompt A/B testing, language routing)
+- **65 Python scripts** for deterministic execution (scoring, analysis, generation, guidelines management, email testing, A/B testing, social optimization, technical SEO auditing, local SEO checking, ROI calculation, budget optimization, CLV analysis, revenue forecasting, content repurposing, review response drafting, link profile analysis, ad budget pacing, approval workflow, execution tracking, performance monitoring, CRM sync, credential management, team management, report generation, memory management, SEO execution, competitor tracking, GEO tracking, PDF generation, revenue simulation, churn prediction, macro signal tracking, creative fatigue prediction, intelligence graphing, journey engine, growth loop modeling, campaign health monitoring, narrative mapping, audience simulation, hallucination detection, claim verification, output validation, eval running, quality tracking, eval config management, prompt A/B testing, language routing)
 - **14 HTTP connectors + 67 npx integrations** for connecting your own marketing accounts AND executing actions (social publishing, email sending, CRM writes, ad campaign creation, SMS, vector databases, knowledge management, CRM platforms, PM/design tools, SEO/monitoring, marketing automation, translation services, and more). Run `/dm:integrations` to see your connector status
 - **Persistent brand memory** that learns across sessions
 - **5-layer memory architecture** — session context → vector DB RAG (Pinecone/Qdrant) → temporal knowledge graphs (Graphiti) → universal agent memory (Supermemory) → knowledge base (Notion/Google Drive)
@@ -480,12 +480,14 @@ The plugin stores brand data at `~/.claude-marketing/`:
 ```
 digital-marketing-pro/
 ├── .claude-plugin/plugin.json    # Plugin manifest (v2.5.0)
+├── .mcp.json                     # 14 HTTP connectors (auto-loaded)
+├── .mcp.json.example             # 67 npx servers (opt-in for Claude Code)
+├── CONNECTORS.md                 # Connector reference with skill links
 ├── commands/                     # 7 top commands (visible in Customize panel)
-├── skills/                       # 136 skill directories (16 modules + 118 commands + context engine + help)
+├── skills/                       # 135 skill directories (16 modules + 118 commands + context engine)
 ├── agents/                       # 25 specialist agents
 ├── hooks/hooks.json              # Session lifecycle, compliance gates, guideline checks, and MCP write safety
-├── scripts/                      # 64 Python execution scripts + requirements.txt
-├── .mcp.json                     # 67 optional MCP integrations
+├── scripts/                      # 65 Python execution scripts + requirements.txt
 ├── docs/                         # 11 documentation guides
 ├── README.md
 ├── CHANGELOG.md
@@ -525,70 +527,75 @@ See [Architecture Reference](docs/architecture.md) for the full technical deep-d
 | `quality-assurance` | Multi-dimensional content evaluation, hallucination detection, quality tracking |
 | `localization-specialist` | Translation routing, transcreation, cultural adaptation, multilingual SEO |
 
-### Scripts (64)
+### Scripts (65)
 
 | Script | Purpose |
 |--------|---------|
 | `setup.py` | Brand profiling and session initialization |
-| `brand-voice-scorer.py` | Brand voice alignment scoring |
-| `content-scorer.py` | Content quality scoring |
-| `readability-analyzer.py` | Readability analysis (Flesch-Kincaid, etc.) |
-| `competitor-scraper.py` | Competitor website analysis |
-| `social-post-formatter.py` | Platform-specific social formatting |
-| `qr-code-generator.py` | QR code generation |
-| `visibility-checker.py` | AI visibility checking |
-| `campaign-tracker.py` | Campaign memory and insights persistence |
 | `adaptive-scorer.py` | Context-aware adaptive scoring |
-| `guidelines-manager.py` | Brand guidelines CRUD operations |
-| `email-subject-tester.py` | Email subject line scoring |
-| `spam-score-checker.py` | Email spam risk checking |
-| `send-time-optimizer.py` | Email send time optimization |
-| `sample-size-calculator.py` | A/B test sample size calculation |
-| `significance-tester.py` | Statistical significance testing |
-| `form-analyzer.py` | Form conversion optimization |
-| `hashtag-analyzer.py` | Hashtag analysis per platform |
-| `posting-time-analyzer.py` | Social posting time optimization |
-| `calendar-validator.py` | Content calendar validation |
-| `tech-seo-auditor.py` | Technical SEO auditing |
-| `local-seo-checker.py` | Local SEO NAP consistency checking |
-| `roi-calculator.py` | Campaign ROI calculation |
-| `budget-optimizer.py` | Budget reallocation optimization |
-| `clv-calculator.py` | Customer lifetime value calculation |
-| `content-repurposer.py` | Content repurposing strategy |
-| `review-response-drafter.py` | Review response drafting |
 | `ad-budget-pacer.py` | Ad budget pacing analysis |
-| `link-profile-analyzer.py` | Link profile health analysis |
-| `revenue-forecaster.py` | Revenue forecasting |
+| `ai-visibility-checker.py` | AI visibility and answer engine checking |
 | `approval-manager.py` | Approval lifecycle management |
-| `execution-tracker.py` | Execution audit trail |
-| `performance-monitor.py` | Metrics aggregation and anomaly detection |
-| `memory-manager.py` | Vector DB/RAG interface and sync |
-| `crm-sync.py` | CRM data preparation and sync |
-| `report-generator.py` | Formatted report generation |
-| `credential-manager.py` | Per-brand credential profiles |
-| `team-manager.py` | Team roles, permissions, capacity |
-| `seo-executor.py` | SEO change tracking and execution via CMS |
-| `competitor-tracker.py` | Competitive baselines, diff, SOV, pricing, ads |
-| `geo-tracker.py` | AI visibility auditing across ChatGPT, Perplexity, Gemini, Copilot |
-| `pdf-generator.py` | PDF report generation and scheduling |
-| `revenue-simulator.py` | Monte Carlo revenue simulation |
+| `audience-simulator.py` | Synthetic audience simulation |
+| `brand-voice-scorer.py` | Brand voice alignment scoring |
+| `budget-optimizer.py` | Budget reallocation optimization |
+| `calendar-validator.py` | Content calendar validation |
+| `campaign-health-monitor.py` | Self-healing campaign monitoring |
+| `campaign-tracker.py` | Campaign memory and insights persistence |
 | `churn-predictor.py` | Customer churn prediction |
-| `macro-signal-tracker.py` | Macro economic and market signal tracking |
+| `claim-verifier.py` | Marketing claim cross-verification |
+| `clv-calculator.py` | Customer lifetime value calculation |
+| `competitor-scraper.py` | Competitor website analysis |
+| `competitor-tracker.py` | Competitive baselines, diff, SOV, pricing, ads |
+| `connector-status.py` | Connector discovery and status reporting |
+| `content-repurposer.py` | Content repurposing strategy |
+| `content-scorer.py` | Content quality scoring |
 | `creative-fatigue-predictor.py` | Creative fatigue prediction |
+| `credential-manager.py` | Per-brand credential profiles |
+| `crm-sync.py` | CRM data preparation and sync |
+| `email-preview.py` | Email template preview and rendering |
+| `email-subject-tester.py` | Email subject line scoring |
+| `eval-config-manager.py` | Per-brand quality thresholds and weights |
+| `eval-runner.py` | Master evaluation suite orchestrator |
+| `execution-tracker.py` | Execution audit trail |
+| `form-analyzer.py` | Form conversion optimization |
+| `geo-tracker.py` | AI visibility auditing across ChatGPT, Perplexity, Gemini, Copilot |
+| `growth-loop-modeler.py` | Growth loop identification and modeling |
+| `guidelines-manager.py` | Brand guidelines CRUD operations |
+| `hallucination-detector.py` | Pattern-based hallucination detection |
+| `hashtag-analyzer.py` | Hashtag analysis per platform |
+| `headline-analyzer.py` | Headline scoring and optimization |
 | `intelligence-graph.py` | Cross-agent intelligence graph |
 | `journey-engine.py` | Cross-channel journey state machines |
-| `growth-loop-modeler.py` | Growth loop identification and modeling |
-| `campaign-health-monitor.py` | Self-healing campaign monitoring |
-| `narrative-mapper.py` | Competitive narrative mapping |
-| `audience-simulator.py` | Synthetic audience simulation |
-| `hallucination-detector.py` | Pattern-based hallucination detection |
-| `claim-verifier.py` | Marketing claim cross-verification |
-| `output-validator.py` | Content structure validation against schemas |
-| `eval-runner.py` | Master evaluation suite orchestrator |
-| `quality-tracker.py` | Eval score persistence and regression tracking |
-| `eval-config-manager.py` | Per-brand quality thresholds and weights |
-| `prompt-ab-tester.py` | Prompt variation quality comparison |
+| `keyword-clusterer.py` | Keyword grouping and topic clustering |
 | `language-router.py` | Translation service routing and language detection |
+| `link-profile-analyzer.py` | Link profile health analysis |
+| `local-seo-checker.py` | Local SEO NAP consistency checking |
+| `macro-signal-tracker.py` | Macro economic and market signal tracking |
+| `memory-manager.py` | Vector DB/RAG interface and sync |
+| `narrative-mapper.py` | Competitive narrative mapping |
+| `output-validator.py` | Content structure validation against schemas |
+| `pdf-generator.py` | PDF report generation and scheduling |
+| `performance-monitor.py` | Metrics aggregation and anomaly detection |
+| `posting-time-analyzer.py` | Social posting time optimization |
+| `prompt-ab-tester.py` | Prompt variation quality comparison |
+| `quality-tracker.py` | Eval score persistence and regression tracking |
+| `readability-analyzer.py` | Readability analysis (Flesch-Kincaid, etc.) |
+| `report-generator.py` | Formatted report generation |
+| `revenue-forecaster.py` | Revenue forecasting |
+| `revenue-simulator.py` | Monte Carlo revenue simulation |
+| `review-response-drafter.py` | Review response drafting |
+| `roi-calculator.py` | Campaign ROI calculation |
+| `sample-size-calculator.py` | A/B test sample size calculation |
+| `schema-generator.py` | Structured data and schema markup generation |
+| `send-time-optimizer.py` | Email send time optimization |
+| `seo-executor.py` | SEO change tracking and execution via CMS |
+| `significance-tester.py` | Statistical significance testing |
+| `social-post-formatter.py` | Platform-specific social formatting |
+| `spam-score-checker.py` | Email spam risk checking |
+| `team-manager.py` | Team roles, permissions, capacity |
+| `tech-seo-auditor.py` | Technical SEO auditing |
+| `utm-generator.py` | UTM parameter generation and QR code creation |
 
 ## MCP Integrations (Optional)
 

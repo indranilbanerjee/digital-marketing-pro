@@ -12,7 +12,8 @@ This document describes the internal architecture of the Digital Marketing Pro p
 digital-marketing-pro/
 ├── .claude-plugin/
 │   └── plugin.json                    # Plugin manifest (v2.5.0)
-├── .mcp.json                          # 67 MCP server configurations
+├── .mcp.json                          # 14 HTTP connectors (auto-loaded)
+├── .mcp.json.example                  # 67 npx servers (opt-in for Claude Code)
 ├── hooks/
 │   └── hooks.json                     # 3 lifecycle hooks
 ├── agents/                            # 25 specialist agents
@@ -38,10 +39,10 @@ digital-marketing-pro/
 │   ├── market-intelligence.md         # NEW in v2.1.0
 │   ├── intelligence-curator.md        # NEW in v2.1.0
 │   ├── competitor-intelligence.md     # NEW in v2.1.0
-│   └── journey-orchestrator.md        # NEW in v2.1.0
+│   ├── journey-orchestrator.md        # NEW in v2.1.0
 │   ├── quality-assurance.md           # NEW in v2.2.0
 │   └── localization-specialist.md     # NEW in v2.2.0
-├── scripts/                           # 64 Python scripts + requirements
+├── scripts/                           # 65 Python scripts + requirements
 │   ├── setup.py                       # Brand management, initialization
 │   ├── campaign-tracker.py            # Campaign persistence + violation tracking
 │   ├── adaptive-scorer.py             # Context-aware scoring weights
@@ -50,6 +51,7 @@ digital-marketing-pro/
 │   ├── social-post-formatter.py       # Platform validation (9 platforms)
 │   ├── competitor-scraper.py          # Public competitor data extraction
 │   ├── ai-visibility-checker.py       # AI answer engine visibility
+│   ├── connector-status.py            # Connector discovery and status reporting
 │   ├── email-preview.py               # Email rendering preview
 │   ├── headline-analyzer.py           # Headline effectiveness scoring
 │   ├── keyword-clusterer.py           # Keyword grouping
@@ -107,7 +109,7 @@ digital-marketing-pro/
 │   ├── prompt-ab-tester.py          # Prompt variation quality comparison (v2.2.0)
 │   ├── language-router.py           # Translation service routing (v2.2.0)
 │   └── requirements.txt               # Python dependencies
-├── skills/                            # 132 skill directories
+├── skills/                            # 135 skill directories
 │   ├── context-engine/                # Shared intelligence layer
 │   │   ├── SKILL.md
 │   │   ├── industry-profiles.md       # 22 industries
@@ -185,7 +187,7 @@ Multiple agents can collaborate on a single task. For example, the `/dm:campaign
 
 ### Tools (scripts/*.py)
 
-Sixty-four Python scripts handle deterministic execution: scoring, formatting, data persistence, and analysis. Every script:
+Sixty-five Python scripts handle deterministic execution: scoring, formatting, data persistence, and analysis. Every script:
 
 - Accepts CLI arguments via argparse
 - Produces JSON output to stdout
@@ -414,7 +416,7 @@ Three lifecycle hooks are defined in `hooks/hooks.json`. They wrap every Claude 
 
 ## 8. Script Architecture
 
-All 64 scripts in `scripts/` follow consistent conventions.
+All 65 scripts in `scripts/` follow consistent conventions.
 
 ### Conventions
 
@@ -428,7 +430,7 @@ All 64 scripts in `scripts/` follow consistent conventions.
 
 | Tier | Dependencies | Scripts |
 |------|-------------|---------|
-| Zero deps (always work) | Python stdlib only | setup.py, campaign-tracker.py, utm-generator.py (basic mode), schema-generator.py, guidelines-manager.py, email-subject-tester.py, spam-score-checker.py, send-time-optimizer.py, sample-size-calculator.py, significance-tester.py, form-analyzer.py, hashtag-analyzer.py, posting-time-analyzer.py, calendar-validator.py, tech-seo-auditor.py, local-seo-checker.py, roi-calculator.py, budget-optimizer.py, clv-calculator.py, content-repurposer.py, review-response-drafter.py, ad-budget-pacer.py, link-profile-analyzer.py, revenue-forecaster.py, approval-manager.py, execution-tracker.py, performance-monitor.py, memory-manager.py, crm-sync.py, report-generator.py, credential-manager.py, team-manager.py, seo-executor.py, competitor-tracker.py, geo-tracker.py, pdf-generator.py, revenue-simulator.py, churn-predictor.py, macro-signal-tracker.py, creative-fatigue-predictor.py, intelligence-graph.py, journey-engine.py, growth-loop-modeler.py, campaign-health-monitor.py, narrative-mapper.py, audience-simulator.py, hallucination-detector.py, claim-verifier.py, output-validator.py, eval-runner.py, quality-tracker.py, eval-config-manager.py, prompt-ab-tester.py, language-router.py |
+| Zero deps (always work) | Python stdlib only | setup.py, campaign-tracker.py, utm-generator.py (basic mode), schema-generator.py, guidelines-manager.py, email-subject-tester.py, spam-score-checker.py, send-time-optimizer.py, sample-size-calculator.py, significance-tester.py, form-analyzer.py, hashtag-analyzer.py, posting-time-analyzer.py, calendar-validator.py, tech-seo-auditor.py, local-seo-checker.py, roi-calculator.py, budget-optimizer.py, clv-calculator.py, content-repurposer.py, review-response-drafter.py, ad-budget-pacer.py, link-profile-analyzer.py, revenue-forecaster.py, approval-manager.py, execution-tracker.py, performance-monitor.py, memory-manager.py, crm-sync.py, report-generator.py, credential-manager.py, team-manager.py, seo-executor.py, competitor-tracker.py, geo-tracker.py, pdf-generator.py, revenue-simulator.py, churn-predictor.py, macro-signal-tracker.py, creative-fatigue-predictor.py, intelligence-graph.py, journey-engine.py, growth-loop-modeler.py, campaign-health-monitor.py, narrative-mapper.py, audience-simulator.py, hallucination-detector.py, claim-verifier.py, output-validator.py, eval-runner.py, quality-tracker.py, eval-config-manager.py, prompt-ab-tester.py, language-router.py, connector-status.py |
 | Lite | nltk, textstat | brand-voice-scorer.py, content-scorer.py, readability-analyzer.py, headline-analyzer.py |
 | Full | + requests, beautifulsoup4, qrcode, Pillow | competitor-scraper.py, utm-generator.py (QR mode), email-preview.py |
 | Optional | + openai, anthropic | ai-visibility-checker.py (API mode) |
@@ -443,7 +445,7 @@ Brand profiles follow schema version `1.0.0` (defined in `setup.py` as `SCHEMA_V
 
 ## 9. MCP Configuration
 
-`.mcp.json` defines 67 MCP (Model Context Protocol) server integrations. These connect Claude Code to the user's own marketing platform accounts.
+`.mcp.json` defines 14 HTTP MCP connectors that work in both Cowork and Claude Code. The `.mcp.json.example` file contains the full 67-server npx configuration for Claude Code users who want additional integrations.
 
 ### Server List
 
