@@ -1,6 +1,7 @@
 ---
 name: localize-campaign
 description: "Use when the user wants to localize an entire campaign for multiple markets — translate all campaign assets, adapt cultural references, adjust compliance per region, and coordinate multilingual publishing."
+argument-hint: "[target-markets]"
 ---
 
 # /dm:localize-campaign

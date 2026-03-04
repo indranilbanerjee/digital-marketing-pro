@@ -1,6 +1,7 @@
 ---
 name: pr-pitch
 description: Use when the user needs media pitch packages including pitch templates, target media lists, outreach strategy, or HARO/Connectively responses.
+argument-hint: "[topic or news-hook]"
 ---
 
 # /dm:pr-pitch

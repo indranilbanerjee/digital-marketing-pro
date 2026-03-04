@@ -1,6 +1,7 @@
 ---
 name: audience-profile
 description: Use when the user needs to build a detailed buyer persona with demographics, psychographics, behaviors, jobs-to-be-done, and content preferences.
+argument-hint: "[audience-segment]"
 ---
 
 # /dm:audience-profile

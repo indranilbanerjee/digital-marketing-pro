@@ -1,6 +1,7 @@
 ---
 name: content-brief
 description: Use when the user needs a detailed content brief with keyword targets, outline, structure, voice guidelines, and SEO requirements for a specific piece of content.
+argument-hint: "[topic]"
 ---
 
 # /dm:content-brief

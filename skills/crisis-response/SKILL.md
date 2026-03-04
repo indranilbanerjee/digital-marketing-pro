@@ -1,6 +1,7 @@
 ---
 name: crisis-response
 description: Use when the user faces a PR crisis or reputational threat and needs rapid severity assessment, stakeholder messaging, and a communication timeline.
+argument-hint: "[situation-description]"
 ---
 
 # /dm:crisis-response

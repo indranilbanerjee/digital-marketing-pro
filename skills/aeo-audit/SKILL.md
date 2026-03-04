@@ -1,6 +1,7 @@
 ---
 name: aeo-audit
 description: Use when the user wants to assess how their brand appears in AI-powered search and answer engines like ChatGPT, Perplexity, Google AI Overviews, and Gemini.
+argument-hint: "[brand-name or URL]"
 ---
 
 # /dm:aeo-audit

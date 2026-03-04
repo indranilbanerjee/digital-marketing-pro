@@ -1,6 +1,8 @@
 ---
 name: send-sms
 description: "Use when the user wants to send an SMS or WhatsApp marketing message via Twilio or Brevo, with compliance checks, consent verification, and delivery tracking."
+disable-model-invocation: true
+argument-hint: "[message-type]"
 ---
 
 # /dm:send-sms

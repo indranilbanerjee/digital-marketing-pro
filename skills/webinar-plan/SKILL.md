@@ -1,6 +1,7 @@
 ---
 name: webinar-plan
 description: "Use when the user needs to plan a webinar, virtual event, online workshop, livestream, or any digital event including promotion strategy, content planning, registration optimization, and post-event follow-up."
+argument-hint: "[topic]"
 ---
 
 # /dm:webinar-plan

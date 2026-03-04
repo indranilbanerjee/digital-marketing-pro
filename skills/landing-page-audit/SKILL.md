@@ -1,6 +1,7 @@
 ---
 name: landing-page-audit
 description: Use when the user needs a landing page scored across above-fold clarity, trust signals, form friction, message match, page speed, and mobile experience.
+argument-hint: "[URL]"
 ---
 
 # /dm:landing-page-audit

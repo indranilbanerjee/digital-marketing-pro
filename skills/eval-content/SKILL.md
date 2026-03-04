@@ -1,6 +1,7 @@
 ---
 name: eval-content
 description: "Use when the user wants to evaluate content quality — run the full multi-dimensional eval suite to get a composite quality score, hallucination check, brand voice assessment, and actionable fix recommendations."
+argument-hint: "[content-path]"
 ---
 
 # /dm:eval-content

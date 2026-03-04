@@ -1,6 +1,8 @@
 ---
 name: send-email-campaign
 description: "Use when the user wants to send an email campaign via SendGrid, Klaviyo, Customer.io, Brevo, or Mailgun, including personalization, A/B subject testing, and deliverability monitoring."
+disable-model-invocation: true
+argument-hint: "[campaign-name]"
 ---
 
 # /dm:send-email-campaign

@@ -1,6 +1,7 @@
 ---
 name: ad-creative
 description: Use when the user needs platform-specific ad copy variations with quality scoring for Google RSA, Meta, LinkedIn, TikTok, or other ad platforms.
+argument-hint: "[platform]"
 ---
 
 # /dm:ad-creative

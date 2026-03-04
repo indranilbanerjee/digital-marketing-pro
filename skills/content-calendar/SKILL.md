@@ -1,6 +1,7 @@
 ---
 name: content-calendar
 description: Use when the user needs a monthly or quarterly content calendar with platform assignments, content pillars, topic ideas, and repurposing workflows.
+argument-hint: "[month or quarter]"
 ---
 
 # /dm:content-calendar

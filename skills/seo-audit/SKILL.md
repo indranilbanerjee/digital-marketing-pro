@@ -1,6 +1,7 @@
 ---
 name: seo-audit
 description: Use when the user needs a comprehensive SEO audit covering technical health, on-page optimization, content quality, E-E-A-T signals, local SEO, and link profile analysis.
+argument-hint: "[URL]"
 ---
 
 # /dm:seo-audit

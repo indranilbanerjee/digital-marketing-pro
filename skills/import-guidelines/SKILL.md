@@ -1,6 +1,7 @@
 ---
 name: import-guidelines
 description: Use when the user wants to import, add, or update brand guidelines, voice and tone guides, restrictions, banned words, channel-specific styles, messaging frameworks, or visual identity rules.
+argument-hint: "[file-path or URL]"
 ---
 
 # /dm:import-guidelines

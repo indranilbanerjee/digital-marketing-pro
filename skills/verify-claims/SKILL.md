@@ -1,6 +1,7 @@
 ---
 name: verify-claims
 description: "Use when the user wants to verify marketing claims against evidence — cross-check statistics, awards, certifications, and performance claims with source data."
+argument-hint: "[content-path]"
 ---
 
 # /dm:verify-claims

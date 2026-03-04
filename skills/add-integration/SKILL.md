@@ -1,6 +1,7 @@
 ---
 name: add-integration
 description: "Use when the user wants to add a new MCP server integration — connect a custom tool, API, or service to the plugin by configuring it in .mcp.json with proper credentials and testing."
+argument-hint: "[service-name]"
 ---
 
 # /dm:add-integration

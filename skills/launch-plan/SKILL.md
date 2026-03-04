@@ -1,6 +1,7 @@
 ---
 name: launch-plan
 description: Use when the user needs a complete product or feature launch playbook with pre-launch, launch day, and post-launch phases across all marketing channels.
+argument-hint: "[product-name]"
 ---
 
 # /dm:launch-plan

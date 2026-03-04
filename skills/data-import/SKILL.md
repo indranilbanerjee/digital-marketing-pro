@@ -1,6 +1,8 @@
 ---
 name: data-import
 description: "Use when the user wants to import data into a connected platform — CRM contacts, email lists, audience segments, competitor data, or campaign data from CSV, JSON, or Google Sheets."
+disable-model-invocation: true
+argument-hint: "[source-file or URL]"
 ---
 
 # /dm:data-import

@@ -1,6 +1,7 @@
 ---
 name: case-study-plan
 description: "Use when the user needs to create a case study, customer success story, client results showcase, portfolio piece, testimonial-based content, or structured proof point that demonstrates marketing results for a specific client or project."
+argument-hint: "[client-name]"
 ---
 
 # /dm:case-study-plan

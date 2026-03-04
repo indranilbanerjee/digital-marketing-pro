@@ -1,5 +1,7 @@
 ---
+name: help
 description: "Show the getting started guide, available commands, examples, and help for Digital Marketing Pro"
+argument-hint: "[--commands | --examples | --troubleshoot]"
 ---
 
 # /dm:help

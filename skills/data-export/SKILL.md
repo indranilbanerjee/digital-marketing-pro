@@ -1,6 +1,8 @@
 ---
 name: data-export
 description: "Use when the user wants to export marketing data to BigQuery, Google Sheets, or Supabase for analysis, reporting, or integration with other tools."
+disable-model-invocation: true
+argument-hint: "[destination]"
 ---
 
 # /dm:data-export

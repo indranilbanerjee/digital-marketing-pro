@@ -1,6 +1,7 @@
 ---
 name: translate-content
 description: "Use when the user wants to translate marketing content — translate with brand voice preservation, automatic translation service routing, quality scoring, and transcreation option for emotional content."
+argument-hint: "[target-language]"
 ---
 
 # /dm:translate-content

@@ -1,6 +1,7 @@
 ---
 name: ab-test-plan
 description: "Use when the user needs to design an A/B test, calculate sample size for an experiment, plan a multivariate test, create a testing hypothesis, or set up a CRO experimentation program."
+argument-hint: "[element-to-test]"
 ---
 
 # /dm:ab-test-plan

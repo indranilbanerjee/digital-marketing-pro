@@ -1,6 +1,7 @@
 ---
 name: campaign-plan
 description: Use when the user needs a complete multi-channel marketing campaign plan with objectives, audience targeting, channel mix, budget allocation, timeline, and KPIs.
+argument-hint: "[campaign-objective]"
 ---
 
 # /dm:campaign-plan

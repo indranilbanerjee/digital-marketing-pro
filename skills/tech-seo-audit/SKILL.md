@@ -1,6 +1,7 @@
 ---
 name: tech-seo-audit
 description: Use when the user wants a technical SEO audit covering Core Web Vitals, crawlability, indexation, site architecture, page speed, mobile-first indexing, redirect health, structured data, or JavaScript rendering assessment.
+argument-hint: "[URL]"
 ---
 
 # /dm:tech-seo-audit

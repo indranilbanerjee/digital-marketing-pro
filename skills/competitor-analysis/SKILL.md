@@ -1,6 +1,7 @@
 ---
 name: competitor-analysis
 description: Use when the user needs a multi-dimensional competitive analysis covering content, SEO, paid ads, social presence, AI visibility, pricing, and market positioning.
+argument-hint: "[competitor names]"
 ---
 
 # /dm:competitor-analysis

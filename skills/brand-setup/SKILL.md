@@ -1,6 +1,7 @@
 ---
 name: brand-setup
 description: Use when the user wants to set up a new brand, create a brand profile, onboard a new client, switch between brands, or update an existing brand's marketing context. Provides interactive brand profiling that powers all other marketing modules.
+argument-hint: "[brand-name or --full]"
 ---
 
 # Brand Setup — Interactive Brand Profiling

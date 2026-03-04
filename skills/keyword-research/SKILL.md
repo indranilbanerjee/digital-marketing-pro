@@ -1,6 +1,7 @@
 ---
 name: keyword-research
 description: "Use when the user needs keyword research, keyword clustering, search intent mapping, keyword opportunity analysis, content gap analysis by keywords, or long-tail keyword discovery for SEO or content planning."
+argument-hint: "[topic or seed keywords]"
 ---
 
 # /dm:keyword-research

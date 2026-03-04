@@ -1,6 +1,7 @@
 ---
 name: connect
 description: "Use when the user wants to set up a specific MCP connector — get step-by-step instructions for connecting a service like Google Ads, Salesforce, Mailchimp, etc. to the plugin."
+argument-hint: "[connector-name]"
 ---
 
 # /dm:connect

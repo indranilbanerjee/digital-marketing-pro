@@ -1,6 +1,8 @@
 ---
 name: live-dashboard
 description: "Use when the user wants to create a live dashboard in Google Looker Studio connected to marketing data sources — auto-configured with relevant metrics, dimensions, and visualizations for the business model."
+disable-model-invocation: true
+argument-hint: "[data-source or dashboard-type]"
 ---
 
 # /dm:live-dashboard

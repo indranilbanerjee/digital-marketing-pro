@@ -1,6 +1,7 @@
 ---
 name: video-script
 description: "Use when the user needs to write a video script, create video content for YouTube, TikTok, Instagram Reels, LinkedIn video, product demo script, explainer video, testimonial video, ad script, or any video marketing content with hooks, timestamps, and visual direction."
+argument-hint: "[topic or format]"
 ---
 
 # /dm:video-script

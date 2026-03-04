@@ -1,6 +1,8 @@
 ---
 name: segment-audience
 description: "Use when the user wants to create or update audience segments in their CRM or email platform for targeting in campaigns, ads, or email sequences."
+disable-model-invocation: true
+argument-hint: "[segment-name or criteria]"
 ---
 
 # /dm:segment-audience

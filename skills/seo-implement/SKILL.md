@@ -1,6 +1,8 @@
 ---
 name: seo-implement
 description: "Use when the user wants to execute SEO changes — update meta tags, deploy schema markup, set canonicals, create redirects, or submit URLs for indexing on WordPress or Webflow via CMS MCP."
+disable-model-invocation: true
+argument-hint: "[URL or change-type]"
 ---
 
 # /dm:seo-implement
