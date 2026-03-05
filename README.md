@@ -1,6 +1,6 @@
 # Digital Marketing Pro — Claude Code & Cowork Plugin
 
-[![Version](https://img.shields.io/badge/version-2.5.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.5.1-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-optional-yellow.svg)](#python-dependencies-optional)
 [![Cowork](https://img.shields.io/badge/cowork-compatible-purple.svg)](docs/claude-interfaces.md#claude-cowork-full-support)
@@ -479,7 +479,7 @@ The plugin stores brand data at `~/.claude-marketing/`:
 
 ```
 digital-marketing-pro/
-├── .claude-plugin/plugin.json    # Plugin manifest (v2.5.0)
+├── .claude-plugin/plugin.json    # Plugin manifest (v2.5.1)
 ├── .mcp.json                     # 14 HTTP connectors (auto-loaded)
 ├── .mcp.json.example             # 67 npx servers (opt-in for Claude Code)
 ├── CONNECTORS.md                 # Connector reference with skill links
@@ -496,6 +496,18 @@ digital-marketing-pro/
 ```
 
 See [Architecture Reference](docs/architecture.md) for the full technical deep-dive.
+
+### Skill Platform Features
+
+| Feature | Scope | Purpose |
+|---------|-------|---------|
+| `argument-hint` | 55 skills | Autocomplete hints in the Skills UI (e.g., `[URL]`, `[brand-name --full]`) |
+| `disable-model-invocation` | 17 execution skills | Prevents Claude from auto-triggering publish, send, launch, import, and export skills — user must invoke explicitly |
+| `evals/evals.json` | 3 key skills | Structured test cases with prompts, expected outputs, and quantitative/qualitative assertions |
+
+**Execution safety**: Skills that write to external platforms (publish-blog, send-email-campaign, launch-ad-campaign, schedule-social, send-report, send-sms, send-notification, data-export, data-import, crm-sync, lead-import, pipeline-update, segment-audience, seo-implement, launch-plan, publish-blog, live-dashboard) have `disable-model-invocation: true`. Claude cannot trigger these autonomously — you must type the `/dm:skill-name` command. This works alongside the MCP write approval hook for defense-in-depth.
+
+**Evals**: The `campaign-plan`, `seo-audit`, and `content-engine` skills include `evals/evals.json` files with reproducible test cases. Each eval has a realistic prompt, expected output description, and assertions (quantitative checks like "budget totals $50,000" and qualitative checks like "uses ABM tactics for enterprise targeting").
 
 ### Agents (25)
 

@@ -1,4 +1,4 @@
-# Digital Marketing Pro Testing Guide — v2.5.0
+# Digital Marketing Pro Testing Guide — v2.5.1
 
 Complete testing guide for the Digital Marketing Pro plugin.
 
@@ -635,6 +635,15 @@ Run this after any changes to verify nothing is broken.
 - [ ] All 118 skills respond to invocation (spot check at minimum)
 - [ ] Skills handle missing connectors gracefully
 
+### Skill Platform Features
+
+- [ ] Argument hints show in Skills UI when typing `/dm:` (spot check 3-5 skills)
+- [ ] Execution skills (e.g., `/dm:publish-blog`, `/dm:send-email-campaign`) cannot be triggered by Claude without explicit user invocation
+- [ ] `/dm:help` has `name: help` in frontmatter (was missing pre-v2.5.1)
+- [ ] `skills/campaign-plan/evals/evals.json` exists and is valid JSON with 3 test cases
+- [ ] `skills/seo-audit/evals/evals.json` exists and is valid JSON with 2 test cases
+- [ ] `skills/content-engine/evals/evals.json` exists and is valid JSON with 3 test cases
+
 ### Hooks
 
 - [ ] SessionStart hook fires without errors
@@ -644,10 +653,10 @@ Run this after any changes to verify nothing is broken.
 
 ### Versioning Consistency
 
-- [ ] `plugin.json` version = 2.5.0
+- [ ] `plugin.json` version = 2.5.1
 - [ ] `hooks.json` version string matches
-- [ ] `README.md` version = 2.5.0
-- [ ] Marketplace entry version = 2.5.0
+- [ ] `README.md` version = 2.5.1
+- [ ] Marketplace entry version = 2.5.1
 - [ ] `25 agents` in all descriptions
 - [ ] `118 skills` in all descriptions (not 115, not 117)
 - [ ] `7 commands` in all descriptions

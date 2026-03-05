@@ -206,6 +206,7 @@ Every module SKILL.md follows this structure:
 ---
 name: module-name
 description: "One sentence describing when to invoke this module."
+argument-hint: "[primary-input --option1 --option2]"
 ---
 
 # Module Name
@@ -247,6 +248,8 @@ Every command SKILL.md follows this structure:
 ---
 name: command-name
 description: "One sentence describing when to invoke this command."
+argument-hint: "[primary-input --option1 --option2]"
+disable-model-invocation: true  # Only on execution skills (publish, send, launch, import, export)
 ---
 
 # /dm:command-name
@@ -919,3 +922,64 @@ These are rules that must not be broken when extending the plugin:
 7. **PreToolUse must not block non-marketing work.** The compliance hook must respond `SKIP` for any file that is not marketing content.
 8. **Execution requires approval.** Every action that writes to an external platform must be explicitly approved by the user in the current conversation. No automated execution without human confirmation.
 9. **Credential isolation.** Agency credential profiles must never leak data between brands. Each brand's credentials are stored separately and switched explicitly.
+
+---
+
+## Skill Platform Features
+
+Added in v2.5.1, these frontmatter fields enhance the skill experience in Claude Code and Cowork.
+
+### argument-hint
+
+Provides autocomplete placeholder text in the Skills UI. Added to all 55 user-invocable skills.
+
+```yaml
+argument-hint: "[URL]"                           # seo-audit
+argument-hint: "[product/service --budget=N]"    # campaign-plan
+argument-hint: "[brand-name --full]"             # brand-setup
+argument-hint: "[competitor1, competitor2, ...]"  # competitor-analysis
+```
+
+Guidelines for new skills:
+- Use `[brackets]` for required inputs, `--flag` for options
+- Keep under 60 characters
+- Show the most common usage pattern
+
+### disable-model-invocation
+
+Prevents Claude from auto-triggering a skill. The user must explicitly type `/dm:skill-name`. Required on all 17 execution skills that write to external platforms.
+
+```yaml
+disable-model-invocation: true
+```
+
+**Execution skills (17):** publish-blog, send-email-campaign, launch-ad-campaign, schedule-social, send-report, send-sms, send-notification, data-export, data-import, crm-sync, lead-import, pipeline-update, segment-audience, seo-implement, launch-plan, live-dashboard, credential-switch
+
+This is a defense-in-depth measure alongside the MCP write approval hook (Section 7). The hook catches MCP writes at the tool level; `disable-model-invocation` catches them at the skill level.
+
+### evals/evals.json
+
+Structured test cases for quality benchmarking. Added to 3 key skills: campaign-plan, seo-audit, content-engine.
+
+```
+skills/
+├── campaign-plan/
+│   ├── SKILL.md
+│   └── evals/
+│       └── evals.json    # 3 test cases
+├── seo-audit/
+│   ├── SKILL.md
+│   └── evals/
+│       └── evals.json    # 2 test cases
+└── content-engine/
+    ├── SKILL.md
+    └── evals/
+        └── evals.json    # 3 test cases
+```
+
+Each eval contains:
+- `prompt` — realistic user input
+- `expected_output` — description of what the skill should produce
+- `assertions[]` — verifiable checks (type: `quantitative` for measurable criteria, `qualitative` for judgment-based criteria)
+
+When adding evals to new skills, follow this pattern and include 2-3 test cases covering different scenarios.

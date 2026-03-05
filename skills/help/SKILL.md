@@ -19,9 +19,9 @@ Display this quick orientation:
 ```
 === DIGITAL MARKETING PRO — HELP ===
 
-Version: 2.5.0
+Version: 2.5.1
 Agents: 25 specialist agents
-Skills: 118 slash commands (/dm:*)
+Skills: 118 slash commands (/dm:*) — all with argument-hint autocomplete
 Modules: 16 marketing knowledge domains
 Connectors: 14 HTTP + 67 npx integrations
 
@@ -131,7 +131,30 @@ When `--troubleshoot` is specified, show common issues:
 | Session context missing | Brand context loads on SessionStart — start a fresh session |
 | Google Drive not showing | Google Drive is a platform-level integration — check Claude Desktop → Settings → Integrations |
 
-### 6. Documentation References
+### 6. Skill Platform Features
+
+When `--platform` argument is used or when showing the full help, include this section:
+
+```
+=== SKILL PLATFORM FEATURES ===
+
+Argument Hints (55 skills):
+  All user-invocable skills show autocomplete hints in the Skills UI.
+  Example: /dm:seo-audit shows [URL]
+  Example: /dm:campaign-plan shows [product/service --budget=N]
+
+Execution Safety (17 skills):
+  Skills that write to external platforms require explicit user invocation.
+  Claude cannot auto-trigger: publish-blog, send-email-campaign,
+  launch-ad-campaign, schedule-social, send-report, and 12 more.
+  This works alongside the MCP write approval hook.
+
+Quality Evals (3 skills):
+  campaign-plan, seo-audit, and content-engine have evals/evals.json
+  with structured test cases for quality benchmarking.
+```
+
+### 7. Documentation References
 
 Point users to these resources for deeper dives:
 

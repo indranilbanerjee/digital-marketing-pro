@@ -4,6 +4,25 @@ All notable changes to the Digital Marketing Pro plugin are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project uses [Semantic Versioning](https://semver.org/).
 
+## [2.5.1] — 2026-03-05
+
+### Added — Skill Platform Enhancements
+
+- **`argument-hint`** added to all 55 user-invocable skills — provides autocomplete hints in the Skills UI (e.g., `[URL]`, `[brand-name --full]`, `[competitor1, competitor2, ...]`)
+- **`disable-model-invocation: true`** added to 17 execution skills — prevents Claude from auto-triggering skills that write to external platforms (publish, send, launch, import, export). Users must explicitly invoke these via `/dm:skill-name`
+- **`evals/evals.json`** added to 3 key skills (campaign-plan, seo-audit, content-engine) — structured test cases with prompts, expected outputs, and quantitative/qualitative assertions for quality benchmarking
+- **Fixed** `/dm:help` skill — added missing `name: help` field in frontmatter (required by Agent Skills spec for skill registration)
+
+### How it works
+
+**Argument hints** appear as placeholder text when a user types `/dm:` in the Skills UI, showing what arguments each skill accepts. For example, `/dm:seo-audit` shows `[URL]` and `/dm:campaign-plan` shows `[product/service description --budget=N]`.
+
+**Execution safety** ensures that skills which write to external platforms (like `/dm:publish-blog`, `/dm:send-email-campaign`, `/dm:launch-ad-campaign`) cannot be triggered by Claude autonomously — the user must explicitly type the slash command. This is a critical safety layer on top of the existing MCP write approval hook.
+
+**Evals** provide reproducible test cases for key skills. Each eval includes a realistic prompt, expected output description, and assertions that can be verified programmatically. Located at `skills/{skill-name}/evals/evals.json`.
+
+---
+
 ## [2.5.0] — 2026-02-26
 
 ### Added — Commands & Version Consistency
