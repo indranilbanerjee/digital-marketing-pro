@@ -83,7 +83,7 @@ Once you have `cert.pem` and `key.pem` from any of the four authorities above:
 
 After production signing, verify before publishing:
 
-1. Upload a sample signed asset to https://contentcredentials.org/verify
+1. Open the Content Credentials verify tool (https://contentcredentials.org/verify) and check a sample signed asset there
 2. Confirm it shows your brand name as signer, the IPTC digital-source-type matches your claim, and the trust-list lookup is green (not "signer not in trust list")
 3. Adobe Photoshop / Lightroom 2026+ also display Content Credentials natively — open the signed asset there as a sanity check
 

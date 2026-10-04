@@ -1659,11 +1659,11 @@ The simplest approach. Manually change the environment variables before starting
 ```bash
 # Working on Client A (their GA4 property, their HubSpot portal)
 export GA_PROPERTY_ID="111111111"
-export HUBSPOT_ACCESS_TOKEN="pat-na1-client-a-token"
+export HUBSPOT_ACCESS_TOKEN="<your hubspot access token>"
 
 # Switching to Client B
 export GA_PROPERTY_ID="222222222"
-export HUBSPOT_ACCESS_TOKEN="pat-na1-client-b-token"
+export HUBSPOT_ACCESS_TOKEN="<your hubspot access token>"
 ```
 
 **Best for:** Agencies with 2-3 clients on the same platforms. Quick to execute, nothing to maintain beyond the credential values themselves.
@@ -1727,17 +1727,17 @@ Create shell scripts that set all environment variables for a specific client, t
 export GA_PROPERTY_ID="111111111"
 export GSC_SITE_URL="https://acmecorp.com"
 export GOOGLE_APPLICATION_CREDENTIALS="/keys/acme-corp-sa.json"
-export HUBSPOT_ACCESS_TOKEN="pat-na1-acme-token"
-export MAILCHIMP_API_KEY="abc123def456-us14"
-export SLACK_BOT_TOKEN="xoxb-acme-slack-token"
+export HUBSPOT_ACCESS_TOKEN="<your hubspot access token>"
+export MAILCHIMP_API_KEY="<your mailchimp api key>"
+export SLACK_BOT_TOKEN="<your slack bot token>"
 
 # File: clients/techflow/env.sh
 export GA_PROPERTY_ID="222222222"
 export GSC_SITE_URL="https://techflow.io"
 export GOOGLE_APPLICATION_CREDENTIALS="/keys/techflow-sa.json"
-export META_ACCESS_TOKEN="EAAxxxxxxxx"
+export META_ACCESS_TOKEN="<your meta access token>"
 export META_AD_ACCOUNT_ID="act_987654321"
-export STRIPE_API_KEY="rk_live_techflow_restricted_key"
+export STRIPE_API_KEY="<your stripe api key>"
 ```
 
 Usage:

@@ -6,6 +6,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.33.3] - 2026-10-04
+
+### Fixed — Hermes refused to install the plugin
+
+- **Hermes Agent's install-time security scan rated the plugin "dangerous"**
+  (`hermes plugins install` refuses that verdict), on harmless lines written
+  the way an attack would be: recursive-delete one-liners aimed at the home
+  folder in the README and testing guide, realistic-looking example tokens in the integrations guide,
+  a constant named `ROBOTS_TOKEN`, an "upload this file to a URL" step in
+  the C2PA guide, and "share of conversation" phrasing the scanner reads as a request
+  to leak the chat. All reworded or renamed (`CRAWLER_NAME`); the docs now
+  say to delete the cache folder, and to move brand data aside rather than
+  delete it before a fresh test. Hermes's own validator (main branch) now
+  passes with a "safe" scan.
+- New `tests/test_host_scanner_compat.py` applies the scanner's patterns to
+  every shipped text file (planted against the pre-fix tree).
+
 ## [3.33.2] - 2026-10-04
 
 ### Fixed

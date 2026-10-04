@@ -45,7 +45,7 @@ logger = logging.getLogger("digital-marketing-pro")
 
 PLUGIN_ROOT = Path(__file__).resolve().parent
 SKILLS_DIR = PLUGIN_ROOT / "skills"
-PLUGIN_VERSION = "3.33.2"
+PLUGIN_VERSION = "3.33.3"
 
 
 def _parse_skill_frontmatter(skill_md_path: Path) -> dict:

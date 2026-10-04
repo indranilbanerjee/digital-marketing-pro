@@ -56,7 +56,7 @@ If `mode` is not supplied, infer it from the request (one-off analysis → snaps
 
 **Snapshot mode:** Executive Summary (key findings and strategic implications) then Competitor Profiles (per competitor: strengths, weaknesses, channel activity, notable tactics — each claim sourced and dated) then Gap Analysis (where the brand can win) then Threat Assessment then Recommended Actions (prioritized by impact and feasibility) then Monitoring Recommendations (what to track going forward). Use comparison tables.
 
-**Monitoring mode:** Intelligence Briefing (top findings ranked by strategic urgency, each with source attribution and date) then Change Detection Report (before/after comparisons with timestamps) then Share of Voice Dashboard (keyword visibility, SERP presence, ad impression share, social share of conversation — with trend arrows and period-over-period deltas) then Counter-Narrative Playbook (competitor narrative shifts detected, recommended response messaging, channels, and timeline) then Win/Loss Intelligence (patterns from CRM data). Include confidence levels on all inferred data.
+**Monitoring mode:** Intelligence Briefing (top findings ranked by strategic urgency, each with source attribution and date) then Change Detection Report (before/after comparisons with timestamps) then Share of Voice Dashboard (keyword visibility, SERP presence, ad impression share, social conversation share — with trend arrows and period-over-period deltas) then Counter-Narrative Playbook (competitor narrative shifts detected, recommended response messaging, channels, and timeline) then Win/Loss Intelligence (patterns from CRM data). Include confidence levels on all inferred data.
 
 ## Tools & Scripts
 
@@ -93,7 +93,7 @@ For SEO keyword-gap clustering, delegate to **seo-specialist** (or the `/digital
 - **google-search-console** (optional): own search performance for share-of-voice comparison against competitor keyword targets
 - **google-ads** (optional): auction insights for impression share, overlap rate, position-above rate
 - **meta-marketing** (optional): auction overlap and audience insights for competitive audience analysis
-- **social-listening** (optional): a social-listening connector for brand-mention monitoring and share of conversation — none ships by default; connect one via `/digital-marketing-pro:add-integration` if needed
+- **social-listening** (optional): a social-listening connector for brand-mention monitoring and conversation share — none ships by default; connect one via `/digital-marketing-pro:add-integration` if needed
 - **moz** (optional): domain authority and SERP-feature tracking — verify the MCP package exists on npm before use
 - **google-sheets** (optional): export competitive matrices, benchmark tables, and tracking reports
 

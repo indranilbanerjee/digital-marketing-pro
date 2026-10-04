@@ -37,13 +37,11 @@ Complete testing guide for the Digital Marketing Pro plugin, including the v3.0 
 
 ### Pre-Test Cleanup
 
-```
-# Clear plugin cache (if reinstalling)
-rm -rf ~/.claude/plugins/cache/
+- **Plugin cache (if reinstalling):** delete the folder `~/.claude/plugins/cache/`. It holds only downloaded plugin copies.
+- **Brand data (for a fresh brand-setup test):** move it aside rather than deleting it, so a real brand profile is never lost:
 
-# Clear brand data (for fresh brand setup test)
-# WARNING: Only do this if you want to start fresh
-rm -rf ~/.claude-marketing/
+```
+mv ~/.claude-marketing ~/.claude-marketing.before-test
 ```
 
 ### Test Brands to Use

@@ -26,8 +26,8 @@ except ImportError:
 # The scraper names itself. Site owners can see who fetched their pages and
 # write robots.txt rules for this token; rotating browser user-agents would
 # hide the scraper from exactly those rules.
-ROBOTS_TOKEN = "DigitalMarketingPro-CompetitorScraper"
-USER_AGENT = f"{ROBOTS_TOKEN}/1.0 (+https://github.com/indranilbanerjee/digital-marketing-pro)"
+CRAWLER_NAME = "DigitalMarketingPro-CompetitorScraper"
+USER_AGENT = f"{CRAWLER_NAME}/1.0 (+https://github.com/indranilbanerjee/digital-marketing-pro)"
 
 SOCIAL_DOMAINS = {
     "facebook.com": "Facebook", "fb.com": "Facebook",
@@ -56,7 +56,7 @@ TECH_SIGNALS = {
 }
 
 
-def robots_verdict(status_code, robots_text, url, agent=ROBOTS_TOKEN):
+def robots_verdict(status_code, robots_text, url, agent=CRAWLER_NAME):
     """Decide from a robots.txt response whether `agent` may fetch `url`.
 
     RFC 9309 section 2.3.1: a 4xx robots.txt means no restrictions; a 5xx or an

@@ -23,7 +23,7 @@ URL = "https://example.com/pricing"
 
 class TestHonestUserAgent(unittest.TestCase):
     def test_user_agent_names_the_scraper_and_the_project(self):
-        self.assertIn(cs.ROBOTS_TOKEN, cs.USER_AGENT)
+        self.assertIn(cs.CRAWLER_NAME, cs.USER_AGENT)
         self.assertIn("github.com/indranilbanerjee/digital-marketing-pro", cs.USER_AGENT)
 
     def test_no_browser_user_agent_is_sent(self):
@@ -45,7 +45,7 @@ class TestRobotsVerdict(unittest.TestCase):
         self.assertTrue(cs.robots_verdict(200, "User-agent: *\nDisallow: /admin\n", URL)[0])
 
     def test_own_token_group_wins_over_star(self):
-        text = (f"User-agent: {cs.ROBOTS_TOKEN}\nDisallow: /\n\n"
+        text = (f"User-agent: {cs.CRAWLER_NAME}\nDisallow: /\n\n"
                 "User-agent: *\nAllow: /\n")
         self.assertFalse(cs.robots_verdict(200, text, URL)[0])
 
