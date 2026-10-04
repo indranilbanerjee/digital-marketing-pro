@@ -441,5 +441,47 @@ class TestClaudeManifestHasOnlyDocumentedFields(unittest.TestCase):
         self.assertEqual(extra, set(), f"plugin.json fields Claude Code strips: {sorted(extra)}")
 
 
+class TestDirectoryListingReady(unittest.TestCase):
+    """Anthropic's directory reads icon/documentation/support/privacy/terms from
+    .claude-plugin/plugin.json; OpenAI's shared ChatGPT+Codex directory reads
+    extensions["com.openai"].interface from the root Agent Plugins plugin.json
+    (developers.openai.com/plugins/build/plugins, read 2026-10-04). Every local
+    path must exist, every URL must be https, and the OpenAI block must not
+    declare hooks (its submission rules forbid lifecycle hooks)."""
+
+    LISTING = ("icon", "documentationUrl", "supportUrl", "privacyPolicyUrl", "termsOfServiceUrl")
+    IFACE = ("displayName", "shortDescription", "longDescription", "developerName",
+             "category", "privacyPolicyURL", "termsOfServiceURL", "defaultPrompt")
+
+    def _local(self, rel):
+        return (PLUGIN_ROOT / rel.lstrip("./")).exists() if rel.startswith("./") else False
+
+    def test_claude_listing_fields(self):
+        m = json.loads((PLUGIN_ROOT / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
+        for key in self.LISTING:
+            with self.subTest(field=key):
+                self.assertIn(key, m)
+                if key == "icon":
+                    self.assertTrue(self._local(m[key]), f"icon {m[key]} missing")
+                else:
+                    self.assertTrue(m[key].startswith("https://"), f"{key} must be https")
+        self.assertTrue((PLUGIN_ROOT / "PRIVACY.md").exists(), "privacyPolicyUrl points at PRIVACY.md")
+        self.assertTrue((PLUGIN_ROOT / "LICENSE").exists(), "termsOfServiceUrl points at LICENSE")
+
+    def test_openai_extension_block(self):
+        root = json.loads((PLUGIN_ROOT / "plugin.json").read_text(encoding="utf-8"))
+        ext = root.get("extensions", {}).get("com.openai", {})
+        self.assertNotIn("hooks", ext, "OpenAI directory forbids lifecycle hooks")
+        iface = ext.get("interface", {})
+        for key in self.IFACE:
+            with self.subTest(field=key):
+                self.assertTrue(iface.get(key), f"interface.{key} missing or empty")
+        for key in ("composerIcon", "logo"):
+            with self.subTest(asset=key):
+                self.assertTrue(self._local(iface.get(key, "")), f"interface.{key} file missing")
+        self.assertEqual(iface["displayName"],
+                         json.loads((PLUGIN_ROOT / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))["displayName"])
+
+
 if __name__ == "__main__":
     unittest.main()

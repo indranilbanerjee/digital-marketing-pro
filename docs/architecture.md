@@ -18,7 +18,7 @@ digital-marketing-pro/
 ├── .mcp.json.example                  # illustrative npx catalog (opt-in; verify packages before use — see its _warning)
 ├── hooks/
 │   └── hooks.json                     # ships EMPTY {"hooks":{}} — zero global hooks
-├── commands/                          # 18 top-level commands
+├── commands/                          # 5 top-level commands
 ├── agents/                            # 24 specialist agents
 │   ├── marketing-strategist.md
 │   ├── content-creator.md
@@ -44,7 +44,7 @@ digital-marketing-pro/
 │   ├── journey-orchestrator.md        # NEW in v2.1.0
 │   ├── quality-assurance.md           # NEW in v2.2.0
 │   └── localization-specialist.md     # NEW in v2.2.0
-├── scripts/                           # 93 Python scripts + requirements
+├── scripts/                           # 94 Python scripts + requirements
 │   ├── setup.py                       # Brand management, initialization
 │   ├── campaign-tracker.py            # Campaign persistence + violation tracking
 │   ├── adaptive-scorer.py             # Context-aware scoring weights
@@ -135,7 +135,7 @@ digital-marketing-pro/
 │   ├── import-guidelines/SKILL.md     # Guideline import (v1.3.0)
 │   ├── import-sop/SKILL.md           # SOP import (v1.3.0)
 │   ├── import-template/SKILL.md      # Template import (v1.3.0)
-│   └── [163 skills total]/             # atomic skills + methodology + quality/status + compliance skills
+│   └── [164 skills total]/             # atomic skills + methodology + quality/status + compliance skills
 │       └── SKILL.md                   # Skill definition
 ├── docs/                              # Documentation
 ├── README.md
@@ -148,7 +148,7 @@ digital-marketing-pro/
 
 The 16 modules are: content-engine, campaign-orchestrator, paid-advertising, analytics-insights, aeo-geo, audience-intelligence, cro, digital-pr, funnel-architect, growth-engineering, influencer-creator, reputation-management, emerging-channels, technical-seo, local-seo, and marketing-automation.
 
-The 163 skills accumulated across releases, covering strategy, content, SEO/AEO/GEO, paid media, analytics, CRO, execution, competitor monitoring, revenue simulation, GEO monitoring, creative intelligence, synthetic audiences, journey orchestration, evaluation/QA, multilingual support, and the v3.0 engagement methodology.
+The 164 skills accumulated across releases, covering strategy, content, SEO/AEO/GEO, paid media, analytics, CRO, execution, competitor monitoring, revenue simulation, GEO monitoring, creative intelligence, synthetic audiences, journey orchestration, evaluation/QA, multilingual support, and the v3.0 engagement methodology.
 
 The 24 agents are: marketing-strategist, content-creator, seo-specialist, analytics-analyst, brand-guardian, media-buyer, growth-engineer, influencer-manager, competitive-intel, pr-outreach, email-specialist, cro-specialist, social-media-manager, execution-coordinator, performance-monitor-agent, crm-manager, memory-manager, agency-operations, marketing-scientist, market-intelligence, intelligence-curator, journey-orchestrator, quality-assurance, and localization-specialist. (The former `competitor-intelligence` agent merged into `competitive-intel` with a `mode: snapshot|monitoring` input.)
 
@@ -422,7 +422,7 @@ When enabled, these three reference lifecycle hooks wrap a Claude Code session w
 
 ## 8. Script Architecture
 
-All 93 scripts in `scripts/` follow consistent conventions.
+All 94 scripts in `scripts/` follow consistent conventions.
 
 ### Conventions
 

@@ -76,7 +76,13 @@ CONNECTOR_REGISTRY = {
         "connectors": {
             "hubspot": {
                 "transport": "http",
-                "url": "https://mcp.hubspot.com/anthropic",
+                # GA remote server (13 Apr 2026); OAuth 2.1 + PKCE. Checked 2026-10-04:
+                # developers.hubspot.com/changelog/remote-hubspot-mcp-server-is-now-generally-available
+                "url": "https://mcp.hubspot.com",
+                "access": "read-write",
+                "setup_note": ("OAuth 2.1 with PKCE is required; have your connector app's client ID, "
+                               "client secret and redirect URL ready. CRM writes run only behind the "
+                               "calling skill's approval gate."),
                 "description": "HubSpot — contacts, deals, email, pipeline",
                 "env_vars": [],
                 "skills_unlocked": [
@@ -241,6 +247,57 @@ CONNECTOR_REGISTRY = {
                 "env_vars": ["TIKTOK_ACCESS_TOKEN", "TIKTOK_ADVERTISER_ID"],
                 "skills_unlocked": [
                     "launch-ad-campaign", "performance-check", "media-plan",
+                ],
+            },
+            # ── Official ad-platform MCP servers (checked 2026-10-04) ──────────
+            # `access` is load-bearing: connector_resolver never picks a
+            # "read-only" connector for a write action. Writes through a
+            # "read-write" one run only behind launch-ad-campaign's typed
+            # approval gate, and new ad objects are created PAUSED.
+            "meta-ads": {
+                "transport": "http",
+                "url": "https://mcp.facebook.com/ads",
+                "access": "read-write",
+                "status": "open beta (announced 29 Apr 2026)",
+                "setup_note": ("Business-authenticated Meta login on first connect; write tools need an "
+                               "ad-account role that can manage ads. Writes only behind the typed "
+                               "approval gate; create new campaigns/ad sets/ads with status PAUSED."),
+                "source": "https://www.facebook.com/business/news/meta-ads-ai-connectors",
+                "description": "Meta Ads AI Connectors — official hosted MCP: reporting, campaign/ad set/ad create+edit, catalogs, signals",
+                "env_vars": [],
+                "skills_unlocked": [
+                    "launch-ad-campaign", "performance-check", "budget-tracker", "media-plan",
+                ],
+            },
+            "google-ads-mcp": {
+                "transport": "http",
+                "url": "https://<your-self-hosted-host>/mcp",
+                "access": "read-only",
+                "setup_note": ("Google's open-source server: runs locally over stdio by default "
+                               "(pipx run --spec google-ads-mcp==<version> google-ads-mcp — Claude Code only), "
+                               "or self-hosted over Streamable HTTP behind its OAuth proxy. Needs OAuth "
+                               "(adwords scope) and, for production, a developer token. Strictly READ-ONLY: "
+                               "search (GAQL), list_accessible_customers, get_resource_metadata."),
+                "source": "https://github.com/googleads/google-ads-mcp",
+                "description": "Google Ads MCP (official, open source, READ-ONLY) — GAQL reporting and account metadata",
+                "env_vars": [],
+                "skills_unlocked": [
+                    "performance-check", "budget-tracker", "media-plan", "campaign-audit",
+                ],
+            },
+            "amazon-ads-mcp": {
+                "transport": "http",
+                "url": "<endpoint-from-your-Amazon-Ads-API-partner-onboarding>",
+                "access": "read-write",
+                "status": "open beta since 2 Feb 2026 — Amazon Ads partners with active API credentials",
+                "setup_note": ("Requires active Amazon Ads API credentials; Amazon's announcement publishes "
+                               "no endpoint URL — take it from your API onboarding. Writes only behind the "
+                               "typed approval gate, new campaigns PAUSED; DMP never runs delete operations."),
+                "source": "https://advertising.amazon.com/library/news/amazon-ads-mcp-server-open-beta",
+                "description": "Amazon Ads MCP Server — campaigns, reporting, account settings (partners, open beta)",
+                "env_vars": [],
+                "skills_unlocked": [
+                    "launch-ad-campaign", "performance-check", "budget-tracker", "media-plan",
                 ],
             },
         },
@@ -426,6 +483,17 @@ def find_connector(name):
         if name in cat["connectors"]:
             return cat["connectors"][name]
     return None
+
+
+def is_read_only(name):
+    """True when the registry marks a connector `access: read-only`.
+
+    The resolver uses this to keep read-only servers (e.g. Google's
+    google-ads-mcp, which "cannot modify bids, pause campaigns, or create new
+    assets") out of every write action's candidate list — choosing one would
+    hand the user a manifest the server can never execute."""
+    info = find_connector(name)
+    return bool(info) and info.get("access") == "read-only"
 
 
 def find_connector_category(name):

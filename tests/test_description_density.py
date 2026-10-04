@@ -50,6 +50,22 @@ def all_skills():
             yield d
 
 
+class TestNoDeadFrontmatter(unittest.TestCase):
+    """`triggers:` is not a Claude Code skill field (the documented one is
+    `when_to_use`, which is loaded into every session alongside the
+    description). Sixteen skills carried trigger lists in it that no host ever
+    read; their routing phrases live in the description's "Triggers on" clause,
+    which the density guard below enforces. Found 2026-10-04."""
+
+    def test_no_skill_declares_triggers(self):
+        bad = []
+        for d in all_skills():
+            fm = (d / "SKILL.md").read_text(encoding="utf-8", errors="replace").split("---")[1]
+            if re.search(r"^triggers:", fm, re.M):
+                bad.append(d.name)
+        self.assertEqual(bad, [], f"skills with an unread `triggers:` field: {bad}")
+
+
 class TestDescriptionDensity(unittest.TestCase):
     def test_every_description_is_single_line_double_quoted(self):
         bad = [d.name for d in all_skills() if description_line(d) is None]

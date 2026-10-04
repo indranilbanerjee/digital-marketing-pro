@@ -159,6 +159,10 @@ EXECUTE_PROFILES = {
     "intercom":           {"oauth_only": True, "reason": "Intercom uses Bearer token — execute support TODO."},
     "canva":              {"oauth_only": True, "reason": "Canva Connect API requires OAuth2; use MCP path."},
     "figma":              {"oauth_only": True, "reason": "Figma requires personal access token; execute support TODO."},
+    # Official ad-platform MCP servers — reachable only as MCP tools (checked 2026-10-04).
+    "meta-ads":           {"oauth_only": True, "reason": "Meta Ads AI Connectors is a hosted MCP server with business login; use MCP path behind the typed approval gate."},
+    "google-ads-mcp":     {"oauth_only": True, "reason": "Google Ads MCP is a read-only MCP server (GAQL search); use MCP path — it cannot execute writes at all."},
+    "amazon-ads-mcp":     {"oauth_only": True, "reason": "Amazon Ads MCP Server needs partner API credentials via its MCP auth; use MCP path behind the typed approval gate."},
 }
 
 

@@ -31,8 +31,12 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 
-# "163 skills" / "93 Python scripts" but not "3-5 skills", "<5 agents", "v3.19.2 skills"
-COUNT_RE = re.compile(r"(?<![-<>~\d])\b(\d{1,3})\s+(?:Python\s+)?(skills|agents|commands|scripts)\b")
+# "163 skills" / "93 Python scripts" but not "3-5 skills", "<5 agents", "v3.19.2 skills".
+# 2026-10-04: "18 top-level commands", "18 top-level slash commands" and "24 specialist
+# agents" escaped the single optional qualifier and stayed stale after 13 commands were
+# folded into their skills; qualifiers now chain.
+COUNT_RE = re.compile(r"(?<![-<>~\d])\b(\d{1,3})\s+(?:(?:Python|top-level|slash|specialist)\s+)*"
+                      r"(skills|agents|commands|scripts)\b")
 # "The 158 SKILL.md files" — the phrasing the original guard could not see.
 # 2026-08-17: backticks ("158 `SKILL.md` files") made the same rot invisible again.
 SKILL_MD_RE = re.compile(r"(?<![-<>~\d])\b(\d{1,3})\s+`?SKILL\.md`?\s+files?\b")
@@ -144,6 +148,9 @@ class TestLiveDocCounts(unittest.TestCase):
         self.assertTrue(TABLE_ROW_RE.search("| Skills count | **158** |"))
         self.assertTrue(COUNT_RE.search("86 Python scripts"))
         self.assertFalse(COUNT_RE.search("~86 scripts"))  # approx stays exempt
+        self.assertTrue(COUNT_RE.search("### 18 top-level commands"))
+        self.assertTrue(COUNT_RE.search("**18 top-level slash commands**"))
+        self.assertTrue(COUNT_RE.search("24 specialist agents"))
         self.assertTrue(QUALIFIED_SKILLS_RE.search("all 158 marketing skills are discoverable"))
         self.assertTrue(QUALIFIED_SKILLS_RE.search("All 158 DMP skill names pass this regex"))
         self.assertTrue(TESTS_RE.search("All 209 tests are stdlib-only"))

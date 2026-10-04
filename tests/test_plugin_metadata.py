@@ -26,7 +26,10 @@ class TestPluginMetadata(unittest.TestCase):
                            "DMP should have 100+ skills")
         self.assertGreater(a["agents"], 20)
         self.assertGreater(a["scripts"], 10)
-        self.assertGreater(a["commands"], 5)
+        # Commands whose names duplicated a skill were folded into the skill
+        # (the skill already provides /digital-marketing-pro:<name>); only
+        # commands with no same-named skill remain, so assert presence, not size.
+        self.assertGreater(a["commands"], 0)
 
     def test_probe_connectors_has_keys(self):
         c = self.pm.probe_connectors()
@@ -51,7 +54,7 @@ class TestPluginMetadata(unittest.TestCase):
         cmds = self.pm.probe_commands_list()
         slash = [c["slash_command"] for c in cmds]
         self.assertIn("/digital-marketing-pro:doctor", slash)
-        self.assertIn("/digital-marketing-pro:cowork-setup", slash)
+        self.assertIn("/digital-marketing-pro:resume", slash)
 
     def test_all_sections_returns_all_keys(self):
         data = self.pm.all_sections()

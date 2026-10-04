@@ -104,7 +104,7 @@ Before continuing, tell the user what's being skipped vs re-run:
 ## Related
 
 - [`commands/engagement.md`](engagement.md) — the headline 12-Part workflow this command resumes
-- [`commands/campaign-plan.md`](campaign-plan.md), [`commands/content-engine.md`](content-engine.md), [`commands/seo-audit.md`](seo-audit.md), [`commands/competitor-analysis.md`](competitor-analysis.md) — other long workflows that benefit from checkpointing
+- [`skills/campaign-plan/SKILL.md`](../skills/campaign-plan/SKILL.md), [`skills/content-engine/SKILL.md`](../skills/content-engine/SKILL.md), [`skills/seo-audit/SKILL.md`](../skills/seo-audit/SKILL.md), [`skills/competitor-analysis/SKILL.md`](../skills/competitor-analysis/SKILL.md) — other long workflows that benefit from checkpointing
 - [`commands/output-folder.md`](output-folder.md) — reveal the user-visible `~/Documents/DigitalMarketingPro/` folder where published artifacts land
 - [`scripts/checkpoint-manager.py`](../scripts/checkpoint-manager.py) — the storage layer
 - [`scripts/output-publisher.py`](../scripts/output-publisher.py) — the dual-copy publisher

@@ -1,39 +1,19 @@
----
-description: Multi-dimensional competitive analysis — content, SEO, paid ads, social, AI visibility, pricing, and positioning
-argument-hint: "<competitor names or URLs>"
----
+# Competitor analysis — dimension checklists, report tables, follow-ups, and dispatch rules
 
-# Competitor Analysis
+Read this when you are working each dimension of the teardown, laying out the report tables, offering next steps, or fanning the dimensions out in parallel. It supplements `SKILL.md`; the brand-loading step there is authoritative.
 
-> If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+## Scope options (ask if not given)
 
-Deliver a comprehensive competitive intelligence report across all major marketing dimensions. Identify competitor strengths, weaknesses, strategies, and gaps the brand can exploit for competitive advantage.
+- **Full analysis** — all dimensions below (default)
+- **SEO comparison** — keyword overlap, domain authority, content depth, link gaps
+- **Content analysis** — publishing strategy, content types, topics, quality, frequency
+- **Paid advertising** — ad copy, creative themes, platforms, estimated spend
+- **Social media** — platform presence, engagement, content mix, posting cadence
+- **Pricing and positioning** — pricing models, value props, messaging frameworks
 
-## Trigger
+## Dimension checklists
 
-User runs `/digital-marketing-pro:competitor-analysis` or asks to analyze competitors, benchmark against competition, find competitive gaps, or understand the competitive landscape.
-
-## Inputs
-
-Gather the following from the user. If not provided, ask before proceeding:
-
-1. **Competitors** — 2-5 competitor names and/or URLs to analyze
-
-2. **Analysis scope** — one of:
-   - **Full analysis** — all dimensions below (default)
-   - **SEO comparison** — keyword overlap, domain authority, content depth, link gaps
-   - **Content analysis** — publishing strategy, content types, topics, quality, frequency
-   - **Paid advertising** — ad copy, creative themes, platforms, estimated spend
-   - **Social media** — platform presence, engagement, content mix, posting cadence
-   - **Pricing and positioning** — pricing models, value props, messaging frameworks
-
-3. **Key battleground keywords** — terms where the brand competes head-to-head
-
-4. **Industry or category** — for contextual benchmarking
-
-## Process
-
-### 1. Content Strategy Analysis
+### 1. Content strategy
 - Content types produced (blog, video, podcast, newsletter, reports, tools)
 - Publishing frequency and consistency
 - Top-performing content (shares, backlinks, estimated traffic)
@@ -41,15 +21,10 @@ Gather the following from the user. If not provided, ask before proceeding:
 - Content gaps — topics you cover that they don't, and vice versa
 - Quality assessment (depth, originality, E-E-A-T signals)
 
-### 2. SEO Competitive Landscape
+### 2. SEO competitive landscape
+**If an SEO data connector is connected:** pull domain metrics, keyword rankings, and backlink profiles automatically; identify exact keyword overlap and gaps.
 
-**If SEO tools are connected (Ahrefs, Similarweb):**
-- Pull domain metrics, keyword rankings, backlink profiles automatically
-- Identify exact keyword overlap and gaps
-
-**If tools are not connected:**
-- Use web search to research the SEO landscape
-- Note: "For detailed ranking data, connect Ahrefs or Similarweb via `/digital-marketing-pro:connect`."
+**If none is connected:** use web search to research the SEO landscape, and note: "For detailed ranking data, connect an SEO data tool via `/digital-marketing-pro:connect`."
 
 Assess:
 - Domain authority comparison
@@ -59,15 +34,15 @@ Assess:
 - Content depth — average word count, topic breadth
 - SERP feature ownership (featured snippets, People Also Ask, knowledge panels)
 
-### 3. Paid Advertising Intelligence
-- Platforms in use (Google, Meta, LinkedIn, TikTok, programmatic)
+### 3. Paid advertising intelligence
+- Platforms in use (search, social, programmatic)
 - Ad copy themes and messaging patterns
 - Landing page strategies
 - Estimated ad spend (if data available)
 - Creative approaches (image, video, carousel, text)
 - Targeting signals (audiences they appear to target)
 
-### 4. Social Media Benchmarking
+### 4. Social media benchmarking
 - Platform presence (which platforms, follower counts)
 - Engagement rates by platform
 - Content mix (text, image, video, stories, live)
@@ -75,20 +50,20 @@ Assess:
 - Community engagement (response rate, comment quality)
 - Viral or standout content
 
-### 5. AI Answer Engine Visibility
+### 5. AI answer-engine visibility
 - How competitors appear in Google AI Overviews
-- Presence in Perplexity, ChatGPT, and other AI answer engines
+- Presence in other AI answer engines
 - Citation patterns — which competitor sites are cited most for key topics
 - Structured content that makes competitors more "citeable"
 
-### 6. Pricing and Positioning
+### 6. Pricing and positioning
 - Pricing models (subscription, per-unit, freemium, enterprise)
 - Price points relative to market
 - Value proposition and messaging pillars
 - Market positioning (premium, mid-market, budget, niche)
 - Differentiation claims
 
-## Output Format
+## Report layout
 
 ### Competitive Overview Matrix
 
@@ -108,21 +83,14 @@ Include rows for: content volume, SEO strength, social following, ad presence, p
 |---------|-----------|--------|--------|-----------------|
 
 ### SWOT per Competitor
-
 For each competitor: Strengths, Weaknesses, Opportunities (for your brand), Threats.
 
 ### Strategic Recommendations
+- **Quick Wins** — competitive gaps you can exploit immediately
+- **Strategic Opportunities** — larger market positioning or content strategy moves
+- **Defensive Priorities** — areas where competitors are gaining ground that need protection
 
-**Quick Wins:**
-- Competitive gaps you can exploit immediately
-
-**Strategic Opportunities:**
-- Larger market positioning or content strategy moves
-
-**Defensive Priorities:**
-- Areas where competitors are gaining ground that need protection
-
-## After the Analysis
+## After the analysis
 
 Ask: "Would you like me to:
 - Set up ongoing competitor monitoring? (`/digital-marketing-pro:competitor-monitor`)

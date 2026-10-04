@@ -43,8 +43,8 @@ Resolves every action in the campaign-audit and launch-campaign skill surfaces a
 - [scripts/action-doctor.py](../scripts/action-doctor.py) — the underlying script
 - [scripts/connector_resolver.py](../scripts/connector_resolver.py) — the resolver and ACTION_SPECS table
 - [scripts/connector-status.py](../scripts/connector-status.py) — the broader connector dashboard (categories, setup guides)
-- [/digital-marketing-pro:check](check.md) — pre-publish quality gate
-- [/digital-marketing-pro:status](status.md) — brand snapshot
+- [/digital-marketing-pro:check](../skills/check/SKILL.md) — pre-publish quality gate
+- [/digital-marketing-pro:status](../skills/status/SKILL.md) — brand snapshot
 
 ## Run
 

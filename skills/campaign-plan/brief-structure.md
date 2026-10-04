@@ -1,51 +1,15 @@
----
-description: Generate a full multi-channel campaign plan with objectives, audience, channel mix, budget, timeline, and KPIs
-argument-hint: "<campaign objective or product>"
----
+# Campaign plan — brief structure, follow-ups, and dispatch rules
 
-# Campaign Plan
+Read this when you are about to write the plan document (section skeleton), offer next steps after delivering it, or fan out per-channel work in parallel. It supplements `SKILL.md`; the brand-loading and shared-reference steps there are authoritative.
 
-> If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+## Discovery detail (ask before proceeding if missing)
 
-Generate a comprehensive multi-channel marketing campaign plan ready for execution. Covers strategic objectives, audience segmentation, channel selection, budget distribution, phased timeline, content calendar, and measurable KPIs.
+- **Campaign goal** — drive signups, increase awareness, launch a product, generate leads, re-engage churned users, drive event registrations.
+- **Budget** is optional. If it is not provided, generate a channel-agnostic plan and note where budget allocation would matter.
+- **Additional context** (optional): key differentiators or value propositions, previous campaign performance or learnings, geographic focus or market, channel constraints or preferences, compliance requirements.
+- If a brand profile exists, reuse its personas instead of asking for them again.
 
-## Trigger
-
-User runs `/digital-marketing-pro:campaign-plan` or asks to plan, design, build, or launch a marketing campaign.
-
-## Inputs
-
-Gather the following from the user. If not provided, ask before proceeding:
-
-1. **Campaign goal** — the primary objective (drive signups, increase awareness, launch a product, generate leads, re-engage churned users, drive event registrations)
-
-2. **Product or service** — what is being promoted
-
-3. **Target audience** — who the campaign is aimed at (demographics, roles, industries, pain points, buying stage). If a brand profile exists, reference existing personas.
-
-4. **Timeline** — campaign duration and any fixed dates (launch date, event, seasonal deadline)
-
-5. **Budget range** — approximate budget or budget tier (optional; if not provided, generate a channel-agnostic plan and note where budget allocation would matter)
-
-6. **Additional context** (optional):
-   - Key differentiators or value propositions
-   - Previous campaign performance or learnings
-   - Geographic focus or market
-   - Channel constraints or preferences
-   - Compliance requirements
-
-## Brand Context
-
-If a brand profile exists at `~/.claude-marketing/brands/`, load it automatically:
-- Apply brand voice settings to all messaging recommendations
-- Reference existing audience personas instead of asking for them again
-- Check for guidelines, restrictions, and compliance rules
-- Load custom templates if available
-- Check agency SOPs for campaign planning standards
-
-If no brand exists, ask: "Set up a brand first (`/digital-marketing-pro:brand-setup`)?" — or proceed with general best practices.
-
-## Campaign Brief Structure
+## The 10-section campaign brief
 
 ### 1. Campaign Overview
 - Campaign name suggestion
@@ -67,7 +31,6 @@ If no brand exists, ask: "Set up a brand first (`/digital-marketing-pro:brand-se
 - Proof points or evidence supporting each message
 
 ### 4. Channel Strategy
-
 Recommend channels based on audience behavior, budget, and objective. For each channel:
 - Why this channel fits the audience and objective
 - Content format recommendations
@@ -83,7 +46,6 @@ Channel categories to evaluate:
 If analytics or advertising connectors are available, reference historical performance data to inform channel recommendations.
 
 ### 5. Content Calendar
-
 Week-by-week (or day-by-day for short campaigns) content plan:
 
 | Week | Content Piece | Channel | Format | Owner/Notes | Dependencies |
@@ -92,7 +54,6 @@ Week-by-week (or day-by-day for short campaigns) content plan:
 Include key milestones, launch dependencies, and approval checkpoints.
 
 ### 6. Content Assets Required
-
 List every content asset needed:
 - Asset name and type (blog, email, social, ad creative, landing page, video, etc.)
 - Brief description
@@ -123,7 +84,7 @@ List every content asset needed:
 - Stakeholder approvals needed
 - Key decision points
 
-## After Planning
+## After planning
 
 Ask: "Would you like me to:
 - Draft specific content pieces from the calendar? (`/digital-marketing-pro:content-engine`)

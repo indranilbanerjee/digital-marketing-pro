@@ -8,6 +8,7 @@ import sys
 import time
 import random
 from urllib.parse import urlparse, urljoin
+from urllib.robotparser import RobotFileParser
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
@@ -15,30 +16,18 @@ import _common  # noqa: E402
 try:
     import requests
 except ImportError:
-    print(json.dumps({
-        "fallback": True,
-        "error": "requests_not_installed",
-        "message": "requests not installed. Competitor scraping requires: pip install requests beautifulsoup4",
-        "recommendation": "Install dependencies for automated scraping, or analyze competitor pages manually."
-    }))
-    sys.exit(0)
+    requests = None
 
 try:
     from bs4 import BeautifulSoup
 except ImportError:
-    print(json.dumps({
-        "fallback": True,
-        "error": "beautifulsoup4_not_installed",
-        "message": "beautifulsoup4 not installed. Competitor scraping requires: pip install beautifulsoup4",
-        "recommendation": "Install dependencies for automated scraping, or analyze competitor pages manually."
-    }))
-    sys.exit(0)
+    BeautifulSoup = None
 
-USER_AGENTS = [
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
-    "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0",
-]
+# The scraper names itself. Site owners can see who fetched their pages and
+# write robots.txt rules for this token; rotating browser user-agents would
+# hide the scraper from exactly those rules.
+ROBOTS_TOKEN = "DigitalMarketingPro-CompetitorScraper"
+USER_AGENT = f"{ROBOTS_TOKEN}/1.0 (+https://github.com/indranilbanerjee/digital-marketing-pro)"
 
 SOCIAL_DOMAINS = {
     "facebook.com": "Facebook", "fb.com": "Facebook",
@@ -67,28 +56,34 @@ TECH_SIGNALS = {
 }
 
 
+def robots_verdict(status_code, robots_text, url, agent=ROBOTS_TOKEN):
+    """Decide from a robots.txt response whether `agent` may fetch `url`.
+
+    RFC 9309 section 2.3.1: a 4xx robots.txt means no restrictions; a 5xx or an
+    unreachable one means the crawler must assume complete disallow. A rule
+    group for this scraper's own token wins over the `*` group, and Allow
+    lines count.
+    """
+    if status_code is None or status_code >= 500:
+        return False, "robots.txt unreachable; treated as disallow (RFC 9309)"
+    if 400 <= status_code < 500:
+        return True, f"robots.txt returned {status_code}; no restrictions (RFC 9309)"
+    rp = RobotFileParser()
+    rp.parse((robots_text or "").splitlines())
+    if rp.can_fetch(agent, url):
+        return True, "Allowed by robots.txt"
+    return False, f"Blocked by robots.txt for {agent}"
+
+
 def check_robots_txt(url):
     """Check if scraping is allowed by robots.txt. Returns (allowed, message)."""
     parsed = urlparse(url)
     robots_url = f"{parsed.scheme}://{parsed.netloc}/robots.txt"
     try:
-        resp = requests.get(robots_url, timeout=5, headers={"User-Agent": random.choice(USER_AGENTS)})
-        if resp.status_code == 200:
-            path = parsed.path or "/"
-            lines = resp.text.splitlines()
-            user_agent_match = False
-            for line in lines:
-                line = line.strip().lower()
-                if line.startswith("user-agent:"):
-                    agent = line.split(":", 1)[1].strip()
-                    user_agent_match = agent == "*"
-                elif user_agent_match and line.startswith("disallow:"):
-                    disallowed = line.split(":", 1)[1].strip()
-                    if disallowed and path.startswith(disallowed):
-                        return False, f"Blocked by robots.txt: {disallowed}"
-        return True, "Allowed or no robots.txt restriction found"
-    except Exception:
-        return True, "Could not fetch robots.txt, proceeding with caution"
+        resp = requests.get(robots_url, timeout=5, headers={"User-Agent": USER_AGENT})
+    except requests.RequestException:
+        return robots_verdict(None, "", url)
+    return robots_verdict(resp.status_code, resp.text, url)
 
 
 def extract_headings(soup):
@@ -163,7 +158,7 @@ def scrape_url(url):
     # Rate limiting: small delay
     time.sleep(random.uniform(0.5, 1.5))
 
-    headers = {"User-Agent": random.choice(USER_AGENTS)}
+    headers = {"User-Agent": USER_AGENT}
     try:
         resp = requests.get(url, timeout=15, headers=headers, allow_redirects=True)
         resp.raise_for_status()
@@ -195,6 +190,7 @@ def scrape_url(url):
         "schema_types": detect_schema_types(soup),
         "technologies_detected": detect_technologies(html),
         "robots_txt": robots_msg,
+        "user_agent": USER_AGENT,
         "legal_disclaimer": (
             "This data was collected from publicly accessible web pages. "
             "No login-protected or paywalled content was accessed. "
@@ -213,6 +209,16 @@ def main():
     if not args.url.strip():
         print(json.dumps({"error": "URL cannot be empty"}))
         sys.exit(1)
+
+    missing = [name for name, mod in (("requests", requests), ("beautifulsoup4", BeautifulSoup)) if mod is None]
+    if missing:
+        print(json.dumps({
+            "fallback": True,
+            "error": f"{missing[0]}_not_installed",
+            "message": "Competitor scraping requires: pip install " + " ".join(missing),
+            "recommendation": "Install dependencies for automated scraping, or analyze competitor pages manually."
+        }))
+        sys.exit(0)
 
     result = scrape_url(args.url.strip())
     _common.finish(result)

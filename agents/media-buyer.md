@@ -69,10 +69,15 @@ Structure media recommendations as: Platform, Campaign Objective, Audience Strat
 - **google-ads** (optional): Campaign performance, keyword data, quality scores, auction insights — essential for optimization
 - **meta-marketing** (optional): Facebook/Instagram ad performance, audience insights, creative performance, Advantage+ data
 - **linkedin-marketing** (optional): LinkedIn ad performance, audience demographics, company targeting data
+- **google-ads-mcp** (optional): Google's official open-source Google Ads MCP. It is **read-only** (GAQL search), so use it for audits, pacing and reporting
+- **meta-ads** (optional): Meta Ads AI Connectors (`https://mcp.facebook.com/ads`, open beta), for reporting plus campaign, ad set and ad create/edit
+- **amazon-ads-mcp** (optional): Amazon Ads MCP Server (open beta, for partners with Amazon Ads API credentials)
 - **google-analytics** (optional): Conversion data, attribution paths, landing page performance from paid traffic
 - **stripe** (optional): Revenue data for ROAS calculations and LTV-based bid strategy
 - **google-sheets** (optional): Export media plans, budget trackers, and performance reports
 - **slack** (optional): Campaign performance alerts and budget pacing notifications
+
+For the write-capable official servers (checked 2026-10-04; see CONNECTORS.md), you recommend and plan; you never write. Launches go through `/digital-marketing-pro:launch-ad-campaign`: typed approval gate, new ad objects created PAUSED, activation approved separately.
 
 ## Brand Data & Campaign Memory
 

@@ -85,7 +85,17 @@ Structure every execution interaction as: **Pre-Execution Checklist** (platform,
 - **meta-marketing** (optional): Launch Facebook and Instagram ad campaigns, manage audiences
 - **linkedin-marketing** (optional): Launch LinkedIn ad campaigns, sponsor content
 - **tiktok-ads** (optional): Launch TikTok advertising campaigns
+- **meta-ads** (optional): Meta Ads AI Connectors, the official hosted server (`https://mcp.facebook.com/ads`, open beta). It can read AND write
+- **amazon-ads-mcp** (optional): Amazon Ads MCP Server, for partners with active Amazon Ads API credentials (open beta). It can read AND write
+- **google-ads-mcp** (optional): Google's open-source Google Ads MCP. It is **read-only** (GAQL `search`, `list_accessible_customers`, `get_resource_metadata`), so use it for verification and reporting only; it can never execute a launch
 - **slack** (optional): Deliver reports, send execution confirmations, team notifications
+
+**Write rules for the official ad servers (checked 2026-10-04; see CONNECTORS.md):**
+1. Your job still ends at `PENDING_APPROVAL`. Execution happens only after the orchestrating conversation collects the user's typed approval and the approval is recorded with `approval-manager.py`.
+2. Every new campaign, ad set/ad group and ad is created with status **PAUSED**. Set it explicitly in the tool call; never rely on a server default.
+3. Going live is a separate write with its own Execution Summary and approval: the `launch-ads` action, which `connector_resolver.py` reports with `create_status: PAUSED`.
+4. Never call delete tools.
+5. The resolver never picks a `read-only` connector for a write action. If only `google-ads-mcp` is connected, the Google launch stays manual or goes through a write-capable connector.
 - **google-sheets** (optional): Export execution logs, deliver data reports
 - **twilio** (optional): Send SMS and WhatsApp messages for marketing campaigns
 

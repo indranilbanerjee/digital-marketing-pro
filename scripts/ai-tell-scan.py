@@ -254,6 +254,34 @@ def _band(metric, value, absolute_count=None):
     return "HIGH" if value >= high else ("MODERATE" if value >= mod else "LOW")
 
 
+# Opening "-ing" words that are not participles. Without this, "During the
+# night..." or "Something changed..." counted as participial openers.
+_NON_PARTICIPLE_ING = frozenset({
+    "during", "something", "nothing", "anything", "everything", "morning",
+    "evening", "spring", "string", "thing", "things", "ceiling", "wedding",
+    "sibling", "sterling", "offspring", "pudding", "darling", "notwithstanding",
+})
+
+
+def _connective_matcher(connectives):
+    """Whole-word match at the start of a sentence. A bare prefix match let
+    "so" fire on "Sometimes", "Soon", "Something" and "Software"."""
+    alts = "|".join(r"\s+".join(re.escape(w) for w in c.split())
+                    for c in sorted(connectives, key=len, reverse=True))
+    return re.compile(rf"^(?:{alts})(?![\w'-])", re.I)
+
+
+def _is_participial_opener(sentence: str) -> bool:
+    words = sentence.strip().split()
+    if not words:
+        return False
+    first = re.sub(r"[^a-z]", "", words[0].lower())
+    return len(first) >= 5 and first.endswith("ing") and first not in _NON_PARTICIPLE_ING
+
+
+_CONNECTIVE_RE = _connective_matcher(_CONNECTIVE_OPENERS)
+
+
 def scan_sentences(sentences):
     """Per-sentence tells, most specific classification first."""
     flagged, counts = [], {"significance_markers": 0, "aphorism_candidates": 0,
@@ -267,9 +295,9 @@ def scan_sentences(sentences):
         counts["soft_adverb_tags"] += soft_here
         if soft_here >= 2:
             counts["soft_adverb_clusters"] += 1
-        if norm.startswith(_CONNECTIVE_OPENERS):
+        if _CONNECTIVE_RE.match(norm):
             counts["connective_openers"] += 1
-        if (st.split() or [""])[0].lower().endswith("ing"):
+        if _is_participial_opener(st):
             counts["participial_openers"] += 1
 
         if marker:
@@ -284,7 +312,7 @@ def scan_sentences(sentences):
         elif soft_here >= 2:
             flagged.append({"index": i, "tell": "soft_adverb_cluster", "text": st[:200],
                             "fix": "Delete the adverbs; if the line needs force it needs a specific."})
-        elif norm.startswith(_CONNECTIVE_OPENERS):
+        elif _CONNECTIVE_RE.match(norm):
             flagged.append({"index": i, "tell": "connective_opener", "text": st[:200],
                             "fix": "Open with the subject, the specific, or the data."})
     return flagged, counts

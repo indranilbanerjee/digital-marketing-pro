@@ -83,3 +83,6 @@ credentials/*.json
 # Internal source / reference PDFs (local only — never for public repo)
 *.pdf
 DM_Strategy_*
+
+# claude plugin eval output
+evals/results/

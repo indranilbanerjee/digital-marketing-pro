@@ -1,7 +1,8 @@
 {
   "name": "digital-marketing-pro",
-  "version": "3.32.0",
-  "description": "Open-source AI marketing plugin for agencies & in-house teams — 163 skills, 24 agents, 12-Part Strategy Flow, Cowork team-persistent, EU AI Act Article 50 ready. Runs on Claude Code, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok + 35+ more Agent Skills platforms.",
+  "displayName": "Digital Marketing Pro",
+  "version": "3.33.0",
+  "description": "Open-source AI marketing plugin for agencies & in-house teams — 164 skills, 24 agents, 12-Part Strategy Flow, Cowork team-persistent, EU AI Act Article 50 ready. Runs on Claude Code, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok + 35+ more Agent Skills platforms.",
   "author": {
     "name": "Indranil Banerjee",
     "url": "https://github.com/indranilbanerjee"
@@ -70,5 +71,10 @@
     "veo-3",
     "gemini-omni",
     "neelverse"
-  ]
+  ],
+  "icon": "./assets/icon.png",
+  "documentationUrl": "https://github.com/indranilbanerjee/digital-marketing-pro#readme",
+  "supportUrl": "https://github.com/indranilbanerjee/digital-marketing-pro/issues",
+  "privacyPolicyUrl": "https://github.com/indranilbanerjee/digital-marketing-pro/blob/main/PRIVACY.md",
+  "termsOfServiceUrl": "https://github.com/indranilbanerjee/digital-marketing-pro/blob/main/LICENSE"
 }

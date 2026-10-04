@@ -6,6 +6,99 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.33.0] - 2026-10-04
+
+### Added — AI surfaces, agent readiness, official ad servers
+
+- **`/digital-marketing-pro:agent-readiness-audit`** (new skill + stdlib
+  `scripts/agent-readiness-audit.py`, offline on exported files; network only
+  with `--fetch`). Checks whether AI agents and AI crawlers can use a site:
+  robots.txt rules for the AI crawler tokens parsed per RFC 9309 (search and
+  user-fetch bots blocked = fail; training bots reported as a policy choice),
+  JSON-LD structured data, main content present without JavaScript,
+  accessibility basics, Merchant Center feed completeness including
+  `native_commerce` and conversational attributes, the agentic-commerce feed,
+  and WebMCP as an optional experiment. It never recommends llms.txt for
+  Google, citing Google's AI optimization guide. 43 tests.
+- **AI-visibility measurement map** in `gsc-ai-performance`, `geo-monitor`
+  and `analytics-insights`, primary-sourced 2026-10-04: Search Console's
+  generative AI report has impressions only (no clicks, CTR or Queries
+  dimension) and reached all sites worldwide on 31 Aug 2026; GA4's AI
+  Assistant channel (medium `ai-assistant`) *excludes* AI Overviews and AI
+  Mode, which GA4 files under Organic Search; Bing Webmaster Tools AI
+  Performance covers Copilot citations and grounding queries. Every
+  deliverable states what no first-party tool reports instead of inferring it.
+- **Ads inside AI answers** (`paid-advertising/ads-in-ai-answers.md`,
+  `media-plan`): ChatGPT ads (Advertiser, Conversions and Reporting APIs,
+  pixel, delta feeds) and Google AI Mode ads through AI Max / Performance Max.
+- **Official ad-platform MCP servers in the connector catalog**: Meta Ads AI
+  Connectors (read-write, open beta), Google Ads MCP (open source,
+  **read-only** — the resolver never picks it for a write), Amazon Ads MCP
+  (partner open beta; endpoint comes from your API onboarding). Every write
+  runs behind `launch-ad-campaign`'s typed approval gate, and new ad objects
+  are created PAUSED. MCP-only connectors return an `mcp_tool_hint` instead
+  of an HTTP request. HubSpot moves to its GA remote server URL; Asana,
+  Webflow and Make entries move to Streamable HTTP. Registry-backed HTTP
+  connectors: 10 → 13.
+- **Meridian 2.x** (JAX backend, experiment-calibrated priors, declarative
+  holdouts) in `marketing-scientist` and the MMM docs.
+- **`docs/ALWAYS-ON-RECIPES.md`**: scheduled rank/SEO drift, competitor
+  alerts and content-decay jobs for Claude routines, Claude Tag, Grok Bot,
+  Gemini Spark, Cursor automations and Hermes cron, each with its approval
+  boundary.
+- **Workflow `/digital-marketing-pro:competitor-sweep`** (`workflows/`):
+  per-competitor research in parallel, then one synthesis. Read-only.
+- **`evals/`**: a trigger suite for `claude plugin eval` (10 cases plus a
+  stay-quiet case).
+- **Directory listing fields**: `displayName`, `icon`, `documentationUrl`,
+  `supportUrl`, `privacyPolicyUrl`, `termsOfServiceUrl`, a new `PRIVACY.md`
+  (no telemetry; what is stored where), and `assets/icon.png`. The root
+  `plugin.json` gains `extensions["com.openai"].interface` for OpenAI's
+  ChatGPT + Codex directory. Guarded.
+
+### Changed — context cost
+
+- **13 commands folded into their same-named skills** (`backlink-gap`,
+  `brand-setup`, `campaign-plan`, `check`, `competitor-analysis`,
+  `content-engine`, `cowork-setup`, `email-sequence`, `keyword-cluster`,
+  `performance-report`, `seo-audit`, `seo-drift`, `status`). Each loaded
+  twice; command-only instructions moved into supplement files beside the
+  skill, and every slash name works as before. Five standalone commands
+  remain. Always-on cost measured with `claude plugin details`: ~47,079 →
+  ~46,656 tokens, with one new skill added.
+- **`triggers:` removed from 16 skills.** It is not a skill frontmatter field
+  and was never loaded; a guard rejects it.
+
+### Fixed
+
+- **Opener matching in `ai-tell-scan.py`**: connectives now match as whole
+  words ("so" no longer matched "Sometimes") and the participial-opener check
+  skips non-participles ("During", "Something"). On a human sample the two
+  rates went from 60% / 60% to 0% / 0%.
+- **The doc-count guard missed qualified counts.** "18 top-level commands"
+  and "24 specialist agents" escaped its regex, so 30+ lines stayed stale
+  after the command fold. Qualifiers now chain; every stale line fixed.
+- **Issue #6's promised guard was never written.** Its resolution said a test
+  would keep all 18 execution skills gated and model-invocable; none existed.
+  `tests/test_execution_gates.py` now does, and also fails if any skill that
+  records an approval is missing from the execution list.
+- **`competitor-scraper.py` disguised itself as a browser.** It sent a random
+  browser User-Agent, which hid it from any robots.txt rule written for it, and
+  treated an unreachable robots.txt as permission. It now sends
+  `DigitalMarketingPro-CompetitorScraper/1.0` with this repo's URL, checks
+  robots.txt for that token with the standard-library parser (agent groups and
+  Allow lines count), and follows RFC 9309: a 4xx means no restrictions, a 5xx
+  or network error means do not fetch. `PRIVACY.md` now lists every network
+  endpoint the scripts can call and the credential each needs.
+
+### Not changed, on purpose
+
+- **Execution skills stay model-invocable.** Setting
+  `disable-model-invocation: true` would trim their descriptions from the
+  listing, but a plain request such as "send the campaign" could then not load
+  the skill, and the model can still reach the same MCP write tools freehand.
+  That routes around the typed approval gate instead of through it.
+
 ## [3.32.0] - 2026-10-04
 
 ### Fixed — install paths

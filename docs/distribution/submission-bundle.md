@@ -80,7 +80,7 @@ require re-scan, re-review, re-publish per release.
 
 ## Caveats to disclose
 
-- 163 skills is a large surface; Codex instruction caps must be validated on a
+- 164 skills is a large surface; Codex instruction caps must be validated on a
   current build before publishing.
 - Scripts require Python 3.10+.
 

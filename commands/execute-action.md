@@ -36,7 +36,7 @@ These execute against the real API when the named env var is set (10 actions, 8 
 
 OAuth-only connectors return `execute_blocked_reason: "use MCP path"`. Use Claude with the connector's MCP installed instead:
 
-Google Ads, Meta Marketing, LinkedIn Marketing, LinkedIn Publishing, TikTok Ads, Twitter/X (OAuth 1.0a), Gmail, Google Calendar, Google Analytics, Google Search Console, Meta Graph (organic), Salesforce, Pipedrive, Zoho CRM, Buffer, Hootsuite, Cision, Muckrack, Amplitude, Similarweb, SEMrush, Moz, Intercom, Canva, Figma.
+Google Ads, Meta Marketing, LinkedIn Marketing, LinkedIn Publishing, TikTok Ads, Twitter/X (OAuth 1.0a), Gmail, Google Calendar, Google Analytics, Google Search Console, Meta Graph (organic), Salesforce, Pipedrive, Zoho CRM, Buffer, Hootsuite, Cision, Muckrack, Amplitude, Similarweb, SEMrush, Moz, Intercom, Canva, Figma, and the official ad-platform MCP servers: Meta Ads AI Connectors (`meta-ads`), Google Ads MCP (`google-ads-mcp`, read-only, so it is never chosen for a write), and Amazon Ads MCP (`amazon-ads-mcp`). For these three the manifest carries an `mcp_tool_hint` instead of an HTTP request, and any new ad object is created PAUSED.
 
 For all of these, the **`manifest_ready`** response includes the exact HTTP request shape Claude's MCP tool will send — so even though Python can't fire it directly, you can see what would go out.
 

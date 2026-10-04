@@ -12,7 +12,8 @@ Plugins are **tool-agnostic** — they describe workflows in terms of categories
 |----------|-------------|-----------------|---------------|
 | Chat | `~~chat` | Slack | Microsoft Teams |
 | Design | `~~design` | Canva, Figma | Adobe Creative Cloud |
-| CRM | `~~CRM` | HubSpot | Salesforce, Pipedrive, Zoho |
+| CRM | `~~CRM` | HubSpot (remote MCP, GA) | Salesforce, Pipedrive, Zoho |
+| Advertising | `~~advertising` | Meta Ads AI Connectors (read/write), Google Ads MCP (read-only), Amazon Ads MCP (partners) | Unified ads MCPs (below) |
 | Product analytics | `~~product analytics` | Amplitude | Mixpanel, Google Analytics |
 | Knowledge base | `~~knowledge base` | Notion | Confluence, Guru |
 | SEO | `~~SEO` | Ahrefs, Similarweb | Semrush, Moz, DataForSEO |
@@ -41,12 +42,35 @@ The following categories require local npx/stdio MCP servers. They work in Claud
 | Category | Available via npx | When HTTP becomes available |
 |----------|------------------|---------------------------|
 | Productivity | Google Drive, Google Sheets | Google Drive/Docs also available as platform integration |
-| Advertising | Google Ads, Meta Ads, LinkedIn Ads, TikTok Ads | **Recommended: use a unified ads MCP** (see "Unified ads MCPs" section below) instead of one stdio server per platform. Synter covers 7 platforms in one endpoint; Ryze covers Google + Meta + GA4 with confirmation patterns; Northbeam is self-hosted. All three are HTTP and Cowork-compatible. Per-platform OAuth still applies. |
+| Advertising | Google Ads, Meta Ads, LinkedIn Ads, TikTok Ads | **Official servers first** (see "Official ad-platform and CRM MCP servers" below): Meta's hosted server is HTTP today; Google's is read-only and local/self-hosted; Amazon's is partner-only. For LinkedIn/TikTok, or one surface across many platforms, use a unified ads MCP (see "Unified ads MCPs" below). Per-platform OAuth still applies. |
 | Analytics | Google Analytics, Google Search Console | Connect via Connectors panel when available |
 | Social media | Buffer, Twitter/X, LinkedIn | Connect via Connectors panel when available |
 | SMS/Messaging | Twilio | Connect via Connectors panel when available |
 | Translation | DeepL, Sarvam AI | Connect via Connectors panel when available |
 | Database | Supabase, PostgreSQL | Connect via Connectors panel when available |
+
+## Official ad-platform and CRM MCP servers (checked 2026-10-04)
+
+These servers are published by the platforms themselves. Like everything else here they are **opt-in**: `.mcp.json` ships empty, and you copy an entry from `.mcp.json.connectors-reference` yourself.
+
+| Entry | Endpoint | Access | Status | Source |
+|---|---|---|---|---|
+| `meta-ads` — Meta Ads AI Connectors | `https://mcp.facebook.com/ads` (Meta-hosted) | **Read + write**: reporting, create/edit campaigns, ad sets and ads, catalogs, signals | Open beta (announced 29 Apr 2026); business-authenticated login | [Meta announcement](https://www.facebook.com/business/news/meta-ads-ai-connectors) · [developer docs](https://developers.facebook.com/documentation/ads-commerce/ads-ai-connectors/ads-mcp-server/ads-mcp-server-overview) |
+| `google-ads-mcp` — Google Ads MCP | Local stdio via `pipx run --spec google-ads-mcp==<version> google-ads-mcp` (Claude Code only), or self-hosted Streamable HTTP behind its OAuth proxy | **Read-only**: `search` (GAQL), `list_accessible_customers`, `get_resource_metadata`. Google: "strictly read-only. It cannot modify bids, pause campaigns, or create new assets." | Open source (Apache-2.0) | [GitHub](https://github.com/googleads/google-ads-mcp) · [Google guide](https://developers.google.com/google-ads/api/docs/developer-toolkit/mcp-server) |
+| `amazon-ads-mcp` — Amazon Ads MCP Server | Not published on the announcement page; take it from your Amazon Ads API onboarding | **Read + write**, including create/update/delete campaigns, reporting, account settings, billing data | Open beta since 2 Feb 2026, for Amazon Ads partners with active API credentials | [Amazon Ads news](https://advertising.amazon.com/library/news/amazon-ads-mcp-server-open-beta) |
+| `hubspot` — remote HubSpot MCP | `https://mcp.hubspot.com` (Streamable HTTP; OAuth 2.1 + PKCE) | **Read + write**: create/update contacts, companies, deals, tickets, line items, products, activities | Generally available since 13 Apr 2026 | [HubSpot changelog](https://developers.hubspot.com/changelog/remote-hubspot-mcp-server-is-now-generally-available) |
+
+**How DMP uses the write-capable ones**
+- Writes run only through the **typed approval gate** in `/digital-marketing-pro:launch-ad-campaign`: Execution Summary → the user types `yes` → `approval-manager.py` records the approval → execute → mark executed.
+- Every **new** campaign, ad set/ad group and ad is **created PAUSED**, with the status set explicitly in the tool call. Going live is a separate, separately approved write.
+- DMP never runs delete operations through these servers.
+- The action resolver (`scripts/connector_resolver.py`) never picks a read-only server such as `google-ads-mcp` for a write action.
+
+**Transport check (2026-10-04).** MCP spec revision 2026-07-28 classifies the old HTTP+SSE transport as **Deprecated** and eligible for removal ([spec](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http)). Catalog changes:
+- Asana moved to its V2 Streamable HTTP endpoint (`https://mcp.asana.com/v2/mcp`). Asana shut down the V1 `/sse` server on 11 May 2026 ([Asana docs](https://developers.asana.com/docs/using-asanas-mcp-server)).
+- Webflow moved to `https://mcp.webflow.com/mcp` ([Webflow changelog](https://developers.webflow.com/home/changelog/2025/11/24)).
+- Make.com moved to its stateless Streamable HTTP URL ([Make docs](https://developers.make.com/mcp-server)).
+- Replicate is **flagged**: its setup page still lists only an `/sse` URL.
 
 ## Unified ads MCPs (added v3.4, corrected v3.4.1)
 

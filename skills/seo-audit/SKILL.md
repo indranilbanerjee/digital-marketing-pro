@@ -49,6 +49,8 @@ The user must provide (or will be prompted for):
 8. Prioritize findings by impact (high/medium/low) and effort (quick win/medium/major project)
 9. Generate the audit report with actionable recommendations
 
+For the per-dimension checklists (incl. keyword research), the findings and action-plan table layouts, the after-audit follow-up menu, and the parallel-dispatch rules (independent dimensions concurrently; the action plan stays sequential), read `dimension-checklists.md` beside this file.
+
 ## Output
 
 A structured SEO audit report containing:

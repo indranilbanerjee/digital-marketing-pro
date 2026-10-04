@@ -63,6 +63,8 @@ def status_dashboard():
                 "transport": conn["transport"],
                 "skills_unlocked": conn["skills_unlocked"],
             }
+            if conn.get("access"):
+                entry["access"] = conn["access"]
 
             if _is_configured(name, conn, active_servers):
                 entry["status"] = "connected"
@@ -115,6 +117,8 @@ def list_available():
                     "transport": conn["transport"],
                     "skills_unlocked": conn["skills_unlocked"],
                 }
+                if conn.get("access"):
+                    entry["access"] = conn["access"]
                 if conn["transport"] == "npx":
                     entry["env_vars_needed"] = conn["env_vars"]
                 available.append(entry)
@@ -142,7 +146,10 @@ def check_connector(name):
 
             if conn["transport"] == "http":
                 result["url"] = conn.get("url", "")
-                result["setup"] = "HTTP connector — auto-connects via OAuth when you first use it"
+                result["setup"] = conn.get(
+                    "setup_note", "HTTP connector — auto-connects via OAuth when you first use it")
+                if conn.get("access"):
+                    result["access"] = conn["access"]
             elif conn.get("package_status") == "no-known-npm-package":
                 result["package"] = None
                 result["package_status"] = conn["package_status"]
@@ -200,6 +207,23 @@ def setup_guide(name):
                         f"No API keys or environment variables needed — authentication is handled by the platform.",
                         f"Works in both Claude Code and Cowork.",
                     ]
+                if conn.get("setup_note"):
+                    # Official servers with their own auth/hosting rules: the
+                    # generic "no keys needed" line would be wrong for them.
+                    guide["steps"] = [s for s in guide["steps"]
+                                      if not s.startswith("No API keys")]
+                    guide["steps"].append(conn["setup_note"])
+                if "<" in conn.get("url", ""):
+                    guide["steps"] = [s for s in guide["steps"]
+                                      if not s.startswith("Works in both")]
+                    guide["steps"].append("Replace the <...> part of the URL with your own endpoint first. "
+                                          "Cowork can reach it only once it is served at a reachable "
+                                          "HTTPS URL; a local stdio run is Claude Code only.")
+                if conn.get("access"):
+                    guide["access"] = conn["access"]
+                for key in ("status", "source"):
+                    if conn.get(key):
+                        guide[key] = conn[key]
                 if configured:
                     guide["status_message"] = (
                         f"{name} is configured. Use any of these skills to activate it: "

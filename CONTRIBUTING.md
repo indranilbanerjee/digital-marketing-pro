@@ -103,7 +103,7 @@ Before producing any marketing output from this module:
 Do not ask the user for information that already exists in their brand profile.
 ```
 
-**Command skills** (163 skills, 18 top-level commands) must have an explicit brand loading step as Process step 1:
+**Command skills** (164 skills, 5 top-level commands) must have an explicit brand loading step as Process step 1:
 
 ```markdown
 1. **Load brand context**: Read `~/.claude-marketing/brands/_active-brand.json` for the active slug, then load `~/.claude-marketing/brands/{slug}/profile.json`. Apply brand voice, compliance rules for target markets (`skills/context-engine/compliance-rules.md`), and industry context. If no brand exists, ask: "Set up a brand first (/digital-marketing-pro:brand-setup)?" — or proceed with defaults.

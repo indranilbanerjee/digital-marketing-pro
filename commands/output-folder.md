@@ -106,6 +106,6 @@ The internal tracking copy (under `~/.claude-marketing/`) is unchanged — that 
 
 ## Related
 
-- [`commands/engagement.md`](engagement.md), [`commands/campaign-plan.md`](campaign-plan.md), [`commands/content-engine.md`](content-engine.md), [`commands/seo-audit.md`](seo-audit.md) — the workflows that produce the files this command reveals
+- [`commands/engagement.md`](engagement.md), [`skills/campaign-plan/SKILL.md`](../skills/campaign-plan/SKILL.md), [`skills/content-engine/SKILL.md`](../skills/content-engine/SKILL.md), [`skills/seo-audit/SKILL.md`](../skills/seo-audit/SKILL.md) — the workflows that produce the files this command reveals
 - [`commands/resume.md`](resume.md) — pick up an interrupted run
 - [`scripts/output-publisher.py`](../scripts/output-publisher.py) — implements the dual-copy save + `where` + `open` subcommands

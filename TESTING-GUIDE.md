@@ -69,7 +69,7 @@ rm -rf ~/.claude-marketing/
 **Expected Results:**
 - [ ] Marketplace loads without errors
 - [ ] DM Pro listed with the current version (= CHANGELOG.md top entry)
-- [ ] Description mentions "24 specialist agents, 18 commands, 163 skills"
+- [ ] Description mentions "164 skills, 24 agents"
 - [ ] Installation completes without rollback
 - [ ] No "Host key verification failed" error (uses HTTPS, not SSH)
 
@@ -94,8 +94,8 @@ rm -rf ~/.claude-marketing/
 **Expected Results:**
 - [ ] Plugin loads with NO auto-firing hook (hooks ship empty); optionally run `python scripts/setup.py --check-deps --summary` yourself
 - [ ] No Python errors or tracebacks
-- [ ] 18 top-level commands visible in the Customize panel (all prefixed `/digital-marketing-pro:`)
-- [ ] 163 skills visible in Skills section
+- [ ] 5 top-level commands visible in the Customize panel (all prefixed `/digital-marketing-pro:`)
+- [ ] 164 skills visible in Skills section
 - [ ] 24 agents registered (check for no frontmatter errors in logs)
 
 ### 2.4 Plugin Structure Verification
@@ -115,7 +115,7 @@ rm -rf ~/.claude-marketing/
 
 ## 3. Command Tests
 
-DM Pro ships 18 top-level commands (all prefixed `/digital-marketing-pro:`). This section details the 7 highest-priority commands; the remaining commands follow the same invocation pattern.
+DM Pro ships 5 top-level commands, and every skill is also a slash name (all prefixed `/digital-marketing-pro:`). This section details the 7 highest-priority slash names; the rest follow the same invocation pattern.
 
 ### 3.1 `/brand-setup`
 
@@ -201,14 +201,14 @@ DM Pro ships 18 top-level commands (all prefixed `/digital-marketing-pro:`). Thi
 
 ## 4. Skill Tests
 
-DM Pro has 163 skills. Test a representative sample from each module.
+DM Pro has 164 skills. Test a representative sample from each module.
 
 ### Context & Setup Module
 
 | Skill | Test Prompt | Key Checks |
 |-------|-------------|------------|
 | `/digital-marketing-pro:help` | (no args) | Shows getting started guide, commands by category, examples, troubleshooting |
-| `/digital-marketing-pro:integrations` | (no args) | Shows the 10 registry-backed HTTP connectors + available connectors by category |
+| `/digital-marketing-pro:integrations` | (no args) | Shows the 13 registry-backed HTTP connectors + available connectors by category |
 | `/digital-marketing-pro:connect notion` | "Set up Notion" | Step-by-step OAuth instructions |
 | `/digital-marketing-pro:switch-brand` | "Switch to HealthFirst" | Brand context changes, subsequent commands use new brand |
 | `/digital-marketing-pro:context-engine` | "Load TestBrand Alpha" | Brand profile loaded, context confirmed |
@@ -367,7 +367,7 @@ DM Pro has ~86 Python scripts. Test key scripts that are critical to plugin oper
 | Script | Trigger | Test | Expected |
 |--------|---------|------|----------|
 | `setup.py` | manual / optional | `python scripts/setup.py --check-deps --summary` | Checks dependencies, prints summary, no errors |
-| `connector-status.py` | `/digital-marketing-pro:integrations` | Run integrations command | Lists 10 registry-backed HTTP + available connectors by category |
+| `connector-status.py` | `/digital-marketing-pro:integrations` | Run integrations command | Lists 13 registry-backed HTTP + available connectors by category |
 | `campaign-tracker.py` | skill-invoked (e.g. sync-memory) | Save an insight | Session insights saved |
 | `guidelines-manager.py` | Brand compliance | Set up brand with guidelines | Rules stored and enforced |
 
@@ -460,14 +460,14 @@ Users who *want* the former lifecycle behavior can copy `hooks/hooks-reference.e
 
 ## 8. MCP Connector Tests
 
-### 8.1 The 10 Registry-Backed HTTP Connectors (+ 4 catalog-only servers)
+### 8.1 Registry-Backed HTTP Connectors (+ catalog-only servers)
 
 | # | Connector | URL | Test Action | Expected |
 |---|-----------|-----|------------|----------|
 | 1 | **Slack** | `mcp.slack.com/mcp` | Send notification | Message delivered |
 | 2 | **Canva** | `mcp.canva.com/mcp` | Generate design | Design created |
 | 3 | **Figma** | `mcp.figma.com/mcp` | Access design file | Design data retrieved |
-| 4 | **HubSpot** | `mcp.hubspot.com/anthropic` | Read CRM contacts | Contact list returned |
+| 4 | **HubSpot** | `mcp.hubspot.com` (GA remote server; OAuth 2.1 + PKCE) | Read CRM contacts | Contact list returned |
 | 5 | **Amplitude** | `mcp.amplitude.com/mcp` | Query analytics | Event data returned |
 | 6 | **Notion** | `mcp.notion.com/mcp` | Read a page | Content retrieved |
 | 7 | **Ahrefs** | `api.ahrefs.com/mcp/mcp` | Get backlink data | Link profile returned |
@@ -476,10 +476,13 @@ Users who *want* the former lifecycle behavior can copy `hooks/hooks-reference.e
 | 10 | **Google Calendar** | `calendarmcp.googleapis.com/mcp/v1` | Create event | Calendar event created |
 | 11 | **Gmail** | `gmailmcp.googleapis.com/mcp/v1` | Draft email | Email draft created |
 | 12 | **Stripe** | `mcp.stripe.com/` | Get revenue data | Payment data returned |
-| 13 | **Asana** | `mcp.asana.com/sse` | List tasks | Task list returned |
-| 14 | **Webflow** | `mcp.webflow.com/sse` | Publish content | Content appears in CMS |
+| 13 | **Asana** | `mcp.asana.com/v2/mcp` (V1 `/sse` shut down 11 May 2026) | List tasks | Task list returned |
+| 14 | **Webflow** | `mcp.webflow.com/mcp` (`/sse` deprecated) | Publish content | Content appears in CMS |
+| 15 | **Meta Ads AI Connectors** (`meta-ads`) | `mcp.facebook.com/ads` | List campaigns (read only) | Campaign list returned |
+| 16 | **Google Ads MCP** (`google-ads-mcp`, read-only) | self-hosted `/mcp`, or local `pipx` stdio | GAQL `search` for campaigns | Campaign rows returned |
+| 17 | **Amazon Ads MCP** (`amazon-ads-mcp`, partners) | endpoint from Amazon Ads API onboarding | Read a campaign report | Report rows returned |
 
-**Note:** Rows 1-5, 7-11 are the 10 registry-backed HTTP connectors (`scripts/_connector_registry.py`). Notion, Stripe, Asana, and Webflow (rows 6, 12-14) are catalog-only servers configured directly from `.mcp.json.connectors-reference` — they have no `/doctor` / `connector-status` support. Each connector requires OAuth authorization on first use. The Claude platform handles this. Not all testers will have accounts for all services.
+**Note:** Rows 1-5, 7-11 and 15-17 are the registry-backed HTTP connectors (`scripts/_connector_registry.py`). Rows 15-17 are the official ad-platform servers (checked 2026-10-04, see CONNECTORS.md): test them with READ actions only — any write goes through `/digital-marketing-pro:launch-ad-campaign`'s typed approval gate, with new ad objects created PAUSED. Notion, Stripe, Asana, and Webflow (rows 6, 12-14) are catalog-only servers configured directly from `.mcp.json.connectors-reference` — they have no `/doctor` / `connector-status` support. Each connector requires OAuth authorization on first use. The Claude platform handles this. Not all testers will have accounts for all services.
 
 ### 8.2 Connector Categories
 
@@ -588,7 +591,7 @@ Run this after any changes to verify nothing is broken.
 
 ### Commands
 
-- [ ] All 18 commands appear in Customize panel (all prefixed `/digital-marketing-pro:`)
+- [ ] All 5 commands and every skill's slash name appear in the Customize panel (all prefixed `/digital-marketing-pro:`)
 - [ ] `/brand-setup` completes full setup flow
 - [ ] `/campaign-plan` generates multi-channel plan with budget
 - [ ] `/seo-audit` produces comprehensive report
@@ -600,8 +603,8 @@ Run this after any changes to verify nothing is broken.
 ### Skills
 
 - [ ] `/digital-marketing-pro:help` shows complete, accurate information
-- [ ] `/digital-marketing-pro:integrations` shows the 10 registry-backed HTTP connectors with correct status
-- [ ] All 163 skills respond to invocation (spot check at minimum)
+- [ ] `/digital-marketing-pro:integrations` shows the 13 registry-backed HTTP connectors with correct status
+- [ ] All 164 skills respond to invocation (spot check at minimum)
 - [ ] Skills handle missing connectors gracefully
 
 ### Skill Platform Features
@@ -635,7 +638,7 @@ section once pinned v3.17.0 for thirteen releases). Verify against the sources o
       run `python -m pytest tests/test_doc_counts.py` instead of counting by hand
 - [ ] AGENTS.md "Supported surfaces" line carries the current version and all 8 native
       surfaces (guarded by the same test)
-- [ ] `10 registry-backed HTTP connectors` (+ 4 catalog-only servers) in all descriptions
+- [ ] `13 registry-backed HTTP connectors` (+ 4 catalog-only servers) in all descriptions
 
 ---
 

@@ -44,6 +44,7 @@ from _connector_registry import (
     _load_mcp_json,
     find_connector,
     is_connector_configured,
+    is_read_only,
 )
 
 import os
@@ -85,6 +86,23 @@ CHANNEL_TO_AD_CONNECTOR = {
     "twitter_ads": "twitter-x",
 }
 
+# Official, platform-published ad MCP servers (checked 2026-10-04). Tried AFTER
+# the per-platform connector for the same channel. Their registry `access`
+# field decides whether they can serve write actions (google-ads-mcp cannot).
+OFFICIAL_AD_MCP_BY_CHANNEL = {
+    "google_ads": ["google-ads-mcp"],
+    "meta_ads": ["meta-ads"],
+    "amazon_ads": ["amazon-ads-mcp"],
+}
+
+# Connectors reached only through an MCP tool — there is no REST manifest to
+# hand back, so manifests carry an `mcp_tool_hint` instead of `http_request`.
+MCP_TOOL_ONLY_CONNECTORS = {"meta-ads", "google-ads-mcp", "amazon-ads-mcp"}
+
+# Every NEW ad object (campaign / ad set / ad group / ad) is created with this
+# status; going live is a separate, separately approved write (launch-ads).
+AD_OBJECT_CREATE_STATUS = "PAUSED"
+
 CHANNEL_TO_AUTOMATION_CONNECTOR = {
     "email": ["klaviyo", "hubspot", "mailchimp", "brevo", "customer-io", "sendgrid"],
     "crm":   ["hubspot", "salesforce", "pipedrive", "zoho-crm"],
@@ -105,10 +123,11 @@ CRM_CONNECTORS_PRIORITY = ["hubspot", "salesforce", "pipedrive", "zoho-crm"]
 def _ad_connector_for_channel(channel):
     """Resolve channel name to ad-platform connector list."""
     if not channel:
-        return list(CHANNEL_TO_AD_CONNECTOR.values())  # all
+        official = [n for names in OFFICIAL_AD_MCP_BY_CHANNEL.values() for n in names]
+        return list(CHANNEL_TO_AD_CONNECTOR.values()) + official  # all
     c = channel.lower().replace("-", "_")
     mapped = CHANNEL_TO_AD_CONNECTOR.get(c)
-    return [mapped] if mapped else []
+    return ([mapped] if mapped else []) + list(OFFICIAL_AD_MCP_BY_CHANNEL.get(c, []))
 
 
 def _automation_connector_for_channel(channel):
@@ -182,7 +201,7 @@ def _manifest_inventory(connector_name, brand, kwargs):
         },
     }
     spec = endpoints.get(connector_name)
-    return {
+    manifest = {
         "connector": connector_name,
         "channel": channel,
         "operation": "read",
@@ -191,6 +210,18 @@ def _manifest_inventory(connector_name, brand, kwargs):
                                f"'list active campaigns' on the {channel} ad account and it will "
                                f"call the MCP tool that wraps this endpoint.",
     }
+    if connector_name in MCP_TOOL_ONLY_CONNECTORS:
+        manifest["http_request"] = None
+        manifest["mcp_tool_hint"] = {
+            "google-ads-mcp": ("Call the server's `search` tool with this GAQL: "
+                               + endpoints["google-ads"]["body_template"]["query"]
+                               + " (use `list_accessible_customers` first to get the customer id)."),
+            "meta-ads": ("Use the Meta Ads MCP reporting tools to list campaigns with id, name, "
+                         "status, daily budget and last-30-day spend/actions for the ad account."),
+            "amazon-ads-mcp": ("Use the Amazon Ads MCP reporting tools to list active campaigns "
+                               "with budget, status and last-30-day spend for the advertiser profile."),
+        }[connector_name]
+    return manifest
 
 
 def _manifest_automations(connector_name, brand, kwargs):
@@ -680,16 +711,30 @@ def _manifest_launch_ads(connector_name, brand, kwargs):
         },
     }
     spec = endpoints.get(connector_name)
-    return {
+    manifest = {
         "connector": connector_name,
         "operation": "write",
         "approval_required": True,
+        "approval_gate": ("typed yes on the Execution Summary, recorded with approval-manager.py "
+                          "create-approval BEFORE this call and mark-executed after the platform "
+                          "confirms (see /digital-marketing-pro:launch-ad-campaign)"),
+        "create_status": AD_OBJECT_CREATE_STATUS,
+        "create_status_note": ("Campaigns, ad sets/ad groups and ads are created "
+                               f"{AD_OBJECT_CREATE_STATUS}; this action is the separate, "
+                               "separately approved activation."),
         "plan_path": plan_path,
         "http_request": spec,
         "launch_order_note": "Launch ads in dependency order from plan.launch_sequence "
                              "(typically Google Ads → Meta → LinkedIn → TikTok). Capture "
                              "activated_at per platform for the launch-record.",
     }
+    if connector_name in MCP_TOOL_ONLY_CONNECTORS:
+        manifest["http_request"] = None
+        manifest["mcp_tool_hint"] = (
+            f"Through the {connector_name} MCP server's campaign-management tools, set status "
+            "ACTIVE only on plan.campaign_ids that exist and are currently PAUSED — never create "
+            "and activate in one call, never delete.")
+    return manifest
 
 
 def _manifest_audit_current_seo(connector_name, brand, kwargs):
@@ -921,10 +966,11 @@ ACTION_SPECS: dict[str, dict[str, Any]] = {
     },
     "launch-ads": {
         "script": "execution-tracker",
-        "purpose": "Activate paid-ads across Google / Meta / LinkedIn / TikTok in dependency order.",
+        "purpose": "Activate paid-ads across Google / Meta / LinkedIn / TikTok / Amazon in dependency order.",
         "operation": "write",
-        "candidate_connectors": lambda kw: ["google-ads", "meta-marketing",
-                                            "linkedin-marketing", "tiktok-ads"],
+        "candidate_connectors": lambda kw: ["google-ads", "meta-marketing", "meta-ads",
+                                            "linkedin-marketing", "tiktok-ads",
+                                            "amazon-ads-mcp"],
         "manual_fallback": "Open each ad platform UI; activate campaigns matching plan.campaign_ids.",
         "fields_returned": ["platforms_activated", "campaign_ids_per_platform",
                             "total_daily_budget", "activated_at"],
@@ -980,6 +1026,12 @@ def resolve_action(action_id: str, brand: str, **kwargs) -> dict:
         info = find_connector(c_name)
         if info is None:
             candidate_status.append({"connector": c_name, "status": "unknown_connector"})
+            continue
+        if spec["operation"] == "write" and is_read_only(c_name):
+            # A read-only server can never execute a write; picking it would
+            # return a manifest that cannot run (e.g. google-ads-mcp).
+            candidate_status.append({"connector": c_name, "status": "skipped_read_only",
+                                     "transport": info["transport"]})
             continue
         is_cfg, evidence = is_connector_configured(c_name, info, active_servers)
         candidate_status.append({
@@ -1043,14 +1095,22 @@ def _build_setup_hint(candidates: list[str]) -> dict:
         if info is None:
             continue
         if info["transport"] == "http":
-            hints.append({
+            hint = {
                 "connector": c_name,
                 "transport": "http",
                 "one_step_setup": f"Add this entry to .mcp.json under mcpServers:",
                 "mcp_json_snippet": {c_name: {"type": "http", "url": info.get("url", "")}},
                 "auth_flow": "OAuth on first use — no env vars needed.",
                 "platforms": "Works in Claude Code CLI + IDE + Anthropic Cowork (HTTP transport).",
-            })
+            }
+            if info.get("setup_note"):
+                hint["auth_flow"] = info["setup_note"]
+            if info.get("access"):
+                hint["access"] = info["access"]
+            if "<" in info.get("url", ""):
+                hint["url_placeholder"] = ("Replace the <...> part of the URL with your own "
+                                           "endpoint before adding it.")
+            hints.append(hint)
         elif info.get("package_status") == "no-known-npm-package" or not info.get("package"):
             hints.append({
                 "connector": c_name,

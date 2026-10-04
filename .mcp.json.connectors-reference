@@ -1,13 +1,19 @@
 {
-  "_readme": "REFERENCE catalog of HTTP MCP connectors for Digital Marketing Pro. Copy any entry you want into .mcp.json under 'mcpServers' to enable it. .mcp.json is gitignored — fresh plugin installs get NO active MCPs by default, which keeps the install footprint clean. PLATFORM NOTE (May 2026): Plugin-bundled MCP servers auto-start when the plugin is enabled, so shipping nothing by default avoids forcing connection attempts and auth prompts on first install. COWORK COMPATIBILITY: All entries below are HTTP MCPs and work in both Claude Code CLI and Anthropic Cowork. Cowork does NOT support the stdio/npx MCPs in .mcp.json.example — for those services, use the aggregator MCPs (Pipedream, Composio, Zapier, Make.com) at the bottom of this file. Endpoints verified May 2026.",
+  "_readme": "REFERENCE catalog of HTTP MCP connectors for Digital Marketing Pro. Copy any entry you want into .mcp.json under 'mcpServers' to enable it. .mcp.json is gitignored — fresh plugin installs get NO active MCPs by default, which keeps the install footprint clean. PLATFORM NOTE (May 2026): Plugin-bundled MCP servers auto-start when the plugin is enabled, so shipping nothing by default avoids forcing connection attempts and auth prompts on first install. COWORK COMPATIBILITY: All entries below are HTTP MCPs and work in both Claude Code CLI and Anthropic Cowork. Cowork does NOT support the stdio/npx MCPs in .mcp.json.example — for those services, use the aggregator MCPs (Pipedream, Composio, Zapier, Make.com) at the bottom of this file. Endpoints verified May 2026. TRANSPORT RE-CHECK 2026-10-04: MCP spec 2026-07-28 classifies the old HTTP+SSE transport as Deprecated (eligible for removal); asana, webflow and make-com were moved to their vendors' Streamable HTTP URLs, and replicate (vendor page still lists only /sse) carries a _transport_status flag. Entries marked _access read-write can change live ad/CRM accounts — DMP routes those writes through the typed approval gate and creates new ad objects PAUSED.",
 
   "mcpServers_reference": {
     "_section_first_party_marketing": "First-party HTTP MCPs from major marketing platforms (best when available — direct vendor support, native auth)",
     "hubspot": {
       "type": "http",
-      "url": "https://mcp.hubspot.com/anthropic",
-      "_auth": "OAuth on first connect",
-      "_purpose": "CRM contacts, deals, email performance, pipeline data, marketing hub analytics"
+      "url": "https://mcp.hubspot.com",
+      "_auth": "OAuth 2.1 with PKCE (required for all connections); uses your connector app's client ID, client secret and redirect URL; HubSpot user permissions are respected",
+      "_access": "read-write",
+      "_purpose": "Remote HubSpot MCP (generally available 13 Apr 2026). Read: contacts, companies, deals, tickets, line items, quotes, invoices, orders, carts, products, subscriptions, segments, plus campaigns, landing pages, blog posts, site pages, marketing events. Create/update: contacts, companies, deals, tickets, line items, products, and calls/meetings/notes/tasks/emails. With HubSpot 'sensitive data' on, activity objects are blocked.",
+      "_write_policy": "Every create/update goes through the approval gate of the calling skill (crm-sync, lead-import, pipeline-update); never write CRM records without an explicit typed yes.",
+      "_transport": "Streamable HTTP",
+      "_source": "https://developers.hubspot.com/changelog/remote-hubspot-mcp-server-is-now-generally-available ; https://developers.hubspot.com/docs/apps/developer-platform/build-apps/integrate-with-the-remote-hubspot-mcp-server",
+      "_checked": "2026-10-04",
+      "_previous_url": "https://mcp.hubspot.com/anthropic (earlier catalog entry; HubSpot's GA docs name only https://mcp.hubspot.com)"
     },
     "stripe": {
       "type": "http",
@@ -55,15 +61,23 @@
     },
     "asana": {
       "type": "http",
-      "url": "https://mcp.asana.com/sse",
-      "_auth": "OAuth on first connect",
-      "_purpose": "Marketing project tracking, task management, sprint planning, team workflows"
+      "url": "https://mcp.asana.com/v2/mcp",
+      "_auth": "OAuth; V2 may need a client ID + client secret from Asana's integration guide if your MCP client does not manage registration for you",
+      "_purpose": "Marketing project tracking, task management, sprint planning, team workflows",
+      "_transport": "Streamable HTTP",
+      "_migration_note": "Replaced https://mcp.asana.com/sse (V1 beta, HTTP+SSE), which Asana deprecated with shutdown on 11 May 2026. The HTTP+SSE transport is Deprecated in MCP spec 2026-07-28.",
+      "_source": "https://developers.asana.com/docs/using-asanas-mcp-server",
+      "_checked": "2026-10-04"
     },
     "webflow": {
       "type": "http",
-      "url": "https://mcp.webflow.com/sse",
+      "url": "https://mcp.webflow.com/mcp",
       "_auth": "OAuth on first connect",
-      "_purpose": "Landing page publishing, CMS management, design updates, style editing"
+      "_purpose": "Landing page publishing, CMS management, design updates, style editing",
+      "_transport": "Streamable HTTP",
+      "_migration_note": "Replaced https://mcp.webflow.com/sse, which Webflow's changelog marks deprecated in favour of /mcp.",
+      "_source": "https://developers.webflow.com/home/changelog/2025/11/24",
+      "_checked": "2026-10-04"
     },
     "canva": {
       "type": "http",
@@ -170,9 +184,13 @@
 
     "make-com": {
       "type": "http",
-      "url": "https://<MAKE_ZONE>/mcp/api/v1/u/<MCP_TOKEN>/sse",
-      "_auth": "MCP token generated in Make.com profile (zone substitution required, e.g. eu1.make.com or us1.make.com)",
-      "_purpose": "Make.com (formerly Integromat) scenario-based automation exposed as MCP. Choose this if your team's existing automation lives in Make."
+      "url": "https://<MAKE_ZONE>/mcp/u/<MCP_TOKEN>",
+      "_auth": "MCP token generated in Make.com profile (zone substitution required, e.g. eu1.make.com or us1.make.com). OAuth alternative URL: https://mcp.make.com. Token-in-header alternative: https://<MAKE_ZONE>/mcp with Authorization: Bearer <MCP_TOKEN>",
+      "_purpose": "Make.com (formerly Integromat) scenario-based automation exposed as MCP. Choose this if your team's existing automation lives in Make.",
+      "_transport": "stateless Streamable HTTP",
+      "_migration_note": "Replaced https://<MAKE_ZONE>/mcp/api/v1/u/<MCP_TOKEN>/sse (HTTP+SSE; Make marks that page outdated). HTTP+SSE is Deprecated in MCP spec 2026-07-28.",
+      "_source": "https://developers.make.com/mcp-server",
+      "_checked": "2026-10-04"
     },
 
     "_section_image_video_generation": "HTTP MCPs for image/video generation (Cowork-compatible)",
@@ -186,10 +204,47 @@
       "type": "http",
       "url": "https://mcp.replicate.com/sse",
       "_auth": "REPLICATE_API_TOKEN env var (free Replicate account required)",
-      "_purpose": "Image/video generation — 1000+ models. Equivalent multi-provider coverage to fal-ai."
+      "_purpose": "Image/video generation — 1000+ models. Equivalent multi-provider coverage to fal-ai.",
+      "_transport_status": "FLAGGED 2026-10-04: Replicate's own setup page (https://mcp.replicate.com/) still lists only this /sse URL for every client, and we could not confirm a Streamable HTTP endpoint. The HTTP+SSE transport is Deprecated in MCP spec 2026-07-28 (https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http) and is eligible for removal. Until Replicate documents a Streamable HTTP endpoint, prefer an image/video entry whose vendor documents one, and re-verify before use.",
+      "_checked": "2026-10-04"
     },
 
-    "_section_unified_ads_mcps": "Purpose-built ads-platform MCPs that unify multiple ad platforms under a single endpoint. Choose ONE — overlap creates duplicate tools. As of May 2026 these are the maturing options; the generic pipedream-* / composio-* entries above remain a valid fallback if you prefer single-vendor ads exposure or want every other SaaS in the same gateway. Endpoint URLs and platform-coverage claims below were verified May 2026 — re-verify before production use as these are early-stage services.",
+    "_section_official_ad_platform_mcps": "Ad-platform MCP servers published by the platforms themselves (checked 2026-10-04). Opt-in only — NEVER copy these into the shipped .mcp.json. DMP write policy for every entry that can write: writes run only behind the typed approval gate in /digital-marketing-pro:launch-ad-campaign (Execution Summary -> user types yes -> approval-manager.py create-approval -> execute -> mark-executed), and every NEW campaign / ad set / ad group / ad is created with status PAUSED, set explicitly in the tool call (do not rely on a server default). Activation is a separate, separately approved write.",
+    "meta-ads": {
+      "type": "http",
+      "url": "https://mcp.facebook.com/ads",
+      "_auth": "Business-authenticated Meta login (OAuth) on first connect; write tools need an ad-account role that can manage ads. Business portfolio admins can set governance rules for AI app connections (16 Jul 2026 update).",
+      "_access": "read-write",
+      "_purpose": "Meta Ads AI Connectors (official, Meta-hosted). Per Meta: create and edit ads, ad sets and campaigns; reporting and insights; catalog creation and feed troubleshooting; signals/dataset health; A/B tests and conversion lift studies; activity logs.",
+      "_write_policy": "Typed approval gate + PAUSED-by-default (see section note). A third-party write-up says Meta's tools create objects paused by default; Meta's own pages we opened do not state it, so DMP sets status PAUSED explicitly.",
+      "_status": "open beta (announced 29 Apr 2026)",
+      "_source": "https://www.facebook.com/business/news/meta-ads-ai-connectors ; https://developers.facebook.com/documentation/ads-commerce/ads-ai-connectors/ads-mcp-server/ads-mcp-server-overview",
+      "_checked": "2026-10-04"
+    },
+    "google-ads-mcp": {
+      "type": "http",
+      "url": "https://<your-self-hosted-host>/mcp",
+      "_auth": "OAuth 2.0 (Application Default Credentials, or OAuth client ID/secret when run behind its OAuth proxy) with the https://www.googleapis.com/auth/adwords scope; a Google Ads developer token is recommended for production access. Service accounts also supported per Google's guide.",
+      "_access": "read-only",
+      "_purpose": "Google's open-source Google Ads MCP server (Apache-2.0). Tools: list_accessible_customers, search (GAQL), get_resource_metadata. Google: 'This implementation is strictly read-only. It cannot modify bids, pause campaigns, or create new assets.' Use it for audits, pacing and reporting; Google Ads writes still go through a write-capable connector behind the approval gate.",
+      "_local_stdio_alternative": "Default mode is local stdio, Claude Code only (not Cowork): {\"command\": \"pipx\", \"args\": [\"run\", \"--spec\", \"google-ads-mcp==<pinned-version>\", \"google-ads-mcp\"]}. The server switches to Streamable HTTP when its OAuth-proxy environment variables are set (self-hosting, e.g. Cloud Run) — that is the URL form above.",
+      "_source": "https://github.com/googleads/google-ads-mcp ; https://developers.google.com/google-ads/api/docs/developer-toolkit/mcp-server",
+      "_checked": "2026-10-04"
+    },
+    "amazon-ads-mcp": {
+      "type": "http",
+      "url": "<endpoint-from-your-Amazon-Ads-API-partner-onboarding>",
+      "_auth": "Requires active Amazon Ads API credentials (Amazon Ads partners). The announcement does not publish an endpoint URL or auth flow — take both from your Amazon Ads API onboarding.",
+      "_access": "read-write",
+      "_purpose": "Amazon Ads MCP Server. Per Amazon: create, update or delete campaigns; performance and reporting queries; account-level settings; billing and financial data; pre-built multi-step workflows. Amazon also announced an 'Amazon Ads MCP Server (Lite)' at unBoxed 2026 (see skills/paid-advertising/SKILL.md).",
+      "_write_policy": "Typed approval gate + PAUSED-by-default (see section note). Delete operations are never run from DMP skills.",
+      "_status": "open beta since 2 Feb 2026, 'available globally in open beta to Amazon Ads partners with active API credentials'",
+      "_source": "https://advertising.amazon.com/library/news/amazon-ads-mcp-server-open-beta",
+      "_secondary_only": "Endpoint URLs, per-region setup and tool lists circulating in third-party guides are not on Amazon's announcement page — treat them as unverified.",
+      "_checked": "2026-10-04"
+    },
+
+    "_section_unified_ads_mcps":"Purpose-built ads-platform MCPs that unify multiple ad platforms under a single endpoint. Choose ONE — overlap creates duplicate tools. As of May 2026 these are the maturing options; the generic pipedream-* / composio-* entries above remain a valid fallback if you prefer single-vendor ads exposure or want every other SaaS in the same gateway. Endpoint URLs and platform-coverage claims below were verified May 2026 — re-verify before production use as these are early-stage services.",
     "synter-media-ai": {
       "type": "http",
       "url": "https://mcp.syntermedia.ai/mcp/",
@@ -214,6 +269,7 @@
     "works_in_cowork": "All entries above (HTTP transport, OAuth or API-key auth via the provider's official endpoint).",
     "does_not_work_in_cowork": "Everything in .mcp.json.example (60+ stdio/npx servers). Cowork only runs HTTP MCPs.",
     "for_each_npx_server_in_example": "Use the matching pipedream-* entry above, or pipedream-generic with the appropriate {service_slug}, or composio-generic with the app enabled in your Composio dashboard, or zapier with the relevant Zap configured.",
-    "anthropic_software_directory_policy": "All listed connectors comply: no financial transaction processing, no advertising delivery, no safety circumvention. OAuth 2.0 or API key auth via the provider's official endpoint (per policy requirement)."
+    "anthropic_software_directory_policy": "No connector is active by default (.mcp.json ships empty). Listed connectors use OAuth or API-key auth via the provider's official endpoint. Some opt-in entries can WRITE to live ad or CRM accounts (meta-ads, amazon-ads-mcp, hubspot); the plugin itself delivers no advertising — every such write is a user-approved action through the typed approval gate, with new ad objects created PAUSED.",
+    "self_hosted_entries": "google-ads-mcp and northbeam-mcp-selfhosted are HTTP only once you host them; until then they run locally (Claude Code only)."
   }
 }
