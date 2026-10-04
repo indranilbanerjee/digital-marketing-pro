@@ -141,6 +141,7 @@ PLAN.md                one-page summary: verdict, top 3 fixes, re-audit date
 2. **The no-JS check is not a rendering test.** It reads the HTML as served. It cannot tell you how a JavaScript-capable crawler renders the page; use `/digital-marketing-pro:tech-seo-audit` for that.
 3. **A feed export is not Merchant Center's verdict.** The audit checks the file. Merchant Center diagnostics, account-level policies, and UCP onboarding status live in the account.
 4. **Being allowed is not being cited.** This audit checks whether agents *can* use the site. Whether they *do* is measured by `/digital-marketing-pro:geo-monitor` (probes plus Bing Webmaster AI Performance) and `/digital-marketing-pro:gsc-ai-performance`.
+5. **An unreachable robots.txt fails the robots check.** With `--fetch`, a 4xx robots.txt means allow-all, and a 5xx or network error means every crawler must assume complete disallow (RFC 9309). The first finding says so; if the cause was your own network rather than the site, re-run.
 
 ## Agents used
 

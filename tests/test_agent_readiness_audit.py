@@ -176,7 +176,7 @@ class TestRobotsMatching(unittest.TestCase):
         tokens = {b["token"] for b in ara.AI_CRAWLERS}
         for t in ("GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-SearchBot",
                   "Claude-User", "PerplexityBot", "Perplexity-User", "Google-Extended",
-                  "Applebot-Extended"):
+                  "Applebot-Extended", "OAI-AdsBot"):
             self.assertIn(t, tokens)
         for b in ara.AI_CRAWLERS:
             self.assertTrue(b["source"].startswith("https://"), b["token"])
@@ -473,6 +473,29 @@ class TestFetchIsOptIn(unittest.TestCase):
             args = ara.build_parser().parse_args(["--site", "https://acme.example", "--fetch"])
             rep = ara.run_audit(args)
         self.assertEqual(self.check_status(rep, "robots_ai_crawlers"), "pass")
+
+    def _robots_unreachable(self, failure):
+        def fake_urlopen(req, timeout=15):
+            if req.full_url.endswith("/robots.txt"):
+                raise failure(req.full_url)
+            return _FakeResp(HTML_GOOD)
+
+        with mock.patch.object(ara.urllib.request, "urlopen", side_effect=fake_urlopen):
+            args = ara.build_parser().parse_args(["--site", "https://acme.example", "--fetch"])
+            rep = ara.run_audit(args)
+        return next(c for c in rep["checks"] if c["id"] == "robots_ai_crawlers")
+
+    def test_robots_5xx_means_complete_disallow(self):
+        check = self._robots_unreachable(
+            lambda url: ara.urllib.error.HTTPError(url, 503, "unavailable", {}, None))
+        self.assertEqual(check["status"], "fail")
+        self.assertIn("RFC 9309", check["findings"][0])
+        self.assertTrue(all(b["verdict"] == "blocked" for b in check["crawlers"]))
+
+    def test_robots_network_error_means_complete_disallow(self):
+        check = self._robots_unreachable(lambda url: ara.urllib.error.URLError("refused"))
+        self.assertEqual(check["status"], "fail")
+        self.assertIn("could not be read", check["findings"][0])
 
     @staticmethod
     def check_status(rep, cid):

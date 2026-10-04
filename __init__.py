@@ -13,7 +13,7 @@ When Hermes Agent loads us via `hermes plugins install indranilbanerjee/digital-
 it clones the repo into ~/.hermes/plugins/digital-marketing-pro/, reads plugin.yaml
 at the root, then calls register(ctx) below. The register() walks the skills/
 directory, discovers every SKILL.md, and exposes each one to Hermes via
-ctx.register_skill(name, path_to_SKILL_md). All 158 marketing skills become
+ctx.register_skill(name, path_to_SKILL_md). Every marketing skill becomes
 available natively in Hermes Desktop.
 
 Design principles
@@ -45,7 +45,7 @@ logger = logging.getLogger("digital-marketing-pro")
 
 PLUGIN_ROOT = Path(__file__).resolve().parent
 SKILLS_DIR = PLUGIN_ROOT / "skills"
-PLUGIN_VERSION = "3.33.0"
+PLUGIN_VERSION = "3.33.1"
 
 
 def _parse_skill_frontmatter(skill_md_path: Path) -> dict:

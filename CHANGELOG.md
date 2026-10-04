@@ -6,6 +6,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.33.1] - 2026-10-04
+
+### Fixed
+
+- **`agent-readiness-audit --fetch` hid an unreachable robots.txt.** A 5xx or
+  a network error on robots.txt was reported as a skipped check. RFC 9309
+  section 2.3.1.4 tells crawlers to assume complete disallow in that case, so
+  the robots check now fails with every crawler blocked and a first finding
+  that explains why (a 4xx is still allow-all). Found while extracting the
+  audit into the standalone `digital-marketing-pro-agent-readiness` skill,
+  which stays byte-identical. Two tests; the docstring no longer claims link
+  names are checked (only buttons are), and the crawler-token test now covers
+  all 11 tokens.
+- The Hermes `__init__.py` docstring no longer quotes a skill count.
+
 ## [3.33.0] - 2026-10-04
 
 ### Added — AI surfaces, agent readiness, official ad servers

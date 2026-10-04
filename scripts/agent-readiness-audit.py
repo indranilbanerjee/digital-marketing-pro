@@ -19,7 +19,7 @@ Checks (each one runs only when its input is supplied):
                        run)? SPA shells / tiny visible text / missing --expect
                        phrases => fail.
   accessibility_basics html lang, image alt text, labelled inputs, named
-                       buttons/links — proxies for the accessibility tree that
+                       buttons — proxies for the accessibility tree that
                        browser agents read. Warn-level only.
   merchant_feed        Merchant Center product feed export (TSV/CSV/XML):
                        required attributes, availability values, price format,
@@ -820,9 +820,19 @@ def recommendations_for(checks: list[dict]) -> list[str]:
     return recs
 
 
+def _note_unreachable(check: dict, why: str | None) -> dict:
+    if why:
+        check["findings"].insert(0, (
+            f"robots.txt could not be read ({why}). Under RFC 9309 every crawler must then "
+            "treat the whole site as disallowed, so no AI crawler can use it. If the cause "
+            "was this machine's network rather than the site, re-run the audit."))
+    return check
+
+
 def run_audit(args) -> dict:
     robots_text = None
     robots_label = None
+    robots_unreachable = None
     html_pages: list[tuple[str, str]] = []
     fetch_log = []
 
@@ -848,6 +858,14 @@ def run_audit(args) -> dict:
             elif code is not None and 400 <= code < 500:
                 # RFC 9309 §2.3.1.3: an unavailable robots.txt (4xx) means no restrictions.
                 robots_text, robots_label = "", f"{url} (HTTP {code} — treated as allow-all)"
+            else:
+                # RFC 9309 §2.3.1.4: an unreachable robots.txt (5xx or a network
+                # error) means crawlers must assume complete disallow.
+                why = f"HTTP {code}" if code is not None else f"unreachable: {err}"
+                robots_text = "User-agent: *\nDisallow: /\n"
+                robots_label = (f"{url} ({why} — RFC 9309: crawlers must assume complete "
+                                f"disallow until it returns 200 or 4xx)")
+                robots_unreachable = why
         for url in [args.site] + list(args.page or []):
             code, body, err = fetch(url)
             fetch_log.append({"url": url, "status": code, "error": err})
@@ -863,7 +881,8 @@ def run_audit(args) -> dict:
     parsed_pages = [(label, parse_html(body), len(body.encode("utf-8"))) for label, body in html_pages]
 
     checks = [
-        check_robots(robots_text, paths, args.training_policy, robots_label or ""),
+        _note_unreachable(check_robots(robots_text, paths, args.training_policy, robots_label or ""),
+                          robots_unreachable),
         check_structured_data([(l, p) for l, p, _ in parsed_pages]),
         check_no_js(parsed_pages, args.expect or [], args.min_text),
         check_a11y([(l, p) for l, p, _ in parsed_pages]),
