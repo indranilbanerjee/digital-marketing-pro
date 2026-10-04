@@ -6,7 +6,7 @@ Run `/digital-marketing-pro:engagement` against each brand. Same 12-Part Strateg
 
 Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Act Article 50 ready, Cowork team-persistent**. Built for marketing agencies, in-house teams running 50–200 brands, and consultancies. Installs on **Claude Code** (CLI + IDE), **Anthropic Cowork**, **OpenAI Codex**, **Cursor 2.5+**, **GitHub Copilot CLI**, **Google Antigravity 2.0**, **Hermes Agent**, **OpenClaw**, and **Grok** + 35+ Agent Skills platforms. Created by [Indranil Banerjee](https://indranil.in) · [LinkedIn](https://www.linkedin.com/in/askneelnow/) · [X](https://x.com/askneelnow).
 
-[![Version](https://img.shields.io/badge/version-3.33.1-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.33.2-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=yellow)](https://github.com/indranilbanerjee/digital-marketing-pro/stargazers)
 [![Forks](https://img.shields.io/github/forks/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=blue)](https://github.com/indranilbanerjee/digital-marketing-pro/network/members)
@@ -14,11 +14,11 @@ Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Ac
 [![Last commit](https://img.shields.io/github/last-commit/indranilbanerjee/digital-marketing-pro?logo=github)](https://github.com/indranilbanerjee/digital-marketing-pro/commits/main)
 [![Tests](https://img.shields.io/badge/tests-494%2F494%20passing-brightgreen.svg)](tests/)
 [![Platforms](https://img.shields.io/badge/platforms-8%20native%20%2B%2035%20Agent%20Skills-success.svg)](#works-on-40-agent-harnesses-via-the-agent-skills-open-standard)
-[![Cowork](https://img.shields.io/badge/cowork-team%20persistent-purple.svg)](#supported-surfaces-v3331)
+[![Cowork](https://img.shields.io/badge/cowork-team%20persistent-purple.svg)](#supported-surfaces-v3332)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Article%2050%20ready-darkred.svg)](skills/context-engine/compliance-rules.md)
 [![Sponsor](https://img.shields.io/badge/sponsor-%E2%9D%A4-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/indranilbanerjee)
 
-> 🆕 **Just shipped — v3.33.1 (October 4, 2026), on top of v3.33.0: agent readiness, honest AI-visibility measurement, and official ad servers.** **New `/digital-marketing-pro:agent-readiness-audit`:** can AI agents and AI crawlers actually use your site? robots.txt per RFC 9309 for the AI crawler tokens, structured data, content that renders without JavaScript, Merchant Center feed readiness for agentic checkout, and WebMCP as an experiment — offline on exported files, and it never tells you llms.txt matters to Google (Google's own guide calls that a myth). **AI visibility, measured honestly:** Search Console's AI report has impressions only — no clicks, no CTR, no queries — and GA4's AI Assistant channel *excludes* AI Overviews and AI Mode, so every report now says what no first-party tool measures instead of guessing. **Official ad servers:** Meta Ads AI Connectors, Google Ads MCP (read-only, never used for a write) and Amazon Ads MCP join the opt-in catalog; writes stay behind the typed approval gate and new ads are created PAUSED. Also: ChatGPT ads and AI Mode ads in media planning, Meridian 2.x, always-on recipes for six schedulers, a competitor-sweep workflow, 13 duplicate commands folded into their skills, and directory listing fields for Anthropic's and OpenAI's plugin directories.
+> 🆕 **Just shipped — v3.33.2 (October 4, 2026), on top of v3.33.0: agent readiness, honest AI-visibility measurement, and official ad servers.** **New `/digital-marketing-pro:agent-readiness-audit`:** can AI agents and AI crawlers actually use your site? robots.txt per RFC 9309 for the AI crawler tokens, structured data, content that renders without JavaScript, Merchant Center feed readiness for agentic checkout, and WebMCP as an experiment — offline on exported files, and it never tells you llms.txt matters to Google (Google's own guide calls that a myth). **AI visibility, measured honestly:** Search Console's AI report has impressions only — no clicks, no CTR, no queries — and GA4's AI Assistant channel *excludes* AI Overviews and AI Mode, so every report now says what no first-party tool measures instead of guessing. **Official ad servers:** Meta Ads AI Connectors, Google Ads MCP (read-only, never used for a write) and Amazon Ads MCP join the opt-in catalog; writes stay behind the typed approval gate and new ads are created PAUSED. Also: ChatGPT ads and AI Mode ads in media planning, Meridian 2.x, always-on recipes for six schedulers, a competitor-sweep workflow, 13 duplicate commands folded into their skills, and directory listing fields for Anthropic's and OpenAI's plugin directories.
 >
 > <sub>Previously — **v3.32.0 (October 4, 2026):** the seven-week freshness pass — Codex installs repaired (the shared marketplace's `github` source shorthand is silently dropped by Codex), the model registry re-verified against every vendor's pages, `requiredMinimumVersion` removed (a managed setting, never a manifest field), and Article 50's EU label icons folded in. [Read what's new →](#whats-new) · [Full changelog →](CHANGELOG.md)</sub>
 
@@ -248,7 +248,7 @@ Output: real API calls fired against your stack with audit logging at `~/.claude
 
 ---
 
-## Supported surfaces (v3.33.1)
+## Supported surfaces (v3.33.2)
 
 | Platform | Install command | Manifest path | Status |
 |---|---|---|---|
@@ -358,6 +358,10 @@ If you run into a platform-specific install snag, file a [GitHub issue](https://
 ---
 
 ## What's new
+
+### v3.33.2 — a test that only passed in a working tree (October 4, 2026)
+
+The shipped-empty `.mcp.json` test errored when run from an installed copy, because `.mcp.json` is gitignored and never ships. It now treats an absent file as what it is (nothing connects) and also guards the ignore rule that keeps servers out of every install. Test-only.
 
 ### v3.33.1 — an unreachable robots.txt now fails the audit (October 4, 2026)
 
@@ -839,7 +843,7 @@ Yes. Each brand has its own `~/.claude-marketing/<brand-slug>/` directory and Py
 Skip to `/digital-marketing-pro:campaign-plan`. Every individual surface (campaign / SEO / content / competitor / email / report) is independently runnable. The full engagement is the canonical path, not the only path.
 
 **Q: Will this work on Codex / Cursor / Copilot CLI / Antigravity?**
-Yes — verified-real native manifests ship for all 9 surfaces (CC, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok). See [Supported surfaces](#supported-surfaces-v3331) above for per-platform install commands.
+Yes — verified-real native manifests ship for all 9 surfaces (CC, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok). See [Supported surfaces](#supported-surfaces-v3332) above for per-platform install commands.
 
 **Q: I run my team on Anthropic Cowork. Does brand state persist between sessions?**
 Yes — but you need to run `/digital-marketing-pro:cowork-setup` once per team first (v3.12.0). Cowork's per-session filesystem is ephemeral, and `${CLAUDE_PLUGIN_DATA}` is too ([open issue #51398](https://github.com/anthropics/claude-code/issues/51398)). The setup wizard routes brand profiles + plans + reports through a Google Drive MCP so everything survives across sessions and is shared across the team. Multi-team isolation via per-team folder names.

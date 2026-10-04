@@ -76,9 +76,17 @@ class TestCatalogTransport(unittest.TestCase):
         self.assertFalse(cat["make-com"]["url"].endswith("/sse"))
 
     def test_shipped_mcp_json_stays_empty(self):
-        data = json.loads((ROOT / ".mcp.json").read_text(encoding="utf-8"))
-        self.assertEqual(data.get("mcpServers"), {},
-                         ".mcp.json must ship with zero auto-connecting MCP servers")
+        # .mcp.json is gitignored, so an installed copy has none at all — which
+        # connects nothing. A local one must still be empty, and the ignore rule
+        # is what keeps any local edit out of every install.
+        gitignore = (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
+        self.assertIn(".mcp.json", [ln.strip() for ln in gitignore],
+                      ".mcp.json must stay gitignored so no install ever ships servers")
+        path = ROOT / ".mcp.json"
+        if path.exists():
+            data = json.loads(path.read_text(encoding="utf-8"))
+            self.assertEqual(data.get("mcpServers"), {},
+                             ".mcp.json must ship with zero auto-connecting MCP servers")
 
     def test_official_servers_are_sourced_and_access_labelled(self):
         cat = _catalog()

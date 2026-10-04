@@ -6,6 +6,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.33.2] - 2026-10-04
+
+### Fixed
+
+- **A test assumed `.mcp.json` exists.** It is gitignored, so an installed
+  copy has none, and the shipped-empty test errored when run from an install
+  (verify-from-installed caught it). An absent file now passes — it connects
+  nothing — a present one must still be empty, and the test now also requires
+  `.gitignore` to keep listing `.mcp.json`, which is what actually keeps
+  servers out of every install (planted). Test-only change.
+
 ## [3.33.1] - 2026-10-04
 
 ### Fixed
