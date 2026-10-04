@@ -13,7 +13,8 @@
 # already exist in that sibling's registry, and always refreshes `aliases`
 # values for alias keys the sibling shares with the canonical file. Entries
 # and alias keys that exist only in the sibling are left untouched; canonical-
-# only entries are never added.
+# only entries are added ONLY when a shared alias or a replacement_id now
+# points at them (otherwise the sibling would carry a dangling alias).
 #
 # This resolves the ghost referenced by model_registry.json's "$comment"
 # ("Update this file then run scripts/sync_model_registry.sh to distribute").
@@ -85,6 +86,43 @@ for key in dest_aliases:
         dest_aliases[key] = src_aliases[key]
         aliases_changed += 1
 
+# Closure: a refreshed alias (or a replacement_id the resolver falls forward
+# along) may now name an entry the subset registry never carried. Copying the
+# alias value without its target leaves a dangling alias that fails at
+# resolution time, so pull every referenced canonical entry in.
+present = {m.get("id") for m in dest_models}
+pending = [v for v in dest_aliases.values() if v not in present]
+pending += [m.get("replacement_id") for m in dest_models
+            if m.get("replacement_id") and m.get("replacement_id") not in present]
+while pending:
+    rid = pending.pop()
+    if rid in present or rid not in canon:
+        continue
+    dest_models.append(canon[rid])
+    present.add(rid)
+    models_changed += 1
+    nxt = canon[rid].get("replacement_id")
+    if nxt and nxt not in present:
+        pending.append(nxt)
+
+dangling = sorted({f"{k}->{v}" for k, v in dest_aliases.items() if v not in present})
+if dangling:
+    print("dangling " + ", ".join(dangling))
+    sys.exit(0)
+
+# Shared top-level metadata (sampling-param rules, tier vocabulary, stewardship)
+# is suite-wide truth, not subset data — a sibling missing a param rule would
+# send rejected parameters to the API.
+for key in ("schema_version", "tiers", "param_compatibility_notes", "stewardship_policy"):
+    if key in src and dest.get(key) != src[key]:
+        dest[key] = src[key]
+        models_changed += 1
+
+if models_changed + aliases_changed and not check_only:
+    for stamp in ("last_updated", "last_updated_by", "next_review_due"):
+        if stamp in src:
+            dest[stamp] = src[stamp]
+
 if models_changed + aliases_changed == 0:
     print("in-sync")
 elif check_only:
@@ -106,6 +144,10 @@ PYEOF
             ;;
         synced*)
             echo "SYNC  $sibling updated in place ($result)"
+            ;;
+        dangling*)
+            echo "ERROR $sibling: alias targets missing from canonical too ($result)" >&2
+            status=1
             ;;
         *)
             echo "ERROR $sibling: unexpected merge output: $result" >&2

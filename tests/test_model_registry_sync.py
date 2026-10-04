@@ -60,6 +60,53 @@ class TestDmpRegistryShape(unittest.TestCase):
             self.assertIn(target, self.dmp_models,
                           f"alias {alias!r} points at missing model {target!r}")
 
+    def test_no_alias_targets_a_retired_model(self):
+        """A 'latest-*' alias resolving to a shut-down model sends live calls to
+        a dead endpoint — e.g. gemini-2.5-flash-image was still 'supported' two
+        days after Google shut it down (found 2026-10-04)."""
+        bad = {a: t for a, t in self.dmp["aliases"].items()
+               if self.dmp_models.get(t, {}).get("status") == "retired"}
+        self.assertEqual(bad, {}, f"aliases resolve to retired models: {bad}")
+
+    def test_every_replacement_id_exists(self):
+        bad = [m["id"] for m in self.dmp["models"]
+               if m.get("replacement_id") and m["replacement_id"] not in self.dmp_models]
+        self.assertEqual(bad, [], f"fall-forward targets missing from registry: {bad}")
+
+
+SIBLING_REGISTRIES = {
+    name: Path(__file__).resolve().parent.parent.parent / name / "scripts" / "model_registry.json"
+    for name in ("contentforge", "socialforge")
+}
+
+
+class TestSiblingAliasClosure(unittest.TestCase):
+    """sync_model_registry.sh once copied refreshed alias VALUES into the subset
+    sibling registries without the entries they name — every new latest-* alias
+    dangled in ContentForge and SocialForge (found 2026-10-04). The sync now
+    pulls the closure in; this pins that every sibling alias and fall-forward
+    resolves locally."""
+
+    def test_sibling_aliases_and_replacements_resolve(self):
+        checked = 0
+        for name, path in SIBLING_REGISTRIES.items():
+            if not path.exists():
+                continue
+            checked += 1
+            reg = _load(path)
+            ids = {m["id"]: m for m in reg["models"]}
+            dangling = {a: t for a, t in reg["aliases"].items() if t not in ids}
+            retired = {a: t for a, t in reg["aliases"].items()
+                       if t in ids and ids[t].get("status") == "retired"}
+            bad_rep = [m["id"] for m in reg["models"]
+                       if m.get("replacement_id") and m["replacement_id"] not in ids]
+            with self.subTest(sibling=name):
+                self.assertEqual(dangling, {}, f"{name}: dangling aliases {dangling}")
+                self.assertEqual(retired, {}, f"{name}: aliases to retired models {retired}")
+                self.assertEqual(bad_rep, [], f"{name}: missing fall-forward targets {bad_rep}")
+        if not checked:
+            self.skipTest("sibling repos not checked out")
+
 
 @unittest.skipUnless(CF_REGISTRY.exists(),
                      "ContentForge sibling repo not checked out; cross-repo drift check skipped")

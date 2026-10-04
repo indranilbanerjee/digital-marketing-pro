@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "digital-marketing-pro",
-  "version": "3.31.1",
+  "version": "3.32.0",
   "description": "Complete digital marketing operating system \u2014 163 skills and 24 agents covering strategy, content, SEO/AEO, paid media, analytics, and compliance.",
   "author": {
     "name": "Indranil Banerjee",

@@ -132,7 +132,7 @@
         "gsc-ai-performance"
       ],
       "doc_files": 11,
-      "bytes": 170013
+      "bytes": 170492
     },
     {
       "name": "anomaly-scan",
@@ -665,7 +665,7 @@
         "verify-claims"
       ],
       "doc_files": 17,
-      "bytes": 150907
+      "bytes": 151031
     },
     {
       "name": "content-repurpose",
@@ -747,7 +747,7 @@
         "validate-profile"
       ],
       "doc_files": 56,
-      "bytes": 877700
+      "bytes": 880264
     },
     {
       "name": "continuous-improvement-loop",
@@ -1268,7 +1268,7 @@
         "seo-drift"
       ],
       "doc_files": 1,
-      "bytes": 11703
+      "bytes": 12478
     },
     {
       "name": "help",
@@ -1382,7 +1382,7 @@
         "c2pa-metadata"
       ],
       "doc_files": 1,
-      "bytes": 5483
+      "bytes": 5540
     },
     {
       "name": "influencer-creator",
@@ -1870,7 +1870,7 @@
         "launch-campaign"
       ],
       "doc_files": 13,
-      "bytes": 190996
+      "bytes": 193319
     },
     {
       "name": "pdf-report",
@@ -2316,7 +2316,7 @@
         "seo-plan"
       ],
       "doc_files": 1,
-      "bytes": 9259
+      "bytes": 9743
     },
     {
       "name": "seo-drift",
@@ -2575,7 +2575,7 @@
         "technical-seo"
       ],
       "doc_files": 1,
-      "bytes": 7992
+      "bytes": 8753
     },
     {
       "name": "technical-seo",

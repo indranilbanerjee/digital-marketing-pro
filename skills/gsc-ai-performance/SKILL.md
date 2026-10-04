@@ -21,10 +21,11 @@ Google rolled out a new **GSC AI Performance Report** on **3 June 2026** ([Searc
 | Date range filtering | NEW |
 | **Click data** | **NOT INCLUDED** (Google explicitly excluded — important caveat for attribution) |
 | Opt-out toggle in Search Console | NEW (replaces having to ship robots.txt / meta tags for AI-specific exclusion) |
-| API surface | **NOT YET PUBLISHED** — UI only (still true as of July 2026) |
+| API surface | **NOT YET PUBLISHED** — UI only (last checked July 2026; re-check the Search Console API release notes before automating) |
 | **Discover generative surfaces** | **NEW (June–July 2026)** — the report family now also covers generative AI features in Discover ([Google announcement](https://developers.google.com/search/blog/2026/06/gen-ai-performance-reports)) |
 | Data availability | Backfilled from **18 May 2026**; access expanded broadly in July 2026, with a companion deep-dive help doc on AI controls |
 | Geographic rollout | UK first, then global ([source](https://searchengineland.com/google-search-console-ai-performance-reports-and-controls-to-block-your-content-in-ai-responses-479298)) |
+| **Multimodal filter** | **NEW (September 2026)** — a `multimodal` search-type filter (Lens, Circle to Search, image uploads) appears in both the Search performance report and the generative AI report. It has **no Queries dimension**, and these impressions are **newly counted** ([Google Search Central](https://developers.google.com/search/blog/2026/09/web-multimodal-in-sc)) |
 
 **Critical interpretation guidance:** The report shows when your pages were SHOWN in AI Overviews / AI Mode, not when users clicked through to them. Because click data is absent, all downstream attribution to AI traffic must come from your analytics (GA4's new `AI Assistant` channel — added 13 May 2026 — is the matching analytics-side surface; see `/digital-marketing-pro:analytics-insights`).
 
@@ -117,7 +118,8 @@ A structured GSC AI performance brief containing:
 2. **UI only at launch.** No public API. Wait for Google to publish the AI report under the Search Console Search Analytics API (`searchanalytics.query`) before automating against it. Current automation must rely on CSV export + manual upload.
 3. **Rollout completed broadly July 2026.** The report started UK-first but access expanded broadly in July 2026, so most properties should now see it. Mark the date you first see data so subsequent month-over-month comparisons start from a real baseline.
 4. **Tab placement may move during rollout.** Google often refines the UI in the first 30–60 days. If the exact tab path differs from step 2 above, look anywhere in the Performance > Search results area for "AI", "Generative", "AI Mode", or "AI Overviews" labels.
-5. **Don't compare AI Overviews impressions to classic SERP impressions one-for-one.** AI Overviews surface differently — an "impression" there means your page was used as a grounding source, which is a stricter bar than appearing in a 10-blue-link result.
+5. **September 2026 is a measurement break, not necessarily growth.** Multimodal impressions (Lens, Circle to Search, image uploads) began being counted in September 2026. Before reporting a month-over-month jump, re-run the comparison with the multimodal filter excluded — otherwise a counting change reads as a visibility gain.
+6. **Don't compare AI Overviews impressions to classic SERP impressions one-for-one.** AI Overviews surface differently — an "impression" there means your page was used as a grounding source, which is a stricter bar than appearing in a 10-blue-link result.
 
 ## Agents used
 

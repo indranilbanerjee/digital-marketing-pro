@@ -6,7 +6,7 @@ Prepared 2026-08-16. Items marked **[owner action]** need the account holder.
 
 | Directory | Route | Status |
 |---|---|---|
-| Anthropic official plugin directory | [submission form](https://clau.de/plugin-directory-submission) | bundle ready — **[owner action]** submit |
+| Anthropic official plugin directory | [developer portal](https://claude.ai/directory/manage) ([how to publish](https://claude.com/docs/directory/publish); the old Console form is retired) | bundle ready — **[owner action]** submit (one plugin per submission; README ≥ 40 words + LICENSE; no `.DS_Store`; every file < 5 MiB) **567 tracked files — over the 512-file threshold, so expect a human-review hold** |
 | OpenAI universal Plugins Directory (ChatGPT + Codex) | [submission portal](https://developers.openai.com/plugins/deploy/submission) | bundle ready — **[owner action]** verified identity, then submit as **skills-only** |
 
 **Name (immutable once listed):** `digital-marketing-pro`.
@@ -83,3 +83,5 @@ require re-scan, re-review, re-publish per release.
 - 163 skills is a large surface; Codex instruction caps must be validated on a
   current build before publishing.
 - Scripts require Python 3.10+.
+
+> **ChatGPT directory ZIP (checked 2026-10-04):** OpenAI's submission rules state "No app references or lifecycle hooks permitted." Our `hooks/hooks.json` is empty, but leave the `hooks/` directory out of the uploaded ZIP to remove any ambiguity. Requires a verified identity and the org permission "Apps Management Write". Source: https://developers.openai.com/plugins/deploy/submission

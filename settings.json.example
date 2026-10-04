@@ -3,12 +3,13 @@
 
   "_fallback_model_comment": "fallbackModel was added in Claude Code v2.1.152 (May 27, 2026) and expanded in v2.1.166 (Jun 6, 2026). Up to 3 models tried in order when the primary model is overloaded or returns a non-retryable API error. Choosing models from different vendors removes single-vendor outage risk. DMP itself does not pin a model — it follows the session model — so this setting is purely for resilience.",
   "fallbackModel": [
+    "claude-sonnet-5-5",
     "claude-sonnet-5",
-    "claude-sonnet-4-6",
-    "claude-haiku-4-5-20251001"
+    "claude-haiku-4-5"
   ],
+  "_fallback_model_ids_verified": "2026-10-04 against platform.claude.com/docs/en/docs/about-claude/models/overview. Model ids age: re-check that page (or run scripts/refresh_models.py) before relying on this list — claude-haiku-4-5 retires 'not sooner than 2026-10-15'.",
 
-  "_required_min_version_comment": "Optional managed setting (v2.1.163). DMP itself declares requiredMinimumVersion: 2.1.157 in its plugin.json, so Claude Code refuses to load DMP on older builds. This top-level setting can pin the host Claude Code version more broadly if your team standardises on a specific minimum.",
+  "_required_min_version_comment": "Optional managed setting (v2.1.163). Claude Code refuses to START if its version is outside the range you set here. A plugin cannot declare this for itself (plugin.json has no such field), so this is the only way to enforce a floor — use it if your team standardises on a minimum.",
 
   "_skill_overrides_comment": "skillOverrides (v2.1.129) controls how skill descriptions are presented. 'name-only' is the lowest-overhead mode: only skill names load at startup, not their descriptions, so the per-session description budget shrinks dramatically. Recommended for users running 3+ plugins simultaneously. Options: 'off' (default), 'user-invocable-only', 'name-only'.",
   "skillOverrides": "off",

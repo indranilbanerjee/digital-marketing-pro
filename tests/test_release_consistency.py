@@ -303,7 +303,10 @@ class TestInstallCommandCoverage(unittest.TestCase):
         self.assertIn("/plugin install digital-marketing-pro@neels-plugins", self.text)
 
     def test_codex_install_command_present(self):
-        self.assertIn("codex plugin install digital-marketing-pro", self.text)
+        # Current codex-cli installs with `codex plugin add PLUGIN@MARKETPLACE`;
+        # `codex plugin install` does not exist (the README shipped it for months).
+        self.assertIn("codex plugin add digital-marketing-pro@neels-plugins", self.text)
+        self.assertNotIn("codex plugin install", self.text)
 
     def test_cursor_install_command_present(self):
         self.assertIn("/add-plugin digital-marketing-pro", self.text)
@@ -394,6 +397,48 @@ class TestReadmeAnchorIntegrity(unittest.TestCase):
         missing = refs - heading_slugs
         self.assertEqual(missing, set(),
                          f"Broken internal anchors: {missing}")
+
+
+class TestRootSettingsJsonIsWellFormed(unittest.TestCase):
+    """A plugin-root settings.json is RESERVED by Claude Code: only `agent` (the
+    NAME of one of this plugin's agents, made the main-thread agent) and
+    `subagentStatusLine` take effect. SocialForge shipped {"agent": {"model":
+    "inherit"}} from v0.1.0 — an object where a name belongs — and was the only
+    suite plugin missing from Cowork's marketplace view (socialforge#3)."""
+
+    def test_root_settings_json_absent_or_valid(self):
+        path = PLUGIN_ROOT / "settings.json"
+        if not path.exists():
+            return
+        data = json.loads(path.read_text(encoding="utf-8"))
+        extra = set(data) - {"agent", "subagentStatusLine"}
+        self.assertEqual(extra, set(), f"settings.json carries keys Claude Code drops: {extra}")
+        if "agent" in data:
+            self.assertIsInstance(data["agent"], str, "settings.json `agent` must be an agent name")
+            self.assertTrue((PLUGIN_ROOT / "agents" / f"{data['agent']}.md").exists(),
+                            f"settings.json names agent {data['agent']!r}, which this plugin lacks")
+
+
+class TestClaudeManifestHasOnlyDocumentedFields(unittest.TestCase):
+    """Claude Code strips unknown top-level plugin.json keys (and `claude plugin
+    validate --strict` fails on them). DMP carried `requiredMinimumVersion` —
+    a MANAGED SETTING, not a manifest field — for 20 releases while its README
+    promised users on old builds an upgrade message that never existed.
+    Field list: code.claude.com/docs/en/plugins-reference (retrieved 2026-10-04)."""
+
+    DOCUMENTED = {
+        "$schema", "name", "displayName", "version", "description", "author",
+        "homepage", "repository", "license", "keywords", "metadata", "icon",
+        "documentationUrl", "supportUrl", "privacyPolicyUrl", "termsOfServiceUrl",
+        "defaultEnabled", "dependencies", "settings", "userConfig", "types",
+        "channels", "skills", "commands", "agents", "hooks", "mcpServers",
+        "lspServers", "outputStyles", "workflows", "experimental",
+    }
+
+    def test_no_undocumented_top_level_fields(self):
+        data = json.loads((PLUGIN_ROOT / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
+        extra = set(data) - self.DOCUMENTED
+        self.assertEqual(extra, set(), f"plugin.json fields Claude Code strips: {sorted(extra)}")
 
 
 if __name__ == "__main__":

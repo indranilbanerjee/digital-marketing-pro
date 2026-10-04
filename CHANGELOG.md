@@ -6,6 +6,80 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.32.0] - 2026-10-04
+
+### Fixed — install paths
+
+- **Codex listed zero suite plugins.** The shared marketplace's
+  `.agents/plugins/marketplace.json` used the `{"source": "github"}` shorthand,
+  which Codex silently drops (marketplace adds cleanly, lists nothing,
+  `codex plugin add` → "not found"). Fixed in neels-plugins 3.52.0 (url
+  sources), reproduced and verified against a live codex-cli 0.145 install.
+- **The README's Codex command did not exist.** `codex plugin install …` →
+  `codex plugin add digital-marketing-pro@neels-plugins`; the install-command
+  guard now also asserts the old form is absent.
+- **`requiredMinimumVersion` removed from `.claude-plugin/plugin.json` and the
+  Grok manifest.** It is a Claude Code *managed setting*, not a manifest field;
+  Claude Code stripped it at load and `claude plugin validate --strict` failed
+  on it. The README's promise that older builds "will be told to upgrade" was
+  never true and is corrected; `settings.json.example` now explains the managed
+  setting honestly and its `fallbackModel` chain moves to the current
+  generation (dated). New guard: plugin.json may carry only documented fields.
+
+### Fixed — model registry (canonical; distributed to CF + SF)
+
+- Re-verified 2026-10-04 against Anthropic, OpenAI and Google models +
+  deprecations pages (`next_review_due` had passed on 2026-09-10). Added
+  `claude-opus-5-5`, `claude-sonnet-5-5`, `claude-fable-5-1`, `gpt-6-astra`,
+  `gpt-6.1-sol`, `gpt-6-luna`, `gpt-image-2.5-sunburst`,
+  `gpt-image-2.5-flare`, `gemini-3.8-flash`, `gemini-omni-1.1-flash`.
+- Retired: `gemini-2.5-flash-image` (was marked *supported*; Google shut it
+  down 2026-10-02), `imagen-4` (shut 2026-08-17), `claude-opus-4-1` (retired
+  2026-08-05). Deprecated with fall-forward: `claude-sonnet-4-5` (retires
+  2026-11-30), `veo-3.1-generate-preview` (shutdown 2026-10-22), `gpt-5.4-nano`,
+  `gemini-omni` (preview endpoint shut 2026-09-30), `gemini-3-pro` (no longer
+  listed).
+- `latest-*` aliases moved to the current generation. `latest-video-google`
+  moved to the GA-format `veo-3.1-generate-001` (its Vertex listing could not
+  be verified — noted in the entry; SocialForge's video chain falls forward on
+  a 404). `gemini-omni-1.1-flash` is registered but deliberately NOT aliased
+  for video: its SDK call shape is undocumented and the Veo rung calls
+  `generate_videos()`.
+- **`sync_model_registry.sh` bug:** it copied refreshed alias values into the
+  subset sibling registries without the entries they name — every new alias
+  dangled in CF and SF. The sync now pulls the alias/replacement closure and
+  the shared top-level metadata (sampling-param rules), and stamps
+  `last_updated`. New guards: no alias targets a retired model, every
+  `replacement_id` resolves, and sibling aliases resolve locally.
+
+### Changed — world changes, each from a primary source
+
+- **EU AI Act Article 50** (`context-engine/eu-code-of-practice.md`): the
+  Commission's three icons (Basic / Fully AI-Generated / Partially
+  AI-Modified), "optional icons, mandatory labelling", label visible at first
+  exposure and when reshared/downloaded, enforcement live since 2 Aug 2026; the
+  "AI-generated vs AI-assisted taxonomy is dropped" line corrected (it was
+  dropped from the *obligation*, not the *label*).
+- **Paid:** AI Max auto-upgrade (from Sep 2026) and the DSA sunset moved to
+  Feb 2027; Google Ads Limited Ad Serving on all surfaces; LinkedIn API
+  `202608`/`202609` changes and the `202510`/`202511` sunsets; Amazon Ads
+  Agent + Ads MCP Server (Lite); ChatGPT Ads noted as secondary-sourced.
+- **Privacy Sandbox:** Topics, Protected Audience, Attribution Reporting and
+  friends are under "Intent to Deprecate and Remove" — the programmatic
+  checklist had told users to *invest* in them.
+- **Search:** expired "valid until ~2026-08" blocks in `seo-audit` and
+  `tech-seo-audit` replaced with update-agnostic triage plus a dated status
+  (May core update; Aug + Sep spam updates; **no** Sep core update; site
+  reputation abuse EEA split; VideoObject `creator`). `gsc-ai-performance`
+  gains the September multimodal measurement-break caveat.
+- Distribution bundle: the Anthropic directory moved to the developer portal
+  (`claude.ai/directory/manage`); DMP's 567 tracked files exceed the 512-file
+  review-hold threshold — noted. ChatGPT directory ZIP rules noted.
+
+Tests: 402 → 407.
+
+---
+
 ## [3.31.1] - 2026-08-17
 
 ### Fixed — all five open community issues, each verified by reproduction first
