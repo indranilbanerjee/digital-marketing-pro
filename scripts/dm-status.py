@@ -375,6 +375,8 @@ def collect_deps_section() -> dict[str, Any]:
         section["mode"] = "lite"
     else:
         section["mode"] = "knowledge-only"
+    if section["missing"]:
+        section["install_command"] = _common.install_command(section["missing"])
 
     return section
 
@@ -571,8 +573,7 @@ def render_text(snapshot: dict[str, Any], quiet: bool = False) -> str:
             lines.append(f"  Available:    {', '.join(deps['available'])}")
         if deps["missing"]:
             lines.append(f"  Missing:      {', '.join(deps['missing'])}")
-            if deps["mode"] == "knowledge-only":
-                lines.append(f"  Hint: pip install nltk textstat (lite mode)")
+            lines.append(f"  Install (tested versions): {deps['install_command']}")
 
     lines.append("")
     lines.append("=" * 60)

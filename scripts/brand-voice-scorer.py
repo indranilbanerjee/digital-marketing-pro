@@ -57,7 +57,8 @@ except ImportError:
     print(json.dumps({
         "fallback": True,
         "error": "nltk_not_installed",
-        "message": "NLTK not installed. Voice scoring requires: pip install nltk",
+        "message": "NLTK not installed. Voice scoring requires it; install the tested version with: "
+                   + _common.install_command(["nltk"]),
         "overall_score": None,
         "recommendation": "Install NLTK for automated scoring, or review manually against brand voice guidelines."
     }, indent=2))

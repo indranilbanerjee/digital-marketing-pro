@@ -26,23 +26,28 @@ ACTIVE_BRAND_FILE = BRANDS_DIR / "_active-brand.json"
 SETTINGS_FILE = MEMORY_ROOT / "settings.json"
 SCHEMA_VERSION = "1.0.0"
 
-LITE_DEPS = [
+# Package names only. The versions come from _common.PINNED_DEPENDENCIES, the one
+# place they are pinned; scripts/requirements.txt lists the same pins.
+LITE_PACKAGES = [
     # Core NLP for brand voice scoring and content analysis
-    "nltk>=3.8",
-    "textstat>=0.7",
+    "nltk",
+    "textstat",
 ]
 
-FULL_DEPS = LITE_DEPS + [
+FULL_PACKAGES = LITE_PACKAGES + [
     # Web scraping for competitor analysis
-    "beautifulsoup4>=4.12",
-    "requests>=2.31",
+    "beautifulsoup4",
+    "requests",
     # QR code generation (utm-generator.py)
-    "qrcode>=7.4",
-    "Pillow>=10.0",
+    "qrcode",
+    "pillow",
     # AI visibility checking (ai-visibility-checker.py --mode api)
-    "openai>=1.0",
-    "anthropic>=0.40",
+    "openai",
+    "anthropic",
 ]
+
+LITE_DEPS = _common.pinned_specs(LITE_PACKAGES)
+FULL_DEPS = _common.pinned_specs(FULL_PACKAGES)
 
 
 def init_memory_dirs():
@@ -259,7 +264,7 @@ def check_deps():
 
     if missing:
         print(f"DEPS_MISSING: {', '.join(missing)}")
-        print("Run: pip install " + " ".join(missing))
+        print("Run: " + _common.install_command(missing))
         return False
 
     print("DEPS_OK")

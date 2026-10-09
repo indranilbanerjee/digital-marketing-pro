@@ -18,9 +18,13 @@ Usage:
 
 import argparse
 import json
+import os
 import re
 import sys
 from pathlib import Path
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _common  # noqa: E402
 
 try:
     import textstat
@@ -28,7 +32,8 @@ except ImportError:
     print(json.dumps({
         "fallback": True,
         "error": "textstat_not_installed",
-        "message": "textstat not installed. Readability analysis requires: pip install textstat",
+        "message": "textstat not installed. Readability analysis requires it; install the tested version with: "
+                   + _common.install_command(["textstat"]),
         "overall_score": None,
         "recommendation": "Install textstat for automated readability analysis, or evaluate manually using grade-level and reading-ease guidelines."
     }))

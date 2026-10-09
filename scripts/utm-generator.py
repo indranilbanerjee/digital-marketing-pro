@@ -11,6 +11,10 @@ import base64
 from pathlib import Path
 from urllib.parse import urlencode, urlparse
 
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _common  # noqa: E402
+
 # GA4 default channel groupings and their expected source/medium patterns
 GA4_CHANNEL_RULES = {
     "Organic Search": {"medium": ["organic"]},
@@ -123,7 +127,8 @@ def build_utm_url(base_url, source, medium, campaign, content="", term="", with_
         if qr_data:
             result["qr_code_base64_png"] = qr_data
         else:
-            result["qr_code_note"] = "Install 'qrcode' and 'Pillow' packages for QR generation"
+            result["qr_code_note"] = ("QR generation needs qrcode and Pillow; install the tested versions with: "
+                                      + _common.install_command(["qrcode", "pillow"]))
     return result
 
 

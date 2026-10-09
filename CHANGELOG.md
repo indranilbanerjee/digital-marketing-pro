@@ -6,6 +6,34 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.35.2] - 2026-10-10
+
+### Every missing-package message prints the exact pinned command, and the README says what the code does
+
+A claim check of the README against the code found the never-do panel's "a missing one prints the exact pinned install command" true only for C2PA, and five README passages the code contradicted. All are fixed; each fix has a test that was run against the old file and failed there.
+
+**Fixed — install commands (the never-do line is now true)**
+
+- One pin table: `_common.PINNED_DEPENDENCIES` pins every optional package a script can use: nltk 3.10.3, textstat 0.7.13, beautifulsoup4 4.15.0, requests 2.34.2, qrcode 8.2, pillow 12.3.0, openai 3.19.2, anthropic 1.8.0, c2pa-python 0.38.0 and cryptography 46.0.3. Each is the newest release at least two weeks old that supports Python 3.10; the C2PA pins are unchanged. `scripts/requirements.txt` lists the same exact pins (it had `>=` ranges and left out the QR, AI-API and C2PA packages), and `setup.py --install lite|full` installs from the table.
+- Every missing-package message prints `_common.install_command()`, the exact pinned command for the interpreter running the script: brand-voice-scorer, content-scorer (textstat and nltk), readability-analyzer, competitor-scraper, dm-status (every missing package, and `install_command` in `--json`), `setup.py --check-deps` and embed-c2pa. Before, six of them said `pip install nltk`, `pip install textstat` or `pip install requests beautifulsoup4` with no version.
+- `ai-visibility-checker.py --mode api`: a key whose SDK was not installed was skipped silently and reported as "No AI API keys found"; it now names the missing SDK and prints its pinned command. `utm-generator.py --qr`: the note named the QR packages without a command; it now prints the pinned one.
+- Proved in fresh Python 3.10 and 3.13 virtualenvs holding only these pins: the scorers, `utm-generator --qr`, the scraper's imports, the OpenAI and Anthropic client calls the checker makes, and C2PA sign plus `--verify` all ran.
+- README's install table, `docs/getting-started.md`, the help skill and CONTRIBUTING.md now give `python scripts/setup.py --install lite` or `python -m pip install -r scripts/requirements.txt`. CONTRIBUTING's script conventions name the pin table and `_common.workspace_root()` instead of `Path.home()`.
+
+**Fixed — README and docs that contradicted the code**
+
+- Automation workflow: `diagnostic` was labelled "GA4 + GSC pull", but both connectors are OAuth-only, so `--execute` returns the MCP manifest; `audit-current` was labelled "workflow state check", but it audits current SEO state (Ahrefs over HTTP, Search Console via MCP). "Real API calls fired against your stack" now says HTTP calls for the 8 executable connectors and MCP manifests for the rest. The approve examples in the README and `commands/execute-action.md` gain the required `--brand`.
+- "25 OAuth connectors" and "25 manifest-ready" are now 28, the executor's count since the three official ad-platform MCP servers were added.
+- "Find your output" showed a layout no script writes (`~/.claude-marketing/<brand-slug>/brand-profile.json`, `01-client-inputs/`, `PROJECT_INSTRUCTIONS.md`). It now shows `brands/<slug>/profile.json`, `insights.json` and `engagements/<id>/` with `_engagement.json`, `living-instruction-file.md` and `part-01-client-inputs/` to `part-12-continuous-improvement/`, as `engagement-state.py` writes them. The same missing `brands/` segment is fixed in five more README lines, SECURITY.md, SUBMISSION.md and the managed-sessions roadmap.
+- Try this first: the "check" row no longer calls AI tells scored (that scan is advisory). Comparison table: live-write safety now says the approval record covers writes the plugin sends itself, and MCP writes rely on the typed yes and the host's permission prompt.
+
+**Tests**
+
+- New `tests/test_pinned_dependencies.py` (18 tests): requirements.txt equals the table; setup.py installs only table pins; every third-party import has a pin and every pin is used; no script or doc says `pip install <name>` without a pin; a version named in prose is the pinned one; and each script, run with its package blocked, prints the exact command. All 16 plants (each pre-fix file put back) fail their test.
+- `tests/test_doc_counts.py` now guards the executor's two connector counts (read from `connector_executor.EXECUTE_PROFILES`) and the brand path (`~/.claude-marketing/<brand>/` without `brands/`); both flagged the old README.
+- New `tests/test_manifest_paths.py`, the same file the other two suite plugins run: every `./` or `../` path in every manifest ships, and no manifest names `.mcp.json`. Planted with an `mcpServers: ./.mcp.json` key, which it flags.
+- Suite: 613 tests.
+
 ## [3.35.1] - 2026-10-10
 
 ### C2PA signing with `--prompt` works on the current c2pa-python, and the 3.35.0 C2PA fixes are tested

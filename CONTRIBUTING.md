@@ -144,9 +144,9 @@ Scripts must follow these conventions:
 
 1. **Argparse CLI**: Use `argparse` for all command-line arguments
 2. **JSON output**: Print structured JSON to stdout for programmatic consumption
-3. **Graceful fallbacks**: If optional dependencies are missing, output a fallback JSON with `"fallback": true` and `sys.exit(0)` — never crash with `sys.exit(1)` on missing optional deps
+3. **Graceful fallbacks**: If optional dependencies are missing, output a fallback JSON with `"fallback": true` and `sys.exit(0)` — never crash with `sys.exit(1)` on missing optional deps. The message prints `_common.install_command([...])`, the exact pinned command; a script never runs pip itself. A new optional package gets an exact pin in `_common.PINNED_DEPENDENCIES` and the same pin in `scripts/requirements.txt` (`tests/test_pinned_dependencies.py` keeps them equal)
 4. **Brand-aware**: Accept `--brand SLUG` to load brand-specific data from `~/.claude-marketing/brands/{slug}/`
-5. **No hardcoded paths**: Use `pathlib.Path.home() / ".claude-marketing"` for the data directory
+5. **No hardcoded paths**: Use `_common.workspace_root()` and `_common.brand_dir(slug)` for the data directory (they honour `CLAUDE_MARKETING_HOME` and the host's plugin data folder)
 
 Example graceful fallback:
 
@@ -157,7 +157,7 @@ except ImportError:
     print(json.dumps({
         "fallback": True,
         "error": "nltk_not_installed",
-        "message": "NLTK not installed. Install with: pip install nltk",
+        "message": "NLTK not installed. Install the tested version with: " + _common.install_command(["nltk"]),
         "recommendation": "Install NLTK for automated scoring, or review manually."
     }, indent=2))
     sys.exit(0)

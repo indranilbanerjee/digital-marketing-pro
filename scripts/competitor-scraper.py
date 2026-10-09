@@ -242,7 +242,8 @@ def main():
         print(json.dumps({
             "fallback": True,
             "error": f"{missing[0]}_not_installed",
-            "message": "Competitor scraping requires: pip install " + " ".join(missing),
+            "message": "Competitor scraping requires " + " and ".join(missing)
+                       + "; install the tested versions with: " + _common.install_command(missing),
             "recommendation": "Install dependencies for automated scraping, or analyze competitor pages manually."
         }))
         sys.exit(0)

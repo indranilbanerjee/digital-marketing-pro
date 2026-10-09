@@ -70,7 +70,8 @@ class TestNeverInstalls(unittest.TestCase):
                                    "--output", str(Path(td) / "out.png"), "--brand", "B", "--generator", "g"],
                                   capture_output=True, text=True, timeout=60)
         self.assertEqual(proc.returncode, 2, proc.stderr)
-        self.assertIn('python -m pip install "c2pa-python==0.38.0"', proc.stderr)
+        self.assertIn(c2._common.install_command(["c2pa-python"]), proc.stderr)
+        self.assertIn("c2pa-python==0.38.0", proc.stderr)
         self.assertIn("does not install packages", proc.stderr)
 
     def test_pins_are_exact(self):

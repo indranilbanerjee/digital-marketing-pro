@@ -1,34 +1,34 @@
-# Digital Marketing Pro — Python Dependencies
+# Digital Marketing Pro — optional Python packages, at the exact versions tested
 #
-# CORE: Required for NLP scoring and content analysis scripts
-# Install: pip install -r requirements.txt
+# The plugin works without ANY of these (knowledge-only mode). No script installs
+# them on its own: a script that needs a missing one prints the exact pinned
+# command and stops, and `python scripts/setup.py --install lite|full` installs
+# only when you run it.
 #
-# OPTIONAL extras are listed at the bottom — install only what you need.
-# The plugin works without ANY Python dependencies (knowledge-only mode).
+# These pins must equal PINNED_DEPENDENCIES in scripts/_common.py
+# (tests/test_pinned_dependencies.py fails if they differ). Every pin supports
+# Python 3.10 and newer.
+#
+# Install everything: python -m pip install -r requirements.txt
 
-# --- Core (brand voice scoring, content scoring, readability) ---
-nltk>=3.8
-textstat>=0.7
+# --- Lite: brand voice scoring, content scoring, readability ---
+nltk==3.10.3
+textstat==0.7.13
 
-# --- Web scraping (competitor analysis) ---
-beautifulsoup4>=4.12
-requests>=2.31
+# --- Full: competitor scraping ---
+beautifulsoup4==4.15.0
+requests==2.34.2
 
-# --- Optional: QR code generation (utm-generator.py --qr) ---
-# pip install qrcode Pillow
-# qrcode>=7.4
-# Pillow>=10.0
+# --- Full: QR codes (utm-generator.py --qr) ---
+qrcode==8.2
+pillow==12.3.0
 
-# --- Optional: AI visibility checking via APIs (ai-visibility-checker.py --mode api) ---
-# Set OPENAI_API_KEY and/or ANTHROPIC_API_KEY environment variables
-# pip install openai anthropic
-# openai>=1.0
-# anthropic>=0.40
+# --- Full: AI visibility checking via APIs (ai-visibility-checker.py --mode api) ---
+# Needs OPENAI_API_KEY and/or ANTHROPIC_API_KEY in the environment.
+openai==3.19.2
+anthropic==1.8.0
 
-# --- Optional: C2PA content provenance (embed-c2pa.py) — EU AI Act Article 50 compliance ---
-# Required for embedding machine-readable provenance manifests in AI-generated assets
-# (images, video, audio, PDF) before EU publication. Article 50 enforcement: 2 Aug 2026.
-# embed-c2pa.py never installs these; it prints this command and exits 2 when they are missing.
-# Exact versions it was verified with:
-# c2pa-python==0.38.0
-# cryptography==46.0.3
+# --- C2PA content provenance (embed-c2pa.py), EU AI Act Article 50 ---
+# Not installed by setup.py; embed-c2pa.py prints this command when they are missing.
+c2pa-python==0.38.0
+cryptography==46.0.3

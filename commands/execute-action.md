@@ -16,7 +16,7 @@ Resolves an action via `connector_resolver` and (optionally) executes it via `co
 | Step | Command | What happens |
 |------|---------|-------------|
 | 1. Prepare | `--execute` (no `--approval-id`) | Builds the exact request (data substituted, credential named but never shown), writes a **pending** approval record holding its sha256 and a script-rendered `preview`, sends nothing, exits 2. |
-| 2. Approve | `approval-manager.py --action approve --id <id>` | Run this **only after the user reads the preview and types `yes`**. Pending records expire after 30 minutes unreviewed. |
+| 2. Approve | `approval-manager.py --brand <slug> --action approve --id <id>` | Run this **only after the user reads the preview and types `yes`**. Pending records expire after 30 minutes unreviewed. |
 | 3. Fire | `--execute --approval-id <id>` | Rebuilds the request; it fires only if the hash matches, the record is approved, inside its 15-minute fire window, and unused. The record is consumed once the request is sent (any HTTP status) and released if nothing was sent (for example a DNS failure). |
 
 Read operations fire on `--execute` alone. With no flags it is a dry run: the resolved manifest, no HTTP call, no record. `--confirm` is accepted for old scripts but adds nothing.

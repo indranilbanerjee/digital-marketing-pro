@@ -16,7 +16,7 @@ Formal multi-agent coordination primitives — replaces the ad-hoc "dispatch par
 
 ### Memory for Managed Agents API
 
-Persistent memory across agent invocations within a managed session. Today DMP uses local JSON files (`~/.claude-marketing/<brand>/insights/`, `_engagement.json`) for the same purpose. The managed-agents Memory API would:
+Persistent memory across agent invocations within a managed session. Today DMP uses local JSON files (`~/.claude-marketing/brands/<brand>/insights.json`, `_engagement.json`) for the same purpose. The managed-agents Memory API would:
 
 - Move brand-profile + engagement-state + cross-engagement insights into Anthropic-managed memory
 - Provide structured read/write APIs from any subagent in the session, with automatic context-window management
@@ -55,7 +55,7 @@ Persistent memory across agent invocations within a managed session. Today DMP u
 - **Pricing.** Anthropic has not published pricing for managed-agent memory storage or for the Multiagent Sessions API beyond standard Claude API token costs. We need pricing clarity before recommending this as the default for agency users running 50–200 brand engagements.
 - **Cowork compatibility.** Cowork is the Anthropic Desktop computer-use product — does it support `managed-agents-2026-04-01`? Unverified as of May 2026.
 - **Cross-API-provider compatibility.** Users on Claude API via AWS Bedrock or Google Vertex AI may not get managed-agents on the same timeline. The local-file fallback path stays load-bearing for these users.
-- **Migration story.** A user who already has 50+ brand engagements in `~/.claude-marketing/<brand>/` needs a one-shot migration to managed memory. Should the v3.5 release include a `/digital-marketing-pro:migrate-to-managed-memory` command, or defer to v4.0?
+- **Migration story.** A user who already has 50+ brand engagements in `~/.claude-marketing/brands/<brand>/` needs a one-shot migration to managed memory. Should the v3.5 release include a `/digital-marketing-pro:migrate-to-managed-memory` command, or defer to v4.0?
 
 ## Tracking
 

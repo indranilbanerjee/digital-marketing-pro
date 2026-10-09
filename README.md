@@ -6,22 +6,22 @@ Run `/digital-marketing-pro:engagement` against each brand. Same 12-Part Strateg
 
 Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Act Article 50 ready, Cowork team-persistent**. Built for marketing agencies, in-house teams running 50–200 brands, and consultancies. Installs on **Claude Code** (CLI + IDE), **Anthropic Cowork**, **OpenAI Codex**, **Cursor 2.5+**, **GitHub Copilot CLI**, **Google Antigravity 2.0**, **Hermes Agent**, **OpenClaw**, and **Grok** + 35+ Agent Skills platforms. Created by [Indranil Banerjee](https://indranil.in) · [LinkedIn](https://www.linkedin.com/in/askneelnow/) · [X](https://x.com/askneelnow).
 
-[![Version](https://img.shields.io/badge/version-3.35.1-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.35.2-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=yellow)](https://github.com/indranilbanerjee/digital-marketing-pro/stargazers)
 [![Forks](https://img.shields.io/github/forks/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=blue)](https://github.com/indranilbanerjee/digital-marketing-pro/network/members)
 [![Issues](https://img.shields.io/github/issues/indranilbanerjee/digital-marketing-pro?logo=github)](https://github.com/indranilbanerjee/digital-marketing-pro/issues)
 [![Last commit](https://img.shields.io/github/last-commit/indranilbanerjee/digital-marketing-pro?logo=github)](https://github.com/indranilbanerjee/digital-marketing-pro/commits/main)
-[![Tests](https://img.shields.io/badge/tests-588%2F588%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-613%2F613%20passing-brightgreen.svg)](tests/)
 [![Platforms](https://img.shields.io/badge/platforms-9%20native%20%2B%2035%20Agent%20Skills-success.svg)](#works-on-40-agent-harnesses-via-the-agent-skills-open-standard)
-[![Cowork](https://img.shields.io/badge/cowork-team%20persistent-purple.svg)](#supported-surfaces-v3351)
+[![Cowork](https://img.shields.io/badge/cowork-team%20persistent-purple.svg)](#supported-surfaces-v3352)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Article%2050%20ready-darkred.svg)](skills/context-engine/compliance-rules.md)
 [![Sponsor](https://img.shields.io/badge/sponsor-%E2%9D%A4-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/indranilbanerjee)
 [![HOL Guard](https://img.shields.io/endpoint?url=https%3A%2F%2Fhol.org%2Fapi%2Fregistry%2Fbadges%2Fplugin%3Fslug%3Dindranil-banerjee%252Fdigital-marketing-pro%26metric%3Dtrust)](https://hol.org/go/guard/indranilbanerjee21?dest=%2Fguard%2Fbilling%3Fpromo%3DGUARD20-INDRANILBANERJEE21%23upgrade&link_id=fc4b1025-e6eb-40bd-b3d7-24a8508c2fd9&utm_source=insights_share&utm_medium=affiliate_cta&utm_campaign=share20)
 
-> 🆕 **Just shipped — v3.35.1 (October 10, 2026): live writes need a matching approval record (v3.35.0), and C2PA signing with a prompt works on the current c2pa-python (v3.35.1).** A write the plugin sends itself now fires only against a single-use approval record for that exact request: the script shows a preview, the skill approves it after you type `yes`, and the request must match within 15 minutes. What that proves is stated plainly (the approval step ran for this request, once; not who typed `yes`), MCP-tool writes are named as outside the check, and autopilot now proposes by default. Also from the Hermes maintainer review: no script installs packages on its own (which exposed and fixed a C2PA signing failure on the current c2pa-python), model-supplied names can no longer reach files outside the plugin's folders, fetchers refuse private and metadata addresses on every redirect, and PRIVACY.md lists every network call. [Read what's new →](#whats-new) · [Full changelog →](CHANGELOG.md)
+> 🆕 **Just shipped — v3.35.2 (October 10, 2026): every missing-package message prints the exact pinned command, and the README says what the code does.** One table pins every optional package; requirements.txt lists the same exact versions, `setup.py --install` installs from it, and every script that needs a missing package prints the tested `pip install` command (before, only C2PA did). A claim check also fixed five README passages the code contradicted: the automation examples, the OAuth connector count (28), the output-folder tree, the check row and the live-write comparison. [Read what's new →](#whats-new) · [Full changelog →](CHANGELOG.md)
 >
-> <sub>Previously — **v3.34.0 (October 10, 2026):** every description fits the skill-listing budget, so the model picks the right skill first on 90.5% of trigger runs, up from 80.5%. [Full changelog →](CHANGELOG.md)</sub>
+> <sub>Previously — **v3.35.0 and v3.35.1 (October 10, 2026):** a write the plugin sends itself fires only against a single-use approval record for that exact request, created after you type `yes` (what that proves is stated plainly, and MCP-tool writes are named as outside the check); autopilot proposes by default; no script installs packages on its own; model-supplied names cannot reach files outside the plugin's folders; fetchers refuse private addresses on every redirect; C2PA signing works on the current c2pa-python. [Full changelog →](CHANGELOG.md)</sub>
 
 ```bash
 # Install — one line
@@ -39,7 +39,7 @@ Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Ac
 |---|---|---|
 | 🏢 **Marketing agency** managing 50–200 brands | `/digital-marketing-pro:engagement` per brand, then `/digital-marketing-pro:cowork-setup` for team Drive persistence | Same 12-Part Strategy Flow audited across every brand. New-hire onboarding goes from 6 weeks to 6 hours. Per-brand AI cost rollup via `:agency-dashboard`. |
 | 👔 **In-house marketing team** (B2B SaaS · e-commerce · fintech · healthtech) | `/digital-marketing-pro:engagement` once to anchor strategy, then `:content-engine` + `:campaign-plan` for ongoing work | A single canonical strategy doc, monthly stakeholder reports via `:performance-report`, content + campaigns that tie back to the strategy instead of drifting. |
-| 🚀 **Marketing automation builder** (n8n · Zapier · Make · Pipedream · custom) | `/digital-marketing-pro:doctor` to see what's wired, `:execute-action` to fire real API calls | 8 verified HTTP connectors executing end-to-end (Slack · HubSpot · Klaviyo · SendGrid · Brevo · Customer.io · Mailchimp · Ahrefs); 25 OAuth connectors via MCP manifest. Stdlib only, no third-party deps. |
+| 🚀 **Marketing automation builder** (n8n · Zapier · Make · Pipedream · custom) | `/digital-marketing-pro:doctor` to see what's wired, `:execute-action` to fire real API calls | 8 verified HTTP connectors executing end-to-end (Slack · HubSpot · Klaviyo · SendGrid · Brevo · Customer.io · Mailchimp · Ahrefs); 28 OAuth connectors via MCP manifest. Stdlib only, no third-party deps. |
 | 💼 **Solo consultant** or freelance marketer | `/digital-marketing-pro:engagement` per client | 50–60 canonical files per client engagement in ~60 minutes for $15–40 of API spend. Same depth on every project. Installs on Codex / Cursor / Copilot CLI / Antigravity if you don't live in Claude. |
 | 📈 **Growth team** / product marketer | `:funnel-architect` → `:analytics-insights` → `:attribution-model` → `:churn-risk` → `:cohort-analysis` | Journey design + measurement + retention + churn — all aligned to the strategy document, not isolated outputs. MMM + incrementality testing baked in. |
 | 🛡 **Compliance-led marketer** (EU · UK · India · Brazil · California) | `/digital-marketing-pro:check` before publishing anything | C2PA content provenance, EU AI Act Article 50 disclosure, GDPR + CCPA + DPDPA + LGPD across 16 jurisdictions, deepfake disclosure clauses on every AI creative brief. |
@@ -56,11 +56,11 @@ Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Ac
 | Multi-brand / agency support | **Yes — per-brand state, brand-switch, agency-dashboard** | No | No | No |
 | EU AI Act Article 50 ready | **Yes — C2PA + deepfake disclosure + 16 jurisdictions** | No | No | Partial |
 | Cowork team persistence | **Yes — Drive MCP routing (v3.12.0)** | Cowork-native | Composio cloud | n/a |
-| Real API execution | **Yes — 8 connectors live, 25 manifest-ready** | OAuth via plugin | OAuth via Composio | Optional DataForSEO / Firecrawl |
+| Real API execution | **Yes — 8 connectors live, 28 manifest-ready** | OAuth via plugin | OAuth via Composio | Optional DataForSEO / Firecrawl |
 | 6-platform AEO/GEO audit | **Yes — incl. Google AI Mode (May 2026)** | No | No | Yes (AEO + GEO) |
 | Cross-platform install | **9 native — CC + Cowork + Codex + Cursor + Copilot CLI + Antigravity + Hermes + OpenClaw + Grok** | Cowork only | Cowork + Codex | CC + Codex |
-| Tests | **588 stdlib unittest** | unknown | unknown | 271 incl. SSRF/DNS coverage |
-| Live-write safety | **A single-use approval record for each exact request, created when you type yes** | Host permission prompt | Host permission prompt | n/a |
+| Tests | **613 stdlib unittest** | unknown | unknown | 271 incl. SSRF/DNS coverage |
+| Live-write safety | **Single-use approval record for writes it sends itself; MCP writes: typed yes + host prompt** | Host permission prompt | Host permission prompt | n/a |
 | License | **MIT — no telemetry, no seats** | Proprietary | Proprietary | MIT |
 | Maintainer responsiveness | Direct via [@askneelnow](https://linkedin.com/in/askneelnow) | Anthropic queue | Composio queue | Community |
 
@@ -94,7 +94,7 @@ Install, then ask in plain words. Each of these kinds of request reached the rig
 | "build the Q3 campaign plan" | A multi-channel plan: objectives, channel mix, budget, timeline, KPIs |
 | "why did our traffic drop" | A site-wide SEO audit ranked into a `PLAN.md`: technical, content, links, local |
 | "how do we stack up against X" | A one-off analysis of 2-5 competitors: positioning, content, SEO, ads, pricing |
-| "check this before we publish" | The scored pre-publish gate: claims, brand voice, compliance, AI tells |
+| "check this before we publish" | The scored pre-publish gate: claims, brand voice, compliance; plus an AI-tell scan |
 | "how many visitors per variant" | An A/B test plan computed by script: sample size, days to run, stopping rules |
 
 ## Why Digital Marketing Pro
@@ -184,25 +184,28 @@ Or jump straight to one workflow:
 ### 5. Find your output
 
 ```
-~/.claude-marketing/<brand-slug>/
-├── brand-profile.json           ← brand voice, audience, guardrails, jurisdictions
-├── engagements/
-│   └── <engagement-slug>/
-│       ├── 01-client-inputs/    ← Part 1 Stone-vs-Opinion intake
-│       ├── 02-research/         ← Part 2 external market research
-│       ├── 03-four-core/        ← Part 3 Four Core Documents (61 steps)
-│       ├── 04-analysis/         ← Part 4 competitive / customer / market
-│       ├── 05-validation/       ← Part 5 Client Validation Document
-│       ├── 06-v2-reruns/        ← Part 6 selective v2 re-runs
-│       ├── 07-prep/             ← Part 7 internal operating layer
-│       ├── 08-growth-plan/      ← Part 8 Growth Plan + Yearly Planner
-│       ├── 09-channels/         ← Part 9 channel-strategy fan-out
-│       ├── 10-execution/        ← Part 10 ad copy / post copy / headlines / CTAs
-│       ├── 11-creative-briefs/  ← Part 11 AI creative instructions
-│       ├── 12-improvement/      ← Part 12 continuous improvement loop
-│       └── PROJECT_INSTRUCTIONS.md  ← Living Project Instruction File
-└── insights/                    ← cross-engagement learnings
+~/.claude-marketing/brands/<brand-slug>/
+├── profile.json                              ← brand voice, audience, guardrails, jurisdictions
+├── insights.json                             ← cross-engagement learnings
+└── engagements/
+    └── <engagement-id>/
+        ├── _engagement.json                  ← state: current part, completed parts, change log
+        ├── living-instruction-file.md        ← Living Project Instruction File
+        ├── part-01-client-inputs/            ← Part 1 Stone-vs-Opinion intake
+        ├── part-02-external-research/        ← Part 2 external market research
+        ├── part-03-four-core-documents/      ← Part 3 Four Core Documents (61 steps), v1/ and v2/
+        ├── part-04-competitive-customer-market/  ← Part 4 analyses, v1/ and v2/
+        ├── part-05-client-validation/        ← Part 5 Client Validation Document
+        ├── part-06-v2-reruns/                ← Part 6 selective v2 re-runs
+        ├── part-07-preparation/              ← Part 7 internal operating layer
+        ├── part-08-growth-plan/              ← Part 8 Growth Plan + Yearly Planner
+        ├── part-09-channel-strategy/         ← Part 9 channel-strategy fan-out
+        ├── part-10-execution-artefacts/      ← Part 10 ad copy / post copy / headlines / CTAs
+        ├── part-11-ai-creative-instructions/ ← Part 11 AI creative instructions
+        └── part-12-continuous-improvement/   ← Part 12 continuous improvement loop
 ```
+
+The workspace is `~/.claude-marketing/` unless `CLAUDE_MARKETING_HOME` or your host's plugin data folder says otherwise; user-facing deliverables are also copied to `~/Documents/DigitalMarketingPro/` (`/digital-marketing-pro:output-folder` opens it).
 
 See the [Multi-Brand & Agency Guide](docs/multi-brand-guide.md) for the multi-client switching workflow.
 
@@ -215,7 +218,7 @@ See the [Multi-Brand & Agency Guide](docs/multi-brand-guide.md) for the multi-cl
 /digital-marketing-pro:brand-setup "ACME Corp"        # interactive: voice, audience, channels, jurisdiction
 /digital-marketing-pro:competitor-analysis            # multi-dimensional deep-dive on top 5 competitors
 /digital-marketing-pro:engagement                     # full 12-Part Strategy Flow (~60 min on Opus-class)
-/digital-marketing-pro:check  engagements/.../03-four-core/*.md   # pre-publish gate before client review
+/digital-marketing-pro:check  engagements/<id>/part-03-four-core-documents/v1/*.md   # pre-publish gate before client review
 ```
 Output: ~50–60 canonical files. Cost: $15–40 in API spend. Time saved: ~3 weeks of senior-strategist labor.
 
@@ -241,12 +244,12 @@ Output: stakeholder-ready Q2 review with anomalies, attribution shift, competito
 ### 🤖 Marketing automation flow (builders)
 ```
 /digital-marketing-pro:doctor                         # which actions are live vs need connector setup
-/digital-marketing-pro:execute-action --action diagnostic --execute            # GA4 + GSC pull
-/digital-marketing-pro:execute-action --action audit-current --execute         # workflow state check
-/digital-marketing-pro:execute-action --action enable-automation --execute     # Klaviyo flow: prepares a preview + approval record
-# after you type yes: approval-manager.py --action approve --id <id>, then re-run with --approval-id <id>
+/digital-marketing-pro:execute-action --action diagnostic --brand acme --execute         # GA4 + GSC tag/consent check (MCP path: returns the manifest)
+/digital-marketing-pro:execute-action --action audit-current --brand acme --execute      # current SEO state (Ahrefs over HTTP; GSC via MCP)
+/digital-marketing-pro:execute-action --action enable-automation --brand acme --execute  # email automation flow: prepares a preview + approval record
+# after you type yes: approval-manager.py --brand acme --action approve --id <id>, then re-run with --approval-id <id>
 ```
-Output: real API calls fired against your stack, each write against a single-use approval record for that exact request, logged at `~/.claude-marketing/brands/{brand}/executions/`. See [Safety and approvals](#safety-and-approvals).
+Output: HTTP calls for the 8 executable connectors (Slack, HubSpot, Klaviyo, SendGrid, Brevo, Customer.io, Mailchimp, Ahrefs), MCP manifests for the rest; each write fires against a single-use approval record for that exact request and is logged at `~/.claude-marketing/brands/{brand}/executions/`. See [Safety and approvals](#safety-and-approvals).
 
 ### 🛡 Pre-publish compliance gate (every campaign)
 ```
@@ -279,7 +282,7 @@ Output: real API calls fired against your stack, each write against a single-use
 - **Connect a service you did not set up.** No MCP server ships enabled and no hooks run.
 - **Remove or hide AI watermarks.** AI involvement is disclosed, with C2PA provenance where the format supports it.
 
-## Supported surfaces (v3.35.1)
+## Supported surfaces (v3.35.2)
 
 | Platform | Install command | Manifest path | Status |
 |---|---|---|---|
@@ -392,6 +395,10 @@ If you run into a platform-specific install snag, file a [GitHub issue](https://
 
 ## What's new
 
+### v3.35.2 — every missing-package message prints the exact pinned command (October 10, 2026)
+
+The never-do panel said a missing package prints the exact pinned install command; only C2PA did. Now `_common.PINNED_DEPENDENCIES` pins every optional package (each the newest release at least two weeks old that supports Python 3.10), `scripts/requirements.txt` lists the same exact pins, `setup.py --install` installs from the table, and every missing-package message prints the tested command, including two that said nothing useful before (the AI-visibility checker blamed the API key when its SDK was missing; the UTM QR note gave no command). Proved in fresh Python 3.10 and 3.13 environments. Also fixed, from a claim check of this README against the code: the automation examples (diagnostic returns an MCP manifest; audit-current is an SEO audit; approve needs `--brand`), the OAuth connector count (28, not 25), the output-folder tree (`brands/<slug>/profile.json`, `part-01-…` folders), the check row and the live-write comparison. New guards: `tests/test_pinned_dependencies.py`, connector-count and brand-path checks in `tests/test_doc_counts.py`, and `tests/test_manifest_paths.py`. 613 tests.
+
 ### v3.35.1 — C2PA signing with a prompt works on the current c2pa-python (October 10, 2026)
 
 `embed-c2pa.py --prompt` failed to sign on c2pa-python 0.38.0, the version v3.35.0 pins, because the prompt was written as a second `c2pa.opened` action; it now rides on the created action. New `tests/test_c2pa_embed.py` (10 tests) pins v3.35.0's C2PA fixes, which had been verified by hand: no install path, pinned install command and exit 2 when a package is missing, the dev key removed even on failure, the `--verify` exit codes, and the PRIVACY.md disclosures. 585 tests.
@@ -399,10 +406,6 @@ If you run into a platform-specific install snag, file a [GitHub issue](https://
 ### v3.35.0 — live writes need a matching approval record (October 10, 2026)
 
 Answers every point of the Hermes catalog review (NousResearch/hermes-agent#132571). Writes sent by `connector_executor.py` fire only against an approval record bound by sha256 to the exact request, approved after you type `yes`, used once, inside a 15-minute window; batches get one record with an itemised preview, and routine writes can run under a capped, expiring standing approval. MCP-tool writes are outside that check and the docs say so, along with the advice to keep the executor out of your host's allowlist. Autopilot proposes by default. `embed-c2pa.py` no longer installs packages (and now signs on c2pa-python 0.38.0, where it had been failing) and gains `--verify`. `safe_child` and a validating argparse type keep model-supplied names inside the plugin's folders; fetchers check every redirect hop; PRIVACY.md lists the DigiCert timestamp and NLTK downloads. 575 tests.
-
-### v3.34.0 — the model finds the right skill more often (October 10, 2026)
-
-Claude Code lists every installed skill, command and workflow to the model in one listing measured in characters (context window x 4 x 1%, so 8,000 on 200k and 40,000 on 1M, shared by every plugin). DMP alone needed about 126,600, so every description was cut short and its trigger phrases never reached the model. All 170 descriptions are rewritten to 60-150 characters, verb and object first, with one phrase a user would type; the listing is now 25,974 characters (on a 200k window only the names fit; set `skillListingBudgetFraction: 0.05` to see descriptions), and `tests/test_description_density.py` holds it there with its reasons written down. Trigger evals with the budget pinned: 80.5% to 90.5% of runs pick the right skill first, ab-test-plan, check, funnel-audit and seo-audit go from 0-1 of 3 to 3 of 3 and hold on a differently worded request, sibling misfires stay at zero, and unrelated requests stay quiet. Two cases that got worse in the first run (competitor-analysis, taken by the competitor-sweep workflow, and verify-claims) were fixed and pass 3/3. Not fixed and reported as is: paid-advertising on a broad account-restructure question (a campaign-type question such as Performance Max or AI Max routes 3/3; the model answered the restructure question in chat), and one-line translations, which the model does itself.
 
 Older releases are in [CHANGELOG.md](CHANGELOG.md).
 
@@ -507,8 +510,8 @@ Plugin works fully without Python — all marketing knowledge, frameworks, agent
 | Mode | Size | Adds |
 |---|---|---|
 | **Knowledge-only** (default) | 0 MB | All 164 skills + 24 agents + 176 reference files |
-| **Lite** (`pip install nltk textstat`) | ~15 MB | Brand-voice scoring, content quality scoring, readability analysis |
-| **Full** (`pip install -r scripts/requirements.txt`) | ~50 MB | Competitor scraping, QR generation, AI visibility API checking, GEO tracking, C2PA signing |
+| **Lite** (`python scripts/setup.py --install lite`) | ~15 MB | Brand-voice scoring, content quality scoring, readability analysis |
+| **Full** (`python -m pip install -r scripts/requirements.txt`, exact pins) | ~50 MB | Competitor scraping, QR generation, AI visibility API checking, GEO tracking, C2PA signing |
 
 ### 14 HTTP MCP connectors
 Notion · Slack · Canva · Figma · HubSpot · Amplitude · Ahrefs · SimilarWeb · Klaviyo · Google Calendar · Gmail · Stripe · Asana · Webflow
@@ -531,7 +534,7 @@ Two user-team complaints from the v3.7.5 cycle drove this release: "dm pro is ta
 /digital-marketing-pro:resume engagement <run-id>          # pick a specific run
 ```
 
-**Fix 2 — Visible output folder.** Every artifact a workflow produces is now copied to TWO locations: the internal tracking copy under `~/.claude-marketing/{brand}/output/{workflow}/...` (system-of-record), and a user-visible published copy under `~/Documents/DigitalMarketingPro/{brand}/{workflow}/{YYYY-MM}/{filename}` (visible in Windows Explorer / macOS Finder by default). Override the visible root with `DIGITAL_MARKETING_PRO_PUBLISH_DIR=/path` (e.g. a Dropbox share for the team). Reveal the folder any time with:
+**Fix 2 — Visible output folder.** Every artifact a workflow produces is now copied to TWO locations: the internal tracking copy under `~/.claude-marketing/brands/{brand}/output/{workflow}/...` (system-of-record), and a user-visible published copy under `~/Documents/DigitalMarketingPro/{brand}/{workflow}/{YYYY-MM}/{filename}` (visible in Windows Explorer / macOS Finder by default). Override the visible root with `DIGITAL_MARKETING_PRO_PUBLISH_DIR=/path` (e.g. a Dropbox share for the team). Reveal the folder any time with:
 
 ```
 /digital-marketing-pro:output-folder                       # opens ~/Documents/DigitalMarketingPro/{brand}/
@@ -548,7 +551,7 @@ The `campaign-audit` and `launch-campaign` skills depend on 14 actions that map 
 
 | mode | what it means |
 |------|---------------|
-| `real` | runs end-to-end with no external API (currently only `arm-watchdog` which writes a watchdog config to `~/.claude-marketing/{brand}/watchdogs/`) |
+| `real` | runs end-to-end with no external API (currently only `arm-watchdog` which writes a watchdog config to `~/.claude-marketing/brands/{brand}/watchdogs/`) |
 | `manifest_ready` | a matching connector is configured — the response includes the exact HTTP request manifest (method, URL, headers, body template, auth pattern) for the orchestrator (Claude via MCP) to execute. Write/launch ops set `approval_required: true`. |
 | `stub_unconfigured` | no matching connector is configured — the response includes the manual fallback PLUS copy-paste `.mcp.json` snippet, env-var list, and a Cowork-compatibility note |
 
@@ -583,7 +586,7 @@ The v3.7.10 resolver returned a manifest of "what would be sent." v3.7.11 adds `
 
 **Requires the MCP path (28 OAuth-only or MCP-only connectors):** Google Ads, Meta Marketing, LinkedIn Marketing, LinkedIn Publishing, TikTok Ads, Twitter/X, Gmail, Google Calendar, Google Analytics, Google Search Console, Meta Graph, Salesforce, Pipedrive, Zoho CRM, Buffer, Hootsuite, Cision, Muckrack, Amplitude, Similarweb, SEMrush, Moz, Intercom, Canva, Figma, plus the official ad-platform MCP servers Meta Ads AI Connectors, Google Ads MCP (read-only) and Amazon Ads MCP. For all of these, the resolver still returns `manifest_ready` so you can see the exact HTTP shape Claude's MCP tool will send — Python just can't execute the OAuth flow itself.
 
-**Safety gates (updated in v3.35.0):** read ops auto-execute with `--execute`; write ops need a matching approved, single-use approval record (`--approval-id`), see [Safety and approvals](#safety-and-approvals); missing env vars block with `setup_hint_credential`; unresolved `{VAR}` placeholders block before the request fires. Every fired call logs to `~/.claude-marketing/{brand}/executions/`.
+**Safety gates (updated in v3.35.0):** read ops auto-execute with `--execute`; write ops need a matching approved, single-use approval record (`--approval-id`), see [Safety and approvals](#safety-and-approvals); missing env vars block with `setup_hint_credential`; unresolved `{VAR}` placeholders block before the request fires. Every fired call logs to `~/.claude-marketing/brands/{brand}/executions/`.
 
 **Test coverage:** end-to-end HTTP send-and-receive for the 8 connectors (Slack `body.ok` post-check, Klaviyo vnd.api+json, Brevo lowercase header, Mailchimp Basic, plus the safety gates and data substitution) was validated during development against a stdlib `http.server` mock. That mock harness is a dev tool and is not shipped in the repo; the shipped suite covers the resolver layer via `tests/test_connector_resolver.py`.
 
@@ -695,13 +698,13 @@ Those are frameworks. DM Pro is a **packaged, opinionated methodology** with exp
 Roughly **$15–40** for a complete 12-part engagement using Opus 4.8 or Opus 5 (same pricing) across ~50–60 documents. Track per-brand consumption via Claude Code v2.1.149+ `/usage` (now integrated into `/digital-marketing-pro:agency-dashboard`).
 
 **Q: Can I run multiple brands in parallel?**
-Yes. Each brand has its own `~/.claude-marketing/<brand-slug>/` directory and Python script state. Switch with `/digital-marketing-pro:switch-brand`.
+Yes. Each brand has its own `~/.claude-marketing/brands/<brand-slug>/` directory and Python script state. Switch with `/digital-marketing-pro:switch-brand`.
 
 **Q: What if I only want a campaign plan, not the full methodology?**
 Skip to `/digital-marketing-pro:campaign-plan`. Every individual surface (campaign / SEO / content / competitor / email / report) is independently runnable. The full engagement is the canonical path, not the only path.
 
 **Q: Will this work on Codex / Cursor / Copilot CLI / Antigravity?**
-Yes — verified-real native manifests ship for all 9 surfaces (CC, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok). See [Supported surfaces](#supported-surfaces-v3351) above for per-platform install commands.
+Yes — verified-real native manifests ship for all 9 surfaces (CC, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok). See [Supported surfaces](#supported-surfaces-v3352) above for per-platform install commands.
 
 **Q: I run my team on Anthropic Cowork. Does brand state persist between sessions?**
 Yes — but you need to run `/digital-marketing-pro:cowork-setup` once per team first (v3.12.0). Cowork's per-session filesystem is ephemeral, and `${CLAUDE_PLUGIN_DATA}` is too ([open issue #51398](https://github.com/anthropics/claude-code/issues/51398)). The setup wizard routes brand profiles + plans + reports through a Google Drive MCP so everything survives across sessions and is shared across the team. Multi-team isolation via per-team folder names.
@@ -774,13 +777,13 @@ Use the direct repo form: `grok plugin install indranilbanerjee/digital-marketin
 ### General (any platform)
 
 **"Tests in `tests/` fail when I `git clone` locally"**
-Run `python tests/run_all.py` from the repo root. All 588 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
+Run `python tests/run_all.py` from the repo root. All 613 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
 
 **"`/digital-marketing-pro:doctor` shows my action as stub_unconfigured"**
 That action needs an MCP connector configured. Run `python scripts/connector-status.py --action setup-guide --name <connector-name>` for the exact setup snippet. Add it to your `.mcp.json` under `mcpServers`, restart your agent, and the action becomes `manifest_ready`. See [Connector-aware action resolver](#connector-aware-action-resolver-v3710) for the full readiness model.
 
 **"Where do my brand files actually go?"**
-Run `/digital-marketing-pro:output-folder` — it prints the active output directory and (on local Claude Code) opens it in your OS file manager. Default: `~/.claude-marketing/<brand-slug>/` for working state + `~/Documents/DigitalMarketingPro/<brand>/` for finished deliverables. Both configurable via `output-folder`.
+Run `/digital-marketing-pro:output-folder` — it prints the active output directory and (on local Claude Code) opens it in your OS file manager. Default: `~/.claude-marketing/brands/<brand-slug>/` for working state + `~/Documents/DigitalMarketingPro/<brand>/` for finished deliverables. Both configurable via `output-folder`.
 
 **Still stuck?** [Open an issue](https://github.com/indranilbanerjee/digital-marketing-pro/issues) with the exact error message + platform name + version. We respond within a few days.
 

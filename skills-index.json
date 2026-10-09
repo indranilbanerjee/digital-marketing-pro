@@ -1301,7 +1301,8 @@
       "description": "Show help with live plugin counts: getting started, which skill fits a goal, fixes. \\\"what can this plugin do\\\"",
       "scripts": [
         "build_skills_index.py",
-        "plugin-metadata.py"
+        "plugin-metadata.py",
+        "setup.py"
       ],
       "missing_scripts": [],
       "gates": [
@@ -1323,7 +1324,7 @@
         "status"
       ],
       "doc_files": 1,
-      "bytes": 10635
+      "bytes": 10719
     },
     {
       "name": "hreflang-check",

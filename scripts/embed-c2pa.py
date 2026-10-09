@@ -46,7 +46,7 @@ AI claim values (mapped to C2paDigitalSourceType):
 The resulting asset can be inspected at https://contentcredentials.org/verify
 or with any C2PA-aware viewer (Photoshop, Lightroom, Truepic, etc.).
 
-Tested with c2pa-python 0.38.0 (C2PA_PIN below). The library API changed in
+Tested with c2pa-python 0.38.0 (pinned in _common.PINNED_DEPENDENCIES). The library API changed in
 0.13+ — this script uses the current `Builder` + `Signer.from_info(C2paSignerInfo)`
 pattern. Since 0.38 the `c2pa.created` action must carry its own
 digitalSourceType; the script writes the IPTC URI there.
@@ -66,11 +66,15 @@ Verify (read-only, used by the pre-publish check's EU AI-asset dimension):
 
 import argparse
 import json
+import os
 import shutil
 import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _common  # noqa: E402
 
 
 SUPPORTED_FORMATS = {
@@ -104,17 +108,18 @@ IPTC_SOURCE_TYPE = {
     "ai-no-substantive-changes": "http://cv.iptc.org/newscodes/digitalsourcetype/humanEdits",
 }
 
-# Exact versions this script was verified against. Printed, never installed.
-C2PA_PIN = "c2pa-python==0.38.0"
-CRYPTOGRAPHY_PIN = "cryptography==46.0.3"
+# Exact versions this script was verified against, from the one pin table in
+# _common. Printed, never installed.
+C2PA_PIN = _common.pinned_specs(["c2pa-python"])[0]
+CRYPTOGRAPHY_PIN = _common.pinned_specs(["cryptography"])[0]
 
 
-def missing_package(package_pin: str, why: str):
+def missing_package(package: str, why: str):
     """Tell the user what to install and stop. The script never runs pip itself."""
     print(
         f"ERROR: {why} is not installed. This script does not install packages.\n"
         f"To install the version it was tested with, run:\n"
-        f'    python -m pip install "{package_pin}"\n'
+        f"    {_common.install_command([package])}\n"
         "Docs: https://opensource.contentauthenticity.org/docs/python/",
         file=sys.stderr,
     )
@@ -136,7 +141,7 @@ def ensure_c2pa():
         import c2pa
         return c2pa
     except ImportError:
-        missing_package(C2PA_PIN, "c2pa-python")
+        missing_package("c2pa-python", "c2pa-python")
 
 
 def build_manifest_json(brand, generator, ai_claim, created, prompt, reviewer,
@@ -399,7 +404,7 @@ def main():
             try:
                 cert_path, key_path = generate_self_signed_cert(tmpdir)
             except ImportError:
-                missing_package(CRYPTOGRAPHY_PIN, "cryptography (needed for the dev certificate)")
+                missing_package("cryptography", "cryptography (needed for the dev certificate)")
             using_dev_cert = True
 
         try:

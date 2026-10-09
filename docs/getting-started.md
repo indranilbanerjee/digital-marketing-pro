@@ -601,10 +601,10 @@ The plugin will tell you when a Python-dependent feature is unavailable and will
 
 ### Lite mode
 
-If you want brand voice scoring and content readability analysis, install two small packages:
+If you want brand voice scoring and content readability analysis, install two small packages at the versions the scripts were tested with:
 
 ```
-pip install nltk textstat
+python /path/to/digital-marketing-pro/scripts/setup.py --install lite
 ```
 
 This unlocks:
@@ -614,10 +614,10 @@ This unlocks:
 
 ### Full mode
 
-For the complete feature set, install all dependencies:
+For the complete feature set, install all dependencies (every line in the file is an exact pin):
 
 ```
-pip install -r /path/to/digital-marketing-pro/scripts/requirements.txt
+python -m pip install -r /path/to/digital-marketing-pro/scripts/requirements.txt
 ```
 
 This adds everything in Lite mode, plus:

@@ -20,9 +20,13 @@ Content Types:  blog | email | ad | landing_page | social
 
 import argparse
 import json
+import os
 import re
 import sys
 from pathlib import Path
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _common  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Dependency checks
@@ -33,7 +37,8 @@ except ImportError:
     print(json.dumps({
         "fallback": True,
         "error": "textstat_not_installed",
-        "message": "textstat not installed. Content scoring requires: pip install textstat",
+        "message": "textstat not installed. Content scoring requires it; install the tested version with: "
+                   + _common.install_command(["textstat"]),
         "overall_score": None,
         "recommendation": "Install textstat for automated content scoring, or evaluate manually using skills/context-engine/scoring-rubrics.md"
     }, indent=2))
@@ -45,7 +50,8 @@ except ImportError:
     print(json.dumps({
         "fallback": True,
         "error": "nltk_not_installed",
-        "message": "NLTK not installed. Content scoring requires: pip install nltk",
+        "message": "NLTK not installed. Content scoring requires it; install the tested version with: "
+                   + _common.install_command(["nltk"]),
         "overall_score": None,
         "recommendation": "Install NLTK for automated content scoring, or evaluate manually using skills/context-engine/scoring-rubrics.md"
     }, indent=2))

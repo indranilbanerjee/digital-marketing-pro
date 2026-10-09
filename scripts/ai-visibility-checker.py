@@ -151,6 +151,7 @@ def run_api_mode(brand, queries, competitors=None, openai_model_override=None, a
     """Attempt to run queries via available AI APIs."""
     results = []
     api_available = False
+    missing_sdks = []  # a key is set but its SDK is not installed
 
     # Resolve model ids via the curator (auto-falls-forward on deprecation)
     openai_model, openai_warn = _negotiate_model(openai_model_override, "latest-balanced-openai")
@@ -198,7 +199,7 @@ def run_api_mode(brand, queries, competitors=None, openai_model_override=None, a
                         "error": str(e),
                     })
         except ImportError:
-            pass
+            missing_sdks.append("openai")
 
     # Check for Anthropic
     anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
@@ -238,18 +239,23 @@ def run_api_mode(brand, queries, competitors=None, openai_model_override=None, a
                         "error": str(e),
                     })
         except ImportError:
-            pass
+            missing_sdks.append("anthropic")
+
+    sdk_note = None
+    if missing_sdks:
+        sdk_note = (f"{' and '.join(missing_sdks)} not installed, so that key was not used. "
+                    f"Install the tested version with: {_common.install_command(missing_sdks)}")
 
     if not api_available:
         return {
-            "error": "No AI API keys found. Set OPENAI_API_KEY or ANTHROPIC_API_KEY environment variables.",
+            "error": sdk_note or "No AI API keys found. Set OPENAI_API_KEY or ANTHROPIC_API_KEY environment variables.",
             "fallback": "Use --mode manual to generate a manual testing checklist instead.",
         }
 
     # Compute summary
     total = len(results)
     mentioned_count = sum(1 for r in results if r.get("brand_mentioned"))
-    return {
+    summary = {
         "brand": brand,
         "mode": "api",
         "total_queries_run": total,
@@ -257,6 +263,9 @@ def run_api_mode(brand, queries, competitors=None, openai_model_override=None, a
         "mentions": mentioned_count,
         "results": results,
     }
+    if sdk_note:
+        summary["warning"] = sdk_note
+    return summary
 
 
 def main():

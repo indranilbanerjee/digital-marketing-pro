@@ -252,6 +252,49 @@ def public_url_error(url: str):
     return None
 
 
+# ── Optional packages (exact pins, printed, never installed) ────────
+#
+# Every optional package a script may ask for, at the exact version it was
+# tested with. scripts/requirements.txt lists the same pins (a test keeps the
+# two equal), and every missing-package message prints install_command(), so
+# the command a user is shown is the one that was tested. No script runs pip;
+# only `scripts/setup.py --install` does, when the user asks for it.
+
+PINNED_DEPENDENCIES = {
+    "nltk": "3.10.3",
+    "textstat": "0.7.13",
+    "beautifulsoup4": "4.15.0",
+    "requests": "2.34.2",
+    "qrcode": "8.2",
+    "pillow": "12.3.0",
+    "openai": "3.19.2",
+    "anthropic": "1.8.0",
+    "c2pa-python": "0.38.0",
+    "cryptography": "46.0.3",
+}
+
+
+def pinned_specs(packages) -> list:
+    """Map package names (any version specifier is ignored) to exact `name==x.y.z`
+    pins. Raises ValueError for a package that has no pin."""
+    out = []
+    for p in packages:
+        name = re.split(r"[<>=!~;\[ ]", str(p), maxsplit=1)[0].strip().lower().replace("_", "-")
+        if name not in PINNED_DEPENDENCIES:
+            raise ValueError(f"no pinned version for package {name!r}; add it to PINNED_DEPENDENCIES")
+        out.append(f"{name}=={PINNED_DEPENDENCIES[name]}")
+    return out
+
+
+def install_command(packages) -> str:
+    """The exact, pinned command a user would run to install `packages` into the
+    interpreter running this script."""
+    exe = sys.executable or "python"
+    if " " in exe:
+        exe = f'"{exe}"'
+    return f"{exe} -m pip install {' '.join(pinned_specs(packages))}"
+
+
 # ── Approval records (payload-bound, single-use, windowed) ──────────
 #
 # What this proves, and what it does not: the model runs every command, so no

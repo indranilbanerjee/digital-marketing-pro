@@ -20,7 +20,7 @@ Nothing connects on install: there are no hooks and no `.mcp.json` ships. A scri
 | `scripts/ai-visibility-checker.py` (API mode) | when you run AI-visibility probes and a key is set | OpenAI and Anthropic APIs | `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` |
 | `scripts/refresh_models.py` | when you refresh the model registry | the model-list endpoints of api.anthropic.com, api.openai.com, generativelanguage.googleapis.com and direct.evolink.ai | the matching key; a provider without one is skipped |
 | `scripts/competitor-scraper.py`, `scripts/tech-seo-auditor.py`, `scripts/agent-readiness-audit.py` (`--fetch` only) | when you pass a URL | the site you name, and its robots.txt | none |
-| `scripts/setup.py` | when you run setup and accept | PyPI, through `pip install` of the packages in `scripts/requirements.txt` | none |
+| `scripts/setup.py` | when you run `setup.py --install lite` or `full` | PyPI, through `pip install` of the exact versions pinned in `scripts/requirements.txt` (the lite or the full set) | none |
 | `scripts/embed-c2pa.py` (`/digital-marketing-pro:c2pa-metadata`) | every time it signs an asset (not in `--verify` mode) | `http://timestamp.digicert.com`, plain HTTP: an RFC 3161 timestamp request carrying a hash of the claim, not the asset | none |
 | `scripts/brand-voice-scorer.py`, `scripts/content-scorer.py`, `scripts/setup.py` | the first run on a machine without the NLTK tokenizer and tagger data | NLTK's data index and packages on raw.githubusercontent.com (nltk/nltk_data) | none |
 | Opt-in MCP connectors | only after you copy an entry into `.mcp.json` yourself | the provider's endpoint, listed in `.mcp.json.connectors-reference` | OAuth or an API key with that provider |

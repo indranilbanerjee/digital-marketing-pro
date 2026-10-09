@@ -45,7 +45,7 @@ Built for digital marketing agencies managing 50–200 brands, in-house marketin
 /digital-marketing-pro:engagement
 ```
 
-Walks the brand through Stone-vs-Opinion intake (Part 1) → unbiased external research (Part 2) → Four Core Documents covering Business & SBU Analysis, Segmentation, Brand Positioning, DMFlow (Part 3, 61 steps) → competitive/customer/market analysis (Part 4) → Client Validation Document (Part 5) → selective v2 re-runs per the Decision Matrix (Part 6) → preparation documents (Part 7) → Growth Plan + 12-month Yearly Planner (Part 8) → channel strategy fan-out across 7 families and up to 17 channels (Part 9, parallel-dispatched) → execution artefacts (Part 10) → AI creative instructions (Part 11) → continuous improvement loop (Part 12). Outputs ~50–60 canonical files in `~/.claude-marketing/<brand>/engagements/<slug>/`.
+Walks the brand through Stone-vs-Opinion intake (Part 1) → unbiased external research (Part 2) → Four Core Documents covering Business & SBU Analysis, Segmentation, Brand Positioning, DMFlow (Part 3, 61 steps) → competitive/customer/market analysis (Part 4) → Client Validation Document (Part 5) → selective v2 re-runs per the Decision Matrix (Part 6) → preparation documents (Part 7) → Growth Plan + 12-month Yearly Planner (Part 8) → channel strategy fan-out across 7 families and up to 17 channels (Part 9, parallel-dispatched) → execution artefacts (Part 10) → AI creative instructions (Part 11) → continuous improvement loop (Part 12). Outputs ~50–60 canonical files in `~/.claude-marketing/brands/<brand>/engagements/<engagement-id>/`.
 
 **Expected duration:** 2–5 hours of conversation across a full engagement; ~$30–80 in Claude API costs using Opus 4.8.
 
@@ -82,7 +82,7 @@ Dispatches 7 parallel subagents per competitor (content, SEO, paid ads, social, 
 /digital-marketing-pro:engagement
 ```
 
-Each brand has its own `~/.claude-marketing/<brand-slug>/` directory with isolated voice, guardrails, jurisdictions, engagements, and insights. Switching is instantaneous — no re-setup, no context bleed between clients.
+Each brand has its own `~/.claude-marketing/brands/<brand-slug>/` directory with isolated voice, guardrails, jurisdictions, engagements, and insights. Switching is instantaneous — no re-setup, no context bleed between clients.
 
 ## 6. Testing account / sample data
 

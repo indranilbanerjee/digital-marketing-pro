@@ -140,32 +140,38 @@ def _is_release_heading(line):
     return any(w in low for w in RELEASE_HEADING_WORDS)
 
 
+def live_lines():
+    """(file, line number, line) for every live-doc line that states current facts."""
+    for f, text in live_docs():
+        in_history = False
+        for i, line in enumerate(text.splitlines(), 1):
+            # Headings reset the state: a release-narrative heading opens a
+            # historical run, any other heading closes one.
+            if line.lstrip().startswith("#"):
+                in_history = _is_release_heading(line.lstrip())
+            # A bold dated version tag opens one, and everything after it in this
+            # section narrates past releases: the entry's body keeps its ship-time
+            # numbers even though the tag sits on an earlier line.
+            if DATED_LINE.search(line):
+                in_history = True
+                continue
+            if in_history:
+                continue
+            low = line.lower()
+            if any(s in low for s in SIBLINGS):
+                continue
+            yield f, i, line
+
+
 class TestLiveDocCounts(unittest.TestCase):
     def test_no_stale_counts_in_live_docs(self):
         truth = ground_truth()
         stale = []
-        for f, text in live_docs():
-            in_history = False
-            for i, line in enumerate(text.splitlines(), 1):
-                # Headings reset the state: a release-narrative heading opens a
-                # historical run, any other heading closes one.
-                if line.lstrip().startswith("#"):
-                    in_history = _is_release_heading(line.lstrip())
-                # A bold dated version tag opens one, and everything after it in this
-                # section narrates past releases: the entry's body keeps its ship-time
-                # numbers even though the tag sits on an earlier line.
-                if DATED_LINE.search(line):
-                    in_history = True
-                    continue
-                if in_history:
-                    continue
-                low = line.lower()
-                if any(s in low for s in SIBLINGS):
-                    continue
-                for n, noun, shown in stale_claims(line, truth):
-                    stale.append(
-                        "%s:%d says '%s' but the repo has %d %s"
-                        % (f.relative_to(REPO).as_posix(), i, shown, truth[noun], noun))
+        for f, i, line in live_lines():
+            for n, noun, shown in stale_claims(line, truth):
+                stale.append(
+                    "%s:%d says '%s' but the repo has %d %s"
+                    % (f.relative_to(REPO).as_posix(), i, shown, truth[noun], noun))
         self.assertEqual(stale, [], "Stale counts in live docs:\n  " + "\n  ".join(stale))
 
     def test_ground_truth_is_sane(self):
@@ -221,6 +227,83 @@ class TestLiveDocCounts(unittest.TestCase):
             right = template % truth[noun]
             self.assertTrue(stale_claims(wrong, truth), "guard missed a planted '%s'" % wrong)
             self.assertEqual(stale_claims(right, truth), [], "guard rejected '%s'" % right)
+
+
+class TestExecutorConnectorCounts(unittest.TestCase):
+    """The executor's two connector sets, in the phrasings the docs use for them.
+
+    Connector counts in general stay unguarded (see COUNT_RE's note), but the executor
+    has exactly two sets with one source of truth, connector_executor.EXECUTE_PROFILES:
+    connectors it sends HTTP requests to itself, and OAuth-only or MCP-only connectors it
+    returns a manifest for. The README said "25 OAuth connectors" and "25 manifest-ready"
+    for two releases after the three official ad-platform MCP servers made it 28.
+    """
+    PHRASES = (
+        (re.compile(r"(?<![-<>~#\d])\b([1-9]\d?)\s+verified\s+(?:HTTP\s+)?connectors\b", re.I), "live"),
+        (re.compile(r"(?<![-<>~#\d])\b([1-9]\d?)\s+connectors\s+live\b", re.I), "live"),
+        (re.compile(r"(?<![-<>~#\d])\b([1-9]\d?)\s+OAuth(?:-only)?(?:\s+or\s+MCP-only)?\s+connectors\b", re.I), "mcp"),
+        (re.compile(r"(?<![-<>~#\d])\b([1-9]\d?)\s+manifest-ready\b", re.I), "mcp"),
+    )
+
+    @staticmethod
+    def truth():
+        import importlib.util
+        import sys
+        scripts = REPO / "scripts"
+        sys.path.insert(0, str(scripts))
+        spec = importlib.util.spec_from_file_location("ce_counts", scripts / "connector_executor.py")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        profiles = mod.EXECUTE_PROFILES
+        mcp = sum(1 for v in profiles.values() if v.get("oauth_only"))
+        return {"live": len(profiles) - mcp, "mcp": mcp}
+
+    def stale(self, line, truth):
+        return [(m.group(0), key) for pat, key in self.PHRASES for m in pat.finditer(line)
+                if int(m.group(1)) != truth[key]]
+
+    def test_executor_connector_counts_match_the_executor(self):
+        truth, seen, wrong = self.truth(), 0, []
+        for f, i, line in live_lines():
+            seen += sum(1 for pat, _ in self.PHRASES for _ in pat.finditer(line))
+            for shown, key in self.stale(line, truth):
+                wrong.append("%s:%d says '%s' but the executor has %d" % (f.relative_to(REPO).as_posix(), i,
+                                                                          shown, truth[key]))
+        self.assertGreater(seen, 0, "no executor connector count found; the guard is vacuous")
+        self.assertEqual(wrong, [])
+
+    def test_guard_flags_planted_numbers(self):
+        truth = self.truth()
+        self.assertGreater(truth["live"], 0)
+        self.assertGreater(truth["mcp"], 0)
+        for template, key in (("%d verified HTTP connectors executing end-to-end", "live"),
+                              ("Yes — %d connectors live", "live"),
+                              ("%d OAuth connectors via MCP manifest", "mcp"),
+                              ("%d OAuth-only or MCP-only connectors", "mcp"),
+                              ("%d manifest-ready", "mcp")):
+            self.assertTrue(self.stale(template % (truth[key] - 3), truth), template)
+            self.assertEqual(self.stale(template % truth[key], truth), [], template)
+
+
+class TestBrandPathCanonical(unittest.TestCase):
+    """Brand data lives under ~/.claude-marketing/brands/<slug>/ (_common.brand_dir).
+
+    The README's "Find your output" tree, its FAQ, SECURITY.md and SUBMISSION.md all gave
+    ~/.claude-marketing/<brand-slug>/ (a pre-v3.15 layout the code only reads as a legacy
+    fallback), with folder names (01-client-inputs/, brand-profile.json,
+    PROJECT_INSTRUCTIONS.md) that no script writes.
+    """
+    WRONG = re.compile(r"~/\.claude-marketing/[<{](?:brand|slug|client)[^/`\s]*[>}]")
+
+    def test_live_docs_use_the_brands_folder(self):
+        wrong = ["%s:%d: %s" % (f.relative_to(REPO).as_posix(), i, m.group(0))
+                 for f, i, line in live_lines() for m in self.WRONG.finditer(line)]
+        self.assertEqual(wrong, [])
+
+    def test_guard_can_fail(self):
+        for bad in ("`~/.claude-marketing/<brand-slug>/`", "`~/.claude-marketing/{brand}/executions/`"):
+            self.assertTrue(self.WRONG.search(bad), bad)
+        self.assertIsNone(self.WRONG.search("`~/.claude-marketing/brands/<brand-slug>/`"))
 
 
 class TestPythonMinimum(unittest.TestCase):
