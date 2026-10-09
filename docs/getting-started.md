@@ -575,7 +575,7 @@ printed                  (just ask for things)        session
 
 ## 9. Python Dependencies (Optional)
 
-Digital Marketing Pro is designed to work at full capability without Python. All 24 specialist agents, 5 top-level commands, and 164 skills function using the plugin's built-in reference knowledge (169 reference files). Python adds bonus scoring and automation features (and the engagement-state, dm-status, auto-save-insight, and eval scripts that power the v3.0 methodology + v3.2 quality gates — install Python if you plan to use the engagement workflow or the /digital-marketing-pro:check + /digital-marketing-pro:status commands).
+Digital Marketing Pro is designed to work at full capability without Python. All 24 specialist agents, 5 top-level commands, and 164 skills function using the plugin's built-in reference knowledge (176 reference files). Python adds bonus scoring and automation features (and the engagement-state, dm-status, auto-save-insight, and eval scripts that power the v3.0 methodology + v3.2 quality gates — install Python if you plan to use the engagement workflow or the /digital-marketing-pro:check + /digital-marketing-pro:status commands).
 
 ### Three dependency modes
 
@@ -590,7 +590,7 @@ Digital Marketing Pro is designed to work at full capability without Python. All
 This is what you get out of the box. No setup required.
 
 You have access to:
-- All 16 marketing modules with 169 reference knowledge files (including the v3.0 methodology references)
+- All 16 marketing modules with 176 reference knowledge files (including the v3.0 methodology references)
 - All 164 skills + 18 top-level `/digital-marketing-pro:` commands (including the v3.0 engagement workflow)
 - All 24 specialist agents
 - Brand profiling and campaign tracking (session hooks are opt-in — see the Session Lifecycle section)

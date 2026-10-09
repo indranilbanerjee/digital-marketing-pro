@@ -52,7 +52,7 @@ In practical terms: instead of you manually pulling a GA4 report, pasting it int
 
 The plugin ships no `.mcp.json` (it is gitignored) — nothing is pre-configured and nothing auto-connects. A catalog of 68 MCP server definitions is provided in `.mcp.json.example` (npx/stdio transports), and an HTTP-connector catalog in `.mcp.json.connectors-reference`. You opt in by copying the entries you want into `.mcp.json` (or renaming the example file). Each one maps to a marketing platform or productivity tool and activates only when you set the required environment variables for that service.
 
-This is the key design principle: **the plugin works fully without any integrations enabled.** All 164 skills, 169 reference knowledge files (including the v3.0 methodology + framework refs), scoring scripts, brand voice analysis, compliance checking, campaign planning features, and the v3.0 12-Part engagement methodology + v3.2 quality gates operate entirely offline using built-in benchmarks and reference data. MCP integrations layer real data on top of that foundation.
+This is the key design principle: **the plugin works fully without any integrations enabled.** All 164 skills, 176 reference knowledge files (including the v3.0 methodology + framework refs), scoring scripts, brand voice analysis, compliance checking, campaign planning features, and the v3.0 12-Part engagement methodology + v3.2 quality gates operate entirely offline using built-in benchmarks and reference data. MCP integrations layer real data on top of that foundation.
 
 ### What Happens Under the Hood
 

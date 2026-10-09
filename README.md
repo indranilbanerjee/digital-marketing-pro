@@ -12,7 +12,7 @@ Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Ac
 [![Forks](https://img.shields.io/github/forks/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=blue)](https://github.com/indranilbanerjee/digital-marketing-pro/network/members)
 [![Issues](https://img.shields.io/github/issues/indranilbanerjee/digital-marketing-pro?logo=github)](https://github.com/indranilbanerjee/digital-marketing-pro/issues)
 [![Last commit](https://img.shields.io/github/last-commit/indranilbanerjee/digital-marketing-pro?logo=github)](https://github.com/indranilbanerjee/digital-marketing-pro/commits/main)
-[![Tests](https://img.shields.io/badge/tests-585%2F585%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-588%2F588%20passing-brightgreen.svg)](tests/)
 [![Platforms](https://img.shields.io/badge/platforms-9%20native%20%2B%2035%20Agent%20Skills-success.svg)](#works-on-40-agent-harnesses-via-the-agent-skills-open-standard)
 [![Cowork](https://img.shields.io/badge/cowork-team%20persistent-purple.svg)](#supported-surfaces-v3351)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Article%2050%20ready-darkred.svg)](skills/context-engine/compliance-rules.md)
@@ -59,7 +59,7 @@ Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Ac
 | Real API execution | **Yes — 8 connectors live, 25 manifest-ready** | OAuth via plugin | OAuth via Composio | Optional DataForSEO / Firecrawl |
 | 6-platform AEO/GEO audit | **Yes — incl. Google AI Mode (May 2026)** | No | No | Yes (AEO + GEO) |
 | Cross-platform install | **9 native — CC + Cowork + Codex + Cursor + Copilot CLI + Antigravity + Hermes + OpenClaw + Grok** | Cowork only | Cowork + Codex | CC + Codex |
-| Tests | **585 stdlib unittest** | unknown | unknown | 271 incl. SSRF/DNS coverage |
+| Tests | **588 stdlib unittest** | unknown | unknown | 271 incl. SSRF/DNS coverage |
 | Live-write safety | **A single-use approval record for each exact request, created when you type yes** | Host permission prompt | Host permission prompt | n/a |
 | License | **MIT — no telemetry, no seats** | Proprietary | Proprietary | MIT |
 | Maintainer responsiveness | Direct via [@askneelnow](https://linkedin.com/in/askneelnow) | Anthropic queue | Composio queue | Community |
@@ -502,11 +502,11 @@ Every skill answers to `/digital-marketing-pro:<skill-name>`. Five more are stan
 Every other skill works the same way — `:competitor-monitor`, `:churn-risk`, `:autopilot-status`, `:agency-dashboard`, `:aeo-audit`, `:geo-monitor`, `:c2pa-metadata`, `:client-onboarding`, `:journey-design` … see `/digital-marketing-pro:help` after install for the full list, or browse `skills/` in the repo.
 
 ### 94 Python scripts (optional)
-Plugin works fully without Python — all marketing knowledge, frameworks, agent capabilities, and skills work out of the box via the 169 reference knowledge files.
+Plugin works fully without Python — all marketing knowledge, frameworks, agent capabilities, and skills work out of the box via the 176 reference knowledge files.
 
 | Mode | Size | Adds |
 |---|---|---|
-| **Knowledge-only** (default) | 0 MB | All 164 skills + 24 agents + 169 reference files |
+| **Knowledge-only** (default) | 0 MB | All 164 skills + 24 agents + 176 reference files |
 | **Lite** (`pip install nltk textstat`) | ~15 MB | Brand-voice scoring, content quality scoring, readability analysis |
 | **Full** (`pip install -r scripts/requirements.txt`) | ~50 MB | Competitor scraping, QR generation, AI visibility API checking, GEO tracking, C2PA signing |
 
@@ -774,7 +774,7 @@ Use the direct repo form: `grok plugin install indranilbanerjee/digital-marketin
 ### General (any platform)
 
 **"Tests in `tests/` fail when I `git clone` locally"**
-Run `python tests/run_all.py` from the repo root. All 585 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.8+) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
+Run `python tests/run_all.py` from the repo root. All 588 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
 
 **"`/digital-marketing-pro:doctor` shows my action as stub_unconfigured"**
 That action needs an MCP connector configured. Run `python scripts/connector-status.py --action setup-guide --name <connector-name>` for the exact setup snippet. Add it to your `.mcp.json` under `mcpServers`, restart your agent, and the action becomes `manifest_ready`. See [Connector-aware action resolver](#connector-aware-action-resolver-v3710) for the full readiness model.

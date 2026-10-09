@@ -494,7 +494,7 @@ If you have either (or both) of these integrations configured, the plugin's comp
 - Content gap analysis across multiple competitors simultaneously
 - Historical ranking data for trend analysis
 
-**Without MCP integrations**, the plugin still delivers strong competitive analysis using the scraper data, your input, the competitive-intel agent's analytical frameworks, and the 169 reference knowledge files. The MCP integrations add quantitative depth, not a fundamentally different analysis.
+**Without MCP integrations**, the plugin still delivers strong competitive analysis using the scraper data, your input, the competitive-intel agent's analytical frameworks, and the 176 reference knowledge files. The MCP integrations add quantitative depth, not a fundamentally different analysis.
 
 ### Automatic insight persistence
 

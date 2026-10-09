@@ -35,8 +35,31 @@ REPO = Path(__file__).resolve().parent.parent
 # 2026-10-04: "18 top-level commands", "18 top-level slash commands" and "24 specialist
 # agents" escaped the single optional qualifier and stayed stale after 13 commands were
 # folded into their skills; qualifiers now chain.
-COUNT_RE = re.compile(r"(?<![-<>~\d])\b(\d{1,3})\s+(?:(?:Python|top-level|slash|specialist)\s+)*"
-                      r"(skills|agents|commands|scripts)\b")
+# 2026-10-10 (Hermes docs sweep): the pattern above could not see "158 Agent Skills", "86 Python
+# helpers", "209 stdlib-unittest tests" or "169 reference knowledge files", and AGENTS.md carried
+# all four, 6 to 40 releases stale. Nouns are now case-insensitive, "helpers" counts as scripts,
+# "Agent" is accepted before "Skills", zero and ranges are not claims, and a '#' before the number
+# is a markdown anchor (#14-commands). Connector counts are deliberately NOT guarded here: DMP
+# documents several different connector sets (first-party HTTP, registry-backed, executable,
+# catalog) and no single filesystem number is "the" count.
+COUNT_RE = re.compile(
+    r"(?<![-<>~#\d])\b([1-9]\d{0,2})\s+"
+    r"(?:(?:Python|top-level|slash|specialist|Claude\s+Code|executable)\s+)*"
+    r"(?:Agent\s+(?=skills))?"
+    r"(skills|agents|commands|scripts|helpers)\b", re.I)
+NOUNS = {"skills": "skills", "agents": "agents", "commands": "commands", "scripts": "scripts",
+         "helpers": "scripts"}
+# "209 stdlib-unittest tests" and the table cell "**585 stdlib unittest**": the qualifier is itself
+# the suite marker.
+TESTS_Q_RE = re.compile(r"(?<![-<>~\d])\b(\d{1,4})\s+(?:stdlib[-\s]unittest(?:\s+tests)?|(?:stdlib|unit)\s+tests)\b", re.I)
+# "169 reference knowledge files", "Reference knowledge (169 files)", the table cell
+# "| Reference knowledge files | ~5 | 169 |" and AGENTS.md's "`skills/<name>/*.md` (169 of them".
+REF_RES = (
+    re.compile(r"(?<![-<>~#\d])\b([1-9]\d{0,2})\s+reference(?:\s+knowledge)?\s+files\b", re.I),
+    re.compile(r"reference knowledge \(([1-9]\d{0,2}) files\)", re.I),
+    re.compile(r"reference knowledge files\s*\|[^|]*\|\s*([1-9]\d{0,2})\s*\|", re.I),
+    re.compile(r"skills/<name>/\*\.md`\s*\(([1-9]\d{0,2}) of them"),
+)
 # "The 158 SKILL.md files" — the phrasing the original guard could not see.
 # 2026-08-17: backticks ("158 `SKILL.md` files") made the same rot invisible again.
 SKILL_MD_RE = re.compile(r"(?<![-<>~\d])\b(\d{1,3})\s+`?SKILL\.md`?\s+files?\b")
@@ -71,7 +94,28 @@ def ground_truth():
         "tests": sum(
             len(re.findall(r"^\s*def test_", f.read_text(encoding="utf-8"), re.M))
             for f in (REPO / "tests").glob("test_*.py")),
+        # reference knowledge files live inside each skill: skills/<name>/*.md except SKILL.md
+        "references": len([f for f in (REPO / "skills").rglob("*.md") if f.name != "SKILL.md"]),
     }
+
+
+def claims_in(line):
+    """Every (number, noun, matched text) count claim on one line."""
+    found = [(int(m.group(1)), NOUNS[m.group(2).lower()], m.group(0))
+             for m in COUNT_RE.finditer(line)]
+    found += [(int(m.group(1)), "skills", m.group(0))
+              for pat in (SKILL_MD_RE, TABLE_ROW_RE, QUALIFIED_SKILLS_RE)
+              for m in pat.finditer(line)]
+    found += [(int(m.group(1)), "tests", m.group(0))
+              for pat in (TESTS_RE, TESTS_Q_RE) for m in pat.finditer(line)]
+    found += [(int(m.group(1)), "references", m.group(0))
+              for pat in REF_RES for m in pat.finditer(line)]
+    return found
+
+
+def stale_claims(line, truth):
+    """The claims on a line that disagree with the repo."""
+    return [(n, noun, shown) for n, noun, shown in claims_in(line) if n != truth[noun]]
 
 
 def live_docs():
@@ -118,18 +162,10 @@ class TestLiveDocCounts(unittest.TestCase):
                 low = line.lower()
                 if any(s in low for s in SIBLINGS):
                     continue
-                found = [(int(m.group(1)), m.group(2), m.group(0))
-                         for m in COUNT_RE.finditer(line)]
-                found += [(int(m.group(1)), "skills", m.group(0))
-                          for pat in (SKILL_MD_RE, TABLE_ROW_RE, QUALIFIED_SKILLS_RE)
-                          for m in pat.finditer(line)]
-                found += [(int(m.group(1)), "tests", m.group(0))
-                          for m in TESTS_RE.finditer(line)]
-                for n, noun, shown in found:
-                    if n != truth[noun]:
-                        stale.append(
-                            "%s:%d says '%s' but the repo has %d %s"
-                            % (f.relative_to(REPO).as_posix(), i, shown, truth[noun], noun))
+                for n, noun, shown in stale_claims(line, truth):
+                    stale.append(
+                        "%s:%d says '%s' but the repo has %d %s"
+                        % (f.relative_to(REPO).as_posix(), i, shown, truth[noun], noun))
         self.assertEqual(stale, [], "Stale counts in live docs:\n  " + "\n  ".join(stale))
 
     def test_ground_truth_is_sane(self):
@@ -140,6 +176,7 @@ class TestLiveDocCounts(unittest.TestCase):
         self.assertGreater(truth["commands"], 0)
         self.assertGreater(truth["scripts"], 0)
         self.assertGreater(truth["tests"], 0)
+        self.assertGreater(truth["references"], 0)
 
     def test_guard_can_fail(self):
         """Plant-check: each new pattern must actually match its rot form."""
@@ -156,6 +193,82 @@ class TestLiveDocCounts(unittest.TestCase):
         self.assertTrue(TESTS_RE.search("All 209 tests are stdlib-only"))
         # A/B-testing prose must stay exempt — "tests" is a marketing noun too.
         self.assertFalse(TESTS_RE.search("A team running 8 tests per quarter with a 30% win rate"))
+        # 2026-10-10 phrasings (each was invisible to the old patterns)
+        self.assertTrue(COUNT_RE.search("158 Agent Skills (the surface area)"))
+        self.assertTrue(COUNT_RE.search("86 Python helpers"))
+        self.assertTrue(COUNT_RE.search("## 14. All 25 Commands"))
+        self.assertTrue(TESTS_Q_RE.search("209 stdlib-unittest tests covering resolve_model"))
+        self.assertTrue(TESTS_Q_RE.search("| Tests | **585 stdlib unittest** | unknown |"))
+        self.assertFalse(COUNT_RE.search("3-5 skills"))
+        self.assertFalse(COUNT_RE.search("expect 0 skills loaded"))
+
+    def test_guard_flags_planted_numbers(self):
+        """Plant a wrong number in each phrasing and confirm the guard reports it; the right
+        number must pass. A pattern that matches but never reports proves nothing."""
+        truth = ground_truth()
+        plants = [("%d Agent Skills (the surface area)", "skills"),
+                  ("%d Python helpers", "scripts"),
+                  ("## 14. All %d Commands", "commands"),
+                  ("%d specialist agents", "agents"),
+                  ("%d stdlib-unittest tests covering resolve_model", "tests"),
+                  ("| Tests | **%d stdlib unittest** | unknown |", "tests"),
+                  ("ships with %d reference knowledge files", "references"),
+                  ("Reference knowledge (%d files)", "references"),
+                  ("| Reference knowledge files | ~5 | %d |", "references"),
+                  ("`skills/<name>/*.md` (%d of them", "references")]
+        for template, noun in plants:
+            wrong = template % (truth[noun] + 7)
+            right = template % truth[noun]
+            self.assertTrue(stale_claims(wrong, truth), "guard missed a planted '%s'" % wrong)
+            self.assertEqual(stale_claims(right, truth), [], "guard rejected '%s'" % right)
+
+
+class TestPythonMinimum(unittest.TestCase):
+    """One Python minimum, stated the same way everywhere.
+
+    Before 2026-10-10 the docs disagreed (3.8+ in guides, 3.10+ in the submission bundle)
+    while the pinned c2pa-python 0.38.0 needs 3.10. The floor is the highest requires_python
+    among the pinned packages (scripts/embed-c2pa.py C2PA_PIN and scripts/requirements.txt); raise FLOOR_MINOR here and in every doc when a pin
+    moves. This test cannot reach PyPI, so it keeps the prose consistent, not the pins.
+    """
+    FLOOR_MINOR = 10
+    OPTIONAL_EXTRA_MINOR = None
+    OPTIONAL_EXTRA_LINE = None
+    STATEMENT = re.compile(r"Python\s+3\.(\d{1,2})\s*(?:\+|or newer)|\b3\.(\d{1,2})\+")
+
+    def statements(self):
+        for f, text in live_docs():
+            for i, line in enumerate(text.splitlines(), 1):
+                if "python" not in line.lower():
+                    continue
+                for m in self.STATEMENT.finditer(line):
+                    yield f, i, int(m.group(1) or m.group(2)), line
+
+    def allowed(self, minor, line):
+        if minor == self.FLOOR_MINOR:
+            return True
+        return bool(self.OPTIONAL_EXTRA_MINOR and minor == self.OPTIONAL_EXTRA_MINOR
+                    and self.OPTIONAL_EXTRA_LINE.search(line))
+
+    def test_every_statement_names_the_same_minimum(self):
+        seen, wrong = 0, []
+        for f, i, minor, line in self.statements():
+            seen += 1
+            if not self.allowed(minor, line):
+                wrong.append("%s:%d says Python 3.%d but the minimum is 3.%d"
+                             % (f.relative_to(REPO).as_posix(), i, minor, self.FLOOR_MINOR))
+        self.assertGreater(seen, 0, "no Python-minimum statement found; the guard is vacuous")
+        self.assertEqual(wrong, [], "Python minimum disagrees:\n  " + "\n  ".join(wrong))
+
+    def test_guard_can_fail(self):
+        """Plant-check: the old wrong forms must be seen and rejected."""
+        for planted in ("Requires Python 3.8+ with optional dependencies",
+                        "- **Python 3.9 or newer** unlocks scoring",
+                        "Python version: must be 3.8+"):
+            hits = [int(m.group(1) or m.group(2)) for m in self.STATEMENT.finditer(planted)]
+            self.assertTrue(hits and not all(self.allowed(h, planted) for h in hits), planted)
+        self.assertTrue(all(self.allowed(int(m.group(1) or m.group(2)), "Python 3.%d+" % self.FLOOR_MINOR)
+                            for m in self.STATEMENT.finditer("Python 3.%d+" % self.FLOOR_MINOR)))
 
 
 class TestAgentsContextCurrent(unittest.TestCase):
