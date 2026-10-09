@@ -467,4 +467,4 @@ Start with `/digital-marketing-pro:campaign-plan` to build your next cross-chann
 
 ---
 
-*This guide is part of the Digital Marketing Pro plugin (v3.17.0). For channel selection matrices and synergy maps, see `skills/campaign-orchestrator/channel-strategy.md`. For platform specifications and character limits, see `skills/context-engine/platform-specs.md`. For UTM naming conventions, see `skills/campaign-orchestrator/utm-tracking.md`.*
+*This guide is part of the Digital Marketing Pro plugin. For channel selection matrices and synergy maps, see `skills/campaign-orchestrator/channel-strategy.md`. For platform specifications and character limits, see `skills/context-engine/platform-specs.md`. For UTM naming conventions, see `skills/campaign-orchestrator/utm-tracking.md`.*

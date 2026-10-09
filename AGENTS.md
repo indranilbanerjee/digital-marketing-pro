@@ -37,17 +37,17 @@ Digital Marketing Pro is a comprehensive open-source AI marketing plugin shippin
 
 ## Files in this repo
 
-- `skills/<name>/SKILL.md` — 158 Agent Skills (the surface area). Each is byte-portable across all supported surfaces.
+- `skills/<name>/SKILL.md` — 164 Agent Skills (the surface area). Each is byte-portable across all supported surfaces.
 - `agents/<name>.md` — 24 specialist agent definitions (Claude Code subagent format; on Codex use TOML conversion at `~/.codex/agents/`, on Antigravity use `/agent` ad-hoc spawn). Full list in the **Specialist agents (24)** section below.
 - `commands/<name>.md` — Claude Code slash commands (`/digital-marketing-pro:<name>`). On other surfaces invoke via natural-language intent — the SKILL.md routing picks up the same handler.
 - `plugin.yaml` + `__init__.py` at repo root — **Hermes Agent native plugin** (native since v3.13.0). `__init__.py` exposes `register(ctx)` which walks `skills/` and exposes all 164 skills via `ctx.register_skill()`. Read ONLY by Hermes; ignored by every other platform.
 - `openclaw.plugin.json` at repo root — **OpenClaw native manifest** (native since v3.13.0). `skills` field points at `./skills`. OpenClaw also auto-detects `.claude-plugin/plugin.json` as a Claude-compatible bundle fallback.
-- `scripts/*.py` — 86 Python helpers (optional, run when Python 3.8+ is present). Includes `_common.py` (shared workspace-root / slugify / atomic-write helpers), `connector_resolver.py` + `connector_executor.py` (8 executable HTTP connectors), `resolve_model.py` + `refresh_models.py` (shared model curator with auto-fall-forward on deprecated IDs), `plugin-metadata.py` (environment + asset probes), `drive-sync-state.py` (Cowork+Drive routing ledger), `check_skill_contracts.py` (doc-vs-argparse linter), and `skill-line-check.py` (CI line guard).
-- `tests/test_*.py` + `tests/run_all.py` — 209 stdlib-unittest tests covering `resolve_model`, `drive-sync-state`, `plugin-metadata`, `skill-line-check`, `connector_resolver`, `_common`, engagement/checkpoint/execution state, the doc-vs-script contract scanner, release-consistency locks, the Hermes adapter (`plugin.yaml` + `__init__.py`), and the OpenClaw manifest. Run with `python tests/run_all.py`.
+- `scripts/*.py` — 94 Python helpers (optional, run when Python 3.10+ is present). Includes `_common.py` (shared workspace-root / slugify / atomic-write helpers), `connector_resolver.py` + `connector_executor.py` (8 executable HTTP connectors), `resolve_model.py` + `refresh_models.py` (shared model curator with auto-fall-forward on deprecated IDs), `plugin-metadata.py` (environment + asset probes), `drive-sync-state.py` (Cowork+Drive routing ledger), `check_skill_contracts.py` (doc-vs-argparse linter), and `skill-line-check.py` (CI line guard).
+- `tests/test_*.py` + `tests/run_all.py` — 585 stdlib-unittest tests covering `resolve_model`, `drive-sync-state`, `plugin-metadata`, `skill-line-check`, `connector_resolver`, `_common`, engagement/checkpoint/execution state, the doc-vs-script contract scanner, release-consistency locks, the Hermes adapter (`plugin.yaml` + `__init__.py`), and the OpenClaw manifest. Run with `python tests/run_all.py`.
 - `settings.json.example` — recommended user settings: `fallbackModel` 3-model resilience chain, the optional `requiredMinimumVersion` managed setting, `skillOverrides`, OTel resource attrs (under `env`).
 - `hooks/hooks.json` — ships as `{"hooks":{}}` (zero global hooks). Add hooks at user scope if needed.
-- `.mcp.json` — ships as `{"mcpServers":{}}` (zero auto-connecting MCPs). Full catalog at `.mcp.json.connectors-reference`.
-- Reference knowledge files live **inside each skill** at `skills/<name>/*.md` (169 of them — there is no top-level `references/` directory), covering compliance, channel mechanics, and AEO/GEO targets.
+- `.mcp.json` — not shipped (gitignored): zero auto-connecting MCPs. Full catalog at `.mcp.json.connectors-reference`.
+- Reference knowledge files live **inside each skill** at `skills/<name>/*.md` (176 of them — there is no top-level `references/` directory), covering compliance, channel mechanics, and AEO/GEO targets.
 
 ## Specialist agents (24)
 
@@ -83,7 +83,7 @@ Digital Marketing Pro is a comprehensive open-source AI marketing plugin shippin
 - **Skills are the universal interface.** Same SKILL.md works on Claude Code, Codex, Antigravity, Cursor, Copilot CLI, Gemini CLI (Agent Skills open standard adopted Dec 2025).
 - **Claude Code subagents (`agents/*.md`) are Claude-only as static files.** On Codex use the TOML equivalent at `~/.codex/agents/*.toml`. On Antigravity use the `/agent` slash command for ad-hoc spawning.
 - **Slash commands are Claude-only as `commands/*.md` files.** On other surfaces invoke skills by name or natural-language intent.
-- **MCP env-var syntax differs by surface.** Claude uses `${user_config.VAR}`; Codex/Antigravity use `$VAR`. Our `.mcp.json` ships empty so this doesn't bite.
+- **MCP env-var syntax differs by surface.** Claude uses `${user_config.VAR}`; Codex/Antigravity use `$VAR`. No `.mcp.json` ships, so this doesn't bite.
 
 ## Identity / authority
 

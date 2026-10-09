@@ -1,6 +1,6 @@
 # Technical Architecture Reference
 
-**Digital Marketing Pro** -- Claude Code Plugin v3.17.0
+**Digital Marketing Pro** -- Claude Code Plugin
 
 This document describes the internal architecture of the Digital Marketing Pro plugin for developers and contributors. It covers file structure, the WAT framework mapping, component anatomy, the hook system, script conventions, data persistence, adaptive scoring, the v3.0 methodology layer, and extension points.
 
@@ -14,7 +14,7 @@ This document describes the internal architecture of the Digital Marketing Pro p
 digital-marketing-pro/
 ├── .claude-plugin/
 │   └── plugin.json                    # Plugin manifest (2026 spec: homepage, repository as a STRING url, license, keywords — NO $schema key, and repository is a string not a {type,url} object, per the plugin spec)
-├── .mcp.json                          # ships EMPTY {"mcpServers":{}} — gitignored, zero auto-connecting MCPs
+├── .mcp.json                          # NOT shipped (gitignored) — zero auto-connecting MCPs
 ├── .mcp.json.example                  # illustrative npx catalog (opt-in; verify packages before use — see its _warning)
 ├── hooks/
 │   └── hooks.json                     # ships EMPTY {"hooks":{}} — zero global hooks
@@ -451,7 +451,7 @@ Brand profiles follow schema version `1.0.0` (defined in `setup.py` as `SCHEMA_V
 
 ## 9. MCP Configuration
 
-The shipped `.mcp.json` is **empty** (`{"mcpServers":{}}`, gitignored) — nothing auto-connects. The tables below are the *conceptual* connector catalog. The HTTP catalog lives in `.mcp.json.connectors-reference`; the npx catalog in `.mcp.json.example`.
+No `.mcp.json` ships (it is gitignored) — nothing auto-connects. The tables below are the *conceptual* connector catalog. The HTTP catalog lives in `.mcp.json.connectors-reference`; the npx catalog in `.mcp.json.example`.
 
 > **Package verification required.** The `Package` column below is illustrative and **not all names are verified on npm** — several are known-fictional (e.g. `@anthropic/mcp-google-analytics`, `mcp-salesforce`, `mcp-supermemory`/`graphiti-mcp`, `@notionhq/mcp-server`). See the `_warning` field in `.mcp.json.example` for the verified-vs-fictional breakdown. `npx` runs remote code, so verify any package on npm before use, or prefer `/digital-marketing-pro:add-integration` for a custom MCP path.
 
@@ -933,7 +933,7 @@ Added in v2.5.1, these frontmatter fields enhance the skill experience in Claude
 
 ### argument-hint
 
-Provides autocomplete placeholder text in the Skills UI. Added to all 67 user-invocable skills.
+Provides autocomplete placeholder text in the Skills UI. Added to every skill that takes arguments.
 
 ```yaml
 argument-hint: "[URL]"                           # seo-audit

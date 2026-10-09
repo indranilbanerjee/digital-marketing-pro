@@ -4,7 +4,7 @@
 
 Plugin files use `~~category` as a placeholder for whatever tool the user connects in that category. For example, `~~CRM` might mean HubSpot, Salesforce, or any other CRM with an MCP server.
 
-Plugins are **tool-agnostic** — they describe workflows in terms of categories (SEO, email marketing, CRM, etc.) rather than specific products. The shipped `.mcp.json` is empty (`{"mcpServers":{}}`) — nothing is pre-configured. You opt into specific MCP servers from `.mcp.json.connectors-reference` (HTTP) or `.mcp.json.example` (npx); any MCP server in that category works.
+Plugins are **tool-agnostic** — they describe workflows in terms of categories (SEO, email marketing, CRM, etc.) rather than specific products. No `.mcp.json` ships (it is gitignored) — nothing is pre-configured. You opt into specific MCP servers from `.mcp.json.connectors-reference` (HTTP) or `.mcp.json.example` (npx); any MCP server in that category works.
 
 ## Connectors for this plugin
 
@@ -51,7 +51,7 @@ The following categories require local npx/stdio MCP servers. They work in Claud
 
 ## Official ad-platform and CRM MCP servers (checked 2026-10-04)
 
-These servers are published by the platforms themselves. Like everything else here they are **opt-in**: `.mcp.json` ships empty, and you copy an entry from `.mcp.json.connectors-reference` yourself.
+These servers are published by the platforms themselves. Like everything else here they are **opt-in**: no `.mcp.json` ships, and you copy an entry from `.mcp.json.connectors-reference` yourself.
 
 | Entry | Endpoint | Access | Status | Source |
 |---|---|---|---|---|

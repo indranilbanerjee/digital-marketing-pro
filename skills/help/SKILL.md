@@ -97,7 +97,7 @@ Goal: "more leads from organic"
 
 Chain 1 (recommended):
   1. [E] /digital-marketing-pro:seo-audit        — find what blocks organic visibility
-  2. [G] /digital-marketing-pro:content-strategy — turn gaps into a content plan
+  2. [G] /digital-marketing-pro:content-calendar — turn gaps into a content plan
   3. [E] /digital-marketing-pro:lead-magnet-ideas — capture the traffic you win
   4. [M] /digital-marketing-pro:check            — gate before anything ships
 ```

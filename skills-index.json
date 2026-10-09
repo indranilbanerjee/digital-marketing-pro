@@ -613,7 +613,7 @@
         "send-notification"
       ],
       "doc_files": 1,
-      "bytes": 7789
+      "bytes": 7775
     },
     {
       "name": "content-brief",
@@ -1313,6 +1313,7 @@
         "check",
         "competitor-analysis",
         "connect",
+        "content-calendar",
         "cowork-setup",
         "import-guidelines",
         "integrations",

@@ -56,7 +56,7 @@ Once you have `cert.pem` and `key.pem` from any of the four authorities above:
 ```
 /digital-marketing-pro:c2pa-metadata \
     --input asset.png --output signed.png \
-    --brand "Acme Corp" --generator "Vertex AI Nano Banana Pro" \
+    --brand "Acme Corp" --generator "Vertex AI image model" \
     --ai-claim ai-generated-content \
     --ai-disclosure \
     --signing-cert /secure/c2pa-prod-cert.pem \

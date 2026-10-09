@@ -12,7 +12,7 @@
 
 ## Network endpoints and credentials
 
-Nothing connects on install: there are no hooks and `.mcp.json` ships empty. A script opens a network connection only when you, or a skill you invoked, run it, and only to the endpoints below.
+Nothing connects on install: there are no hooks and no `.mcp.json` ships. A script opens a network connection only when you, or a skill you invoked, run it, and only to the endpoints below.
 
 | What | When | Endpoint | Credential |
 |---|---|---|---|

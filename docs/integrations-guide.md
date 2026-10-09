@@ -1,8 +1,8 @@
 # Integrations & CRM Guide
 
-> **Digital Marketing Pro** v3.17.0 | For marketing operations managers
+> **Digital Marketing Pro** | For marketing operations managers
 >
-> This guide covers the 68-server MCP connector catalog shipped in `.mcp.json.example` (the live `.mcp.json` ships **empty** — nothing auto-connects), how to configure them, how to manage credentials across multiple clients, and what the plugin can do with or without live connections.
+> This guide covers the 68-server MCP connector catalog shipped in `.mcp.json.example` (no `.mcp.json` ships — nothing auto-connects), how to configure them, how to manage credentials across multiple clients, and what the plugin can do with or without live connections.
 
 ---
 
@@ -50,7 +50,7 @@ In practical terms: instead of you manually pulling a GA4 report, pasting it int
 
 ### How the Plugin Uses MCP
 
-The plugin ships an **empty** `.mcp.json` (`{"mcpServers":{}}`) — nothing is pre-configured and nothing auto-connects. A catalog of 68 MCP server definitions is provided in `.mcp.json.example` (npx/stdio transports), and an HTTP-connector catalog in `.mcp.json.connectors-reference`. You opt in by copying the entries you want into `.mcp.json` (or renaming the example file). Each one maps to a marketing platform or productivity tool and activates only when you set the required environment variables for that service.
+The plugin ships no `.mcp.json` (it is gitignored) — nothing is pre-configured and nothing auto-connects. A catalog of 68 MCP server definitions is provided in `.mcp.json.example` (npx/stdio transports), and an HTTP-connector catalog in `.mcp.json.connectors-reference`. You opt in by copying the entries you want into `.mcp.json` (or renaming the example file). Each one maps to a marketing platform or productivity tool and activates only when you set the required environment variables for that service.
 
 This is the key design principle: **the plugin works fully without any integrations enabled.** All 164 skills, 169 reference knowledge files (including the v3.0 methodology + framework refs), scoring scripts, brand voice analysis, compliance checking, campaign planning features, and the v3.0 12-Part engagement methodology + v3.2 quality gates operate entirely offline using built-in benchmarks and reference data. MCP integrations layer real data on top of that foundation.
 
@@ -1412,7 +1412,7 @@ You: Run Core Web Vitals checks on our top 20 landing pages and flag any failing
 **Where to get credentials:**
 1. Create an account at [app.dataforseo.com/register](https://app.dataforseo.com/register)
 2. Your login email is the username, your account password is the password
-3. API access is included with all plans. Pay-as-you-go pricing starts at $0.0001 per task for most endpoints
+3. API access is included with all plans. Billing is pay-as-you-go per task; see the provider's pricing page for current rates
 4. Test with the sandbox environment first (set `DATAFORSEO_SANDBOX=true` for free testing with sample data)
 
 **9 API modules available:**
@@ -1678,7 +1678,7 @@ Maintain separate MCP configuration files per client and swap the active one.
 
 ```bash
 # One-time setup: create per-client configs from the connector catalog
-# (the shipped .mcp.json is empty, so start from the example catalog and trim per client)
+# (no .mcp.json ships, so start from the example catalog and trim per client)
 cp .mcp.json.example .mcp-acme-corp.json      # Edit with Acme Corp's servers + credentials
 cp .mcp.json.example .mcp-techflow.json        # Edit with TechFlow's servers + credentials
 cp .mcp.json.example .mcp-greenleaf.json       # Edit with GreenLeaf's servers + credentials
@@ -1916,4 +1916,4 @@ When connecting MCP integrations that access personal data (especially GA4, HubS
 
 ---
 
-*Digital Marketing Pro v3.17.0 -- Integrations & CRM Guide*
+*Digital Marketing Pro -- Integrations & CRM Guide*

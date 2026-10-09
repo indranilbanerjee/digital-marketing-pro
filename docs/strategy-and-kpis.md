@@ -486,4 +486,4 @@ Start with `/digital-marketing-pro:brand-setup`. Define your goals. Let the KPI 
 
 ---
 
-*This guide is part of the Digital Marketing Pro plugin (v3.17.0). For the complete KPI tree reference, see `skills/analytics-insights/kpi-frameworks.md`. For industry benchmark data across 22 industries, see `skills/context-engine/industry-profiles.md`.*
+*This guide is part of the Digital Marketing Pro plugin. For the complete KPI tree reference, see `skills/analytics-insights/kpi-frameworks.md`. For industry benchmark data across 22 industries, see `skills/context-engine/industry-profiles.md`.*

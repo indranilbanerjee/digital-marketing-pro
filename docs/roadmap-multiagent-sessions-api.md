@@ -72,4 +72,4 @@ Persistent memory across agent invocations within a managed session. Today DMP u
 
 ---
 
-**This is a planning document.** No code in DMP v3.17.0 implements anything in this doc — the managed-agents path remains unadopted and engagement state still persists to local JSON files. It exists so the team knows the direction and can evaluate whether to start Phase A in a future release.
+**This is a planning document.** No code in DMP implements anything in this doc — the managed-agents path remains unadopted and engagement state still persists to local JSON files. It exists so the team knows the direction and can evaluate whether to start Phase A in a future release.

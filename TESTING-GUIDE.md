@@ -1,4 +1,4 @@
-# Digital Marketing Pro Testing Guide — v3.17.0
+# Digital Marketing Pro Testing Guide
 
 Complete testing guide for the Digital Marketing Pro plugin, including the v3.0 12-Part engagement methodology.
 
@@ -102,8 +102,8 @@ mv ~/.claude-marketing ~/.claude-marketing.before-test
 - [ ] `agents/` — 24 agent .md files (all with YAML frontmatter)
 - [ ] `commands/` — 18 command .md files
 - [ ] `skills/` — 158 skill directories, each with SKILL.md
-- [ ] `scripts/` — ~86 Python scripts
-- [ ] `.mcp.json` — ships empty `{"mcpServers":{}}` (gitignored; zero auto-connecting MCPs)
+- [ ] `scripts/` — 94 Python scripts
+- [ ] `.mcp.json` — not shipped (gitignored); zero auto-connecting MCPs
 - [ ] `.mcp.json.example` — illustrative npx catalog (opt-in; verify packages before use)
 - [ ] `hooks/hooks.json` — ships `{"hooks":{}}` (zero global hooks)
 - [ ] `docs/` — 16 documentation guides
@@ -358,7 +358,7 @@ DM Pro has 24 specialist agents. Verify they register correctly and respond when
 
 ## 6. Script Tests
 
-DM Pro has ~86 Python scripts. Test key scripts that are critical to plugin operation.
+DM Pro has 94 Python scripts. Test key scripts that are critical to plugin operation.
 
 ### 6.1 Core Scripts
 

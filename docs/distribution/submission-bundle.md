@@ -23,7 +23,7 @@ Prepared 2026-08-16. Items marked **[owner action]** need the account holder.
   humanize gate, SEO/AEO/GEO, paid media with provenance-stamped benchmarks
   (every market number carries a source URL and as-of date — stale quotes are
   refused, never reused), email, social, CRM, analytics, and per-market
-  compliance. 108 of the 163 execute real scripts; a machine-verified depth
+  compliance. 109 of the 164 execute real scripts; a machine-verified depth
   contract keeps the promises honest, and a run auditor re-derives the content
   engine's gates before "ready" may be declared.
 - **Homepage / repo:** https://github.com/indranilbanerjee/digital-marketing-pro

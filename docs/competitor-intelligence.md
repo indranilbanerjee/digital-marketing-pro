@@ -1,6 +1,6 @@
 # Competitor Intelligence Guide
 
-**Digital Marketing Pro v3.17.0** | Turning publicly available data into strategic advantage
+**Digital Marketing Pro** | Turning publicly available data into strategic advantage
 
 Competitor intelligence is not about copying what others do. It is about understanding the market landscape well enough to make smarter decisions --- identifying gaps your competitors have missed, anticipating their next moves, and positioning your brand where competition is weakest and opportunity is highest.
 
@@ -623,4 +623,4 @@ Each cycle makes the system smarter. Insights saved today become context for tom
 
 ---
 
-*Digital Marketing Pro v3.17.0 --- Competitive intelligence that turns market awareness into strategic advantage.*
+*Digital Marketing Pro --- Competitive intelligence that turns market awareness into strategic advantage.*

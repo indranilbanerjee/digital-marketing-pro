@@ -1,6 +1,6 @@
 # The Engagement Methodology Guide
 
-**Plugin version: 3.17.0 | Methodology version: 3.2** | A user-facing guide to running marketing engagements with Digital Marketing Pro
+**Methodology version: 3.2** | A user-facing guide to running marketing engagements with Digital Marketing Pro
 
 > The 12-Part methodology itself was introduced in v3.0 and remains structurally unchanged through v3.15. v3.2 adds two adjacent commands that pair well with the engagement workflow: **`/digital-marketing-pro:check`** (pre-publish quality gate for any deliverable produced inside an engagement) and **`/digital-marketing-pro:status`** (engagement progress + brand snapshot). See [docs/v3.2-opt-ins.md](v3.2-opt-ins.md) for the full v3.2 additions.
 
@@ -103,7 +103,7 @@ Use Path B when:
 - The brand requires depth and rigour, not speed
 - You will be presenting client-facing deliverables (Growth Plan, Yearly Planner)
 
-**Both paths share the same 24 specialist agents, 158 atomic skills, 14 HTTP MCP connectors, brand profile system, and compliance enforcement.** The methodology layer just orchestrates them into a known sequence.
+**Both paths share the same 24 specialist agents, 164 atomic skills, 14 HTTP MCP connectors, brand profile system, and compliance enforcement.** The methodology layer just orchestrates them into a known sequence.
 
 ---
 

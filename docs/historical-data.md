@@ -1,6 +1,6 @@
 # Historical Data & Campaign Memory
 
-**Version 3.17.0** | A guide to how Digital Marketing Pro remembers, learns, and applies past marketing work
+A guide to how Digital Marketing Pro remembers, learns, and applies past marketing work
 
 Digital Marketing Pro does not start from scratch every session. It builds a persistent memory of your campaigns, performance metrics, and strategic learnings --- then uses that history to make every future recommendation sharper. v3.0 extends this with a per-engagement version history (every source document carries its v1.0 → v2.0 → v2.1 lineage) and the Living Project Instruction File. This guide explains what gets saved, how it informs new work, and how to query and manage your marketing data over time.
 
@@ -441,4 +441,4 @@ The best marketing teams learn from their own data. This system makes sure nothi
 
 ---
 
-*Digital Marketing Pro v3.17.0 --- Built for marketing professionals who want strategy and execution that stays on-brand, every time.*
+*Digital Marketing Pro --- Built for marketing professionals who want strategy and execution that stays on-brand, every time.*
