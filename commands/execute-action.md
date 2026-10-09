@@ -1,5 +1,5 @@
 ---
-description: "Actually fire a campaign-audit / launch-campaign action against its real API (vs returning a manifest). Reads credentials from env vars (no OAuth flow). Read ops auto-execute with --execute; write ops require --confirm. Logs every execution to the audit trail."
+description: "Execute an audit or launch action against its real API; writes need --confirm. \"actually fire this action\""
 argument-hint: "--action <id> [--brand <slug>] [--execute] [--confirm] [--channel <name>] [--data <json>]"
 allowed-tools: Bash Read
 disable-model-invocation: false

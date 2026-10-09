@@ -6,21 +6,21 @@ Run `/digital-marketing-pro:engagement` against each brand. Same 12-Part Strateg
 
 Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Act Article 50 ready, Cowork team-persistent**. Built for marketing agencies, in-house teams running 50–200 brands, and consultancies. Installs on **Claude Code** (CLI + IDE), **Anthropic Cowork**, **OpenAI Codex**, **Cursor 2.5+**, **GitHub Copilot CLI**, **Google Antigravity 2.0**, **Hermes Agent**, **OpenClaw**, and **Grok** + 35+ Agent Skills platforms. Created by [Indranil Banerjee](https://indranil.in) · [LinkedIn](https://www.linkedin.com/in/askneelnow/) · [X](https://x.com/askneelnow).
 
-[![Version](https://img.shields.io/badge/version-3.33.3-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.34.0-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=yellow)](https://github.com/indranilbanerjee/digital-marketing-pro/stargazers)
 [![Forks](https://img.shields.io/github/forks/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=blue)](https://github.com/indranilbanerjee/digital-marketing-pro/network/members)
 [![Issues](https://img.shields.io/github/issues/indranilbanerjee/digital-marketing-pro?logo=github)](https://github.com/indranilbanerjee/digital-marketing-pro/issues)
 [![Last commit](https://img.shields.io/github/last-commit/indranilbanerjee/digital-marketing-pro?logo=github)](https://github.com/indranilbanerjee/digital-marketing-pro/commits/main)
-[![Tests](https://img.shields.io/badge/tests-496%2F496%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-511%2F511%20passing-brightgreen.svg)](tests/)
 [![Platforms](https://img.shields.io/badge/platforms-8%20native%20%2B%2035%20Agent%20Skills-success.svg)](#works-on-40-agent-harnesses-via-the-agent-skills-open-standard)
-[![Cowork](https://img.shields.io/badge/cowork-team%20persistent-purple.svg)](#supported-surfaces-v3333)
+[![Cowork](https://img.shields.io/badge/cowork-team%20persistent-purple.svg)](#supported-surfaces-v3340)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Article%2050%20ready-darkred.svg)](skills/context-engine/compliance-rules.md)
 [![Sponsor](https://img.shields.io/badge/sponsor-%E2%9D%A4-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/indranilbanerjee)
 
-> 🆕 **Just shipped — v3.33.3 (October 4, 2026), on top of v3.33.0: agent readiness, honest AI-visibility measurement, and official ad servers.** **New `/digital-marketing-pro:agent-readiness-audit`:** can AI agents and AI crawlers actually use your site? robots.txt per RFC 9309 for the AI crawler tokens, structured data, content that renders without JavaScript, Merchant Center feed readiness for agentic checkout, and WebMCP as an experiment — offline on exported files, and it never tells you llms.txt matters to Google (Google's own guide calls that a myth). **AI visibility, measured honestly:** Search Console's AI report has impressions only — no clicks, no CTR, no queries — and GA4's AI Assistant channel *excludes* AI Overviews and AI Mode, so every report now says what no first-party tool measures instead of guessing. **Official ad servers:** Meta Ads AI Connectors, Google Ads MCP (read-only, never used for a write) and Amazon Ads MCP join the opt-in catalog; writes stay behind the typed approval gate and new ads are created PAUSED. Also: ChatGPT ads and AI Mode ads in media planning, Meridian 2.x, always-on recipes for six schedulers, a competitor-sweep workflow, 13 duplicate commands folded into their skills, and directory listing fields for Anthropic's and OpenAI's plugin directories.
+> 🆕 **Just shipped — v3.34.0 (October 10, 2026): the model finds the right skill more often.** Claude Code shows the model one list of every installed skill, and that list has a character budget. DMP's descriptions needed about 126,600 characters, so even on a 1M-token window each was cut to about 195 characters and its trigger phrases never reached the model. Every description is now 60-150 characters and says what the skill does first; the list fits in 25,974 characters, which leaves room for other plugins inside a 1M window's 40,000. In trigger tests the model's first move was the right skill on 90.5% of runs, up from 80.5%, with no misfires onto a sibling skill and no skill firing on unrelated requests. A plugin workflow whose description was taking competitor questions is fixed, and workflows now count toward the budget guard. [Read what's new →](#whats-new) · [Full changelog →](CHANGELOG.md)
 >
-> <sub>Previously — **v3.32.0 (October 4, 2026):** the seven-week freshness pass — Codex installs repaired (the shared marketplace's `github` source shorthand is silently dropped by Codex), the model registry re-verified against every vendor's pages, `requiredMinimumVersion` removed (a managed setting, never a manifest field), and Article 50's EU label icons folded in. [Read what's new →](#whats-new) · [Full changelog →](CHANGELOG.md)</sub>
+> <sub>Previously — **v3.33.3 (October 4, 2026):** agent readiness, honest AI-visibility measurement, and official ad servers — the new `/digital-marketing-pro:agent-readiness-audit`, Search Console and GA4 AI reports that say what no first-party tool measures, Meta, Google and Amazon ad servers in the opt-in catalog behind the typed approval gate, and Hermes installs working again. [Full changelog →](CHANGELOG.md)</sub>
 
 ```bash
 # Install — one line
@@ -248,7 +248,7 @@ Output: real API calls fired against your stack with audit logging at `~/.claude
 
 ---
 
-## Supported surfaces (v3.33.3)
+## Supported surfaces (v3.34.0)
 
 | Platform | Install command | Manifest path | Status |
 |---|---|---|---|
@@ -358,6 +358,10 @@ If you run into a platform-specific install snag, file a [GitHub issue](https://
 ---
 
 ## What's new
+
+### v3.34.0 — the model finds the right skill more often (October 10, 2026)
+
+Claude Code lists every installed skill, command and workflow to the model in one listing measured in characters (context window x 4 x 1%, so 8,000 on 200k and 40,000 on 1M, shared by every plugin). DMP alone needed about 126,600, so every description was cut short and its trigger phrases never reached the model. All 170 descriptions are rewritten to 60-150 characters, verb and object first, with one phrase a user would type; the listing is now 25,974 characters, and `tests/test_description_density.py` holds it there with its reasons written down. Trigger evals with the budget pinned: 80.5% to 90.5% of runs pick the right skill first, ab-test-plan, check, funnel-audit and seo-audit go from 0-1 of 3 to 3 of 3 and hold on a differently worded request, sibling misfires stay at zero, and unrelated requests stay quiet. Two cases that got worse in the first run (competitor-analysis, taken by the competitor-sweep workflow, and verify-claims) were fixed and pass 3/3. Not fixed and reported as is: paid-advertising on a reworded request, and one-line translations, which the model does itself.
 
 ### v3.33.3 — Hermes can install it again (October 4, 2026)
 
@@ -847,7 +851,7 @@ Yes. Each brand has its own `~/.claude-marketing/<brand-slug>/` directory and Py
 Skip to `/digital-marketing-pro:campaign-plan`. Every individual surface (campaign / SEO / content / competitor / email / report) is independently runnable. The full engagement is the canonical path, not the only path.
 
 **Q: Will this work on Codex / Cursor / Copilot CLI / Antigravity?**
-Yes — verified-real native manifests ship for all 9 surfaces (CC, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok). See [Supported surfaces](#supported-surfaces-v3333) above for per-platform install commands.
+Yes — verified-real native manifests ship for all 9 surfaces (CC, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok). See [Supported surfaces](#supported-surfaces-v3340) above for per-platform install commands.
 
 **Q: I run my team on Anthropic Cowork. Does brand state persist between sessions?**
 Yes — but you need to run `/digital-marketing-pro:cowork-setup` once per team first (v3.12.0). Cowork's per-session filesystem is ephemeral, and `${CLAUDE_PLUGIN_DATA}` is too ([open issue #51398](https://github.com/anthropics/claude-code/issues/51398)). The setup wizard routes brand profiles + plans + reports through a Google Drive MCP so everything survives across sessions and is shared across the team. Multi-team isolation via per-team folder names.
@@ -916,7 +920,7 @@ Use the direct repo form: `grok plugin install indranilbanerjee/digital-marketin
 ### General (any platform)
 
 **"Tests in `tests/` fail when I `git clone` locally"**
-Run `python tests/run_all.py` from the repo root. All 496 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.8+) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
+Run `python tests/run_all.py` from the repo root. All 511 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.8+) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
 
 **"`/digital-marketing-pro:doctor` shows my action as stub_unconfigured"**
 That action needs an MCP connector configured. Run `python scripts/connector-status.py --action setup-guide --name <connector-name>` for the exact setup snippet. Add it to your `.mcp.json` under `mcpServers`, restart your agent, and the action becomes `manifest_ready`. See [Connector-aware action resolver](#connector-aware-action-resolver-v3710) for the full readiness model.

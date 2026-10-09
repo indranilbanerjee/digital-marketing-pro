@@ -1,6 +1,6 @@
 export const meta = {
   name: 'competitor-sweep',
-  description: 'Research several competitors in parallel (positioning, pricing, content, SEO, paid, AI visibility), each with cited sources, then synthesize one comparison with gaps and opportunities',
+  description: 'Sweep many competitors in parallel with cited sources. 2-5 named, one pass → competitor-analysis. "deep-dive on all our competitors"',
   phases: ['Research each competitor', 'Synthesize'],
 }
 

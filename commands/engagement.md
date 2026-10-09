@@ -1,5 +1,5 @@
 ---
-description: "Run a marketing engagement using the 12-Part methodology. Subcommands: start, next, status, validate, re-run-decision, update-back, lif-show, file-tree, list-engagements, four-core, growth-plan, yearly-planner, loop."
+description: "Drive the 12-Part engagement by subcommand: start, next, status, validate, loop. \"advance to the next part\""
 argument-hint: "<subcommand> [args]"
 allowed-tools: Read Write Edit Bash Glob Grep
 ---

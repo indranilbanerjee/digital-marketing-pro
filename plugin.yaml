@@ -16,7 +16,7 @@
 # the skills/ directory and exposes every SKILL.md to Hermes via ctx.register_skill().
 
 name: digital-marketing-pro
-version: 3.33.3
+version: 3.34.0
 description: >-
   Open-source AI marketing plugin for agencies & in-house teams. 164 skills,
   24 specialist agents, 12-Part Strategy Flow, Cowork team-persistent, EU AI

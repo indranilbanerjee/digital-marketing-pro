@@ -10,7 +10,7 @@
     {
       "name": "ab-test-plan",
       "tier": "E",
-      "description": "Design a statistically rigorous A/B or multivariate test plan — If/Then/Because hypothesis, control and variant specs, required sample size per variant (absolute vs relative MDE via sample-size-calculator.py), test duration, guardrail metrics, stopping rules, and go/no-go decision criteria. Triggers on \\\"/digital-marketing-pro:ab-test-plan\\\", \\\"set up an A/B test\\\", \\\"how long should my test run\\\", \\\"calculate sample size for an experiment\\\", \\\"is this test result significant\\\". Reads the brand profile and past campaign-tracker results to avoid re-testing validated hypotheses; finished tests are evaluated with significance-tester.py by the cro-specialist agent.",
+      "description": "Plan an A/B test by script: sample size per variant, days to run, stopping rules. \\\"how many visitors per variant\\\"",
       "scripts": [
         "campaign-tracker.py",
         "sample-size-calculator.py",
@@ -22,12 +22,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7980
+      "bytes": 7424
     },
     {
       "name": "ad-creative",
       "tier": "M",
-      "description": "Generate 3-5 ad copy variations per platform — headlines, descriptions, and CTAs formatted to Google, Meta, LinkedIn, TikTok, X, and Pinterest specs — each scored 1-10 with policy-compliance flags, A/B testing groupings, and a message-match check against the landing page. Triggers on \\\"/digital-marketing-pro:ad-creative\\\", \\\"write ad copy for Meta\\\", \\\"give me RSA headline variations\\\", \\\"we need LinkedIn ad copy\\\", \\\"draft TikTok ad creative\\\". Reads the brand profile, guidelines, and compliance rules; routes video ad scripts to /digital-marketing-pro:video-script and gates AI-generated visuals for EU campaigns through /digital-marketing-pro:c2pa-metadata and /digital-marketing-pro:check.",
+      "description": "Write ad copy variants to each platform's specs, policy-checked and in brand voice. \\\"write ad copy for Meta\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [
@@ -42,12 +42,12 @@
         "video-script"
       ],
       "doc_files": 1,
-      "bytes": 6656
+      "bytes": 6064
     },
     {
       "name": "add-integration",
       "tier": "G",
-      "description": "Walk through adding a custom MCP server integration to the plugin — searches npm for an existing MCP package (or scaffolds a custom server from the plugin's guide), generates the exact .mcp.json entry, sets up environment-variable credentials, tests connectivity, and documents the tools the new server exposes. Triggers on \\\"/digital-marketing-pro:add-integration\\\", \\\"connect Ahrefs to the plugin\\\", \\\"add a new MCP server\\\", \\\"integrate our internal API\\\", \\\"hook up Stripe data\\\". Reads the brand profile and agency credential profiles at ~/.claude-marketing/credentials/ to map client-specific keys; custom builds follow skills/context-engine/custom-mcp-guide.md.",
+      "description": "Add a custom MCP integration: scaffold the server, write .mcp.json, test it. \\\"add a new MCP server\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -55,12 +55,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7306
+      "bytes": 6737
     },
     {
       "name": "aeo-audit",
       "tier": "E",
-      "description": "Audit how a brand appears across the 6 canonical AI answer surfaces — ChatGPT, Perplexity, Google AI Mode, AI Overviews, Gemini, Copilot — probing 10-25 queries into a numbered output bundle with per-platform visibility scorecards, citation-accuracy checks, a competitor matrix, content gaps, and an optimization playbook behind a four-gate quality scorecard. Triggers on \\\"/digital-marketing-pro:aeo-audit\\\", \\\"does ChatGPT know about our brand\\\", \\\"check our AI search visibility\\\", \\\"how does Perplexity describe us\\\", \\\"are we showing up in AI Overviews\\\". Reads the brand profile; reconciles probes against GSC actuals via /digital-marketing-pro:gsc-ai-performance and defines the AI-visibility scoring standard reused by geo-monitor and share-of-voice.",
+      "description": "Run a one-time AEO audit of six AI answer engines, scored per surface. \\\"check our AI search visibility\\\"",
       "scripts": [
         "geo-tracker.py"
       ],
@@ -77,12 +77,12 @@
         "seo-drift"
       ],
       "doc_files": 1,
-      "bytes": 10662
+      "bytes": 10005
     },
     {
       "name": "aeo-geo",
       "tier": "E",
-      "description": "Strategy module for Answer Engine / Generative Engine Optimization — audits AI visibility, restructures content for citation, runs entity-consistency checks across Knowledge Graph, Wikidata, Wikipedia, Crunchbase, and LinkedIn, and produces JSON-LD schema specs, monitoring frameworks, and a 90-day LLM content strategy. Triggers on \\\"/digital-marketing-pro:aeo-geo\\\", \\\"how do we get cited by AI\\\", \\\"optimize for AI Overviews\\\", \\\"fix our entity consistency\\\", \\\"do we need llms.txt\\\". Reads the brand profile, compliance rules, and industry benchmarks; its measurement counterpart is /digital-marketing-pro:aeo-audit, with GSC actuals via /digital-marketing-pro:gsc-ai-performance.",
+      "description": "Plan AEO/GEO strategy to get cited by AI: content, entities, schema, 90-day plan. \\\"how do we get cited by AI\\\"",
       "scripts": [
         "campaign-tracker.py"
       ],
@@ -94,12 +94,12 @@
         "gsc-ai-performance"
       ],
       "doc_files": 5,
-      "bytes": 44660
+      "bytes": 44085
     },
     {
       "name": "agency-dashboard",
       "tier": "E",
-      "description": "Generate a portfolio-level dashboard across ALL client brands — per-client RAG health scores, campaign activity, budget pacing, aggregate KPIs, team utilization, pending approvals, upcoming deadlines, and an alerts panel — built for agency standups and weekly reviews. Triggers on \\\"/digital-marketing-pro:agency-dashboard\\\", \\\"how are all our clients doing\\\", \\\"portfolio health check\\\", \\\"budget pacing across accounts\\\", \\\"which accounts are at risk\\\". Enumerates every brand under ~/.claude-marketing/brands/ and pulls data via campaign-tracker.py, execution-tracker.py, and team-manager.py; drill into a single client with /digital-marketing-pro:performance-report or /digital-marketing-pro:client-report.",
+      "description": "Build the agency dashboard across all client brands: health, pacing, risk. \\\"how are all our clients doing\\\"",
       "scripts": [
         "campaign-tracker.py",
         "execution-tracker.py",
@@ -114,12 +114,12 @@
         "performance-report"
       ],
       "doc_files": 1,
-      "bytes": 10197
+      "bytes": 9591
     },
     {
       "name": "agent-readiness-audit",
       "tier": "E",
-      "description": "Audit whether AI agents and AI crawlers can actually use a site — robots.txt rules per AI crawler token (OpenAI, Anthropic and Perplexity bots, Google-Extended, Applebot-Extended), Product/Offer/Organization/FAQ JSON-LD, whether main content is in the no-JavaScript server HTML, Merchant Center feed completeness incl. native_commerce checkout eligibility and conversational attributes, an optional agentic-commerce feed, and an optional experimental WebMCP check. Triggers on \\\"/digital-marketing-pro:agent-readiness-audit\\\", \\\"can AI agents use our site\\\", \\\"are we blocking GPTBot or ClaudeBot\\\", \\\"is our product feed ready for AI Mode shopping\\\", \\\"run an agent-readiness check\\\". Runs agent-readiness-audit.py offline on exports (network only with --fetch) and never recommends llms.txt for Google.",
+      "description": "Audit agent readiness by script: AI-crawler rules, product schema, no-JS HTML, feeds. \\\"can AI agents use our site\\\"",
       "scripts": [
         "agent-readiness-audit.py"
       ],
@@ -134,12 +134,12 @@
         "tech-seo-audit"
       ],
       "doc_files": 1,
-      "bytes": 15463
+      "bytes": 14773
     },
     {
       "name": "analytics-insights",
       "tier": "E",
-      "description": "Marketing measurement module — builds KPI trees per business model, reporting templates (weekly, monthly, QBR, campaign), anomaly root-cause diagnosis, MMM and incrementality guidance, dark-social tracking, and privacy-first cookieless measurement architecture, including the GA4 AI Assistant channel group for attributing AI-referred traffic. Triggers on \\\"/digital-marketing-pro:analytics-insights\\\", \\\"why did traffic drop\\\", \\\"define our KPIs\\\", \\\"design an executive dashboard\\\", \\\"can we do marketing mix modeling\\\". Reads the brand profile, industry benchmarks, and campaign history; pairs with /digital-marketing-pro:gsc-ai-performance and /digital-marketing-pro:aeo-audit to triangulate AI-surface impressions against actual traffic.",
+      "description": "Design the analytics layer with script-backed benchmarks: KPI trees, report templates, MMM, cookieless. \\\"define our KPIs\\\"",
       "scripts": [
         "benchmark_book.py"
       ],
@@ -153,12 +153,12 @@
         "gsc-ai-performance"
       ],
       "doc_files": 11,
-      "bytes": 178844
+      "bytes": 178223
     },
     {
       "name": "anomaly-scan",
       "tier": "E",
-      "description": "Scan all connected marketing platforms for statistically significant deviations from stored baselines — traffic drops, CPA spikes, deliverability collapse, budget overruns, or unexpected wins — classified critical/warning/info with probable causes, correlation to recent changes, and recommended actions. Triggers on \\\"/digital-marketing-pro:anomaly-scan\\\", \\\"why did our CPA spike\\\", \\\"did anything weird happen this week\\\", \\\"check for anomalies\\\", \\\"our conversions suddenly dropped\\\". Runs performance-monitor.py for baselines and detection, correlates flags against execution-tracker.py history and the diagnostic framework in skills/analytics-insights/anomaly-diagnosis.md, and persists critical findings as insights via campaign-tracker.py. Reads the brand profile.",
+      "description": "Scan connected platforms for anomalies against stored baselines, with likely causes. \\\"why did our CPA spike\\\"",
       "scripts": [
         "campaign-tracker.py",
         "execution-tracker.py",
@@ -170,71 +170,67 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7907
+      "bytes": 7241
     },
     {
       "name": "attribution-model",
       "tier": "G",
-      "description": "Design a multi-touch attribution strategy — recommends the best-fit model for the business's sales cycle and data maturity, defines credit-distribution rules and lookback windows, maps platform-specific setup (GA4, HubSpot, Salesforce, warehouse), and documents tracking gaps and known blind spots. Triggers on \\\"/digital-marketing-pro:attribution-model\\\", \\\"set up multi-touch attribution\\\", \\\"which attribution model should we use\\\", \\\"configure GA4 attribution\\\", \\\"how should we credit channels for conversions\\\". Reads the brand profile and consumes the canonical model taxonomy in skills/funnel-architect/attribution-models.md; to run the models against real conversion data, pair with /digital-marketing-pro:attribution-report.",
+      "description": "Design an attribution model and credit rules. Real path data → attribution-report. \\\"set up multi-touch attribution\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "attribution-report",
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 9799
+      "bytes": 9182
     },
     {
       "name": "attribution-report",
       "tier": "G",
-      "description": "Run multi-touch attribution analysis on real conversion-path data — applies two or more models side-by-side (first-touch, last-touch, linear, time-decay, position-based, data-driven), computes per-channel attributed revenue and ROAS, assisted-conversion ratios, path-length and time-to-conversion distributions, and budget reallocation recommendations. Triggers on \\\"/digital-marketing-pro:attribution-report\\\", \\\"which channels actually drive revenue\\\", \\\"compare first-touch vs last-touch\\\", \\\"run an attribution analysis\\\", \\\"is paid social undervalued\\\". Pulls journeys from Google Analytics, Google Ads, Meta, and CRM MCPs and includes GA4's AI Assistant channel; model definitions come from skills/funnel-architect/attribution-models.md, strategy design from /digital-marketing-pro:attribution-model.",
+      "description": "Run attribution on real conversion paths, comparing models. \\\"which channels actually drive revenue\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "attribution-model",
         "brand-setup",
         "gsc-ai-performance"
       ],
       "doc_files": 1,
-      "bytes": 13080
+      "bytes": 12373
     },
     {
       "name": "audience-intelligence",
       "tier": "E",
-      "description": "Audience research module — builds six-dimension buyer personas (demographic, psychographic, behavioral, need-state, information, decision), Jobs-to-Be-Done maps, RFM/behavioral/lifecycle segmentation models, anti-personas with exclusion criteria, B2B buying-committee maps, and lookalike seed specs. Triggers on \\\"/digital-marketing-pro:audience-intelligence\\\", \\\"who are our customers\\\", \\\"build buyer personas\\\", \\\"segment our audience\\\", \\\"run a JTBD analysis\\\". Reads the brand profile, industry benchmarks, and campaign history, and works from CRM/survey/analytics data when supplied — or labels hypothesis personas explicitly when data is thin. For a single quick persona document, /digital-marketing-pro:audience-profile is the lighter sibling.",
+      "description": "Research audiences: personas, JTBD maps, RFM segments. One persona doc → audience-profile. \\\"run a JTBD analysis\\\"",
       "scripts": [
         "campaign-tracker.py"
       ],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "audience-profile",
         "brand-setup"
       ],
       "doc_files": 6,
-      "bytes": 54251
+      "bytes": 53612
     },
     {
       "name": "audience-profile",
       "tier": "G",
-      "description": "Build a named, narrative buyer persona document — demographic snapshot, psychographic drivers, jobs-to-be-done, day-in-the-life scenario, buyer journey map, objections with counter-messaging, and content/channel preferences — for the 2-4 personas a brand actually needs. Triggers on \\\"/digital-marketing-pro:audience-profile\\\", \\\"create a buyer persona\\\", \\\"profile our target customer\\\", \\\"who is our ideal customer\\\", \\\"map the buyer journey for this segment\\\". Reads the brand profile, guidelines, and any customer data supplied (surveys, CRM exports, analytics demographics); run by the marketing-strategist agent. For the deeper research module — segmentation, anti-personas, buying committees — see /digital-marketing-pro:audience-intelligence.",
+      "description": "Profile 2-4 buyer personas as narrative documents: drivers, objections, journey. \\\"create a buyer persona\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "audience-intelligence",
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 3663
+      "bytes": 3012
     },
     {
       "name": "autopilot-status",
       "tier": "E",
-      "description": "Campaign autopilot operations dashboard — 0-100 health scores for all active campaigns, a chronological log of auto-corrections taken (bid, budget, audience, creative, pause) with before/after metrics, the current guardrail rule table, campaigns escalated for human attention ranked by urgency, and estimated savings from automated interventions. Triggers on \\\"/digital-marketing-pro:autopilot-status\\\", \\\"how is autopilot doing\\\", \\\"what did the autopilot change\\\", \\\"which campaigns need my attention\\\", \\\"show guardrail settings\\\". Runs campaign-health-monitor.py for health scores, corrections history, and the savings report; reads the brand profile for KPI targets, naming conventions, and budget constraints.",
+      "description": "Show autopilot status: health, auto-corrections, guardrails, escalations. \\\"what did the autopilot change\\\"",
       "scripts": [
         "campaign-health-monitor.py"
       ],
@@ -244,12 +240,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7604
+      "bytes": 6994
     },
     {
       "name": "backlink-gap",
       "tier": "E",
-      "description": "Find referring domains that link to your competitors but not to you, ranked by an outreach-priority score (0.40 DR + 0.25 link-overlap + 0.20 traffic + 0.15 topical relevance) — outputs a four-gate quality scorecard, a 30-prospect outreach shortlist, broken-link candidates, and pre-filled outreach templates. Triggers on \\\"/digital-marketing-pro:backlink-gap\\\", \\\"where are competitors getting links we aren't\\\", \\\"plan a link-building campaign\\\", \\\"quarterly backlink audit\\\", \\\"first 50 link targets for a new client\\\". Consumes backlink CSV exports from the brand's connected backlink MCP, runs scripts/backlink_gap.py, reads the brand profile for DR thresholds and voice, and hands off to /digital-marketing-pro:digital-pr and /digital-marketing-pro:pr-pitch.",
+      "description": "Find backlink gap domains linking to competitors, not you, scored by script. \\\"who links to our competitors but not us\\\"",
       "scripts": [
         "backlink_gap.py"
       ],
@@ -267,12 +263,12 @@
         "seo-drift"
       ],
       "doc_files": 1,
-      "bytes": 11247
+      "bytes": 10601
     },
     {
       "name": "brand-setup",
       "tier": "E",
-      "description": "Create or update the brand profile every other skill reads — a quick 5-question or full 17-question interactive setup capturing identity, business model, industry and compliance markets, 4-dimension voice scales, channels, goals, and competitors, saved to ~/.claude-marketing/brands/{slug}/profile.json via scripts/setup.py. Triggers on \\\"/digital-marketing-pro:brand-setup\\\", \\\"set up a new brand\\\", \\\"onboard a new client\\\", \\\"switch to another brand\\\", \\\"update our brand voice\\\". Also handles brand switching (updates _active-brand.json) and field-level profile edits; run this first — all marketing skills auto-apply the resulting profile, voice samples, and compliance rules.",
+      "description": "Set up or update the brand profile every skill reads: voice, audience, compliance. \\\"set up a new brand\\\"",
       "scripts": [
         "setup.py"
       ],
@@ -287,28 +283,27 @@
         "switch-brand"
       ],
       "doc_files": 1,
-      "bytes": 7872
+      "bytes": 7292
     },
     {
       "name": "budget-optimizer",
       "tier": "E",
-      "description": "Reallocate marketing spend across channels using performance data and diminishing-returns modeling — produces a current-vs-optimized allocation table, projected ROI ranges with confidence intervals, a phased 4-8 week reallocation timeline, and a 10-15% testing reserve. Recommends shifts only; it never changes spend on any platform. Triggers on \\\"/digital-marketing-pro:budget-optimizer\\\", \\\"optimize my marketing budget\\\", \\\"which channels should get more spend\\\", \\\"reallocate budget based on ROAS\\\", \\\"is our channel split right\\\". Reads the brand profile and guidelines, runs scripts/budget-optimizer.py, and pairs with /digital-marketing-pro:budget-tracker for in-flight pacing.",
+      "description": "Optimize channel budget with diminishing-returns models. Pacing → budget-tracker. \\\"is our channel split right\\\"",
       "scripts": [
         "budget-optimizer.py"
       ],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup",
-        "budget-tracker"
+        "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 6743
+      "bytes": 6171
     },
     {
       "name": "budget-tracker",
       "tier": "E",
-      "description": "Track advertising spend pacing in real time across connected ad platforms (Google Ads, Meta, LinkedIn, TikTok) — produces a budget dashboard with daily burn rates, end-of-period projections, overspend/underspend alerts, and dollar-specific reallocation recommendations backed by CPA/ROAS context. Monitors and recommends only; it never edits platform budgets. Triggers on \\\"/digital-marketing-pro:budget-tracker\\\", \\\"are we overspending this month\\\", \\\"how is our ad budget pacing\\\", \\\"track spend across platforms\\\", \\\"will we blow through the budget cap\\\". Reads budget targets from the brand profile, runs scripts/ad-budget-pacer.py, and saves snapshots for trend history; pairs with /digital-marketing-pro:budget-optimizer.",
+      "description": "Project ad budget pacing by script from live accounts or given numbers: month-end overspend. \\\"are we overspending this month\\\"",
       "scripts": [
         "ad-budget-pacer.py",
         "budget-optimizer.py",
@@ -317,16 +312,15 @@
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup",
-        "budget-optimizer"
+        "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7620
+      "bytes": 7018
     },
     {
       "name": "c2pa-metadata",
       "tier": "E",
-      "description": "Embed a C2PA provenance manifest into an AI-generated marketing asset (PNG, JPG, WebP, GIF, TIFF, MP4, MOV, WebM, MP3, WAV, PDF) via scripts/embed-c2pa.py — produces a signed copy of the file carrying IPTC digital-source-type AI claims, an optional c2pa.ai-disclosure assertion for EU AI Act Article 50 (applicable 2 Aug 2026), and a JSON status report. Triggers on \\\"/digital-marketing-pro:c2pa-metadata\\\", \\\"sign this AI image for EU compliance\\\", \\\"add content credentials to this asset\\\", \\\"embed provenance metadata\\\", \\\"mark this video as AI-generated\\\". Uses a self-signed dev certificate unless --signing-cert/--signing-key are supplied; pairs with /digital-marketing-pro:check, which verifies manifests pre-publish.",
+      "description": "Embed C2PA provenance in AI-generated images, video or PDF by script. \\\"add content credentials to this asset\\\"",
       "scripts": [
         "embed-c2pa.py"
       ],
@@ -338,12 +332,12 @@
         "check"
       ],
       "doc_files": 1,
-      "bytes": 10260
+      "bytes": 9645
     },
     {
       "name": "campaign-audit",
       "tier": "E",
-      "description": "Inventory and score everything currently running for a brand across paid search, paid social, email, organic, SEO, AEO/GEO, CRM, and analytics — produces a dated audit document with a 4-tier triage (healthy / quick win / strategic gap / red flag), a quick-wins backlog, and a compliance posture section. Strictly read-only: it never pauses, edits, or launches anything. Triggers on \\\"/digital-marketing-pro:campaign-audit\\\", \\\"what's currently running for this brand\\\", \\\"audit our existing campaigns\\\", \\\"we just inherited this account\\\", \\\"where is budget leaking\\\". Requires a validated brand profile (run validate-profile first); missing connectors degrade gracefully into findings. Feeds /digital-marketing-pro:campaign-plan and pairs with /digital-marketing-pro:performance-check.",
+      "description": "Audit all campaigns running for a brand across channels, with 4-tier triage. \\\"we just inherited this account\\\"",
       "scripts": [
         "ai-visibility-checker.py",
         "crm-sync.py",
@@ -361,28 +355,27 @@
         "validate-profile"
       ],
       "doc_files": 1,
-      "bytes": 16646
+      "bytes": 15969
     },
     {
       "name": "campaign-orchestrator",
       "tier": "E",
-      "description": "Full campaign-lifecycle module — produces campaign briefs, budget allocations via three models (70/20/10, efficiency-ranked, funnel-weighted), channel-mix and media plans, UTM taxonomies with governance rules, launch checklists, ABM plans, and post-mortem reports. Plans and documents; it does not launch or edit live campaigns. Triggers on \\\"/digital-marketing-pro:campaign-orchestrator\\\", \\\"build a media plan\\\", \\\"how should we split budget across channels\\\", \\\"set up UTM naming conventions\\\", \\\"run a post-mortem on the campaign\\\". Reads the brand profile, guidelines, and campaign history via campaign-tracker.py; its reference docs are consumed by /digital-marketing-pro:campaign-plan rather than duplicated.",
+      "description": "Orchestrate a campaign lifecycle: briefs, budget models, UTMs, post-mortems. \\\"set up UTM naming conventions\\\"",
       "scripts": [
         "campaign-tracker.py"
       ],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup",
-        "campaign-plan"
+        "brand-setup"
       ],
       "doc_files": 8,
-      "bytes": 64285
+      "bytes": 63678
     },
     {
       "name": "campaign-plan",
       "tier": "G",
-      "description": "Generate a complete multi-channel campaign plan document — SMART objectives, audience segments with targeting criteria, channel mix with rationale, a budget allocation table with reach/cost estimates, a phased timeline from pre-launch to wrap-up, a KPI framework, and a risk register. Plans only; it does not launch or modify campaigns. Triggers on \\\"/digital-marketing-pro:campaign-plan\\\", \\\"plan a campaign for our product launch\\\", \\\"build the Q3 campaign plan\\\", \\\"what channels and budget for lead gen\\\", \\\"draft a campaign timeline with KPIs\\\". Reads the brand profile, guidelines, and agency SOPs, and reuses the /digital-marketing-pro:campaign-orchestrator reference docs for planning frameworks instead of re-deriving them.",
+      "description": "Write a multi-channel campaign plan: objectives, channel mix, budget, timeline, KPIs. \\\"build the Q3 campaign plan\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -395,12 +388,12 @@
         "media-plan"
       ],
       "doc_files": 2,
-      "bytes": 9252
+      "bytes": 8634
     },
     {
       "name": "campaign-status",
       "tier": "E",
-      "description": "Unified status dashboard for every tracked campaign across connected platforms — produces a summary table with health indicators, live spend and performance metrics, a 7-day execution history, pending approvals with age, KPI variance classification (on track / at risk / behind), flagged issues, and next scheduled actions. Reports only; it changes nothing on any platform. Triggers on \\\"/digital-marketing-pro:campaign-status\\\", \\\"what campaigns are running right now\\\", \\\"any failed executions or stuck approvals\\\", \\\"status of the Q1-Launch campaign\\\", \\\"which campaigns are behind target\\\". Reads the brand's campaign registry, execution log, and approval queue via campaign-tracker.py, execution-tracker.py, and approval-manager.py, plus live metrics from connected platform MCPs.",
+      "description": "Show status of every tracked campaign: health, spend, executions, pending approvals. \\\"what campaigns are running right now\\\"",
       "scripts": [
         "approval-manager.py",
         "campaign-tracker.py",
@@ -412,12 +405,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7121
+      "bytes": 6459
     },
     {
       "name": "case-study-plan",
       "tier": "G",
-      "description": "Build a complete case-study creation blueprint — a Challenge-Solution-Results narrative framework, 15-20 client interview questions plus 10 internal-team questions, a data-visualization plan, format specifications (PDF, web page, slide deck, video script outline, social snippets, sales one-pager), a distribution strategy, a permission/approval checklist, and a draft executive summary. Plans the case study; it does not produce the finished designed asset. Triggers on \\\"/digital-marketing-pro:case-study-plan\\\", \\\"turn this client win into a case study\\\", \\\"what should we ask the client in the interview\\\", \\\"plan a success story for sales enablement\\\", \\\"case study formats and distribution plan\\\". Reads the brand profile, guidelines, custom templates, and agency SOPs.",
+      "description": "Plan a case study: narrative, interview questions, formats. \\\"turn this client win into a case study\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -425,12 +418,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 8833
+      "bytes": 8158
     },
     {
       "name": "check",
       "tier": "E",
-      "description": "Run the unified pre-publish quality gate on marketing content — wraps scripts/eval-runner.py to score hallucination risk, claim substantiation (with --evidence), brand-voice fit (with --brand), structure (with --schema), content quality, and readability, plus a C2PA provenance check for AI assets in EU-targeted campaigns; returns a composite score with a PASS / WARN / BLOCKED decision and per-issue fix suggestions. Reports only — it never edits the content. Triggers on \\\"/digital-marketing-pro:check\\\", \\\"is this safe to publish\\\", \\\"run a hallucination check on this draft\\\", \\\"validate this copy against the brand voice\\\", \\\"pre-publish quality gate\\\". Resolves the active brand profile automatically; pairs with /digital-marketing-pro:c2pa-metadata to fix missing manifests.",
+      "description": "Run the scored pre-publish gate via eval-runner.py: claims, brand voice, compliance, AI tells. \\\"check this before we publish\\\"",
       "scripts": [
         "ai-tell-scan.py",
         "brand-voice-scorer.py",
@@ -457,12 +450,12 @@
         "eval-content"
       ],
       "doc_files": 1,
-      "bytes": 17548
+      "bytes": 16889
     },
     {
       "name": "churn-risk",
       "tier": "E",
-      "description": "Score customer segments for churn risk from behavioral signals — email engagement decline, purchase recency, usage drops, support sentiment — producing a 0-100 risk scorecard with four tiers, per-tier intervention playbooks (actions, timing windows, channels, messaging), LTV-at-risk totals, and retention-ROI prioritization. Assesses and recommends; it does not send outreach or launch campaigns. Triggers on \\\"/digital-marketing-pro:churn-risk\\\", \\\"which customers are about to churn\\\", \\\"score our segments for churn risk\\\", \\\"email engagement is dropping, who is at risk\\\", \\\"build a retention intervention plan\\\". Pulls behavioral data from a connected CRM MCP (Salesforce or HubSpot) or user-provided exports, runs scripts/churn-predictor.py, and reads the brand profile for lifecycle context.",
+      "description": "Score churn risk per segment by script, with tiered retention playbooks. \\\"which customers are about to churn\\\"",
       "scripts": [
         "churn-predictor.py"
       ],
@@ -472,12 +465,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 9559
+      "bytes": 8867
     },
     {
       "name": "client-onboarding",
       "tier": "G",
-      "description": "Generate a complete onboarding package for a new marketing client — kickoff meeting agenda, 20-30 question discovery questionnaire, stakeholder map with RACI matrix, platform-by-platform access checklist, 30-60-90 day milestone plan, communication cadence, escalation protocol, welcome email template, internal team brief, risk register, and a day-by-day first-week action plan. Triggers on \\\"/digital-marketing-pro:client-onboarding\\\", \\\"we just signed a new client\\\", \\\"build a kickoff agenda and discovery questionnaire\\\", \\\"30-60-90 day plan for the new account\\\", \\\"what access do we need from the client\\\". Reads the brand profile, guidelines, custom templates, and agency SOPs so the package matches house process.",
+      "description": "Build a client onboarding pack: kickoff agenda, discovery questions, 30-60-90. \\\"we just signed a new client\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -485,12 +478,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7411
+      "bytes": 6798
     },
     {
       "name": "client-proposal",
       "tier": "G",
-      "description": "Draft a professional agency proposal or pitch document for a prospective client — executive summary, situation analysis, scope of services with a deliverables matrix, KPI targets with baselines and stretch goals, 2-3 pricing options, team bio structure, case-study placeholders, terms outline, and next steps, written from the agency's perspective. Triggers on \\\"/digital-marketing-pro:client-proposal\\\", \\\"write a proposal for this prospect\\\", \\\"scope of work for a 6-month retainer\\\", \\\"respond to this RFP\\\", \\\"pitch deck outline with pricing tiers\\\". Loads the agency's own brand profile (not the client's), plus custom templates and agency SOPs; industry benchmarks inform the KPI and pricing sections.",
+      "description": "Draft a client proposal or RFP response: scope, deliverables, KPIs, pricing tiers. \\\"respond to this RFP\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -498,12 +491,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 6725
+      "bytes": 6122
     },
     {
       "name": "client-report",
       "tier": "E",
-      "description": "Generate a white-labeled client report in agency voice — weekly pulse, monthly review, or QBR — with a KPI scorecard vs targets and comparison period, channel breakdowns, top wins with attribution, root-cause analysis of misses, 3-5 strategic recommendations, and budget efficiency. Requires explicit approval before any external send; only then can it deliver via connected Slack, email, or Google Sheets MCPs and log the delivery. Triggers on \\\"/digital-marketing-pro:client-report\\\", \\\"prepare the monthly report for the client\\\", \\\"build the QBR for this account\\\", \\\"send the weekly performance pulse\\\", \\\"white-labeled performance report\\\". Reads the brand profile and pulls data via campaign-tracker.py, execution-tracker.py, and connected platform MCPs; formats via report-generator.py.",
+      "description": "Write a white-labeled report for one client from tracked data. All clients → agency-dashboard. \\\"prepare the monthly client report\\\"",
       "scripts": [
         "campaign-tracker.py",
         "execution-tracker.py",
@@ -515,28 +508,25 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 9557
+      "bytes": 8893
     },
     {
       "name": "client-validation-document",
       "tier": "E",
-      "description": "Produce the Part 5 Client Validation Document — the one true stop of the 12-Part engagement where unbiased v1 findings from Parts 2-4 are compiled into 12-25 evidence-cited finding blocks, each awaiting an ACCEPT / REJECT / EDIT / DEFER client decision, plus a paired JSON response template. Recorded responses feed the Part 6 Decision Matrix (engagement-state.py) to determine v2 re-runs. Triggers on \\\"/digital-marketing-pro:client-validation-document\\\", \\\"prepare v1 findings for client review\\\", \\\"run part 5 client validation\\\", \\\"the one true stop\\\", \\\"record the client's validation responses\\\". Requires Parts 3-4 marked completed in _engagement.json; reads the eight v1 core documents; pairs with /digital-marketing-pro:engagement-workflow and /digital-marketing-pro:four-core-documents.",
+      "description": "Produce the Part 5 client validation document: evidence-cited findings for client decisions. \\\"prepare v1 findings for client review\\\"",
       "scripts": [
         "engagement-state.py"
       ],
       "missing_scripts": [],
       "gates": [],
-      "cross_refs": [
-        "engagement-workflow",
-        "four-core-documents"
-      ],
+      "cross_refs": [],
       "doc_files": 1,
-      "bytes": 13972
+      "bytes": 13308
     },
     {
       "name": "cohort-analysis",
       "tier": "E",
-      "description": "Segment customers into cohorts — by acquisition period, channel, first behavior, or revenue tier — and produce a color-coded retention matrix, overlaid retention curves, LTV-by-cohort comparisons with LTV:CAC where cost data exists, best/worst cohort rankings with hypothesized drivers, stabilization-point analysis, and intervention recommendations for underperformers. Analyzes and recommends; it launches nothing. Triggers on \\\"/digital-marketing-pro:cohort-analysis\\\", \\\"are newer customers retaining better than older ones\\\", \\\"which channel produces the highest-LTV customers\\\", \\\"build a retention matrix\\\", \\\"when does our churn stabilize\\\". Pulls customer data from connected CRM and analytics MCPs, reads the brand profile for business-model context, and saves the summary as a campaign-tracker.py insight for trend tracking.",
+      "description": "Run cohort analysis: retention matrix and LTV by cohort. Churn scoring → churn-risk. \\\"build a retention matrix\\\"",
       "scripts": [
         "campaign-tracker.py"
       ],
@@ -546,25 +536,23 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 11292
+      "bytes": 10568
     },
     {
       "name": "competitor-alerts",
       "tier": "G",
-      "description": "Configure a tiered competitor alert system — per-competitor trigger thresholds across content, pricing, ads, social, ranking, and SERP changes, with critical/warning/info urgency routing, digest batching, and alert-fatigue guardrails — then send test alerts to verify Slack or email delivery. Triggers on \\\"/digital-marketing-pro:competitor-alerts\\\", \\\"alert me when a competitor changes pricing\\\", \\\"set up competitor alerts\\\", \\\"too many competitor notifications\\\", \\\"tell me when competitors launch new ads\\\". Requires baselines from /digital-marketing-pro:competitor-monitor and persists config via competitor-tracker.py; reads the brand profile for competitive context.",
+      "description": "Configure competitor alerts: change thresholds per competitor, urgency routing, digests. \\\"set up competitor alerts\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
-      "cross_refs": [
-        "competitor-monitor"
-      ],
+      "cross_refs": [],
       "doc_files": 1,
-      "bytes": 17970
+      "bytes": 17409
     },
     {
       "name": "competitor-analysis",
       "tier": "G",
-      "description": "Run a multi-dimensional competitive teardown of 2-5 competitors — content strategy, SEO, paid ads, social, AI answer-engine visibility, and pricing/positioning — producing a competitor overview matrix, per-competitor SWOT, gap analysis, and strategic recommendations prioritized by opportunity size. Triggers on \\\"/digital-marketing-pro:competitor-analysis\\\", \\\"analyze our competitors\\\", \\\"how do we stack up against X\\\", \\\"competitive landscape report\\\", \\\"what are competitors doing that we aren't\\\". Point-in-time analysis, not ongoing tracking — pair with /digital-marketing-pro:competitor-monitor for that. Reads the brand profile, guidelines, and compliance rules.",
+      "description": "Analyze 2-5 competitors once: positioning, content, SEO, ads, pricing. Ongoing → competitor-monitor. \\\"how do we stack up against X\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -579,28 +567,27 @@
         "share-of-voice"
       ],
       "doc_files": 2,
-      "bytes": 9283
+      "bytes": 8741
     },
     {
       "name": "competitor-monitor",
       "tier": "E",
-      "description": "Set up ongoing competitor monitoring — captures per-competitor baselines across content, pricing, ads, social, SEO, and SERP features, saves them via competitor-tracker.py, configures per-dimension scan schedules and alert rules, and produces an initial competitive intelligence brief with threat rankings. Triggers on \\\"/digital-marketing-pro:competitor-monitor\\\", \\\"track our competitors over time\\\", \\\"watch competitor pricing pages\\\", \\\"set up competitor tracking\\\", \\\"detect when competitors change their site\\\". Baselines power /digital-marketing-pro:competitor-alerts and share-of-voice trends. Reads the brand profile for competitive landscape context.",
+      "description": "Monitor competitors over time: baseline sites, pricing and ads by script, flag changes. \\\"track our competitors over time\\\"",
       "scripts": [
         "competitor-tracker.py"
       ],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup",
-        "competitor-alerts"
+        "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 12651
+      "bytes": 12112
     },
     {
       "name": "competitor-pages",
       "tier": "M",
-      "description": "Build competitor comparison and alternatives pages — X-vs-Y head-to-heads, alternatives-to-X lists, category roundups, and feature-matrix pages — delivering a 1,500+ word page template, comparison table, JSON-LD schema via schema-generator.py, keyword and title-tag targeting, an internal-linking plan, and fairness/accuracy guardrails. Triggers on \\\"/digital-marketing-pro:competitor-pages\\\", \\\"create a vs page\\\", \\\"build an alternatives page\\\", \\\"comparison page for our product\\\", \\\"best tools roundup for our category\\\". Produces page content and markup, not a live publish. Reads the brand profile and guidelines, especially restrictions on competitor mentions.",
+      "description": "Build competitor comparison pages: X-vs-Y, alternatives and roundups, with schema. \\\"create a vs page\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [
@@ -608,12 +595,12 @@
       ],
       "cross_refs": [],
       "doc_files": 1,
-      "bytes": 8555
+      "bytes": 7987
     },
     {
       "name": "connect",
       "tier": "E",
-      "description": "Guide the connection of a known MCP integration to the plugin — looks up the connector registry via connector-status.py, checks current status, and returns transport-specific setup steps (OAuth for HTTP connectors, env-var credentials plus the exact .mcp.json block for npx connectors), verification steps, and the skills each connector unlocks. Triggers on \\\"/digital-marketing-pro:connect\\\", \\\"connect Google Ads\\\", \\\"hook up Slack to the plugin\\\", \\\"set up the HubSpot integration\\\", \\\"how do I add Mailchimp\\\". Guidance and status checks only — the user adds credentials themselves; unknown or custom servers route to /digital-marketing-pro:add-integration.",
+      "description": "Connect a known MCP integration: check the registry and status, return exact setup steps. \\\"connect Google Ads\\\"",
       "scripts": [
         "connector-status.py"
       ],
@@ -626,27 +613,26 @@
         "send-notification"
       ],
       "doc_files": 1,
-      "bytes": 8196
+      "bytes": 7643
     },
     {
       "name": "content-brief",
       "tier": "G",
-      "description": "Create a production-ready content brief a writer can execute without extra context — keyword map (primary, secondary, related questions), H2/H3 outline with key points and word-count targets, brand voice guidance, on-page SEO checklist, visual/media spec with AI-generation and C2PA provenance notes, and success metrics. Triggers on \\\"/digital-marketing-pro:content-brief\\\", \\\"write a brief for this topic\\\", \\\"brief a blog post on X\\\", \\\"what should this article cover\\\", \\\"outline and SEO requirements for a pillar page\\\". Preferred upstream of /digital-marketing-pro:content-engine. Reads the brand profile, guidelines, and compliance rules.",
+      "description": "Write an executable content brief: keyword map, outline, intent, SEO checklist. \\\"write a brief for this topic\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
         "brand-setup",
-        "c2pa-metadata",
-        "content-engine"
+        "c2pa-metadata"
       ],
       "doc_files": 1,
-      "bytes": 4876
+      "bytes": 4341
     },
     {
       "name": "content-calendar",
       "tier": "G",
-      "description": "Generate a structured content calendar for a month, quarter, or custom range — topics mapped to platforms and publish dates, content-pillar and funnel-stage tags, repurposing chains from each core piece, SEO keyword targets, and owner assignments when team capacity is given. Triggers on \\\"/digital-marketing-pro:content-calendar\\\", \\\"plan next month's content\\\", \\\"build a quarterly editorial calendar\\\", \\\"what should we publish in March\\\", \\\"map our content pillars to a schedule\\\". Planning output only — it does not schedule or publish posts. Reads the brand profile, guidelines, and compliance rules for pillars and voice.",
+      "description": "Build a content calendar: topics by platform and date, pillar and funnel tags. \\\"plan next month's content\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -654,12 +640,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 3499
+      "bytes": 2975
     },
     {
       "name": "content-decay-scan",
       "tier": "E",
-      "description": "Scan the content library for decay — declining traffic, falling keyword positions, stale content, broken links, lost AI citations — scoring each URL 0-100 via creative-fatigue-predictor.py and ranking refreshes by recoverable revenue, with actionable refresh briefs and traffic-recovery estimates for top-priority tiers. Triggers on \\\"/digital-marketing-pro:content-decay-scan\\\", \\\"which content is losing traffic\\\", \\\"find stale content to refresh\\\", \\\"our blog traffic keeps dropping\\\", \\\"prioritize content refreshes\\\". Pulls performance data from Google Analytics/Search Console MCPs or exported CSVs; cross-reference causes with /digital-marketing-pro:seo-drift. Reads the brand profile for content strategy context.",
+      "description": "Scan content for decay by script and rank refreshes by recoverable traffic. \\\"which content is losing traffic\\\"",
       "scripts": [
         "creative-fatigue-predictor.py"
       ],
@@ -671,12 +657,12 @@
         "seo-drift"
       ],
       "doc_files": 1,
-      "bytes": 12194
+      "bytes": 11580
     },
     {
       "name": "content-engine",
       "tier": "E",
-      "description": "Draft marketing content in brand voice — blog posts, ad copy, email sequences, social posts, landing pages, and brand-voice guides — through a gated pipeline (research, outline, draft, fact-check, humanize, voice check, SEO checklist) with numbered working files and a five-gate quality scorecard before copy is publish-ready. Triggers on \\\"/digital-marketing-pro:content-engine\\\", \\\"write a blog post about X\\\", \\\"draft ad copy for this campaign\\\", \\\"create an email sequence\\\", \\\"landing page copy for our product\\\". Takes /digital-marketing-pro:content-brief as preferred upstream; hands off to /digital-marketing-pro:publish-blog, /digital-marketing-pro:content-repurpose, and /digital-marketing-pro:check. Reads the brand profile, guidelines, platform specs, and compliance rules.",
+      "description": "Draft content in brand voice through a gated pipeline: blogs, ads, emails. Brief only → content-brief. \\\"write a blog post about X\\\"",
       "scripts": [
         "ai-tell-scan.py",
         "authorship.py",
@@ -706,12 +692,12 @@
         "verify-claims"
       ],
       "doc_files": 18,
-      "bytes": 156451
+      "bytes": 155796
     },
     {
       "name": "content-repurpose",
       "tier": "E",
-      "description": "Turn one piece of content into a multi-channel repurposing plan — a derivative matrix targeting 10+ formats, full platform-adapted drafts, a publishing calendar, UTM-tagged links, and per-piece brand-voice scores; every derivative must pass the standalone test (own hook, own payoff) and the cut list records what failed it. Triggers on \\\"/digital-marketing-pro:content-repurpose\\\", \\\"repurpose this blog post\\\", \\\"turn this webinar into social posts\\\", \\\"get more mileage out of this article\\\", \\\"atomize this whitepaper\\\". Produces drafts and a schedule, not published posts. Reads the brand profile, channel style overrides, and platform specs.",
+      "description": "Repurpose one content piece into 10+ channel formats with drafts and a calendar. \\\"repurpose this blog post\\\"",
       "scripts": [
         "campaign-tracker.py"
       ],
@@ -721,12 +707,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7579
+      "bytes": 7039
     },
     {
       "name": "context-engine",
       "tier": "E",
-      "description": "Load and manage the shared marketing context other skills build on — the active brand profile (voice, audiences, competitors, goals), industry benchmark profiles, geographic and industry compliance rules, platform specs, and scoring rubrics — plus brand switching and campaign-data persistence under ~/.claude-marketing/. Triggers on \\\"/digital-marketing-pro:context-engine\\\", \\\"switch to brand X\\\", \\\"what are the benchmarks for my industry\\\", \\\"which compliance rules apply to us\\\", \\\"load my brand context\\\". Pairs with /digital-marketing-pro:brand-setup to create profiles and /digital-marketing-pro:switch-brand to change them; its reference files are read by nearly every sibling skill.",
+      "description": "Load shared marketing context: brand profile, benchmarks, compliance rules, specs. \\\"load my brand context\\\"",
       "scripts": [
         "benchmark_book.py",
         "budget-optimizer.py",
@@ -788,12 +774,12 @@
         "validate-profile"
       ],
       "doc_files": 56,
-      "bytes": 880273
+      "bytes": 879685
     },
     {
       "name": "continuous-improvement-loop",
       "tier": "M",
-      "description": "Run Part 12 of the engagement methodology — the continuous improvement loop that aggregates quarterly-review, customer-feedback, competitive, and operating signals into a Quarterly Product & Offering Improvement Brief for business leadership, plus fast 1-3 page ad-hoc briefs when a significant signal lands mid-quarter. Triggers on \\\"/digital-marketing-pro:continuous-improvement-loop\\\", \\\"run part 12\\\", \\\"produce the quarterly improvement brief\\\", \\\"aggregate this quarter's signals\\\", \\\"we need a fast read on this competitor move\\\". Flags v2.x update-back triggers but never auto-executes them. Reads monthly reports, signals.jsonl, /digital-marketing-pro:competitor-monitor outputs, and the Living Project Instruction File.",
+      "description": "Run the Part 12 continuous improvement loop into a quarterly brief for leadership. \\\"produce the quarterly improvement brief\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [
@@ -803,12 +789,12 @@
         "competitor-monitor"
       ],
       "doc_files": 1,
-      "bytes": 14464
+      "bytes": 13859
     },
     {
       "name": "counter-narrative",
       "tier": "E",
-      "description": "Build a counter-narrative playbook responding to a competitor's positioning move — rebrand, category claim, aggressive campaign, price change, or partnership. Analyzes the move and its impact, selects a counter approach (direct counter, reframe, category counter, social proof, or zeitgeist) via narrative-mapper.py, and delivers a multi-channel response plan with content angles, ad concepts, PR angles, messaging guidelines, an urgency-calibrated timeline, and tracking metrics. Triggers on \\\"/digital-marketing-pro:counter-narrative\\\", \\\"competitor just rebranded, how do we respond\\\", \\\"they are claiming a new category\\\", \\\"respond to their attack campaign\\\", \\\"counter a competitor price cut\\\". Plans the response — it does not launch campaigns. Reads the brand profile and messaging guardrails.",
+      "description": "Build a counter-narrative playbook for a competitor's rebrand, category claim or attack. \\\"respond to their attack campaign\\\"",
       "scripts": [
         "narrative-mapper.py"
       ],
@@ -818,12 +804,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 9752
+      "bytes": 9072
     },
     {
       "name": "cowork-setup",
       "tier": "E",
-      "description": "One-shot setup that wires Digital Marketing Pro for team use in Anthropic Cowork — verifies the sandbox via plugin-metadata.py, checks a Google Drive MCP is connected, creates the canonical Drive folder skeleton (_brands/, _runs/, _plans/), and writes the routing config via drive-sync-state.py so brand profiles, plans, and run checkpoints persist across sessions. Triggers on \\\"/digital-marketing-pro:cowork-setup\\\", \\\"set up DMP for my team in Cowork\\\", \\\"brand profiles aren't persisting between sessions\\\", \\\"route outputs to our shared Drive\\\", \\\"first-time Cowork install\\\". Run once per team; in local Claude Code it only offers optional Drive mirroring. Pairs with /digital-marketing-pro:brand-setup next and /digital-marketing-pro:doctor to verify routing.",
+      "description": "Set up DMP for team use in Cowork: sandbox check, Drive folders, saved routing. \\\"set up DMP for my team in Cowork\\\"",
       "scripts": [
         "drive-sync-state.py",
         "plugin-metadata.py"
@@ -837,12 +823,12 @@
         "status"
       ],
       "doc_files": 1,
-      "bytes": 11204
+      "bytes": 10552
     },
     {
       "name": "creative-health",
       "tier": "G",
-      "description": "Assess ad creative fatigue across active campaigns — scores each creative 0-100 via creative-fatigue-predictor.py (CTR, CPM, and engagement vs baseline, frequency saturation, time running), predicts days until fatigue, and delivers refresh briefs, A/B test plans, and a priority list ranked by estimated spend waste. Triggers on \\\"/digital-marketing-pro:creative-health\\\", \\\"are our ads fatiguing\\\", \\\"CTR is dropping on our ads\\\", \\\"when should we refresh creatives\\\", \\\"which ads are wasting spend\\\". Needs per-creative performance data (exported or from connected ad platform MCPs). Analysis and recommendations only — it does not pause or launch ads. Reads the brand profile and visual-identity restrictions for refresh constraints.",
+      "description": "Score ad creative fatigue against baseline, predict days left, brief refreshes. \\\"are our ads fatiguing\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -850,12 +836,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 9278
+      "bytes": 8643
     },
     {
       "name": "creative-testing-framework",
       "tier": "E",
-      "description": "Design a structured ad creative testing playbook — prioritized variable matrix, isolated test grid, script-computed sample sizes and minimum budgets per variant, holdout control design, iteration cadence, and winner selection criteria. Plans the testing program; it does not launch or edit live ads. Triggers on \\\"/digital-marketing-pro:creative-testing-framework\\\", \\\"design an A/B test for our ads\\\", \\\"our ad creatives fatigue too fast\\\", \\\"build a creative testing roadmap\\\", \\\"how many conversions per variant do we need\\\". Reads the brand profile and guidelines, and pairs with /digital-marketing-pro:c2pa-metadata for AI-generated variants headed to EU placements.",
+      "description": "Plan a creative testing roadmap with script-computed sample sizes. Fatigue → creative-health. \\\"build a creative testing roadmap\\\"",
       "scripts": [
         "sample-size-calculator.py",
         "significance-tester.py"
@@ -870,12 +856,12 @@
         "check"
       ],
       "doc_files": 1,
-      "bytes": 10914
+      "bytes": 10373
     },
     {
       "name": "credential-switch",
       "tier": "E",
-      "description": "Switch the active credential profile to a different client brand, validating each configured platform's API keys, env vars, and token expiry before anything runs — preventing cross-client data leaks and misrouted ad spend. Outputs a per-platform validation report plus a logged switch confirmation with audit trail. Triggers on \\\"/digital-marketing-pro:credential-switch\\\", \\\"switch to the other client's account\\\", \\\"activate Acme's API keys\\\", \\\"are the right credentials active\\\", \\\"change which brand we're working on\\\". Reads brand and credential profiles under ~/.claude-marketing/ and pairs with /digital-marketing-pro:client-onboarding when a profile is missing.",
+      "description": "Switch the active credential profile to another client, validating keys first, approval-gated. \\\"activate Acme's API keys\\\"",
       "scripts": [
         "approval-manager.py",
         "execution-tracker.py"
@@ -889,12 +875,12 @@
         "client-report"
       ],
       "doc_files": 1,
-      "bytes": 9231
+      "bytes": 8682
     },
     {
       "name": "crisis-response",
       "tier": "M",
-      "description": "Assess a PR crisis and deliver a structured response plan — severity classification (Level 1-3), a ready-to-publish holding statement, tailored messaging per stakeholder group, an hour-by-hour communication timeline, and a trust-rebuilding roadmap. Drafts and plans only; it publishes nothing. Triggers on \\\"/digital-marketing-pro:crisis-response\\\", \\\"we're getting slammed on social media\\\", \\\"draft a holding statement fast\\\", \\\"a negative story just broke about us\\\", \\\"how do we respond to this backlash\\\". Reads the brand profile, voice settings, guidelines, and market compliance rules before drafting any statement.",
+      "description": "Respond to a breaking PR crisis: severity, holding statement, stakeholder messages, timeline. \\\"draft a holding statement fast\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [
@@ -904,12 +890,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 3691
+      "bytes": 3195
     },
     {
       "name": "crm-sync",
       "tier": "E",
-      "description": "Sync marketing data to and from Salesforce, HubSpot, Zoho, or Pipedrive — contacts, deals, and campaign links with field mapping, deduplication, consent checks, batched execution behind a mandatory approval gate, and a rollback manifest. Produces a full sync report with per-record outcomes. Triggers on \\\"/digital-marketing-pro:crm-sync\\\", \\\"push these contacts into HubSpot\\\", \\\"sync deals to Salesforce\\\", \\\"our CRM and marketing lists don't match\\\", \\\"set up a recurring CRM sync\\\". Reads the brand profile and compliance rules; for scored lead imports use /digital-marketing-pro:lead-import instead.",
+      "description": "Sync contacts and deals with a connected CRM, deduped, approval-gated. \\\"sync deals to Salesforce\\\"",
       "scripts": [
         "approval-manager.py",
         "crm-sync.py"
@@ -921,12 +907,12 @@
         "lead-import"
       ],
       "doc_files": 1,
-      "bytes": 12536
+      "bytes": 12029
     },
     {
       "name": "cro",
       "tier": "E",
-      "description": "Audit landing pages, forms, pricing pages, and checkout flows for conversion killers, and design statistically sound A/B tests — ICE-prioritized recommendations, hypothesis templates, and script-computed sample sizes and significance checks. Advises and plans; it does not edit your site or run the tests. Triggers on \\\"/digital-marketing-pro:cro\\\", \\\"audit this landing page\\\", \\\"why is our conversion rate so low\\\", \\\"how long should this A/B test run\\\", \\\"reduce cart abandonment\\\". Reads the brand profile, industry benchmarks, and campaign history before making recommendations.",
+      "description": "Plan CRO for pages, forms and checkout with ICE-ranked fixes. One page → landing-page-audit. \\\"reduce cart abandonment\\\"",
       "scripts": [
         "campaign-tracker.py",
         "sample-size-calculator.py",
@@ -938,12 +924,12 @@
         "brand-setup"
       ],
       "doc_files": 7,
-      "bytes": 100412
+      "bytes": 99949
     },
     {
       "name": "dark-funnel",
       "tier": "G",
-      "description": "Map the buyer journey activity your attribution can't see — Reddit and community mentions, AI chatbot citations, podcast lift, dark social, and word-of-mouth — into a dark funnel intelligence report with per-channel health scores, marketing-activity correlations, and prioritized investment recommendations. Triggers on \\\"/digital-marketing-pro:dark-funnel\\\", \\\"where is our untracked traffic coming from\\\", \\\"branded search spiked and we don't know why\\\", \\\"map our dark funnel\\\", \\\"people say they heard of us on a podcast\\\". Reads the brand profile and pairs with /digital-marketing-pro:geo-monitor for AI-visibility signal input.",
+      "description": "Map the dark funnel attribution misses: communities, AI citations, podcasts, word of mouth. \\\"map our dark funnel\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -952,12 +938,12 @@
         "geo-monitor"
       ],
       "doc_files": 1,
-      "bytes": 7615
+      "bytes": 7093
     },
     {
       "name": "data-export",
       "tier": "E",
-      "description": "Export marketing data — metrics, contacts, campaigns, performance snapshots — to BigQuery, Google Sheets, or Supabase as clean tabular data with schema documentation, PII redaction, and post-export integrity verification, gated behind an explicit approval step. Triggers on \\\"/digital-marketing-pro:data-export\\\", \\\"send this month's metrics to BigQuery\\\", \\\"export contacts to a Google Sheet\\\", \\\"get campaign data into our warehouse\\\", \\\"set up a recurring weekly export\\\". Reads local campaign, execution, and performance stores plus connected analytics and CRM MCPs, and pairs with /digital-marketing-pro:segment-audience to build a segment before exporting its members.",
+      "description": "Export marketing data to a warehouse or Sheets, PII-redacted, approval-gated. \\\"export contacts to a sheet\\\"",
       "scripts": [
         "approval-manager.py"
       ],
@@ -968,12 +954,12 @@
         "segment-audience"
       ],
       "doc_files": 1,
-      "bytes": 14736
+      "bytes": 14166
     },
     {
       "name": "data-import",
       "tier": "E",
-      "description": "Import CSV, JSON, or Google Sheets data into a connected CRM, email platform, or audience store — auto-suggested field mapping, validation, dedup against existing records, consent verification, and batched writes behind a mandatory approval gate, with rollback guidance. Produces a per-record import results report. Triggers on \\\"/digital-marketing-pro:data-import\\\", \\\"import this CSV of leads into HubSpot\\\", \\\"load subscribers into Mailchimp\\\", \\\"half these rows have bad emails\\\", \\\"dry-run this import first\\\". Reads brand compliance rules (GDPR, CAN-SPAM, CCPA) for contact data and executes through the destination platform's connected MCP.",
+      "description": "Import CSV or Sheets data into a CRM or ESP with mapping and dedup, approval-gated. \\\"dry-run this import first\\\"",
       "scripts": [
         "approval-manager.py"
       ],
@@ -983,28 +969,27 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 9174
+      "bytes": 8638
     },
     {
       "name": "digital-pr",
       "tier": "E",
-      "description": "Plan and draft digital PR campaigns — tiered media lists, customized journalist pitches, press releases, journalist-request responses (Qwoted, Featured, Source of Sources), thought-leadership calendars, and E-E-A-T authority audits. Produces strategy documents, pitch templates, and press kits; sending the outreach stays with you. Triggers on \\\"/digital-marketing-pro:digital-pr\\\", \\\"pitch this story to journalists\\\", \\\"write a press release for our launch\\\", \\\"how do we build E-E-A-T authority\\\", \\\"respond to this journalist request\\\". Reads the brand profile, guidelines, and campaign history, and pairs with /digital-marketing-pro:content-engine for byline content.",
+      "description": "Plan digital PR: media lists, thought leadership, E-E-A-T authority. One pitch → pr-pitch. \\\"how do we build E-E-A-T authority\\\"",
       "scripts": [
         "campaign-tracker.py"
       ],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup",
-        "content-engine"
+        "brand-setup"
       ],
       "doc_files": 7,
-      "bytes": 52195
+      "bytes": 51651
     },
     {
       "name": "email-sequence",
       "tier": "M",
-      "description": "Design a complete, ESP-ready email sequence — per-email subject line options, preview text, body copy with CTAs, send timing, segmentation and branching logic, plus a bulk-sender deliverability checklist (SPF/DKIM/DMARC, one-click unsubscribe, complaint-rate limits). Designs only; it sends nothing. Triggers on \\\"/digital-marketing-pro:email-sequence\\\", \\\"build a welcome sequence\\\", \\\"write a cart abandonment flow\\\", \\\"our emails keep landing in spam\\\", \\\"nurture sequence for trial users\\\". Reads the brand profile, voice, templates, and compliance rules; actual sending belongs to /digital-marketing-pro:send-email-campaign.",
+      "description": "Design an ESP-ready email sequence: subjects, copy, timing, branching, deliverability. \\\"build a welcome sequence\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [
@@ -1018,12 +1003,12 @@
         "send-sms"
       ],
       "doc_files": 2,
-      "bytes": 9611
+      "bytes": 9095
     },
     {
       "name": "emerging-channels",
       "tier": "E",
-      "description": "Evaluate and plan emerging marketing channels — voice and visual search, conversational and social commerce, communities, podcasts, and video — producing channel evaluation reports with 90-day pilot plans, setup checklists, and go/no-go recommendations. Advises and plans; it does not set platforms up for you. Triggers on \\\"/digital-marketing-pro:emerging-channels\\\", \\\"should we open a TikTok Shop\\\", \\\"is voice search worth optimizing for\\\", \\\"plan a community launch on Discord\\\", \\\"evaluate podcast advertising for us\\\". Reads the brand profile and industry benchmarks, and stamps any dollar figures through the benchmark book before they enter a plan.",
+      "description": "Evaluate emerging channels such as voice or social commerce with pilot plans. \\\"should we open a TikTok Shop\\\"",
       "scripts": [
         "benchmark_book.py",
         "campaign-tracker.py"
@@ -1034,12 +1019,12 @@
         "brand-setup"
       ],
       "doc_files": 10,
-      "bytes": 147336
+      "bytes": 146785
     },
     {
       "name": "engagement-workflow",
       "tier": "E",
-      "description": "Orchestrate a full marketing engagement through the 12-Part methodology — Stone vs Opinion intake, external research, Four Core Documents, client validation, Decision Matrix v2 re-runs, growth planning, channel fan-out, and the continuous-improvement loop — with checkpointed, resumable state at every part. Triggers on \\\"/digital-marketing-pro:engagement-workflow\\\", \\\"start a new engagement\\\", \\\"what part of the engagement are we on\\\", \\\"apply the decision matrix\\\", \\\"advance to the next part\\\". Reads and writes engagement state via engagement-state.py only, and dispatches to /digital-marketing-pro:four-core-documents, growth-plan, yearly-planner, and continuous-improvement-loop.",
+      "description": "Run the 12-Part engagement workflow from intake to growth plan, checkpointed. \\\"start a new engagement\\\"",
       "scripts": [
         "checkpoint-manager.py",
         "engagement-state.py",
@@ -1054,16 +1039,15 @@
         "check",
         "competitor-analysis",
         "content-engine",
-        "four-core-documents",
         "seo-audit"
       ],
       "doc_files": 1,
-      "bytes": 26006
+      "bytes": 25419
     },
     {
       "name": "entity-audit",
       "tier": "E",
-      "description": "Audit brand entity consistency across the knowledge sources AI engines trust — Wikidata properties, Google Knowledge Panel, Wikipedia presence and notability, and industry directories — producing a consistency scorecard, per-property discrepancy list, and a fix plan ranked by AI-visibility impact. Audits and recommends; it does not edit those platforms for you. Triggers on \\\"/digital-marketing-pro:entity-audit\\\", \\\"is our Knowledge Panel accurate\\\", \\\"our Wikidata entry shows the wrong founding date\\\", \\\"audit our entity data\\\", \\\"why do AI engines get our company facts wrong\\\". Reads the brand profile as the source of truth and logs each finding via geo-tracker.",
+      "description": "Audit brand entity facts AI engines trust: Wikidata, Knowledge Panel. \\\"is our Knowledge Panel accurate\\\"",
       "scripts": [
         "geo-tracker.py"
       ],
@@ -1073,12 +1057,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 9446
+      "bytes": 8876
     },
     {
       "name": "eval-config",
       "tier": "E",
-      "description": "View and tune the brand's content evaluation settings — per-dimension minimum score thresholds, composite weight distribution, auto-reject floors, and content-type overrides — with validation, before/after scoring comparisons, and industry-based recommendations. Outputs an updated, internally consistent eval configuration. Triggers on \\\"/digital-marketing-pro:eval-config\\\", \\\"raise the hallucination threshold\\\", \\\"why did this draft auto-reject\\\", \\\"recommend eval settings for healthcare\\\", \\\"reset eval scoring to defaults\\\". Reads the brand profile and guidelines, writes via eval-config-manager.py, and pairs with /digital-marketing-pro:eval-content to see the new bar in action.",
+      "description": "Tune eval thresholds: dimension minimums, weights, auto-reject floors. \\\"raise the hallucination threshold\\\"",
       "scripts": [
         "eval-config-manager.py"
       ],
@@ -1092,12 +1076,12 @@
         "quality-report"
       ],
       "doc_files": 1,
-      "bytes": 10995
+      "bytes": 10412
     },
     {
       "name": "eval-content",
       "tier": "E",
-      "description": "Score marketing content across six dimensions — content quality, brand voice, hallucination risk, claim verification, structure, readability — into a composite score with letter grade, a severity-classified issue list with fix suggestions, and a pass/fail/review recommendation. Every run is logged for trend tracking. Triggers on \\\"/digital-marketing-pro:eval-content\\\", \\\"score this draft before it ships\\\", \\\"check this post for hallucinations\\\", \\\"does this match our brand voice\\\", \\\"is this landing page copy publication-ready\\\". Reads the brand profile, guidelines, and compliance rules, and applies custom thresholds set via /digital-marketing-pro:eval-config.",
+      "description": "Score one piece via eval-runner on six dimensions with a fix list. Many pieces → eval-suite. \\\"score this draft before it ships\\\"",
       "scripts": [
         "eval-config-manager.py",
         "eval-runner.py",
@@ -1116,12 +1100,12 @@
         "eval-config"
       ],
       "doc_files": 1,
-      "bytes": 9388
+      "bytes": 8847
     },
     {
       "name": "eval-suite",
       "tier": "E",
-      "description": "Batch-evaluate a whole set of content pieces — files, a directory, or pasted blocks — in one run, producing a ranked portfolio quality report: grade distribution, per-dimension averages, systemic issues, a prioritized revision list, and auto-rejects below threshold. Triggers on \\\"/digital-marketing-pro:eval-suite\\\", \\\"score our whole content library\\\", \\\"quality-check all campaign assets before launch\\\", \\\"evaluate these 5 drafts together\\\", \\\"which deliverables are weakest\\\". Runs eval-runner.py per item, logs every score to the quality tracker for trend analysis, and reads the brand profile and guidelines for scoring context.",
+      "description": "Evaluate a batch of content in one run: ranked quality report, systemic issues. \\\"score our whole content library\\\"",
       "scripts": [
         "eval-runner.py",
         "quality-tracker.py"
@@ -1135,12 +1119,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 9137
+      "bytes": 8613
     },
     {
       "name": "exec-summary",
       "tier": "E",
-      "description": "Generate a C-suite-ready executive summary of marketing performance — ROI, CAC, LTV, top-3 wins and risks, strategic recommendations, and budget utilization — for a single brand or the whole portfolio, adapted to CEO, CMO, CFO, or board audiences. Triggers on \\\"/digital-marketing-pro:exec-summary\\\", \\\"prepare the board report\\\", \\\"summarize this quarter for the CEO\\\", \\\"portfolio ROI summary\\\", \\\"what do I tell leadership\\\". Computes KPIs via the CLV, ROI, forecaster, and budget-optimizer scripts, pulls data from connected analytics and CRM MCPs, reads the brand profile, and pairs with /digital-marketing-pro:competitor-analysis for competitive context.",
+      "description": "Write an executive summary from tracked marketing results for CEO, CFO or board. \\\"summarize this quarter for the CEO\\\"",
       "scripts": [
         "budget-optimizer.py",
         "clv-calculator.py",
@@ -1154,26 +1138,25 @@
         "competitor-analysis"
       ],
       "doc_files": 1,
-      "bytes": 14404
+      "bytes": 13859
     },
     {
       "name": "executive-dashboard",
       "tier": "G",
-      "description": "Design an executive marketing dashboard as a build-ready specification — 5-7 north-star metrics with rationale, metric hierarchy, chart choices, alert thresholds, data-source mapping, wireframe layout, drill-down structure, and a mobile variant. It designs the dashboard; it does not build or connect a live one. Triggers on \\\"/digital-marketing-pro:executive-dashboard\\\", \\\"design a CMO dashboard\\\", \\\"what metrics should the board see\\\", \\\"our exec report is too noisy\\\", \\\"create a leadership reporting view\\\". Reads the brand profile and guidelines; pairs with /digital-marketing-pro:exec-summary for the written companion narrative.",
+      "description": "Design an executive dashboard spec: north-star metrics, charts, alert thresholds. \\\"design a CMO dashboard\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup",
-        "exec-summary"
+        "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7617
+      "bytes": 7086
     },
     {
       "name": "focus-group",
       "tier": "E",
-      "description": "Run a simulated focus group: AI personas grounded in your CRM data react to messaging, pricing, or creative stimuli, producing a transcript with per-segment sentiment, consensus themes, objections, and explicit confidence caveats — directional hypotheses, not real consumer research. Triggers on \\\"/digital-marketing-pro:focus-group\\\", \\\"test this messaging before we spend on research\\\", \\\"how would our segments react to this pricing\\\", \\\"run a synthetic panel\\\", \\\"which positioning lands better\\\". Builds and reuses panels via audience-simulator.py, reads the brand profile, and shares panel IDs with /digital-marketing-pro:message-test.",
+      "description": "Run a simulated focus group of CRM-grounded personas reacting to messaging or pricing. \\\"run a focus group on this message\\\"",
       "scripts": [
         "audience-simulator.py"
       ],
@@ -1184,44 +1167,42 @@
         "message-test"
       ],
       "doc_files": 1,
-      "bytes": 8480
+      "bytes": 7961
     },
     {
       "name": "four-core-documents",
       "tier": "M",
-      "description": "Produce Part 3 of the 12-Part engagement: the four strategic-spine documents across 61 steps — 3.1 Business & SBU Analysis, 3.2 Segmentation Framework, 3.3 Brand Positioning & Communications, 3.4 DMFlow — with --doc single-document runs, --view v2 re-runs, and a --combined executive stitch. Triggers on \\\"/digital-marketing-pro:four-core-documents\\\", \\\"produce the four core documents\\\", \\\"run part 3 of the engagement\\\", \\\"generate the strategic spine\\\", \\\"re-run positioning as v2\\\". Requires an initialised engagement with Part 1 complete; reads Stone facts, Part 2 research, and the brand profile, and feeds /digital-marketing-pro:growth-plan.",
+      "description": "Produce the Part 3 Four Core Documents: business, segmentation, positioning, DMFlow. \\\"produce the four core documents\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [
         "brand-guardian"
       ],
       "cross_refs": [
-        "brand-setup",
-        "growth-plan"
+        "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 16307
+      "bytes": 15775
     },
     {
       "name": "funnel-architect",
       "tier": "E",
-      "description": "Design or restructure a marketing funnel matched to the business model — stage architecture with entry/exit criteria and KPIs, a customer journey map with emotions and friction points, gap analysis, an attribution model recommendation, and a 30/60/90 optimization roadmap. Plans and diagnoses; does not execute campaigns. Triggers on \\\"/digital-marketing-pro:funnel-architect\\\", \\\"map our customer journey\\\", \\\"which attribution model should we use\\\", \\\"where are we losing customers\\\", \\\"design a funnel for our SaaS\\\". Reads the brand profile, industry benchmarks, and campaign history; pairs with /digital-marketing-pro:funnel-audit for data-driven diagnosis.",
+      "description": "Design a funnel for the business model: stages, KPIs, journey. Existing data → funnel-audit. \\\"design a funnel for our SaaS\\\"",
       "scripts": [
         "campaign-tracker.py"
       ],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup",
-        "funnel-audit"
+        "brand-setup"
       ],
       "doc_files": 6,
-      "bytes": 55728
+      "bytes": 55191
     },
     {
       "name": "funnel-audit",
       "tier": "E",
-      "description": "Audit an existing funnel's stage-to-stage conversion data to find where prospects drop off and why — benchmarked against industry averages, with the top 3 bottlenecks ranked by revenue impact, root causes, improvement scenarios, and a prioritized action plan. Triggers on \\\"/digital-marketing-pro:funnel-audit\\\", \\\"why is our funnel leaking\\\", \\\"find our biggest drop-off point\\\", \\\"audit conversion by stage\\\", \\\"our demo-to-close rate collapsed\\\". Sizes the validating experiment with sample-size-calculator.py and confirms lifts with significance-tester.py; reads the brand profile and pairs with /digital-marketing-pro:funnel-architect for redesign.",
+      "description": "Find funnel drop-offs from stage numbers you give or connected data, benchmarked, ranked by revenue. \\\"where are we losing people\\\"",
       "scripts": [
         "sample-size-calculator.py",
         "significance-tester.py"
@@ -1229,16 +1210,15 @@
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup",
-        "funnel-architect"
+        "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 4367
+      "bytes": 3843
     },
     {
       "name": "geo-monitor",
       "tier": "E",
-      "description": "Track brand visibility in AI answers on a recurring schedule across the 6 canonical surfaces — ChatGPT, Perplexity, Gemini, Google AI Mode, AI Overviews, Copilot — scoring each query on the shared aeo-audit rubric and rolling results into a 0-100 GEO health trend with narrative-drift flags and competitor benchmarks. Triggers on \\\"/digital-marketing-pro:geo-monitor\\\", \\\"is ChatGPT mentioning us\\\", \\\"track our AI visibility over time\\\", \\\"monitor brand mentions in Perplexity\\\", \\\"did our AI Overviews presence change\\\". Records and diffs runs via geo-tracker.py, keeps probe scores separate from first-party Bing Webmaster AI Performance citations and Search Console AI impressions, reads the brand profile for positioning, and is the recurring mode of /digital-marketing-pro:aeo-audit.",
+      "description": "Monitor GEO visibility over time across six AI answer engines, with a 0-100 trend. \\\"is ChatGPT mentioning us\\\"",
       "scripts": [
         "geo-tracker.py"
       ],
@@ -1251,23 +1231,23 @@
         "gsc-ai-performance"
       ],
       "doc_files": 1,
-      "bytes": 12901
+      "bytes": 12219
     },
     {
       "name": "goal-filter",
       "tier": "G",
-      "description": "Lock ONE primary marketing goal per brand, then judge any idea, draft, campaign, or plan against it — ON GOAL, PARTIAL, or OFF — always returning the fix or a sharper version that pulls harder toward the metric, and naming drift patterns across the verdict history. Triggers on \\\"/digital-marketing-pro:goal-filter\\\", \\\"is this on goal\\\", \\\"lock the goal for this quarter\\\", \\\"does this serve the objective\\\", \\\"keep me focused\\\", \\\"what's our priority\\\". Stores the lock in the brand workspace (goal-lock.json) so every session reads the same goal; inside a 12-Part engagement it offers to lock Part 1's primary objective rather than inventing a parallel one.",
+      "description": "Lock one primary goal per brand and judge ideas or drafts against it. \\\"does this fit our goal\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [],
       "doc_files": 1,
-      "bytes": 3929
+      "bytes": 3361
     },
     {
       "name": "growth-engineering",
       "tier": "E",
-      "description": "Structured guidance for engineering growth systems — product-led growth motions, referral program design, viral loop mechanics, launch playbooks, retention loops, and affiliate programs — producing strategy documents, program specs, and spreadsheet-ready growth models. Recommends and designs; does not build product features or launch anything. Triggers on \\\"/digital-marketing-pro:growth-engineering\\\", \\\"design a referral program\\\", \\\"how do we get a viral loop\\\", \\\"plan our Product Hunt launch\\\", \\\"reduce churn with re-engagement\\\". Reads the brand profile, industry benchmarks, and campaign history; pairs with /digital-marketing-pro:cro for activation and onboarding optimization.",
+      "description": "Engineer growth systems: PLG motions, referrals, viral and retention loops. \\\"design a referral program\\\"",
       "scripts": [
         "benchmark_book.py",
         "campaign-tracker.py"
@@ -1275,16 +1255,15 @@
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup",
-        "cro"
+        "brand-setup"
       ],
       "doc_files": 8,
-      "bytes": 109310
+      "bytes": 108723
     },
     {
       "name": "growth-plan",
       "tier": "G",
-      "description": "Produce the 11-section Growth Plan — the flagship Part 8 client-facing deliverable that synthesises Parts 1-7 of the engagement into a single 20-30 page executable strategy with three-scenario forecasts, an In-Market/Out-Market budget split, and a 30/60/90 timeline, exported to PDF and DOCX. Triggers on \\\"/digital-marketing-pro:growth-plan\\\", \\\"produce the growth plan\\\", \\\"write the strategy document for the client\\\", \\\"run part 8\\\", \\\"synthesise the engagement into one deliverable\\\". Requires Parts 1-7 complete; reads the Four Core Documents, the Living Project Instruction File, and Part 7 prep docs, and pairs with /digital-marketing-pro:yearly-planner.",
+      "description": "Produce the Part 8 Growth Plan: one strategy with scenario forecasts and a 30/60/90. \\\"write the strategy document for the client\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -1292,12 +1271,12 @@
         "yearly-planner"
       ],
       "doc_files": 1,
-      "bytes": 11220
+      "bytes": 10687
     },
     {
       "name": "gsc-ai-performance",
       "tier": "E",
-      "description": "Baseline and interpret Google Search Console's AI Performance Report — combined AI Overviews + AI Mode impressions, cited pages, country and device mix (impressions only: no clicks, CTR or queries, and GA4 files AI Overviews/AI Mode visits under Organic Search) — from a user-supplied CSV export, with an in-SC AI opt-out recommendation and a gated quality scorecard. Triggers on \\\"/digital-marketing-pro:gsc-ai-performance\\\", \\\"read the new GSC AI report\\\", \\\"baseline our AI search visibility\\\", \\\"how many AI Overviews impressions do we get\\\", \\\"should we opt out of AI results\\\". Parses and archives exports via gsc-ai-performance.py, reconciles actuals against /digital-marketing-pro:aeo-audit probes, and feeds /digital-marketing-pro:seo-drift.",
+      "description": "Read the GSC AI Performance report by script: AI Overviews and AI Mode impressions. \\\"read the new GSC AI report\\\"",
       "scripts": [
         "gsc-ai-performance.py"
       ],
@@ -1314,12 +1293,12 @@
         "seo-drift"
       ],
       "doc_files": 1,
-      "bytes": 15870
+      "bytes": 15230
     },
     {
       "name": "help",
       "tier": "E",
-      "description": "Show the Digital Marketing Pro guide with live plugin state — version, agent, skill, command, and connector counts read from plugin-metadata.py, never hardcoded — plus getting-started steps, examples, and troubleshooting. Includes the --intent goal-routing mode, which turns a stated goal into up to 3 ordered skill chains ending at a quality gate, and renders depth-tier badges — [E] executes scripts, [M] measured output, [G] structured guidance — read from skills-index.json. Triggers on \\\"/digital-marketing-pro:help\\\", \\\"what can this plugin do\\\", \\\"which skill should I use for more leads\\\", \\\"list all the commands\\\", \\\"how do I get started\\\". Pairs with /digital-marketing-pro:status and /digital-marketing-pro:integrations for brand and connector state.",
+      "description": "Show help with live plugin counts: getting started, which skill fits a goal, fixes. \\\"what can this plugin do\\\"",
       "scripts": [
         "build_skills_index.py",
         "plugin-metadata.py"
@@ -1343,12 +1322,12 @@
         "status"
       ],
       "doc_files": 1,
-      "bytes": 11148
+      "bytes": 10489
     },
     {
       "name": "hreflang-check",
       "tier": "G",
-      "description": "Audit hreflang implementation from supplied HTML, sitemap XML, or SEO-tool exports (it does not crawl sites) — running seven checks: self-referential tags, bidirectional pairs, valid ISO 639-1/3166-1 codes, x-default, duplicates, absolute URLs, and URL consistency — producing a 0-100 score, a language coverage matrix, and corrected code snippets per issue. Triggers on \\\"/digital-marketing-pro:hreflang-check\\\", \\\"audit our hreflang tags\\\", \\\"why is Google serving the wrong language version\\\", \\\"check x-default configuration\\\", \\\"validate our international SEO tags\\\". Compares findings against the brand's configured languages in profile.json to flag markets with no hreflang coverage.",
+      "description": "Validate hreflang, alternate-language link tags and x-default from pasted HTML or sitemaps, with fixes. \\\"check our hreflang tags\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -1356,23 +1335,23 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 13148
+      "bytes": 12585
     },
     {
       "name": "image-seo-audit",
       "tier": "G",
-      "description": "Audit every image on a page for SEO, performance, and accessibility — alt text quality, tiered file-size thresholds, WebP/AVIF format adoption, srcset/sizes responsiveness, lazy loading, fetchpriority on the LCP image, and width/height for CLS — producing an optimization list sorted by file-size savings. Triggers on \\\"/digital-marketing-pro:image-seo-audit\\\", \\\"audit our image SEO\\\", \\\"check alt text across the page\\\", \\\"why are our images so heavy\\\", \\\"should we switch to WebP\\\". Fetches and analyzes the page via tech-seo-auditor.py and reads the brand profile for industry context.",
+      "description": "Audit image SEO on a page: alt text, weight, formats, srcset, lazy loading, CLS. \\\"audit our image SEO\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [],
       "doc_files": 1,
-      "bytes": 4435
+      "bytes": 3946
     },
     {
       "name": "import-guidelines",
       "tier": "E",
-      "description": "Import brand guidelines — voice and tone rules, messaging, banned words and restrictions, channel styles, visual identity — and structure them into enforceable markdown files in the brand's guidelines layer, auto-classified by category, conflict-checked against the brand profile, and merged with existing rules rather than overwritten. Triggers on \\\"/digital-marketing-pro:import-guidelines\\\", \\\"here's our brand voice guide\\\", \\\"add these banned words\\\", \\\"import our style guide\\\", \\\"save the rule that we never use jargon\\\". Reads the active brand profile and existing guidelines manifest; saved guidelines are then applied automatically across all content-producing commands.",
+      "description": "Import brand guidelines into enforceable rules: voice, banned words, styles. \\\"here's our brand voice guide\\\"",
       "scripts": [
         "guidelines-manager.py"
       ],
@@ -1382,12 +1361,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7199
+      "bytes": 6624
     },
     {
       "name": "import-sop",
       "tier": "E",
-      "description": "Import agency Standard Operating Procedures — approval workflows, campaign launch checklists, escalation procedures, QA steps — and structure them into numbered, role-assigned steps with human-approval gates marked. SOPs save at the agency level so they apply across every client brand, not per-brand. Triggers on \\\"/digital-marketing-pro:import-sop\\\", \\\"add our content approval workflow\\\", \\\"import our launch checklist\\\", \\\"here is our crisis escalation process\\\", \\\"every deliverable must follow these steps\\\". Reads the active brand profile for context, merges with an existing SOP of the same name after confirmation, and explains which commands will reference the SOP.",
+      "description": "Import agency procedures as role-assigned SOP steps with approval gates. \\\"import our launch checklist\\\"",
       "scripts": [
         "guidelines-manager.py"
       ],
@@ -1397,12 +1376,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 6853
+      "bytes": 6278
     },
     {
       "name": "import-template",
       "tier": "E",
-      "description": "Import deliverable templates — proposal formats, report structures, brief layouts — and convert them into reusable placeholder-marked templates saved per brand, so commands like /digital-marketing-pro:performance-report and /digital-marketing-pro:content-brief format their output your way instead of the default. Triggers on \\\"/digital-marketing-pro:import-template\\\", \\\"our reports always follow this format\\\", \\\"use this proposal structure\\\", \\\"add a template for content briefs\\\", \\\"make the output match our deliverable format\\\". Reads the active brand profile, maps each template to its matching command, and updates the brand's template manifest on save.",
+      "description": "Import a deliverable template as a reusable placeholder template per brand. \\\"use this proposal structure\\\"",
       "scripts": [
         "guidelines-manager.py"
       ],
@@ -1414,12 +1393,12 @@
         "performance-report"
       ],
       "doc_files": 1,
-      "bytes": 7099
+      "bytes": 6541
     },
     {
       "name": "influencer-brief",
       "tier": "G",
-      "description": "Create a complete influencer campaign brief — creator discovery criteria, a shareable creator brief document, compensation framework, content approval workflow, FTC/ASA compliance checklist, usage rights, and a measurement framework, including AI-tool clauses and the EU deepfake disclosure clause for EU placements. Triggers on \\\"/digital-marketing-pro:influencer-brief\\\", \\\"write a brief for our influencer campaign\\\", \\\"what should our creator brief include\\\", \\\"set criteria for choosing creators\\\", \\\"draft the disclosure requirements for influencers\\\". Reads the brand profile, guidelines, and agency SOPs; references the /digital-marketing-pro:c2pa-metadata workflow for AI assets shipped for paid amplification.",
+      "description": "Write an influencer campaign brief: creator criteria, pay, approvals, disclosure. \\\"write a brief for our influencer campaign\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -1428,12 +1407,12 @@
         "c2pa-metadata"
       ],
       "doc_files": 1,
-      "bytes": 5540
+      "bytes": 4946
     },
     {
       "name": "influencer-creator",
       "tier": "E",
-      "description": "Plan influencer and creator marketing end to end — creator discovery and audience-authenticity vetting, campaign brief development, FTC and international disclosure compliance audits, contract and usage-rights frameworks, UGC strategy, and performance measurement (EMV, ROAS, brand lift). Advisory and planning only — it does not contact creators or publish anything. Triggers on \\\"/digital-marketing-pro:influencer-creator\\\", \\\"find influencers for our launch\\\", \\\"are these sponsored posts FTC compliant\\\", \\\"how should we structure an influencer contract\\\", \\\"plan a UGC campaign\\\". Reads the brand profile, guidelines, compliance rules, and campaign history via campaign-tracker.py before planning new work.",
+      "description": "Plan influencer marketing: creator vetting, disclosure audits, contracts, UGC. \\\"find influencers for our launch\\\"",
       "scripts": [
         "benchmark_book.py",
         "campaign-tracker.py"
@@ -1444,12 +1423,12 @@
         "brand-setup"
       ],
       "doc_files": 8,
-      "bytes": 111819
+      "bytes": 111218
     },
     {
       "name": "integrations",
       "tier": "E",
-      "description": "Show the MCP integration status dashboard — which connectors are connected, which are available but not yet configured, the skills each one unlocks, per-category coverage, and the top three quick-win connectors to add next. Read-only status check via connector-status.py; it changes nothing. Triggers on \\\"/digital-marketing-pro:integrations\\\", \\\"what integrations are connected\\\", \\\"which connectors do I have\\\", \\\"what would connecting a CRM unlock\\\", \\\"show my integration coverage\\\". Pairs with /digital-marketing-pro:connect for connector setup instructions and /digital-marketing-pro:add-integration for custom MCP servers.",
+      "description": "Show integrations status: connected and available connectors, what each unlocks. \\\"which connectors do I have\\\"",
       "scripts": [
         "connector-status.py"
       ],
@@ -1461,12 +1440,12 @@
         "launch-ad-campaign"
       ],
       "doc_files": 1,
-      "bytes": 4578
+      "bytes": 4058
     },
     {
       "name": "intelligence-report",
       "tier": "E",
-      "description": "Generate an intelligence briefing from the brand's compound intelligence base — total learnings with confidence distribution, cross-agent patterns by channel, audience, and objective, actionable playbooks synthesized from proven strategies, stale learnings flagged for revalidation, and a 0-100 compound intelligence maturity score. Triggers on \\\"/digital-marketing-pro:intelligence-report\\\", \\\"what have we learned across campaigns\\\", \\\"summarize our marketing intelligence\\\", \\\"generate a playbook for the product launch\\\", \\\"where are our knowledge gaps\\\". Reads the brand profile and pulls stats, patterns, and playbooks from intelligence-graph.py; suited to quarterly planning, strategy reviews, and onboarding.",
+      "description": "Report on the brand intelligence base: confident learnings, patterns, playbooks, gaps. \\\"what have we learned across campaigns\\\"",
       "scripts": [
         "intelligence-graph.py"
       ],
@@ -1476,12 +1455,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7797
+      "bytes": 7207
     },
     {
       "name": "journey-design",
       "tier": "E",
-      "description": "Design cross-channel customer journeys as state machines — states, transitions, touchpoints, and personalization branches — then validate the design with Monte Carlo simulation via journey-engine.py before any build. Produces the journey map, touchpoint calendar, per-touchpoint content briefs, simulation results with bottleneck analysis, and a per-platform implementation checklist; it designs and simulates, it does not activate anything. Triggers on \\\"/digital-marketing-pro:journey-design\\\", \\\"map the onboarding journey\\\", \\\"design a win-back flow across email and ads\\\", \\\"plan the touchpoints after signup\\\", \\\"build a retention journey with branching\\\". Reads the brand profile, guidelines, and compliance rules, and flags content gaps needing new creation.",
+      "description": "Design cross-channel journeys as state machines, simulation-tested before build. \\\"map the onboarding journey\\\"",
       "scripts": [
         "journey-engine.py"
       ],
@@ -1491,12 +1470,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 10899
+      "bytes": 10240
     },
     {
       "name": "keyword-cluster",
       "tier": "E",
-      "description": "Build a pillar+spokes content cluster plan from seed keywords — SERP-overlap clustering via keyword_cluster.py, intent grouping, a priority-scored build order, an internal-link map with anchor suggestions, and a four-gate quality scorecard (cannibalisation, orphan, coverage, anchor diversity), delivered as a numbered file set ending in PLAN.md. Triggers on \\\"/digital-marketing-pro:keyword-cluster\\\", \\\"cluster these keywords\\\", \\\"design our topical hub\\\", \\\"are these pages cannibalising each other\\\", \\\"plan the pillar pages\\\". Reads the brand profile and compliance rules to filter banned terms; consumes seeds from /digital-marketing-pro:keyword-research and hands PLAN.md to /digital-marketing-pro:content-brief.",
+      "description": "Cluster keywords into pillar and spoke pages by SERP overlap via script. \\\"cluster these keywords\\\"",
       "scripts": [
         "keyword_cluster.py"
       ],
@@ -1514,12 +1493,12 @@
         "seo-implement"
       ],
       "doc_files": 1,
-      "bytes": 10628
+      "bytes": 10006
     },
     {
       "name": "keyword-research",
       "tier": "E",
-      "description": "Standalone keyword research — expands seeds via the brand's connected keyword MCP (Ahrefs, Semrush, SE Ranking, or GSC), classifies search intent, maps keywords to content types, surfaces competitor content gaps, long-tail and SERP-feature opportunities, and delivers a prioritized keyword strategy document. Volume and difficulty come from the connected provider and are never fabricated. Triggers on \\\"/digital-marketing-pro:keyword-research\\\", \\\"what keywords should we target\\\", \\\"find content gaps versus competitors\\\", \\\"expand these seed keywords\\\", \\\"which queries have buying intent\\\". Reads the brand profile, guidelines, and campaign history; hands 20+ raw keywords to /digital-marketing-pro:keyword-cluster for pillar+spokes clustering.",
+      "description": "Research keywords via the connected data source: intent, gaps. Grouping → keyword-cluster. \\\"what keywords should we target\\\"",
       "scripts": [
         "campaign-tracker.py"
       ],
@@ -1530,12 +1509,12 @@
         "keyword-cluster"
       ],
       "doc_files": 1,
-      "bytes": 7822
+      "bytes": 7199
     },
     {
       "name": "landing-page-audit",
       "tier": "M",
-      "description": "Audit a landing page across six conversion dimensions — above-fold clarity, trust signals, form friction, message match against the upstream ad or email, page speed, and mobile experience — each scored 1-10, rolled into an overall score benchmarked against industry averages, with the top 5 fixes ranked by expected conversion impact. Assessment and recommendations only; it does not edit the page. Triggers on \\\"/digital-marketing-pro:landing-page-audit\\\", \\\"audit this landing page\\\", \\\"why isn't this page converting\\\", \\\"score our signup page\\\", \\\"does the page match the ad copy\\\". Reads the brand profile, guidelines, custom templates, and agency SOPs before scoring.",
+      "description": "Audit one landing page on six conversion dimensions, incl. ad message match. \\\"why isn't this page converting\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [
@@ -1545,61 +1524,55 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 3728
+      "bytes": 3162
     },
     {
       "name": "language-audit",
       "tier": "M",
-      "description": "Audit multilingual integrity across every language version of a site or content set — hreflang implementation, content parity (missing, outdated, or structurally divergent translations), translation-quality spot checks via language-router.py, regional compliance per market (GDPR, DPDPA, LGPD, PIPA, APPI, CCPA), and locale formatting — producing 0-100 scores per dimension and a severity-ranked fix list. Triggers on \\\"/digital-marketing-pro:language-audit\\\", \\\"check our hreflang tags\\\", \\\"is the German site missing pages\\\", \\\"audit our translation quality\\\", \\\"are all language versions compliant\\\". Reads the brand's language configuration and compliance rules; pairs with /digital-marketing-pro:language-config, which maintains the settings this audit checks against.",
+      "description": "Audit all language versions of a site for parity and quality. Tags only → hreflang-check. \\\"is the German site missing pages\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [
         "brand-guardian"
       ],
       "cross_refs": [
-        "brand-setup",
-        "language-config"
+        "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 11205
+      "bytes": 10556
     },
     {
       "name": "language-config",
       "tier": "G",
-      "description": "Configure the brand's multilingual settings in profile.json — primary and secondary languages, do-not-translate terms, preferred translation service per language (routed by language family across the translation MCPs you have connected), and locale formatting for dates, numbers, and currency — with view/add/remove/reset actions and a before/after diff on every change. Triggers on \\\"/digital-marketing-pro:language-config\\\", \\\"add German as a target language\\\", \\\"never translate our product name\\\", \\\"set the date format for the UK site\\\", \\\"which languages is this brand set up for\\\". This configuration is read by every multilingual command — /digital-marketing-pro:translate-content, /digital-marketing-pro:multilingual-score, /digital-marketing-pro:language-audit, and /digital-marketing-pro:hreflang-check.",
+      "description": "Configure brand languages: secondary languages, do-not-translate terms, locale formats. \\\"never translate our product name\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup",
-        "hreflang-check",
-        "language-audit",
-        "multilingual-score",
-        "translate-content"
+        "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 10598
+      "bytes": 9902
     },
     {
       "name": "launch-ad-campaign",
       "tier": "E",
-      "description": "Create and launch a paid ad campaign on Google, Meta, LinkedIn, or TikTok through the connected ad-platform MCP — campaign structure, audience targeting, bid strategy, negative targeting, creative quality scoring, compliance review, and a post-launch monitoring schedule. A mandatory execution gate shows the full spend summary and requires an explicit typed yes before anything goes live; budgets over brand thresholds force re-confirmation and every approval is recorded via approval-manager.py. Triggers on \\\"/digital-marketing-pro:launch-ad-campaign\\\", \\\"launch the Google Ads campaign\\\", \\\"put these Meta ads live\\\", \\\"start the LinkedIn campaign tomorrow\\\", \\\"deploy our TikTok ads\\\". Reads the brand profile's budget thresholds, guidelines, and agency SOPs; it is the paid-ads subset that /digital-marketing-pro:launch-campaign delegates to.",
+      "description": "Launch a paid ad campaign on a connected ad platform, approval-gated. \\\"launch the Google Ads campaign\\\"",
       "scripts": [
         "approval-manager.py"
       ],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup",
-        "launch-campaign"
+        "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 15692
+      "bytes": 14946
     },
     {
       "name": "launch-campaign",
       "tier": "E",
-      "description": "Orchestrate the full multi-channel launch of an approved campaign plan — pre-launch BLOCKER gates (approved plan, assets present, connectors probed, conversion tracking verified, C2PA-signed AI assets for EU markets), then dependency-ordered activation across CRM, landing page, email, paid ads, organic social, influencer, and PR, with a checkpoint after every step and a dual-copy launch record. Nothing executes until the dry-run preview is shown and the user types an explicit yes. Triggers on \\\"/digital-marketing-pro:launch-campaign\\\", \\\"go live with the campaign\\\", \\\"kick off the launch\\\", \\\"activate every channel for this campaign\\\", \\\"flip the switch on the launch\\\". Consumes the plan from /digital-marketing-pro:campaign-plan, delegates paid ads to /digital-marketing-pro:launch-ad-campaign, and resumes interrupted launches via /digital-marketing-pro:resume.",
+      "description": "Launch an approved multi-channel campaign: blocker checks, then ordered activation. \\\"go live with the campaign\\\"",
       "scripts": [
         "connector-status.py",
         "crm-sync.py",
@@ -1621,12 +1594,12 @@
         "validate-profile"
       ],
       "doc_files": 1,
-      "bytes": 14590
+      "bytes": 13829
     },
     {
       "name": "launch-plan",
       "tier": "G",
-      "description": "Build a three-phase launch playbook — pre-launch (T-30), an hour-by-hour launch-day runbook, and post-launch optimization (T+30) — with per-task owners and deadlines, channel activation plans, a risk register, and KPIs per phase. Triggers on \\\"/digital-marketing-pro:launch-plan\\\", \\\"plan our product launch\\\", \\\"launch playbook for the new feature\\\", \\\"what should launch week look like\\\", \\\"coordinate the rebrand rollout\\\". Planning only: it performs no external action itself; any playbook step handed to an execution skill such as /digital-marketing-pro:launch-campaign or /digital-marketing-pro:send-email-campaign must pass that skill's own typed-yes approval gate first. Reads the brand profile, guidelines, templates, and agency SOPs.",
+      "description": "Plan a product launch: pre-launch, hour-by-hour launch day, follow-up, owners, risks. \\\"plan our product launch\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -1637,12 +1610,12 @@
         "send-email-campaign"
       ],
       "doc_files": 1,
-      "bytes": 4425
+      "bytes": 3791
     },
     {
       "name": "lead-import",
       "tier": "E",
-      "description": "Import leads into Salesforce, HubSpot, Zoho, or Pipedrive with validation, deduplication against existing CRM records, lead scoring, consent and compliance checks, and source attribution — then push via the CRM MCP and return a full import report with an audit log. Triggers on \\\"/digital-marketing-pro:lead-import\\\", \\\"import these leads\\\", \\\"load this CSV into the CRM\\\", \\\"add the webinar signups to HubSpot\\\", \\\"dedupe and score this lead list\\\". Nothing touches the live CRM until the Execution Summary is approved with a typed yes — the approval gate is mandatory. Scores leads with the marketing-automation lead-scoring framework and reads the brand profile; for general CRM syncing without scoring use /digital-marketing-pro:crm-sync.",
+      "description": "Import leads into a CRM with dedup, scoring and consent checks, approval-gated. \\\"dedupe and score this lead list\\\"",
       "scripts": [
         "approval-manager.py"
       ],
@@ -1653,12 +1626,12 @@
         "crm-sync"
       ],
       "doc_files": 1,
-      "bytes": 13194
+      "bytes": 12563
     },
     {
       "name": "lead-magnet-ideas",
       "tier": "G",
-      "description": "Turn a content topic, campaign, or existing piece into 3-5 named, briefable lead-magnet ideas cut from the brand's real assets and expertise, each graded on lead-gen power × build effort, with funnel-fit and delivery notes plus a not-recommended list that pre-empts the obvious-but-weak options. Triggers on \\\"/digital-marketing-pro:lead-magnet-ideas\\\", \\\"lead magnet for this\\\", \\\"what should we give away\\\", \\\"opt-in ideas\\\", \\\"freebie for this campaign\\\", \\\"turn this into a lead magnet\\\". Reads the brand profile for audience, expertise, and existing IP; routes onward to /digital-marketing-pro:email-sequence for the post-capture nurture or /digital-marketing-pro:funnel-architect when there is nowhere to send the lead yet.",
+      "description": "Generate 3-5 lead magnet ideas from the brand's assets, graded by effort and power. \\\"what should we give away\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -1667,12 +1640,12 @@
         "funnel-architect"
       ],
       "doc_files": 1,
-      "bytes": 4155
+      "bytes": 3537
     },
     {
       "name": "learn",
       "tier": "E",
-      "description": "Save a structured marketing learning to the brand's intelligence graph — insight text, context conditions (channel, audience, objective), confidence score, source, and supporting evidence — deduplicated against related learnings, with contradictions surfaced for a decision and a confirmation plus graph stats returned. Triggers on \\\"/digital-marketing-pro:learn\\\", \\\"save this insight\\\", \\\"remember that subject lines with numbers win for us\\\", \\\"log what we learned from this campaign\\\", \\\"record this test result\\\". Reads the brand profile to validate the learning fits the brand's domain, writes via the intelligence-graph script, and routes each saved learning to the relevant specialist agents so future recommendations use it.",
+      "description": "Log a marketing learning to the brand intelligence graph with confidence, deduplicated. \\\"save this insight\\\"",
       "scripts": [
         "intelligence-graph.py"
       ],
@@ -1682,12 +1655,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 6750
+      "bytes": 6122
     },
     {
       "name": "live-dashboard",
       "tier": "E",
-      "description": "Design a Google Looker Studio marketing dashboard as an implementation-ready specification — page layouts, widgets, metrics, calculated-field formulas, filter controls, and a step-by-step setup guide — tailored to the business model (SaaS, eCommerce, B2B lead-gen, agency). Triggers on \\\"/digital-marketing-pro:live-dashboard\\\", \\\"build a Looker Studio dashboard\\\", \\\"live view of our marketing KPIs\\\", \\\"dashboard for the exec team\\\", \\\"pull our ad data into one report\\\". Produces a spec by default: no Looker Studio MCP ships with the plugin, so nothing is created or shared externally unless the user has independently connected their own connector and approved the Execution Summary with a typed yes. Reads the brand profile for business model, KPIs, brand colors, and connected platforms.",
+      "description": "Design a live Looker Studio dashboard spec with fields, filters and setup guide. \\\"build a Looker Studio dashboard\\\"",
       "scripts": [
         "approval-manager.py"
       ],
@@ -1697,12 +1670,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 10362
+      "bytes": 9680
     },
     {
       "name": "local-seo",
       "tier": "E",
-      "description": "Build local SEO strategy end to end — Google Business Profile optimization, NAP consistency and citation cleanup, local pack ranking tactics, location and service-area pages, review management, local link building, LocalBusiness schema, and multi-location management — delivered as audit reports, checklists, and a 30/60/90-day roadmap. Triggers on \\\"/digital-marketing-pro:local-seo\\\", \\\"optimize my Google Business Profile\\\", \\\"why aren't we in the map pack\\\", \\\"fix our NAP consistency\\\", \\\"local SEO for our 12 locations\\\", \\\"rank for near me searches\\\". Includes Google's 2026 agentic-booking guidance for local services, home repair, beauty, and pet care verticals. Reads the brand profile and compliance rules; its reference files also power /digital-marketing-pro:local-seo-audit.",
+      "description": "Build local SEO strategy: Business Profile, NAP, map pack, location pages, reviews. \\\"rank for near me searches\\\"",
       "scripts": [
         "campaign-tracker.py"
       ],
@@ -1710,32 +1683,30 @@
       "gates": [],
       "cross_refs": [
         "aeo-audit",
-        "brand-setup",
-        "local-seo-audit"
+        "brand-setup"
       ],
       "doc_files": 5,
-      "bytes": 102420
+      "bytes": 101741
     },
     {
       "name": "local-seo-audit",
       "tier": "E",
-      "description": "Run a comprehensive local SEO audit — Google Business Profile completeness, NAP consistency, citations, reviews, location pages, local schema, local link opportunities, and competitor benchmarking — scored 0-100 and compiled into a prioritized report with the top 5 quick wins and a 90-day week-by-week action plan. Triggers on \\\"/digital-marketing-pro:local-seo-audit\\\", \\\"audit our local SEO\\\", \\\"how healthy is our Google Business Profile\\\", \\\"check our citations and NAP\\\", \\\"why did we drop out of the local pack\\\". Runs the local-seo-checker script when Python is available, reads the brand profile and compliance rules, and draws on the /digital-marketing-pro:local-seo reference frameworks for GBP, citations, local content, and multi-location work.",
+      "description": "Audit local SEO health by script: profile, NAP, citations, reviews, scored 0-100. \\\"audit our local SEO\\\"",
       "scripts": [
         "local-seo-checker.py"
       ],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup",
-        "local-seo"
+        "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 5414
+      "bytes": 4758
     },
     {
       "name": "localize-campaign",
       "tier": "E",
-      "description": "Localize an entire campaign — emails, ads, social posts, landing pages, video scripts — for multiple markets, producing a deployment-ready per-market package: translations, transcreation options for emotional copy, Hofstede-based cultural adaptation notes, market-specific compliance additions, localized SEO and hreflang specs, RTL and locale formatting, quality scores, and a cross-market consistency report. Triggers on \\\"/digital-marketing-pro:localize-campaign\\\", \\\"localize this campaign for Germany and Japan\\\", \\\"adapt these assets for new markets\\\", \\\"take the Q3 campaign multilingual\\\", \\\"prepare our launch for hi-IN and ar-SA\\\". Prepares and scores assets but publishes nothing — each package ships with a deployment checklist. Reads the brand profile's language config and do-not-translate terms; for a single piece use /digital-marketing-pro:translate-content.",
+      "description": "Localize a whole campaign for several markets with transcreation. One text → translate-content. \\\"take the Q3 campaign multilingual\\\"",
       "scripts": [
         "brand-voice-scorer.py",
         "eval-runner.py",
@@ -1750,12 +1721,12 @@
         "translate-content"
       ],
       "doc_files": 1,
-      "bytes": 14955
+      "bytes": 14209
     },
     {
       "name": "loop-detect",
       "tier": "E",
-      "description": "Detect and model the growth loops already compounding in a business — viral, content, data, paid, ecosystem, community — then quantify each loop's amplification factor, cycle time, and bottleneck, propose new loops, and rank investments by projected 12-month ROI with a sequenced implementation roadmap. Triggers on \\\"/digital-marketing-pro:loop-detect\\\", \\\"what growth loops do we have\\\", \\\"model our viral loop\\\", \\\"why isn't growth compounding\\\", \\\"where should we invest for compound growth\\\". Runs the growth-loop-modeler script for detection and 12-month loop comparisons, and reads the brand profile for business model and industry benchmarks. Analysis and recommendations only — it changes nothing in any live system.",
+      "description": "Detect growth loops in the business and model each loop's amplification by script. \\\"what growth loops do we have\\\"",
       "scripts": [
         "growth-loop-modeler.py"
       ],
@@ -1765,12 +1736,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 9716
+      "bytes": 9100
     },
     {
       "name": "market-weather",
       "tier": "E",
-      "description": "Generate a one-page Marketing Weather Report scoring current conditions green/yellow/red across five dimensions — economic climate, cultural moments, industry and competitive activity, platform changes, and regulatory updates — with an overall go/no-go signal, recommendations matched to a this-week/this-month/this-quarter horizon, and an upcoming-events calendar. Triggers on \\\"/digital-marketing-pro:market-weather\\\", \\\"is now a good time to launch\\\", \\\"what are market conditions like this month\\\", \\\"any platform or regulatory changes I should know about\\\", \\\"marketing weather report\\\". Scores signals recorded in the last 30 days via the macro-signal-tracker script — it reports on tracked signals, not a live web scan — applies the brand profile's industry and channel mix, and shows trend direction versus the previous report when one exists.",
+      "description": "Rate market weather by script: economy, competition, platform and regulatory shifts, scored. \\\"is now a good time to launch\\\"",
       "scripts": [
         "macro-signal-tracker.py"
       ],
@@ -1780,12 +1751,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7246
+      "bytes": 6512
     },
     {
       "name": "marketing-automation",
       "tier": "E",
-      "description": "Design marketing automation programs — end-to-end workflow architecture, lead scoring models with MQL/SQL thresholds, nurture and drip sequences, behavioral triggers, lifecycle stage frameworks, deliverability and compliance automation, and MAP platform selection or migration plans — delivered as workflow maps, scoring rubrics, sequence plans, and audits. Triggers on \\\"/digital-marketing-pro:marketing-automation\\\", \\\"build a lead scoring model\\\", \\\"design a welcome nurture sequence\\\", \\\"our contacts get too many automated emails\\\", \\\"should we migrate from Mailchimp to HubSpot\\\". Produces designs and audit findings, not live platform changes. Reads the brand profile and compliance rules; its lead-scoring framework is the one /digital-marketing-pro:lead-import applies when importing leads.",
+      "description": "Design marketing automation: workflows, lead scoring, nurture triggers. \\\"build a lead scoring model\\\"",
       "scripts": [
         "benchmark_book.py",
         "campaign-tracker.py"
@@ -1793,16 +1764,15 @@
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup",
-        "lead-import"
+        "brand-setup"
       ],
       "doc_files": 5,
-      "bytes": 98068
+      "bytes": 97367
     },
     {
       "name": "martech-audit",
       "tier": "G",
-      "description": "Audit the marketing technology stack — map every tool to 11 core functions, flag gaps and redundant overlaps with wasted-spend estimates, score integration health and data silos, rate stack maturity on a 5-level scale, and deliver consolidation recommendations with ROI projections and a phased 0-30-day / 1-3-month / 3-12-month implementation roadmap. Triggers on \\\"/digital-marketing-pro:martech-audit\\\", \\\"audit our martech stack\\\", \\\"are we paying for overlapping tools\\\", \\\"what's missing from our marketing stack\\\", \\\"help us consolidate platforms\\\". Assessment and recommendations only — it changes no live systems and buys nothing. Reads the brand profile for industry benchmarking and compliance constraints.",
+      "description": "Audit the martech stack for gaps, overlaps and wasted spend, with a consolidation plan. \\\"audit our martech stack\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -1810,12 +1780,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 6606
+      "bytes": 6000
     },
     {
       "name": "media-plan",
       "tier": "G",
-      "description": "Build a ready-to-implement paid media plan — efficiency-weighted budget allocation across channels, a week-by-week flight schedule, an audience-by-channel targeting matrix, a creative rotation calendar with fatigue thresholds, reach and frequency projections, a measurement framework, platform setup checklists, and a 10-15% contingency reserve with reallocation triggers. Triggers on \\\"/digital-marketing-pro:media-plan\\\", \\\"plan our Q4 ad budget\\\", \\\"how should we split spend between Google and Meta\\\", \\\"build the media buy schedule\\\", \\\"we have 50K for paid — where does it go\\\". Planning only — it launches no campaigns and spends nothing. Reads the brand profile, guidelines, and compliance rules for the target markets.",
+      "description": "Build a paid media plan: channel split, weekly flighting, audiences, reach and frequency. \\\"plan our Q4 ad budget\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -1823,12 +1793,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 9197
+      "bytes": 8579
     },
     {
       "name": "message-test",
       "tier": "E",
-      "description": "Test 2-6 message variants against synthetic audience panels grounded in CRM data before spending on live tests — each variant scored per segment on resonance, clarity, credibility, urgency, and differentiation, with objection patterns, personalization opportunities, and the top 2-3 variants recommended for a real A/B test. Triggers on \\\"/digital-marketing-pro:message-test\\\", \\\"which of these headlines will win\\\", \\\"pretest this ad copy\\\", \\\"test these subject lines on our segments\\\", \\\"predict objections before we launch\\\". Runs the audience-simulator script, can reuse panels built by /digital-marketing-pro:focus-group, and reads the brand profile for voice and positioning. Results are directional preference signals with an explicit confidence rating — not live conversion data.",
+      "description": "Pretest 2-6 message variants on CRM-grounded synthetic panels. \\\"which of these headlines will win\\\"",
       "scripts": [
         "audience-simulator.py"
       ],
@@ -1839,12 +1809,12 @@
         "focus-group"
       ],
       "doc_files": 1,
-      "bytes": 8350
+      "bytes": 7658
     },
     {
       "name": "multilingual-score",
       "tier": "M",
-      "description": "Score translated or localized content into one composite quality verdict — technical translation scoring (length ratio, formatting, do-not-translate terms, placeholders), content quality in the target language, brand voice consistency, and target-market compliance — classified as Publish Ready (85+), Native Speaker Review (70-84), or Re-translate (below 70) with specific, located fix suggestions per issue. Triggers on \\\"/digital-marketing-pro:multilingual-score\\\", \\\"is this German translation ready to publish\\\", \\\"score this localized landing page\\\", \\\"did the translation keep our brand voice\\\", \\\"check compliance on the Japanese version\\\". Runs the language-router, eval-runner, and brand-voice-scorer scripts, reads the brand profile's language config and do-not-translate list, and compares against the brand's multilingual baseline when past runs exist.",
+      "description": "Score translated content for publication: quality, brand voice, market compliance. \\\"is this German translation ready to publish\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [
@@ -1855,57 +1825,53 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 12679
+      "bytes": 11940
     },
     {
       "name": "narrative-landscape",
       "tier": "E",
-      "description": "Map competitor positioning across 3-5 narrative dimensions to find crowded clusters and unclaimed gaps, then score each gap by customer desirability times brand credibility. Produces a landscape map, ranked gap analysis, a recommended positioning territory, and a 30/60/90-day messaging plan to claim it. Triggers on \\\"/digital-marketing-pro:narrative-landscape\\\", \\\"map the competitive narrative landscape\\\", \\\"what positioning gaps can we own\\\", \\\"where do competitors cluster\\\", \\\"find us a differentiated position\\\". Reads the brand profile for current positioning and voice; analysis and strategy only — no messaging is published. Pairs with /digital-marketing-pro:narrative-tracker for what AI engines say about the brand.",
+      "description": "Map the competitive narrative landscape and score unclaimed positioning gaps. \\\"find us a differentiated position\\\"",
       "scripts": [
         "narrative-mapper.py"
       ],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup",
-        "narrative-tracker"
+        "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 8230
+      "bytes": 7615
     },
     {
       "name": "narrative-tracker",
       "tier": "E",
-      "description": "Track what AI engines (ChatGPT, Perplexity, Gemini, AI Overviews, Copilot) say about the brand, score responses against desired positioning, and flag misrepresentations, drift, and competitor narrative gains. Produces an alignment report, a narrative territory map, and a content strategy to correct AI perception, with snapshots persisted via geo-tracker.py for trend comparison. Triggers on \\\"/digital-marketing-pro:narrative-tracker\\\", \\\"what is ChatGPT saying about us\\\", \\\"track our AI narrative\\\", \\\"is AI misrepresenting our brand\\\", \\\"are competitors gaining narrative ground\\\". Reads the brand profile for reference positioning; recommends corrective content but does not publish it. Pairs with /digital-marketing-pro:narrative-landscape for competitor messaging territory.",
+      "description": "Track the brand narrative in AI engines against desired positioning, flag misstatements. \\\"is AI misrepresenting our brand\\\"",
       "scripts": [
         "geo-tracker.py"
       ],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup",
-        "narrative-landscape"
+        "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 9408
+      "bytes": 8750
     },
     {
       "name": "page-seo-analysis",
       "tier": "G",
-      "description": "Run a deep SEO audit of one URL across title/meta, headings, content depth, E-E-A-T, schema (with deprecation flags for HowTo, FAQ, SpecialAnnouncement), images, internal links, technical signals, and AI search readiness. Produces a scored /80 report with exact replacement title tags and meta descriptions, ready-to-paste JSON-LD, and optional competitor comparison. Triggers on \\\"/digital-marketing-pro:page-seo-analysis\\\", \\\"analyze the SEO of this page\\\", \\\"why isn't this page ranking\\\", \\\"audit this URL before publish\\\", \\\"compare my page against competitor pages\\\". Reads the brand profile and guidelines; analysis and recommendations only — nothing is changed on the site. For a site-wide view, pair with /digital-marketing-pro:seo-audit.",
+      "description": "Analyze the SEO of one URL, scored /80 with paste-ready fixes. \\\"analyze the SEO of this page\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
-      "cross_refs": [
-        "seo-audit"
-      ],
+      "cross_refs": [],
       "doc_files": 1,
-      "bytes": 4639
+      "bytes": 3985
     },
     {
       "name": "paid-advertising",
       "tier": "E",
-      "description": "Plan, structure, and audit paid media campaigns across Google, Meta, LinkedIn, TikTok, Microsoft, ChatGPT, programmatic, retail media, native, and audio — campaign hierarchy, audience architecture, bid strategy, budget allocation and pacing, creative strategy, and current platform API changes (Google Ads v24/v25, Meta v25). Produces campaign plans, platform audit scorecards, budget models, creative briefs, and optimization playbooks. Triggers on \\\"/digital-marketing-pro:paid-advertising\\\", \\\"plan a Google Ads campaign\\\", \\\"audit our Meta account\\\", \\\"which bid strategy should we use\\\", \\\"allocate our paid media budget\\\". Reads the brand profile, guidelines, and campaign history via campaign-tracker.py; plans and recommends only — launching is handled by /digital-marketing-pro:launch-campaign.",
+      "description": "Plan or audit paid ads with current platform rules and benchmarks: Google PMax/AI Max, Meta, retail. \\\"should we use Performance Max\\\"",
       "scripts": [
         "benchmark_book.py",
         "campaign-tracker.py"
@@ -1915,16 +1881,15 @@
       "cross_refs": [
         "agent-readiness-audit",
         "brand-setup",
-        "launch-ad-campaign",
-        "launch-campaign"
+        "launch-ad-campaign"
       ],
       "doc_files": 14,
-      "bytes": 206836
+      "bytes": 206163
     },
     {
       "name": "pdf-report",
       "tier": "G",
-      "description": "Generate a branded, audience-structured marketing report — executive summary, campaign report, channel deep-dive, competitor report, or monthly/quarterly review — assembled via pdf-generator.py with brand colors, logo, and fonts, and previewed for adjustments before finalizing. Pulls data from campaign-tracker.py, performance-monitor.py, competitor-tracker.py, and connected analytics MCPs, flagging stale sources. Triggers on \\\"/digital-marketing-pro:pdf-report\\\", \\\"generate a client report\\\", \\\"build an executive summary PDF\\\", \\\"create the quarterly review report\\\", \\\"make a branded campaign report\\\". Reads the brand profile for the stored report theme; structures content for c-suite, team, or client audiences.",
+      "description": "Generate a branded PDF report: executive summary, campaign or channel review. \\\"export this as a branded PDF\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -1932,12 +1897,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7632
+      "bytes": 7017
     },
     {
       "name": "performance-check",
       "tier": "E",
-      "description": "Pull live metrics from every connected analytics MCP into one cross-channel snapshot: KPI scoreboard with RAG status vs profile targets, period-over-period trends, industry benchmarks, top wins and concerns, and 3-5 recommended actions — then persist the snapshot via performance-monitor.py for trend history. Triggers on \\\"/digital-marketing-pro:performance-check\\\", \\\"how are our marketing metrics\\\", \\\"pull current KPIs\\\", \\\"quick performance snapshot\\\", \\\"are we hitting our targets\\\". Reads the brand profile for KPI targets and industry benchmarks; reports data gaps for unconnected platforms. Pairs with /digital-marketing-pro:performance-report, which turns these snapshots into the stakeholder narrative.",
+      "description": "Check live performance KPIs from connected analytics: RAG status, trends, actions. \\\"quick performance snapshot\\\"",
       "scripts": [
         "campaign-tracker.py",
         "performance-monitor.py",
@@ -1951,12 +1916,12 @@
         "performance-report"
       ],
       "doc_files": 1,
-      "bytes": 8523
+      "bytes": 7921
     },
     {
       "name": "performance-report",
       "tier": "G",
-      "description": "Turn marketing data into a stakeholder-ready performance report: executive summary, channel-by-channel KPI dashboard, trend analysis, anomaly alerts with root-cause hypotheses, and recommendations ranked by expected impact — formatted for an executive or tactical audience. Triggers on \\\"/digital-marketing-pro:performance-report\\\", \\\"write the monthly performance report\\\", \\\"summarize campaign results for stakeholders\\\", \\\"why did performance change last quarter\\\", \\\"turn these metrics into a report\\\". Consumes snapshots persisted by /digital-marketing-pro:performance-check rather than re-pulling platforms itself; reads the brand profile, custom templates, and agency SOPs. Hands deeper anomaly diagnosis to /digital-marketing-pro:anomaly-scan.",
+      "description": "Write a stakeholder performance report from data. Sudden spikes → anomaly-scan. \\\"write the monthly performance report\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -1971,12 +1936,12 @@
         "performance-check"
       ],
       "doc_files": 2,
-      "bytes": 7966
+      "bytes": 7335
     },
     {
       "name": "pipeline-update",
       "tier": "E",
-      "description": "Update CRM deals — move stages, change values and close dates, attach notes and activities, create follow-up tasks — with validation against pipeline rules, a before-and-after comparison, and calculated velocity, forecast, and pipeline-health impact. Writes to Salesforce, HubSpot, Zoho, or Pipedrive via the connected CRM MCP only after a mandatory execution gate: an Execution Summary preview plus explicit typed approval, logged through approval-manager.py. Triggers on \\\"/digital-marketing-pro:pipeline-update\\\", \\\"move this deal to negotiation\\\", \\\"update the deal value\\\", \\\"mark this deal closed-won\\\", \\\"which deals are stalled\\\". Reads the brand profile; pairs with /digital-marketing-pro:lead-import for creating deals and /digital-marketing-pro:executive-dashboard for bulk reporting.",
+      "description": "Update CRM pipeline deals with forecast impact, behind a typed approval gate. \\\"move this deal to negotiation\\\"",
       "scripts": [
         "approval-manager.py"
       ],
@@ -1988,12 +1953,12 @@
         "lead-import"
       ],
       "doc_files": 1,
-      "bytes": 13217
+      "bytes": 12529
     },
     {
       "name": "pr-pitch",
       "tier": "G",
-      "description": "Build a complete media pitch package: an email-ready core pitch with subject line options, 3-5 outlet-specific variations, a target media list with journalist beats and approach notes, an outreach timeline, plus press release draft, fact sheet, and quote bank. Also crafts responses for journalist request platforms (Qwoted, Featured, Source of Sources). Triggers on \\\"/digital-marketing-pro:pr-pitch\\\", \\\"pitch this story to journalists\\\", \\\"build a media list for our launch\\\", \\\"respond to this journalist request\\\", \\\"write a press release and pitch\\\". Reads the brand profile, guidelines, and custom templates for voice and compliance; produces the materials only — it does not send any outreach.",
+      "description": "Build a PR pitch package: core pitch, outlet variations, media list, release. \\\"pitch this story to journalists\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -2001,12 +1966,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 3707
+      "bytes": 3117
     },
     {
       "name": "pricing-test",
       "tier": "E",
-      "description": "Estimate willingness-to-pay by testing 3-8 candidate price points against synthetic audience panels grounded in CRM purchase data (audience-simulator.py), Van Westendorp / Gabor-Granger style. Produces per-segment sensitivity curves, an optimal price, the acceptable price range, revenue- vs volume-maximizing prices, competitive positioning, and tiering recommendations — always with explicit confidence limits. Triggers on \\\"/digital-marketing-pro:pricing-test\\\", \\\"what should we charge for this\\\", \\\"test these price points\\\", \\\"is our pricing too high\\\", \\\"should we introduce pricing tiers\\\". Reads the brand profile for positioning and market context; results are directional simulations that require real-world validation, not live market tests.",
+      "description": "Test 3-8 price points on CRM-grounded synthetic panels by script, find the optimum. \\\"test these price points\\\"",
       "scripts": [
         "audience-simulator.py"
       ],
@@ -2016,23 +1981,23 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 8924
+      "bytes": 8280
     },
     {
       "name": "programmatic-seo",
       "tier": "G",
-      "description": "Plan or audit SEO pages generated at scale from structured data — data-source quality, template uniqueness, URL patterns, internal linking, canonicals, sitemaps, and index-bloat prevention — enforcing hard quality gates against thin content and Google's Scaled Content Abuse policy (uniqueness thresholds, batch rollout limits, standalone value test). Produces a /100 scorecard with prioritized fixes and a progressive rollout plan. Triggers on \\\"/digital-marketing-pro:programmatic-seo\\\", \\\"plan programmatic landing pages\\\", \\\"audit our location pages\\\", \\\"will 5000 generated pages get us penalized\\\", \\\"design a template engine for pSEO\\\". Reads the brand profile and guidelines; plans and audits only — it does not generate or publish the pages.",
+      "description": "Plan or audit programmatic SEO pages at scale, gated against thin content. \\\"audit our location pages\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [],
       "doc_files": 1,
-      "bytes": 7851
+      "bytes": 7198
     },
     {
       "name": "prompt-test",
       "tier": "E",
-      "description": "A/B test content variations by quality score: create a named test, log each variant (scored via eval-runner.py on hallucination, content quality, and readability), and get a winner declaration with margin of victory, confidence level, per-dimension trade-offs, and auto-reject flags. Produces a decision-ready recommendation plus reusable insights about which approach wins for this brand. Triggers on \\\"/digital-marketing-pro:prompt-test\\\", \\\"which headline style works better\\\", \\\"A/B test these subject lines\\\", \\\"compare two versions of this copy\\\", \\\"show the results of my content test\\\". Reads the brand profile and guidelines for evaluation context; compares eval scores, not live audience performance — pair with /digital-marketing-pro:ab-test-plan for real-traffic experiments.",
+      "description": "A/B test content variants by eval score and declare a winner with confidence. \\\"compare two versions of this copy\\\"",
       "scripts": [
         "eval-runner.py",
         "prompt-ab-tester.py"
@@ -2043,16 +2008,15 @@
         "quality-assurance"
       ],
       "cross_refs": [
-        "ab-test-plan",
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 8320
+      "bytes": 7646
     },
     {
       "name": "publish-blog",
       "tier": "E",
-      "description": "Publish a blog post to WordPress or Webflow through the connected CMS MCP with SEO metadata, categories and tags, featured image, slug optimization, and optional scheduling. Runs pre-publish gates — content-scorer.py, brand-voice-scorer.py, SEO and compliance checks — and a MANDATORY approval gate: an Execution Summary the user must approve with an explicit typed yes (logged via approval-manager.py) before anything goes live, then verifies the live URL and schema markup and submits to Google Search Console if connected. Triggers on \\\"/digital-marketing-pro:publish-blog\\\", \\\"publish this post to WordPress\\\", \\\"push the draft live on Webflow\\\", \\\"schedule this article for Monday\\\", \\\"take this blog post live\\\". Reads the brand profile and platform-publishing-specs.md for CMS field mappings.",
+      "description": "Publish a blog post to WordPress or Webflow with SEO metadata, approval-gated. \\\"publish this post to WordPress\\\"",
       "scripts": [
         "approval-manager.py"
       ],
@@ -2062,12 +2026,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 11459
+      "bytes": 10769
     },
     {
       "name": "qbr-plan",
       "tier": "G",
-      "description": "Prepare a complete Quarterly Business Review package from the quarter's campaign data: a performance scorecard of goals vs actuals vs benchmarks, top-3 wins with attribution stories, underperformance root-cause analysis, ROI and budget-efficiency breakdowns, 3-5 strategic recommendations, upsell business cases, a next-quarter roadmap, action items with owners, and an account health score. Triggers on \\\"/digital-marketing-pro:qbr-plan\\\", \\\"prepare the QBR\\\", \\\"build the quarterly review for this client\\\", \\\"quarterly business review deck\\\", \\\"summarize the quarter for the client meeting\\\". Reads the brand profile, guidelines, custom templates, and agency SOPs; works from campaign data the user supplies and structures the presentation content — it does not pull live platform metrics itself.",
+      "description": "Prepare a QBR package: goals vs actuals, wins, root causes, ROI, next-quarter plan. \\\"prepare the QBR\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -2075,12 +2039,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7748
+      "bytes": 7050
     },
     {
       "name": "quality-report",
       "tier": "E",
-      "description": "Report content-quality trends over time from logged evaluations: weekly score trend charts, a content-type leaderboard, per-dimension performance breakdown, statistically flagged regression alerts, best and worst content examples, and 3-7 prioritized improvement recommendations. Triggers on \\\"/digital-marketing-pro:quality-report\\\", \\\"is our content quality improving\\\", \\\"show quality trends for the last month\\\", \\\"which content types score worst\\\", \\\"any quality regressions lately\\\". Pulls data via quality-tracker.py from evaluations logged by /digital-marketing-pro:eval-content — run evals first or there is nothing to report. Reads the brand profile for quality targets and eval-rubrics.md for dimension-specific improvement strategies.",
+      "description": "Report content quality trends from logged evals, with regression alerts. \\\"is our content quality improving\\\"",
       "scripts": [
         "quality-tracker.py"
       ],
@@ -2093,12 +2057,12 @@
         "eval-content"
       ],
       "doc_files": 1,
-      "bytes": 10128
+      "bytes": 9489
     },
     {
       "name": "rank-monitor",
       "tier": "G",
-      "description": "Set up and run keyword ranking monitoring — baseline capture, scheduled position checks against GSC and connected rank-tracker MCPs, and severity-tiered alerts (minor/major/critical) on drops; --features adds a query-by-SERP-feature ownership matrix including AI Overview citation presence. Triggers on \\\"/digital-marketing-pro:rank-monitor\\\", \\\"track our keyword rankings\\\", \\\"why did our rankings drop\\\", \\\"alert me when positions change\\\", \\\"are we in the AI Overview for this query\\\". Reads the brand profile and saved keyword lists; for scored AI visibility pair with /digital-marketing-pro:geo-monitor, and for snapshot comparison /digital-marketing-pro:seo-drift.",
+      "description": "Monitor keyword rankings with drop alerts and SERP features. Two-snapshot compare → seo-drift. \\\"track our keyword rankings\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -2113,12 +2077,12 @@
         "serp-tracker"
       ],
       "doc_files": 1,
-      "bytes": 11692
+      "bytes": 11147
     },
     {
       "name": "recall",
       "tier": "E",
-      "description": "Retrieve validated marketing learnings from the brand's compound intelligence graph for a channel, audience, objective, or freeform situation — returned as a themed, decision-ready playbook ranked by confidence and recency, with conflicting insights flagged and quick wins called out. Triggers on \\\"/digital-marketing-pro:recall\\\", \\\"what do we know about email for this audience\\\", \\\"what worked last time we ran a launch campaign\\\", \\\"pull past learnings before I plan this\\\", \\\"recall insights about paid social\\\". Reads the brand profile for context boosting and queries the graph via intelligence-graph.py; it retrieves and synthesizes existing learnings — it does not record new ones.",
+      "description": "Recall past learnings for a channel or audience as a confidence-ranked playbook. \\\"what worked last time\\\"",
       "scripts": [
         "intelligence-graph.py"
       ],
@@ -2128,12 +2092,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 6597
+      "bytes": 6009
     },
     {
       "name": "redirect-manager",
       "tier": "E",
-      "description": "Create, audit, and repair URL redirects — new 301/302 rules, chain flattening, loop breaking, broken-target fixes, and bulk migration imports — deployed through a connected WordPress or Webflow CMS MCP with post-deploy HTTP verification and rollback logging. Every change stops at a mandatory approval gate: an Execution Summary you must explicitly approve before any live rule is touched. Triggers on \\\"/digital-marketing-pro:redirect-manager\\\", \\\"set up a 301 redirect\\\", \\\"audit our redirects for chains and loops\\\", \\\"we migrated URLs and traffic dropped\\\", \\\"import this redirect map\\\". Reads the brand profile and GSC history for source-URL validation.",
+      "description": "Create, audit and fix URL redirects on a connected CMS, approval-gated. \\\"set up a 301 redirect\\\"",
       "scripts": [
         "approval-manager.py"
       ],
@@ -2143,12 +2107,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 9761
+      "bytes": 9196
     },
     {
       "name": "region-config",
       "tier": "G",
-      "description": "Configure a brand's regional settings — timezone, languages, currency, compliance regulations (GDPR, CCPA, APPI, LGPD, EU AI Act Article 50, and more), local platforms, business hours, holiday calendars, and data-residency rules — written to a persistent per-region config file plus a practical compliance checklist. Downstream commands like content-calendar, email-sequence, and performance-report inherit these settings automatically. Triggers on \\\"/digital-marketing-pro:region-config\\\", \\\"set up the Japan market\\\", \\\"what compliance rules apply in the EU\\\", \\\"configure timezone and currency for APAC\\\", \\\"add a new region for this brand\\\". Reads and updates the brand profile with the region list and compliance summary.",
+      "description": "Configure a brand region: timezone, currency, compliance regimes, holidays. \\\"set up the Japan market\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -2160,12 +2124,12 @@
         "performance-report"
       ],
       "doc_files": 1,
-      "bytes": 13964
+      "bytes": 13337
     },
     {
       "name": "reputation-management",
       "tier": "E",
-      "description": "Full reputation playbook: FTC-compliant review generation, negative-review response frameworks, 3-tier crisis communication with a 72-hour severe-crisis timeline, 4-layer brand safety assessment, sentiment monitoring design, and 30/60/90-day recovery plans — delivered as ready-to-use plans, drafted responses, and audits. Triggers on \\\"/digital-marketing-pro:reputation-management\\\", \\\"we're getting hit with negative reviews\\\", \\\"prepare a crisis communication plan\\\", \\\"how do we get more Google reviews\\\", \\\"someone is spreading misinformation about us\\\". Reads the brand profile, guidelines, and compliance rules; it plans and drafts — it does not post responses or monitor platforms itself. For a single review reply, /digital-marketing-pro:review-response is the focused sibling.",
+      "description": "Run reputation programs: reviews, sentiment, brand safety. Crisis → crisis-response; one review → review-response. \\\"get more Google reviews\\\"",
       "scripts": [
         "benchmark_book.py",
         "campaign-tracker.py"
@@ -2173,16 +2137,15 @@
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup",
-        "review-response"
+        "brand-setup"
       ],
       "doc_files": 7,
-      "bytes": 91821
+      "bytes": 91177
     },
     {
       "name": "retargeting-strategy",
       "tier": "E",
-      "description": "Design a cross-platform retargeting playbook — funnel-stage audience segments with recency windows, creative sequencing per segment, frequency caps, exclusion lists, budget allocation, dynamic product-feed setup, KPI-based optimization triggers, and a 30/60/90-day roadmap. Triggers on \\\"/digital-marketing-pro:retargeting-strategy\\\", \\\"plan our remarketing campaigns\\\", \\\"cart abandoners aren't converting\\\", \\\"how should we sequence retargeting ads\\\", \\\"set frequency caps across Meta and Google\\\". Reads the brand profile and past campaign performance via campaign-tracker.py; it produces the strategy document and tracking checklist — it does not launch or modify live campaigns.",
+      "description": "Design a retargeting strategy: audience windows, sequencing, frequency caps. \\\"plan our remarketing campaigns\\\"",
       "scripts": [
         "campaign-tracker.py"
       ],
@@ -2192,12 +2155,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7362
+      "bytes": 6786
     },
     {
       "name": "review-response",
       "tier": "M",
-      "description": "Draft ready-to-post responses to positive, neutral, and negative reviews on any platform (Google, Yelp, G2, Capterra, Trustpilot, Amazon, App Store), with formal and casual variants, brand-voice scoring, escalation recommendations, and a batch mode that varies language across similar reviews to avoid templated-sounding replies. Triggers on \\\"/digital-marketing-pro:review-response\\\", \\\"reply to this 1-star review\\\", \\\"write a response to this Google review\\\", \\\"we got a nasty Yelp review, what do we say\\\", \\\"draft replies for this batch of reviews\\\". Reads the brand profile, voice-and-tone guidelines, and custom templates; it drafts and scores the responses — posting them to the platform is up to you.",
+      "description": "Draft a reply to one customer review, voice-scored, with escalation flags. \\\"reply to this 1-star review\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [
@@ -2207,12 +2170,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7039
+      "bytes": 6434
     },
     {
       "name": "roi-calculator",
       "tier": "E",
-      "description": "Compute campaign ROI from spend, conversion, and revenue inputs — channel-level ROI/ROAS/CPA/CPL, blended totals, five-model attribution comparison (last-touch, first-touch, linear, time-decay, position-based), LTV payback periods, industry benchmark ratings, and 2-3 modeled budget-reallocation scenarios, packaged as an executive-ready report. Triggers on \\\"/digital-marketing-pro:roi-calculator\\\", \\\"what's the ROI on this campaign\\\", \\\"compare ROAS across channels\\\", \\\"is our CAC sustainable against LTV\\\", \\\"where should we shift budget\\\". Runs roi-calculator.py, reads industry benchmarks for the brand's vertical, and logs results to the campaign tracker for period-over-period trend comparison.",
+      "description": "Calculate campaign ROI by script: ROAS, CPA, attribution views, LTV payback. \\\"what's the ROI on this campaign\\\"",
       "scripts": [
         "campaign-tracker.py",
         "roi-calculator.py"
@@ -2223,12 +2186,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 6119
+      "bytes": 5526
     },
     {
       "name": "save-knowledge",
       "tier": "E",
-      "description": "Save a single piece of brand knowledge — a campaign learning, guideline, competitive finding, performance insight, or approved asset — to the persistent memory layer with SHA-256 deduplication, auto-suggested tags, provenance tracking, priority, and optional expiration. Stores via a connected vector-DB MCP (e.g. Pinecone) when one exists, otherwise in the always-available local index; no memory backend is bundled by default. Triggers on \\\"/digital-marketing-pro:save-knowledge\\\", \\\"remember this for next time\\\", \\\"save that email analysis we just did\\\", \\\"store this competitor intel\\\", \\\"keep this learning about subject lines\\\". Pairs with /digital-marketing-pro:search-knowledge for retrieval and /digital-marketing-pro:sync-memory for bulk session syncing.",
+      "description": "Save one piece of brand knowledge to persistent memory with dedup and tags. \\\"store this competitor intel\\\"",
       "scripts": [
         "memory-manager.py"
       ],
@@ -2240,12 +2203,12 @@
         "sync-memory"
       ],
       "doc_files": 1,
-      "bytes": 8939
+      "bytes": 8277
     },
     {
       "name": "schedule-social",
       "tier": "E",
-      "description": "Schedule social posts to Twitter/X, Instagram, LinkedIn, TikTok, YouTube, and Pinterest through connected platform MCPs — generating per-platform copy variations, hashtag mixes, media-spec validation, UTM-tagged links, and posting-time analysis (the brand's own engagement history first, dated population baselines second), then verifying each queued post and updating the content calendar. Nothing goes live without the mandatory execution gate: a full scheduling summary you must explicitly approve first. Triggers on \\\"/digital-marketing-pro:schedule-social\\\", \\\"schedule this post for Monday\\\", \\\"publish this across our social channels\\\", \\\"queue the launch announcement on LinkedIn and X\\\", \\\"post this everywhere at the best times\\\". Reads the brand profile, guidelines, and platform publishing specs.",
+      "description": "Schedule social posts to connected platforms at best times, approval-gated. \\\"schedule this post for Monday\\\"",
       "scripts": [
         "approval-manager.py",
         "posting-time-analyzer.py"
@@ -2256,12 +2219,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 13501
+      "bytes": 12800
     },
     {
       "name": "search-knowledge",
       "tier": "E",
-      "description": "Search everything the brand has stored in memory — semantic, exact, or hybrid queries across a connected vector-DB MCP, an optional knowledge-graph server, and the always-available local index — returning ranked entries with provenance, cross-references, detected knowledge gaps, and follow-up query suggestions. Triggers on \\\"/digital-marketing-pro:search-knowledge\\\", \\\"what worked for email in Q4\\\", \\\"what are our brand voice guidelines\\\", \\\"what do we know about competitor X\\\", \\\"find past learnings about cart abandonment\\\". Reads the brand profile for context; pairs with /digital-marketing-pro:save-knowledge (store new entries) and /digital-marketing-pro:sync-memory (push un-synced local entries to persistent storage).",
+      "description": "Search the brand's stored knowledge and memory, ranked with provenance. \\\"what are our brand voice guidelines\\\"",
       "scripts": [
         "memory-manager.py"
       ],
@@ -2273,12 +2236,12 @@
         "sync-memory"
       ],
       "doc_files": 1,
-      "bytes": 8892
+      "bytes": 8269
     },
     {
       "name": "segment-audience",
       "tier": "E",
-      "description": "Build or update audience segments in the brand's CRM, email, or ad platform (Salesforce, HubSpot, Mailchimp, Meta Custom Audiences, Google Customer Match, and more) via connected MCPs — with size estimation, overlap analysis, exclusion impact, ad-consent compliance checks, RFM modeling, and cross-platform sync with match-rate verification. Creation halts at a mandatory approval gate showing criteria, estimated members, and sample profiles before anything is pushed live. Triggers on \\\"/digital-marketing-pro:segment-audience\\\", \\\"create a segment of lapsed customers\\\", \\\"build a lookalike seed audience\\\", \\\"who should we target for the win-back campaign\\\", \\\"sync this list to Meta\\\". Reads the brand profile; pairs with /digital-marketing-pro:lead-import (get contacts in first) and /digital-marketing-pro:data-export (send segment data out).",
+      "description": "Build audience segments in CRM, email or ad platforms with consent checks, approval-gated. \\\"create a segment of lapsed customers\\\"",
       "scripts": [
         "approval-manager.py"
       ],
@@ -2290,12 +2253,12 @@
         "lead-import"
       ],
       "doc_files": 1,
-      "bytes": 14219
+      "bytes": 13499
     },
     {
       "name": "send-email-campaign",
       "tier": "E",
-      "description": "Send a targeted email campaign through a connected SendGrid, Klaviyo, Customer.io, Brevo, or Mailchimp MCP — subject-line and spam scoring, personalization with fallbacks, A/B variants, CAN-SPAM/GDPR/CASL compliance checks, a test send you confirm, then the full send with deliverability monitoring and early engagement snapshots. No email leaves without the mandatory execution gate: a campaign summary with recipient count and risk tier (medium/high/critical by list size) that you must explicitly approve. Triggers on \\\"/digital-marketing-pro:send-email-campaign\\\", \\\"send this newsletter to the active list\\\", \\\"deploy the Q1 announcement email\\\", \\\"launch the promo email with two subject lines\\\", \\\"email this segment tomorrow at 9am\\\". Reads the brand profile, guidelines, and platform publishing specs.",
+      "description": "Send an email campaign via a connected ESP with spam and compliance checks, approval-gated. \\\"send this newsletter to the active list\\\"",
       "scripts": [
         "approval-manager.py",
         "send-time-optimizer.py"
@@ -2306,12 +2269,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 12387
+      "bytes": 11710
     },
     {
       "name": "send-notification",
       "tier": "E",
-      "description": "Send internal team notifications through a connected Slack or Intercom MCP — campaign status updates, performance alerts, and approval requests formatted by urgency tier (info/warning/critical with @here escalation), with inline campaign or approval context, call-to-action blocks, and a 24-hour alert-fatigue check on the target channel. Strictly internal team messaging, never customer outreach, and every send passes a mandatory approval gate with a formatted preview first. Triggers on \\\"/digital-marketing-pro:send-notification\\\", \\\"ping the team that the campaign launched\\\", \\\"alert #marketing about the bounce-rate spike\\\", \\\"send an approval request to Slack\\\", \\\"notify leadership before EOD\\\". Reads the brand profile and the channel's recent notification history.",
+      "description": "Send a team notification to Slack or Intercom by urgency tier, approval-gated. \\\"ping the team that the campaign launched\\\"",
       "scripts": [
         "approval-manager.py"
       ],
@@ -2321,12 +2284,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 11654
+      "bytes": 11000
     },
     {
       "name": "send-report",
       "tier": "E",
-      "description": "Generate a performance report from connected analytics MCPs (Google Analytics, Google/Meta/LinkedIn Ads, email platforms) and deliver it via Slack, email, or Google Sheets — weekly pulse, monthly review, QBR, or custom, with KPIs scored against targets, trend and anomaly analysis, event annotations, and 3-5 prioritized recommendations. Delivery waits at a mandatory approval gate: you review the full report preview and recipient list (risk tiered low for internal, medium for client-facing) before anything is sent. Triggers on \\\"/digital-marketing-pro:send-report\\\", \\\"send the weekly report to Slack\\\", \\\"email the monthly performance review to the client\\\", \\\"push our KPIs into the tracking sheet\\\", \\\"prep the QBR and deliver it\\\". Reads the brand profile's targets and archives each report snapshot for period-over-period comparison.",
+      "description": "Send a performance report to Slack, email or Sheets from connected analytics, approval-gated. \\\"send the weekly report to Slack\\\"",
       "scripts": [
         "approval-manager.py"
       ],
@@ -2336,12 +2299,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 13368
+      "bytes": 12653
     },
     {
       "name": "send-sms",
       "tier": "E",
-      "description": "Send an SMS or WhatsApp marketing message through a connected Twilio or Brevo MCP, with consent verification (TCPA/GDPR/CASL), quiet-hours enforcement, opt-out and message-length checks, cost estimates, and delivery tracking. Nothing sends without an Execution Summary and explicit typed approval — the gate cannot be skipped. Triggers on \\\"/digital-marketing-pro:send-sms\\\", \\\"send an SMS blast\\\", \\\"send this WhatsApp message to the list\\\", \\\"text our customers about the sale\\\", \\\"schedule an SMS for tomorrow morning\\\". Reads the brand profile and compliance rules, scores the message with the brand-voice scorer, and logs every send to the execution audit trail.",
+      "description": "Send SMS or WhatsApp marketing with consent and quiet-hours checks, approval-gated. \\\"send an SMS blast\\\"",
       "scripts": [
         "approval-manager.py"
       ],
@@ -2351,12 +2314,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 12236
+      "bytes": 11672
     },
     {
       "name": "seo-audit",
       "tier": "E",
-      "description": "Run a comprehensive SEO audit across technical health, on-page, content quality, E-E-A-T, link profile, and local SEO — producing dated numbered outputs (crawl inventory through prioritised actions) plus a single-page PLAN.md with an impact-by-effort action plan and a four-gate quality scorecard. Triggers on \\\"/digital-marketing-pro:seo-audit\\\", \\\"audit my site's SEO\\\", \\\"why did our rankings drop\\\", \\\"check our technical SEO health\\\", \\\"how strong is our E-E-A-T\\\". Reads the brand profile; PLAN.md feeds /digital-marketing-pro:seo-implement, /digital-marketing-pro:seo-plan, and /digital-marketing-pro:seo-drift, with link prospecting handed to /digital-marketing-pro:backlink-gap.",
+      "description": "Run a site-wide SEO audit into a ranked PLAN.md: technical, content, links, local. A single page → page-seo-analysis. \\\"why did our traffic drop\\\"",
       "scripts": [
         "link-profile-analyzer.py"
       ],
@@ -2376,12 +2339,12 @@
         "tech-seo-audit"
       ],
       "doc_files": 2,
-      "bytes": 18355
+      "bytes": 17814
     },
     {
       "name": "seo-drift",
       "tier": "E",
-      "description": "Compare two SEO snapshots from the same source — GSC, the GSC AI Performance report, a rank-tracker export, or aeo-audit probes — into a drift report: top gainers and losers per metric, growth/decline/reshuffle/stable/new/lost classification, and a four-gate quality scorecard. Triggers on \\\"/digital-marketing-pro:seo-drift\\\", \\\"compare this month's GSC export to last month's\\\", \\\"what moved after the core update\\\", \\\"did the content refresh work\\\", \\\"which queries lost AI Mode impressions\\\". Runs scripts/seo_drift.py on two CSVs, reads the brand profile for noise thresholds, and branches findings to /digital-marketing-pro:seo-audit, /digital-marketing-pro:aeo-geo, or /digital-marketing-pro:content-engine.",
+      "description": "Compare two SEO snapshots by script: gainers, losers, drift classes. \\\"what moved after the core update\\\"",
       "scripts": [
         "seo_drift.py"
       ],
@@ -2397,28 +2360,27 @@
         "seo-audit"
       ],
       "doc_files": 1,
-      "bytes": 11324
+      "bytes": 10711
     },
     {
       "name": "seo-implement",
       "tier": "E",
-      "description": "Execute approved SEO changes on a connected WordPress or Webflow CMS — meta title/description updates, JSON-LD schema deployment, canonical URLs, 301/302 redirects, and Search Console indexing requests — with before/after diffs, post-deploy verification, and stored rollback snapshots. Every run stops at a mandatory approval gate: nothing deploys until the user reviews the diff and gives explicit approval. Triggers on \\\"/digital-marketing-pro:seo-implement\\\", \\\"update the meta tags on these pages\\\", \\\"deploy the schema markup\\\", \\\"set up 301 redirects for the migration\\\", \\\"push the audit fixes live\\\". Consumes PLAN.md from /digital-marketing-pro:seo-audit, reads the brand profile, and logs every change via seo-executor.py.",
+      "description": "Implement approved SEO fixes on a connected CMS, approval-gated. \\\"push the audit fixes live\\\"",
       "scripts": [
         "approval-manager.py"
       ],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup",
-        "seo-audit"
+        "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 8079
+      "bytes": 7437
     },
     {
       "name": "seo-plan",
       "tier": "G",
-      "description": "Build a 12-month SEO strategy and phased roadmap with industry templates (SaaS, ecommerce, local, publisher, agency). With fresh specialist outputs it runs as a dispatcher: scores four pillars — technical, content, topical, AI search — and makes the weakest pillar the plan's lead theme; missing specialists re-run only after explicit confirmation. Plans and prioritises only — makes no live changes. Triggers on \\\"/digital-marketing-pro:seo-plan\\\", \\\"build an SEO strategy\\\", \\\"what should our SEO roadmap be\\\", \\\"plan SEO for a new site\\\", \\\"which SEO pillar is weakest\\\". Reads specialist PLAN.md outputs (tech-seo-audit, content-decay-scan, aeo-audit, backlink-gap, keyword-cluster, seo-drift); feeds /digital-marketing-pro:content-engine and /digital-marketing-pro:campaign-plan.",
+      "description": "Build a 12-month SEO plan that scores four pillars and phases the roadmap. \\\"build an SEO strategy\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -2435,12 +2397,12 @@
         "tech-seo-audit"
       ],
       "doc_files": 1,
-      "bytes": 15814
+      "bytes": 15124
     },
     {
       "name": "serp-tracker",
       "tier": "G",
-      "description": "Deprecated pointer skill — SERP-feature tracking merged into rank-monitor, and this skill only explains the move and redirects you to run /digital-marketing-pro:rank-monitor --features (AI Overviews, Featured Snippets, People Also Ask, Knowledge Panels, Local Pack, and more, plus feature ownership vs competitors). Triggers on \\\"/digital-marketing-pro:serp-tracker\\\", \\\"track SERP features\\\", \\\"are we showing in AI Overviews\\\", \\\"who owns the featured snippet\\\", \\\"monitor the local pack\\\". Performs no tracking itself; pairs with /digital-marketing-pro:rank-monitor for positions plus features, /digital-marketing-pro:geo-monitor and /digital-marketing-pro:aeo-audit for scored AI visibility, and /digital-marketing-pro:gsc-ai-performance for real AI impressions.",
+      "description": "Deprecated; use rank-monitor --features for SERP features. \\\"track SERP features\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -2451,12 +2413,12 @@
         "rank-monitor"
       ],
       "doc_files": 1,
-      "bytes": 2345
+      "bytes": 1659
     },
     {
       "name": "share-of-voice",
       "tier": "E",
-      "description": "Calculate share of voice against named competitors across four dimensions — organic (volume-weighted keyword visibility), paid (Google Ads auction insights), social (mention volume with sentiment weighting), and AI citations across the six canonical AI surfaces — aggregated into a weighted SOV dashboard with gap-to-leader metrics and trend deltas. Triggers on \\\"/digital-marketing-pro:share-of-voice\\\", \\\"what's our share of voice\\\", \\\"how visible are we vs competitors\\\", \\\"are we winning the AI citation race\\\", \\\"who leads the category conversation\\\". Reads the brand profile and competitor baselines, persists each measurement via competitor-tracker.py for momentum tracking; social listening needs a connector via /digital-marketing-pro:add-integration.",
+      "description": "Calculate share of voice by script vs competitors in search, social and AI. \\\"what's our share of voice\\\"",
       "scripts": [
         "competitor-tracker.py",
         "geo-tracker.py"
@@ -2469,27 +2431,26 @@
         "brand-setup"
       ],
       "doc_files": 2,
-      "bytes": 19288
+      "bytes": 18629
     },
     {
       "name": "signal-mine",
       "tier": "G",
-      "description": "Triage a raw dump of external material — news, social threads, community discussions, competitor moves, sales-call notes — into content angles the brand has authority to make, each mapped to a pillar with a format and timeliness window, plus an explicit dropped-signals list recording why the rest were rejected. Triggers on \\\"/digital-marketing-pro:signal-mine\\\", \\\"mine this\\\", \\\"what content is in here\\\", \\\"turn this industry news into ideas\\\", \\\"any angles for us in this thread\\\". Requires the brand profile (pillars, audience, competitors) and stops without one; unverified claims route to /digital-marketing-pro:verify-claims before anything cites them; surviving angles feed /digital-marketing-pro:content-engine.",
+      "description": "Mine raw signals (news, threads, sales notes) into content angles. \\\"turn this industry news into ideas\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
         "brand-setup",
-        "content-engine",
         "verify-claims"
       ],
       "doc_files": 1,
-      "bytes": 4078
+      "bytes": 3457
     },
     {
       "name": "simulate",
       "tier": "G",
-      "description": "Run Monte Carlo simulations (default 10,000 iterations via revenue-simulator.py) of marketing scenarios — channel-mix shifts, budget reallocations, new-channel launches — reporting expected/P10/P50/P90 revenue, probability of hitting a stated target, risk-adjusted scenario ranking, and tornado-chart sensitivity analysis. Models outcomes only — commits no budget and changes no campaigns. Triggers on \\\"/digital-marketing-pro:simulate\\\", \\\"what if we shift 30% of paid budget to TikTok\\\", \\\"simulate next quarter's revenue\\\", \\\"what's the probability we hit the target\\\", \\\"compare these budget scenarios\\\". Reads the brand's historical performance plus industry-profile and channel-family benchmarks to calibrate ROI distributions.",
+      "description": "Simulate scenarios by Monte Carlo: P10-P90 revenue, odds of target. Quick estimate → what-if. \\\"simulate next quarter's revenue\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -2497,23 +2458,23 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 8554
+      "bytes": 7946
     },
     {
       "name": "sitemap-manager",
       "tier": "G",
-      "description": "Audit an existing XML sitemap — URL counts vs protocol limits, lastmod validity, sampled URL status codes, robots.txt and noindex conflicts, missing pages, compression — or generate a new sitemap (plan or valid XML with index splitting) from industry templates for SaaS, ecommerce, local, publisher, or agency sites. Triggers on \\\"/digital-marketing-pro:sitemap-manager\\\", \\\"audit our sitemap\\\", \\\"why are there 404s in the sitemap\\\", \\\"generate a sitemap for the new site\\\", \\\"is our sitemap declared in robots.txt\\\". Outputs a severity-ranked issue report or ready-to-submit XML with the robots.txt line and GSC submission instructions; uses tech-seo-auditor.py for URL health checks.",
+      "description": "Audit or generate XML sitemaps: limits, lastmod, status codes, robots conflicts. \\\"audit our sitemap\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [],
       "doc_files": 1,
-      "bytes": 5524
+      "bytes": 4936
     },
     {
       "name": "social-strategy",
       "tier": "G",
-      "description": "Build a platform-specific social media strategy: 3-5 content pillars, posting cadence, content-mix ratios, an engagement playbook with response templates, growth tactics, KPI targets, and a 30-day quick-start plan across Instagram, TikTok, LinkedIn, X, YouTube, Facebook, Pinterest, and Threads. Strategy only — schedules and publishes nothing. Triggers on \\\"/digital-marketing-pro:social-strategy\\\", \\\"build our social media strategy\\\", \\\"how often should we post on LinkedIn\\\", \\\"define our content pillars\\\", \\\"our engagement is flat, what's the plan\\\". Reads the brand profile, guidelines, and agency SOPs so pillars, cadence, and playbooks match brand voice and compliance rules.",
+      "description": "Build a social media strategy per platform: pillars, cadence, KPIs. \\\"build our social media strategy\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -2521,12 +2482,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 3988
+      "bytes": 3405
     },
     {
       "name": "sop-library",
       "tier": "E",
-      "description": "Manage the agency's Standard Operating Procedure library — create SOPs from category templates, list the library, assign SOPs to brands with per-brand overrides, check compliance against logged executions, version updates with archived backups, and view full histories. Triggers on \\\"/digital-marketing-pro:sop-library\\\", \\\"create an SOP for blog publishing\\\", \\\"assign the reporting SOP to this brand\\\", \\\"are we following our SOPs\\\", \\\"update the campaign launch checklist\\\". Stores SOPs under ~/.claude-marketing/sops/, reads execution history via execution-tracker.py for compliance scoring, flags declining adherence, and pairs with brand profiles in multi-client agency workflows.",
+      "description": "Manage the agency SOP library: templates, assignments, compliance. \\\"create an SOP for blog publishing\\\"",
       "scripts": [
         "execution-tracker.py"
       ],
@@ -2536,12 +2497,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 8647
+      "bytes": 8063
     },
     {
       "name": "status",
       "tier": "E",
-      "description": "Print a read-only status snapshot of the active brand via scripts/dm-status.py: profile summary, engagements with current part and update age, last five insights, recent compliance violations, and Python dependency mode — with --quiet, --json, --section, and --brand variants. Triggers on \\\"/digital-marketing-pro:status\\\", \\\"what's my DMP status\\\", \\\"what brand am I on\\\", \\\"show engagement status\\\", \\\"status snapshot\\\". Never modifies state: switching brands is /digital-marketing-pro:switch-brand, advancing engagements is /digital-marketing-pro:engagement, connector status is /digital-marketing-pro:integrations, and content checks are /digital-marketing-pro:check.",
+      "description": "Show DMP status for the active brand: profile, engagement progress, recent insights. \\\"what brand am I on\\\"",
       "scripts": [
         "dm-status.py"
       ],
@@ -2556,12 +2517,12 @@
         "switch-brand"
       ],
       "doc_files": 1,
-      "bytes": 9615
+      "bytes": 9049
     },
     {
       "name": "story-mine",
       "tier": "G",
-      "description": "Turn a real experience — a client win, failed launch, support ticket, founder moment — into 3-5 distinct content angles from a five-type taxonomy (lesson, contrarian take, framework, proof, relatable moment), each with format, pillar, and a draft opening in brand voice, plus an honest list of angles the story does not support. Triggers on \\\"/digital-marketing-pro:story-mine\\\", \\\"mine this story\\\", \\\"we just had a client win\\\", \\\"is there a post in this\\\", \\\"turn this experience into content\\\". Client stories anonymise by default (--client-safe); reads the brand profile for voice, pillars, and compliance; angles route to /digital-marketing-pro:content-engine for drafting and strong proof angles to /digital-marketing-pro:case-study-plan.",
+      "description": "Mine a real story like a client win into 3-5 content angles with draft openings. \\\"is there a post in this\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -2570,28 +2531,27 @@
         "content-engine"
       ],
       "doc_files": 1,
-      "bytes": 4205
+      "bytes": 3564
     },
     {
       "name": "switch-brand",
       "tier": "E",
-      "description": "Switch the active brand profile for multi-client and agency work by running setup.py --switch-brand, after listing configured brands with the active one starred; confirms the new brand's industry, business model, and primary channel so subsequent outputs use its voice and compliance rules. Triggers on \\\"/digital-marketing-pro:switch-brand\\\", \\\"switch to the other client\\\", \\\"change brand to Acme\\\", \\\"list available brands\\\", \\\"what brands do I have set up\\\". Can present a side-by-side comparison of two brand profiles on request; offers /digital-marketing-pro:brand-setup when the brand isn't found; pairs with /digital-marketing-pro:status to verify the active context.",
+      "description": "Switch the active brand profile for agency work and confirm the new context. \\\"change brand to Acme\\\"",
       "scripts": [
         "setup.py"
       ],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup",
-        "status"
+        "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 1891
+      "bytes": 1317
     },
     {
       "name": "sync-memory",
       "tier": "E",
-      "description": "Batch-sync this session's learnings, insights.json entries, and campaign history into the persistent memory layer — incremental from the last checkpoint so repeat runs are fast and idempotent — and report exactly what was synced, skipped, or failed. Triggers on \\\"/digital-marketing-pro:sync-memory\\\", \\\"save what we learned this session\\\", \\\"sync insights to memory\\\", \\\"persist campaign learnings before I close\\\", \\\"did my session learnings get saved\\\". Stores via a connected vector-DB MCP when one exists, otherwise the local index; reads the active brand profile and complements /digital-marketing-pro:save-knowledge, which saves single items.",
+      "description": "Sync session learnings to persistent memory incrementally, with a report. \\\"save what we learned this session\\\"",
       "scripts": [
         "memory-manager.py"
       ],
@@ -2602,12 +2562,12 @@
         "save-knowledge"
       ],
       "doc_files": 1,
-      "bytes": 9240
+      "bytes": 8698
     },
     {
       "name": "team-assign",
       "tier": "E",
-      "description": "Assign marketing tasks to team members by scoring role fit, channel expertise, current utilization, and region alignment; also lists active assignments and builds workload dashboards with capacity warnings and rebalancing suggestions. Triggers on \\\"/digital-marketing-pro:team-assign\\\", \\\"who should write the Q2 email sequence\\\", \\\"assign this task to someone on the team\\\", \\\"show current assignments\\\", \\\"is anyone on the team overloaded\\\". Reads the team roster and capacity via team-manager.py, notifies assignees through a connected Slack or email MCP when available, and logs every assignment for audit.",
+      "description": "Assign marketing tasks to team members by role fit and workload. \\\"who should write the Q2 email sequence\\\"",
       "scripts": [
         "team-manager.py"
       ],
@@ -2617,12 +2577,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 13167
+      "bytes": 12664
     },
     {
       "name": "tech-seo-audit",
       "tier": "E",
-      "description": "Run a technical SEO audit of a site — crawlability, indexation, Core Web Vitals, redirects, structured data, mobile, security — and produce a severity-ranked report with specific fixes, effort estimates, and quick wins. Triggers on \\\"/digital-marketing-pro:tech-seo-audit\\\", \\\"audit my site's technical SEO\\\", \\\"why isn't Google indexing my pages\\\", \\\"check Core Web Vitals\\\", \\\"find crawl errors on my site\\\". Reads the brand profile and the /digital-marketing-pro:technical-seo reference files; link-profile work is out of scope — pairs with /digital-marketing-pro:seo-audit for the content and E-E-A-T side and /digital-marketing-pro:backlink-gap for competitor link gaps.",
+      "description": "Audit technical SEO site-wide by script: crawl, indexation, Web Vitals. A single page → page-seo-analysis. \\\"why isn't Google indexing my pages\\\"",
       "scripts": [
         "tech-seo-auditor.py"
       ],
@@ -2631,32 +2591,30 @@
       "cross_refs": [
         "backlink-gap",
         "brand-setup",
-        "seo-audit",
-        "technical-seo"
+        "seo-audit"
       ],
       "doc_files": 1,
-      "bytes": 8753
+      "bytes": 8219
     },
     {
       "name": "technical-seo",
       "tier": "E",
-      "description": "Deep technical SEO knowledge module covering Core Web Vitals, crawlability, indexation, site architecture, JavaScript SEO, redirects, structured data, hreflang, and migrations — producing audit reports, redirect maps, robots.txt and JSON-LD specs, and migration checklists. Triggers on \\\"/digital-marketing-pro:technical-seo\\\", \\\"my LCP is failing\\\", \\\"plan a site migration\\\", \\\"fix redirect chains\\\", \\\"write schema markup for my pages\\\", \\\"crawl budget problems\\\". Reads the brand profile plus its own reference files (core-web-vitals, crawlability, site-architecture, indexation, international-seo) and backs the /digital-marketing-pro:tech-seo-audit command.",
+      "description": "Technical SEO reference for deep fixes: Web Vitals, JS SEO, migrations, schema. \\\"plan a site migration\\\"",
       "scripts": [
         "campaign-tracker.py"
       ],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup",
-        "tech-seo-audit"
+        "brand-setup"
       ],
       "doc_files": 6,
-      "bytes": 111441
+      "bytes": 110881
     },
     {
       "name": "translate-content",
       "tier": "E",
-      "description": "Translate marketing content with automatic service routing per language pair, quality scoring across five dimensions (length ratio, formatting, key terms, placeholders, completeness), and a brand-voice check on the result; flags idioms, wordplay, and emotional CTAs for transcreation with 2-3 scored creative options plus back-translations. Triggers on \\\"/digital-marketing-pro:translate-content\\\", \\\"translate this landing page into German\\\", \\\"localize this email for India\\\", \\\"transcreate our slogan\\\", \\\"does the translated version keep our brand voice\\\". Reads the brand profile's do-not-translate terms, glossary, and formality preferences; executes via connected translation MCP servers.",
+      "description": "Translate marketing content using the brand glossary and do-not-translate terms, with quality scoring. \\\"translate this into Japanese\\\"",
       "scripts": [
         "brand-voice-scorer.py",
         "language-router.py"
@@ -2668,12 +2626,12 @@
         "language-config"
       ],
       "doc_files": 1,
-      "bytes": 11358
+      "bytes": 10798
     },
     {
       "name": "validate-output",
       "tier": "E",
-      "description": "Validate marketing content against a structural schema — required sections, word counts, markdown formatting, placeholder text (TBD, lorem ipsum, unfilled variables), CTA-topic consistency, and SEO structure — returning a pass/fail checklist with fix instructions. Eight built-in schemas plus custom JSON schemas; auto-detects the schema when none is named. Triggers on \\\"/digital-marketing-pro:validate-output\\\", \\\"check this post against the blog schema\\\", \\\"is this email structurally ready to ship\\\", \\\"scan for leftover placeholders\\\", \\\"why does this draft feel incomplete\\\". Runs output-validator.py and reads brand templates and custom schemas; complements /digital-marketing-pro:eval-content, which judges quality rather than structure.",
+      "description": "Validate content structure against a schema: sections, word counts. \\\"scan for leftover placeholders\\\"",
       "scripts": [
         "output-validator.py"
       ],
@@ -2687,12 +2645,12 @@
         "eval-content"
       ],
       "doc_files": 1,
-      "bytes": 9104
+      "bytes": 8457
     },
     {
       "name": "validate-profile",
       "tier": "E",
-      "description": "Read-only health check that a brand profile is production-ready: required fields, voice and audience completeness, guardrails, compliance-jurisdiction coverage, connector configuration and MCP reachability, output-path writeability, and model-registry age — reported per check as BLOCKER or WARNING without ever printing credential values. Triggers on \\\"/digital-marketing-pro:validate-profile\\\", \\\"is the brand setup correct\\\", \\\"check connector credentials\\\", \\\"profile sanity check\\\", \\\"we rotated an API key — is it wired up\\\". Reads profile.json and probes connectors via connector-status.py; the prerequisite gate before /digital-marketing-pro:engagement, /digital-marketing-pro:campaign-plan, and /digital-marketing-pro:launch-campaign.",
+      "description": "Validate the brand profile is production-ready: fields, compliance, connectors. \\\"is the brand setup correct\\\"",
       "scripts": [
         "connector-status.py",
         "refresh_models.py",
@@ -2715,12 +2673,12 @@
         "switch-brand"
       ],
       "doc_files": 1,
-      "bytes": 13167
+      "bytes": 12530
     },
     {
       "name": "verify-claims",
       "tier": "E",
-      "description": "Extract every verifiable claim in marketing copy — statistics, rankings, awards, citations, performance and time-bound assertions — and check each against a user-supplied evidence JSON, classifying it verified, partially verified, unverified, or contradicted, with corrected-text and hedged-language suggestions. Without an evidence file it runs extraction-only and generates a template to fill in. Triggers on \\\"/digital-marketing-pro:verify-claims\\\", \\\"fact-check this case study\\\", \\\"can we back up these numbers\\\", \\\"is this statistic real\\\", \\\"check our award claims before the press release\\\". Runs claim-verifier.py and applies brand compliance rules for regulated industries; the claim-integrity deep-dive alongside /digital-marketing-pro:eval-content.",
+      "description": "Verify copy claims by script against evidence you give; without it, lists what needs proof. \\\"can we back up these numbers\\\"",
       "scripts": [
         "claim-verifier.py"
       ],
@@ -2734,12 +2692,12 @@
         "eval-content"
       ],
       "doc_files": 1,
-      "bytes": 9848
+      "bytes": 9208
     },
     {
       "name": "video-packaging",
       "tier": "M",
-      "description": "Generate or critique video packaging — title + thumbnail-text pairs where the title carries context and keywords, the thumbnail text carries the tension, and any word echoed between them is rejected as wasted real estate. Generate mode delivers 3 pairs tagged by discovery intent (search vs browse) with a recommendation and A/B note; critique mode returns a PASS/FIX/FAIL verdict with 3 fixed pairs. Triggers on \\\"/digital-marketing-pro:video-packaging\\\", \\\"title for this video\\\", \\\"thumbnail text ideas\\\", \\\"why is no one clicking this video\\\", \\\"critique this title\\\", \\\"package this video\\\". Pairs with /digital-marketing-pro:video-script, pulls real query phrasing from /digital-marketing-pro:keyword-research for search-intent titles, and gates title claims through /digital-marketing-pro:check before anything ships.",
+      "description": "Package a video: title and thumbnail-text pairs that never repeat words, or critique them. \\\"why is no one clicking this video\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [
@@ -2751,12 +2709,12 @@
         "video-script"
       ],
       "doc_files": 1,
-      "bytes": 5283
+      "bytes": 4585
     },
     {
       "name": "video-script",
       "tier": "M",
-      "description": "Write a production-ready video script — 3 hook variants, timestamped dialogue with visual and audio direction columns, CTA placement map, retention notes, accessibility package, and thumbnail concepts. Detects whether the script is organic or an ad: organic scripts declare a search/browse discovery intent, ad scripts inherit objective, audience, and offer from campaign context and follow per-format rules (6s bumper, 15s skippable, 30s spot, UGC-style with disclosure). Triggers on \\\"/digital-marketing-pro:video-script\\\", \\\"write a YouTube script about X\\\", \\\"script a 15-second ad\\\", \\\"TikTok video for our launch\\\", \\\"explainer video script\\\". Reads the brand profile and campaign briefs; every script passes the /digital-marketing-pro:check gate before delivery.",
+      "description": "Write a video script: hooks, timestamped dialogue, visual cues. Title/thumbnail → video-packaging. \\\"write a YouTube script about X\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [
@@ -2769,12 +2727,12 @@
         "video-packaging"
       ],
       "doc_files": 1,
-      "bytes": 12118
+      "bytes": 11482
     },
     {
       "name": "webinar-plan",
       "tier": "G",
-      "description": "Plan a webinar or virtual event end to end — format selection, minute-by-minute run of show, registration page copy, a 3-week multi-channel promotion calendar, email sequences, presenter guide, engagement plan, post-event follow-up funnel, and a day-of checklist with success metrics. Triggers on \\\"/digital-marketing-pro:webinar-plan\\\", \\\"plan a webinar on X\\\", \\\"how do we get more webinar registrations\\\", \\\"build the follow-up sequence for our virtual event\\\", \\\"run of show for next month's demo day\\\". Reads the brand profile, guidelines, and agency SOPs; produces the plan and copy for a team to execute — it does not send emails or configure the webinar platform itself.",
+      "description": "Plan a webinar end to end: run of show, registration copy, promotion, follow-up. \\\"plan a webinar on X\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -2782,12 +2740,12 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7949
+      "bytes": 7371
     },
     {
       "name": "what-if",
       "tier": "G",
-      "description": "Compare 2-4 marketing budget scenarios side by side with directional point-estimate projections — revenue, ROI, and risk per scenario, deltas versus the current baseline, and a recommendation with the key trade-offs spelled out. The fast alternative to full Monte Carlo via /digital-marketing-pro:simulate; outputs are planning aids built from stated assumptions, not forecasts. Triggers on \\\"/digital-marketing-pro:what-if\\\", \\\"should we shift budget from paid to content\\\", \\\"compare these two budget splits\\\", \\\"what happens if we double the ads budget\\\", \\\"quick scenario check before the meeting\\\". Runs revenue-simulator.py in what-if mode and calibrates against the brand profile's historical channel performance.",
+      "description": "Run a quick what-if on 2-4 budget scenarios with revenue and ROI estimates. \\\"compare two budget splits\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -2796,18 +2754,18 @@
         "simulate"
       ],
       "doc_files": 1,
-      "bytes": 6745
+      "bytes": 6128
     },
     {
       "name": "yearly-planner",
       "tier": "G",
-      "description": "Produce the 12-month operational Yearly Planner — the Part 8 calendar companion to the Growth Plan — with quarterly themes, 12 monthly sections (initiatives with owners, key dates, budget, KPI targets), seasonal strategy, campaign and content-pillar calendars, and channel cadence, delivered as markdown, PDF, and XLSX. Triggers on \\\"/digital-marketing-pro:yearly-planner\\\", \\\"produce the yearly planner\\\", \\\"month-by-month execution plan\\\", \\\"operational calendar for the year\\\", \\\"quarterly themes and monthly initiatives\\\". Requires a completed Growth Plan and Part 7 preparation docs; reads the brand profile for geography-driven seasonality and marks Part 8 complete in the engagement workflow.",
+      "description": "Produce the Part 8 yearly planner: quarterly themes and monthly initiatives. \\\"plan the whole year month by month\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [],
       "doc_files": 1,
-      "bytes": 8491
+      "bytes": 7903
     }
   ]
 }

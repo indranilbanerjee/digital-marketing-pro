@@ -1,6 +1,6 @@
 ---
 name: launch-ad-campaign
-description: "Create and launch a paid ad campaign on Google, Meta, LinkedIn, or TikTok through the connected ad-platform MCP — campaign structure, audience targeting, bid strategy, negative targeting, creative quality scoring, compliance review, and a post-launch monitoring schedule. A mandatory execution gate shows the full spend summary and requires an explicit typed yes before anything goes live; budgets over brand thresholds force re-confirmation and every approval is recorded via approval-manager.py. Triggers on \"/digital-marketing-pro:launch-ad-campaign\", \"launch the Google Ads campaign\", \"put these Meta ads live\", \"start the LinkedIn campaign tomorrow\", \"deploy our TikTok ads\". Reads the brand profile's budget thresholds, guidelines, and agency SOPs; it is the paid-ads subset that /digital-marketing-pro:launch-campaign delegates to."
+description: "Launch a paid ad campaign on a connected ad platform, approval-gated. \"launch the Google Ads campaign\""
 disable-model-invocation: false
 argument-hint: "[platform]"
 ---

@@ -1,6 +1,6 @@
 ---
 name: gsc-ai-performance
-description: "Baseline and interpret Google Search Console's AI Performance Report — combined AI Overviews + AI Mode impressions, cited pages, country and device mix (impressions only: no clicks, CTR or queries, and GA4 files AI Overviews/AI Mode visits under Organic Search) — from a user-supplied CSV export, with an in-SC AI opt-out recommendation and a gated quality scorecard. Triggers on \"/digital-marketing-pro:gsc-ai-performance\", \"read the new GSC AI report\", \"baseline our AI search visibility\", \"how many AI Overviews impressions do we get\", \"should we opt out of AI results\". Parses and archives exports via gsc-ai-performance.py, reconciles actuals against /digital-marketing-pro:aeo-audit probes, and feeds /digital-marketing-pro:seo-drift."
+description: "Read the GSC AI Performance report by script: AI Overviews and AI Mode impressions. \"read the new GSC AI report\""
 argument-hint: "[brand-name or site URL]"
 ---
 

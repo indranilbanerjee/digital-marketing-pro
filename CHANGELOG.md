@@ -6,6 +6,65 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.34.0] - 2026-10-10
+
+### Every description fits the listing budget, and the model finds the right skill more often
+
+**Changed — descriptions**
+
+- **All 164 skill, 5 command and 1 workflow descriptions now fit Claude Code's
+  skill-listing budget.** The budget is characters, not tokens: the context
+  window x 4 x `skillListingBudgetFraction` (default 1%), so 8,000 characters
+  on a 200k window and 40,000 on 1M, shared by every installed plugin. Every
+  listed name counts and is never dropped. DMP's listing needed about 126,600
+  characters, so on a 1M window every description was cut to about 195
+  characters and its trigger phrases never reached the model. It is now
+  25,974 (median description 109 characters), which leaves room for other
+  plugins inside a 1M window's 40,000. On a 200k
+  window the listing is still over budget and descriptions are shortened;
+  each now opens with what the skill does, so the part that survives is the
+  part that routes.
+- Each description says what the skill does, why to load it rather than
+  answer in chat (it runs a script, has an approval gate, reads the brand
+  profile), and one phrase a user would type. Slash aliases and "Triggers on"
+  lists are gone from the listing and remain in the skill bodies.
+- `tests/test_description_density.py` enforces the rule: 60-150 characters,
+  median <= 110, one owner per quoted phrase, 24 registered near-miss pairs
+  with a pointer on one side only, and the listing formula with a
+  26,000-character ceiling. Its docstring records why, so the descriptions are
+  not made "denser" again.
+- **Workflows count too.** `workflows/*.js` descriptions are listed alongside
+  skills and commands; the guard now reads them (planted). The after-eval
+  found the competitor-sweep workflow, whose 183-character description named
+  exactly the dimensions of a competitor question, taking requests meant for
+  competitor-analysis. Rewritten, with a pointer to competitor-analysis.
+
+**Measured with trigger evals** (`claude plugin eval`, listing budget pinned
+so the comparison measures wording rather than truncation, first action
+graded, 3 runs per case and 5 for near-miss pairs):
+
+- Same 45 cases before and after: 136/169 runs pass before, 153/169 after
+  (80.5% to 90.5%). ab-test-plan, check, funnel-audit and seo-audit went
+  from 0 or 1 of 3 to 3 of 3. "Should not trigger" cases stay
+  quiet (12/12), and every near-miss pair holds at 4/5 or better except
+  translate-content.
+- Two cases got worse in the first after-run and were fixed before release:
+  competitor-analysis (the workflow above) and verify-claims ("against
+  supplied evidence" sent the model looking for a file first; the skill also
+  works without one, and now says what it does then). Both pass 3/3 on
+  re-run.
+- Each fix was checked against a second, differently worded request, and
+  counts only if that passes too. It holds for ab-test-plan, budget-tracker,
+  check, funnel-audit, seo-audit, competitor-analysis and verify-claims (3/3
+  each). paid-advertising passes its original case 3/3 but its reworded twin
+  0/3 (the model answers in chat), so that fix is not counted.
+- Not fixed, reported as is: translate-content (the model translates a
+  one-line request itself, 0/5 before and after) and hreflang-check (its test
+  prompt never attaches the page it asks about; recorded in `evals/README.md`
+  as a case defect, kept unchanged so the comparison stays paired).
+- At Claude Code's default budget, without the pin, the same cases pass and
+  fail (42 of 45).
+
 ## [3.33.3] - 2026-10-04
 
 ### Fixed — Hermes refused to install the plugin

@@ -1,6 +1,6 @@
 ---
 name: c2pa-metadata
-description: "Embed a C2PA provenance manifest into an AI-generated marketing asset (PNG, JPG, WebP, GIF, TIFF, MP4, MOV, WebM, MP3, WAV, PDF) via scripts/embed-c2pa.py — produces a signed copy of the file carrying IPTC digital-source-type AI claims, an optional c2pa.ai-disclosure assertion for EU AI Act Article 50 (applicable 2 Aug 2026), and a JSON status report. Triggers on \"/digital-marketing-pro:c2pa-metadata\", \"sign this AI image for EU compliance\", \"add content credentials to this asset\", \"embed provenance metadata\", \"mark this video as AI-generated\". Uses a self-signed dev certificate unless --signing-cert/--signing-key are supplied; pairs with /digital-marketing-pro:check, which verifies manifests pre-publish."
+description: "Embed C2PA provenance in AI-generated images, video or PDF by script. \"add content credentials to this asset\""
 ---
 
 # /digital-marketing-pro:c2pa-metadata — Embed Content Authenticity Provenance

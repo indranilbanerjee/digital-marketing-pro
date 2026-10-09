@@ -1,5 +1,5 @@
 ---
-description: "Per-action readiness diagnostic. Shows which campaign-audit and launch-campaign actions are live (manifest-ready) vs blocked (stub-unconfigured) in the current environment, with one-step setup hints for the blocked ones. Now includes model-registry freshness + Cowork+Drive routing status."
+description: "Run the readiness doctor: which audit and launch actions are live or blocked. \"why is this action blocked\""
 argument-hint: "[--brand <slug>] [--action <id>] [--channel <name>] [--json] [--summary]"
 allowed-tools: Bash Read
 ---

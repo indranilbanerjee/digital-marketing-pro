@@ -1,5 +1,5 @@
 ---
-description: Resume a long-running DMP workflow (engagement / campaign-plan / content-engine / seo-audit / competitor-analysis / campaign-audit / launch-campaign) that was interrupted partway through
+description: "Resume an interrupted DMP workflow from its checkpoint. \"pick up where we left off\""
 argument-hint: "[workflow] [run-id] (both optional — omit to auto-pick latest in-progress)"
 disable-model-invocation: false
 ---
