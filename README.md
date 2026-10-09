@@ -816,7 +816,7 @@ If a version stays the same but content changed (fast-iteration debugging): dele
 
 ## Neelverse Marketing Suite
 
-DM Pro is part of a three-plugin suite by [Indranil Banerjee](https://indranil.in) — share the same brand profiles, install together, designed to chain:
+DM Pro is part of a three-plugin suite by [Indranil Banerjee](https://indranil.in) — one marketplace, installed together, designed to chain (each plugin keeps its own brand setup):
 
 | Plugin | What it does |
 |---|---|
