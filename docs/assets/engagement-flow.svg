@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 416" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <title>The 12-Part Engagement Methodology</title>
+  <desc>Twelve parts in order: client inputs, external research, the Four Core Documents, market analyses, client validation (the one true stop), selective v2 re-runs, preparation documents, the Growth Plan and Yearly Planner, channel fan-out, execution artefacts, AI creative instructions, and the continuous improvement loop, which feeds the next cycle.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a6577"/>
+    </marker>
+    <marker id="arrloop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b06414"/>
+    </marker>
+  </defs>
+
+  <text x="590" y="26" text-anchor="middle" font-size="17" font-weight="700" fill="#8a94a4">The 12-part engagement — research first, the client validates once, then everything is built on the validated view</text>
+
+  <!-- row 1 -->
+  <g font-size="13" text-anchor="middle">
+    <g>
+      <rect x="20" y="76" width="170" height="80" rx="10" fill="#e5f1ee" stroke="#9cc5bb"/>
+      <text x="105" y="100" font-weight="700" fill="#1f2733">1  Client inputs</text>
+      <text x="105" y="120" fill="#5a6577" font-size="11.5">Stone vs Opinion:</text>
+      <text x="105" y="137" fill="#5a6577" font-size="11.5">known vs believed</text>
+    </g>
+    <g>
+      <rect x="212" y="76" width="170" height="80" rx="10" fill="#e5f1ee" stroke="#9cc5bb"/>
+      <text x="297" y="100" font-weight="700" fill="#1f2733">2  External research</text>
+      <text x="297" y="120" fill="#5a6577" font-size="11.5">unbiased: no client</text>
+      <text x="297" y="137" fill="#5a6577" font-size="11.5">documents used</text>
+    </g>
+    <g>
+      <rect x="404" y="76" width="170" height="80" rx="10" fill="#e3eefb" stroke="#9db8dd"/>
+      <text x="489" y="100" font-weight="700" fill="#1f2733">3  Four Core Docs</text>
+      <text x="489" y="120" fill="#5a6577" font-size="11.5">business, segments,</text>
+      <text x="489" y="137" fill="#5a6577" font-size="11.5">brand, DMFlow — 61 steps</text>
+    </g>
+    <g>
+      <rect x="596" y="76" width="170" height="80" rx="10" fill="#e5f1ee" stroke="#9cc5bb"/>
+      <text x="681" y="100" font-weight="700" fill="#1f2733">4  Market analyses</text>
+      <text x="681" y="120" fill="#5a6577" font-size="11.5">competitive, customer,</text>
+      <text x="681" y="137" fill="#5a6577" font-size="11.5">market — 4 documents</text>
+    </g>
+    <g>
+      <rect x="788" y="76" width="170" height="80" rx="10" fill="#f9efe2" stroke="#d9b389"/>
+      <text x="873" y="100" font-weight="700" fill="#1f2733">5  Client validation</text>
+      <text x="873" y="120" fill="#5a6577" font-size="11.5">the one true stop: accept,</text>
+      <text x="873" y="137" fill="#5a6577" font-size="11.5">reject or edit each finding</text>
+    </g>
+    <g>
+      <rect x="980" y="76" width="170" height="80" rx="10" fill="#e5f1ee" stroke="#9cc5bb"/>
+      <text x="1065" y="100" font-weight="700" fill="#1f2733">6  v2 re-runs</text>
+      <text x="1065" y="120" fill="#5a6577" font-size="11.5">only what validation</text>
+      <text x="1065" y="137" fill="#5a6577" font-size="11.5">changed (Decision Matrix)</text>
+    </g>
+  </g>
+  <g stroke="#5a6577" stroke-width="1.6" fill="none">
+    <line x1="190" y1="116" x2="206" y2="116" marker-end="url(#arr)"/>
+    <line x1="382" y1="116" x2="398" y2="116" marker-end="url(#arr)"/>
+    <line x1="574" y1="116" x2="590" y2="116" marker-end="url(#arr)"/>
+    <line x1="766" y1="116" x2="782" y2="116" marker-end="url(#arr)"/>
+    <line x1="958" y1="116" x2="974" y2="116" marker-end="url(#arr)"/>
+  </g>
+  <!-- v2 re-run loop: 6 back to 3/4 -->
+  <path d="M 1065 76 C 1040 60, 700 58, 520 72" stroke="#b06414" stroke-width="1.4" stroke-dasharray="5 4" fill="none" marker-end="url(#arrloop)"/>
+  <text x="800" y="50" text-anchor="middle" font-size="10.5" fill="#b06414">re-run the parts the client changed (v1 is kept)</text>
+
+  <!-- wrap 6 to 7 -->
+  <path d="M 1065 156 L 1065 186 L 105 186 L 105 214" stroke="#5a6577" stroke-width="1.6" fill="none" marker-end="url(#arr)"/>
+
+  <!-- row 2 -->
+  <g font-size="13" text-anchor="middle">
+    <g>
+      <rect x="20" y="220" width="170" height="80" rx="10" fill="#e5f1ee" stroke="#9cc5bb"/>
+      <text x="105" y="244" font-weight="700" fill="#1f2733">7  Preparation</text>
+      <text x="105" y="264" fill="#5a6577" font-size="11.5">KPI tree, pillars,</text>
+      <text x="105" y="281" fill="#5a6577" font-size="11.5">approval chains</text>
+    </g>
+    <g>
+      <rect x="212" y="220" width="170" height="80" rx="10" fill="#e3eefb" stroke="#9db8dd"/>
+      <text x="297" y="244" font-weight="700" fill="#1f2733">8  Growth Plan</text>
+      <text x="297" y="264" fill="#5a6577" font-size="11.5">11-section strategy +</text>
+      <text x="297" y="281" fill="#5a6577" font-size="11.5">12-month Yearly Planner</text>
+    </g>
+    <g>
+      <rect x="404" y="220" width="170" height="80" rx="10" fill="#e5f1ee" stroke="#9cc5bb"/>
+      <text x="489" y="244" font-weight="700" fill="#1f2733">9  Channel fan-out</text>
+      <text x="489" y="264" fill="#5a6577" font-size="11.5">up to 17 channel docs</text>
+      <text x="489" y="281" fill="#5a6577" font-size="11.5">in 7 families</text>
+    </g>
+    <g>
+      <rect x="596" y="220" width="170" height="80" rx="10" fill="#e5f1ee" stroke="#9cc5bb"/>
+      <text x="681" y="244" font-weight="700" fill="#1f2733">10  Execution</text>
+      <text x="681" y="264" fill="#5a6577" font-size="11.5">ad and post copy,</text>
+      <text x="681" y="281" fill="#5a6577" font-size="11.5">headlines, CTAs</text>
+    </g>
+    <g>
+      <rect x="788" y="220" width="170" height="80" rx="10" fill="#e5f1ee" stroke="#9cc5bb"/>
+      <text x="873" y="244" font-weight="700" fill="#1f2733">11  Creative briefs</text>
+      <text x="873" y="264" fill="#5a6577" font-size="11.5">AI visual instructions,</text>
+      <text x="873" y="281" fill="#5a6577" font-size="11.5">C2PA + EU Article 50</text>
+    </g>
+    <g>
+      <rect x="980" y="220" width="170" height="80" rx="10" fill="#e5f1ee" stroke="#9cc5bb"/>
+      <text x="1065" y="244" font-weight="700" fill="#1f2733">12  Improvement loop</text>
+      <text x="1065" y="264" fill="#5a6577" font-size="11.5">quarterly briefs from</text>
+      <text x="1065" y="281" fill="#5a6577" font-size="11.5">live results</text>
+    </g>
+  </g>
+  <g stroke="#5a6577" stroke-width="1.6" fill="none">
+    <line x1="190" y1="260" x2="206" y2="260" marker-end="url(#arr)"/>
+    <line x1="382" y1="260" x2="398" y2="260" marker-end="url(#arr)"/>
+    <line x1="574" y1="260" x2="590" y2="260" marker-end="url(#arr)"/>
+    <line x1="766" y1="260" x2="782" y2="260" marker-end="url(#arr)"/>
+    <line x1="958" y1="260" x2="974" y2="260" marker-end="url(#arr)"/>
+  </g>
+  <!-- improvement loop: 12 back to 1 -->
+  <path d="M 1065 300 C 1050 336, 140 336, 60 304" stroke="#b06414" stroke-width="1.4" stroke-dasharray="5 4" fill="none" marker-end="url(#arrloop)"/>
+  <text x="590" y="350" text-anchor="middle" font-size="10.5" fill="#b06414">corrections version the source documents (v2.1, v2.2 …) and feed the next cycle</text>
+
+  <!-- legend -->
+  <g font-size="11.5" fill="#8a94a4">
+    <rect x="250" y="366" width="14" height="14" rx="3" fill="#e5f1ee" stroke="#9cc5bb"/>
+    <text x="270" y="378">working document</text>
+    <rect x="420" y="366" width="14" height="14" rx="3" fill="#e3eefb" stroke="#9db8dd"/>
+    <text x="440" y="378">flagship client deliverable</text>
+    <rect x="640" y="366" width="14" height="14" rx="3" fill="#f9efe2" stroke="#d9b389"/>
+    <text x="660" y="378">the client decides</text>
+  </g>
+  <text x="590" y="406" text-anchor="middle" font-size="11.5" fill="#8a94a4">Two views: v1 (unbiased market view) is never deleted; after Part 5, operating decisions use v2 (client-validated). Source: skills/context-engine/</text>
+</svg>

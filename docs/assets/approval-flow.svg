@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 400" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <title>How a live write gets approved in Digital Marketing Pro</title>
+  <desc>Prepare builds the exact request and a pending record with its sha256 and a preview, sending nothing. You read the preview and type yes. The approval step marks the record approved. Fire rebuilds the request and sends it only if the hash matches, within 15 minutes, and the record is unused; otherwise it is refused and nothing is sent. Writes through MCP server tools are outside this check and rely on the typed yes and the host permission prompt.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a6577"/>
+    </marker>
+    <marker id="arrno" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b3412f"/>
+    </marker>
+  </defs>
+
+  <text x="590" y="28" text-anchor="middle" font-size="17" font-weight="700" fill="#8a94a4">How a live write gets approved — one record, for one exact request, used once</text>
+
+  <g font-size="13" text-anchor="middle">
+    <g>
+      <rect x="20" y="62" width="200" height="104" rx="10" fill="#e5f1ee" stroke="#9cc5bb"/>
+      <text x="120" y="88" font-weight="700" fill="#1f2733">1  Prepare</text>
+      <text x="120" y="110" fill="#5a6577" font-size="11.5">builds the exact request</text>
+      <text x="120" y="128" fill="#5a6577" font-size="11.5">pending record + its sha256</text>
+      <text x="120" y="146" fill="#5a6577" font-size="11.5">shows a preview, sends nothing</text>
+    </g>
+    <g>
+      <rect x="250" y="62" width="200" height="104" rx="10" fill="#f9efe2" stroke="#d9b389"/>
+      <text x="350" y="88" font-weight="700" fill="#1f2733">2  You decide</text>
+      <text x="350" y="110" fill="#5a6577" font-size="11.5">read the preview as printed</text>
+      <text x="350" y="128" fill="#5a6577" font-size="11.5">type yes — anything else cancels</text>
+      <text x="350" y="146" fill="#5a6577" font-size="11.5">30 minutes to review</text>
+    </g>
+    <g>
+      <rect x="480" y="62" width="200" height="104" rx="10" fill="#e5f1ee" stroke="#9cc5bb"/>
+      <text x="580" y="88" font-weight="700" fill="#1f2733">3  Approve</text>
+      <text x="580" y="110" fill="#5a6577" font-size="11.5">the approval step marks</text>
+      <text x="580" y="128" fill="#5a6577" font-size="11.5">the record approved</text>
+      <text x="580" y="146" fill="#5a6577" font-size="11.5">pending → approved</text>
+    </g>
+    <g>
+      <rect x="710" y="62" width="200" height="104" rx="10" fill="#e5f1ee" stroke="#9cc5bb"/>
+      <text x="810" y="88" font-weight="700" fill="#1f2733">4  Fire</text>
+      <text x="810" y="110" fill="#5a6577" font-size="11.5">rebuilds the request</text>
+      <text x="810" y="128" fill="#5a6577" font-size="11.5">must match the record's hash</text>
+      <text x="810" y="146" fill="#5a6577" font-size="11.5">within 15 minutes, never reused</text>
+    </g>
+    <g>
+      <rect x="940" y="62" width="200" height="104" rx="10" fill="#e3eefb" stroke="#9db8dd"/>
+      <text x="1040" y="88" font-weight="700" fill="#1f2733">Sent once</text>
+      <text x="1040" y="110" fill="#5a6577" font-size="11.5">the record is consumed</text>
+      <text x="1040" y="128" fill="#5a6577" font-size="11.5">every fire is logged</text>
+      <text x="1040" y="146" fill="#5a6577" font-size="11.5">with a copy of the record</text>
+    </g>
+  </g>
+
+  <g stroke="#5a6577" stroke-width="1.6" fill="none">
+    <line x1="220" y1="114" x2="244" y2="114" marker-end="url(#arr)"/>
+    <line x1="450" y1="114" x2="474" y2="114" marker-end="url(#arr)"/>
+    <line x1="680" y1="114" x2="704" y2="114" marker-end="url(#arr)"/>
+    <line x1="910" y1="114" x2="934" y2="114" marker-end="url(#arr)"/>
+  </g>
+
+  <!-- refusal branch -->
+  <line x1="810" y1="166" x2="810" y2="196" stroke="#b3412f" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrno)"/>
+  <g font-size="13" text-anchor="middle">
+    <rect x="690" y="202" width="240" height="62" rx="10" fill="#fbecea" stroke="#e0aaa2"/>
+    <text x="810" y="226" font-weight="700" fill="#1f2733">Refused — nothing is sent</text>
+    <text x="810" y="247" fill="#5a6577" font-size="11.5">changed request, expired or used record</text>
+  </g>
+  <text x="350" y="232" text-anchor="middle" font-size="11.5" fill="#8a94a4">A batch gets one record with an itemised preview;</text>
+  <text x="350" y="250" text-anchor="middle" font-size="11.5" fill="#8a94a4">each item is checked and consumed on its own.</text>
+
+  <!-- outside the code check -->
+  <rect x="20" y="288" width="1120" height="68" rx="10" fill="none" stroke="#8a94a4" stroke-dasharray="6 5"/>
+  <text x="40" y="314" font-size="12.5" fill="#b06414" font-weight="700">Outside this check:</text>
+  <text x="168" y="314" font-size="12.5" fill="#8a94a4">writes through MCP server tools (Google Ads, Meta, LinkedIn, TikTok, Amazon) rely on the skill's typed yes and your host's permission prompt.</text>
+  <text x="40" y="338" font-size="12.5" fill="#b06414" font-weight="700">The gate the agent can't fake:</text>
+  <text x="224" y="338" font-size="12.5" fill="#8a94a4">your host's permission prompt. Keep connector_executor.py --execute and MCP write tools off its allowlist.</text>
+
+  <text x="590" y="388" text-anchor="middle" font-size="11.5" fill="#8a94a4">The record proves the approval step ran for this exact request, once — not who typed yes. Source: commands/execute-action.md, scripts/connector_executor.py</text>
+</svg>
