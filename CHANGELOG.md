@@ -6,6 +6,48 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.35.0] - 2026-10-10
+
+### Live writes need a matching approval record, and the Hermes review is answered point by point
+
+A maintainer review of the Hermes catalog listing (NousResearch/hermes-agent#132571, against 3.33.3) asked for changes before listing. Every point is fixed below, with tests that fail if the fix is undone (each test was run against the old code and failed there).
+
+**Changed (behaviour) — approvals for live writes (review item 2)**
+
+- **Writes sent by `connector_executor.py` fire only against a matching approval record.** `--execute` without an id builds the exact request, writes a pending record holding its sha256 and a preview rendered by the script, sends nothing and exits 2. After the user types `yes`, the skill runs `approval-manager.py --action approve`. The fire step rebuilds the request and must match the hash (brand, connector, action, credential name, URL, body); the record must be approved, inside its window (30 minutes to review, 15 to fire) and unused. It is consumed once the request is sent, whatever the HTTP status, and released if nothing was sent. `--confirm` no longer fires anything.
+- What this proves is stated as such everywhere: the approval step ran for this exact request, once, in its window. Code cannot tell the user from the agent, which runs every command, and writes through MCP server tools (Google Ads, Meta, LinkedIn, TikTok, Amazon) are outside this check; they rely on the skill's typed `yes` and the host's permission prompt. The docs now say to keep `connector_executor.py --execute` out of the host's allowlist, the one check the agent cannot fake. Every fire is logged with a full copy of the record.
+- Batches: `--prepare-batch` writes one record with an itemised preview; each item is consumed on its own and a changed item fails alone. Standing approvals (`approval-manager.py --action create-standing`) are scoped to a connector and actions, capped per day and expire within 7 days (executor) or 30 (autopilot), with every use logged.
+- `approval-manager.py` no longer stamps `approved_by: "user"`; it records `approved_via: "approval-step"` and the time. The 23 skill calls that sent fields the approval step rejected now send `type`, `platform` and `content_summary`, and every execution skill says to stop and report if the approval step errors. Slack and other internal messages are no longer auto-confirmed.
+- **Autopilot proposes by default.** `allowed_actions` now defaults to empty, so every correction waits for a typed `yes`. Pre-authorising corrections needs `set-guardrails --approval-id` with an approved autopilot standing approval; automatic corrections stop at its daily cap. Guardrails written before 3.35.0 that already list actions keep working as written.
+- Fixed a bypass the red-team found: `resolve_action` ran local actions (arm-watchdog writes a file) during resolution, so even a dry run had a side effect before any gate. Resolving is now side-effect free; local actions run only under `--execute`.
+
+**Fixed — review item 1 (C2PA install)**
+
+- `embed-c2pa.py` never installs packages. A missing package prints the exact pinned command (`c2pa-python==0.38.0`, `cryptography==46.0.3`) and exits 2. The c2pa-metadata skill no longer claims anything is auto-installed.
+- **Found while pinning:** with c2pa-python 0.38.0, the version an unpinned install pulls today, signing failed ("c2pa.created action must have a digitalSourceType"). The created action now carries the IPTC digital-source-type URI; all three AI claims sign and verify, with and without `--ai-disclosure`.
+- New `embed-c2pa.py --verify ASSET` (exit 0 valid, 6 no manifest, 7 invalid, 2 not installed), the presence check the pre-publish gate already described but no script provided.
+
+**Fixed — review item 3 (path containment)**
+
+- `_common.safe_child()` and `child_or_error()`: every model- or user-supplied ID that reaches a file path (run, member, content-hash, guideline, template, SOP, journey, schedule, approval ids and raw brand names) must be a single plain component and resolve directly inside its folder. Applied at 26 sites in 7 managers, `discard_run`, the raw-brand legacy branch, `auto-save-insight`, three run-id entry points, and the guideline, template and SOP save paths.
+- Every `--brand`, `--slug`, `--run-id` and `--client` argument in 44 scripts uses the new `type=_common.path_component` (one allow-listed name, with its reason); `tests/test_cli_path_args.py` keeps it that way.
+
+**Fixed — review item 4 (PRIVACY.md)**
+
+- New rows: the `timestamp.digicert.com` request on every C2PA signature (plain HTTP, a hash of the claim only) and NLTK data downloads. New sections on approvals for live writes and on actions under a standing approval. The dev C2PA signing key is now deleted when the script exits (review note).
+
+**Fixed — smaller review notes**
+
+- Fetchers: one URL guard (`_common.public_url_error`) checked on every redirect hop in `tech-seo-auditor.py`, `competitor-scraper.py` and `agent-readiness-audit.py` (which keeps a standalone copy, tested to agree): http/https only, no loopback, private, link-local or cloud-metadata addresses.
+- `connector_executor.py` substitutes only the connector's own environment variables into a request.
+- 104 skills, reference files and commands that run `${CLAUDE_PLUGIN_ROOT}/scripts/...` now say where the scripts are when a host does not set that variable (same line as ContentForge and SocialForge; guarded).
+- Doc drift: the pre-publish gate's C2PA verify mode now exists (above); `execute-action` and README no longer list Brevo and Customer.io send endpoints the resolver never built (both are read-only from Python).
+- Also found: the autopilot guide documented guardrail keys and a path the script never read, and its default limits (bids 20%, budget 25%) did not match the published ones (15%, 20%); all now match. `guidelines-manager.py` ignored `CLAUDE_MARKETING_HOME` / `PLUGIN_DATA` for SOPs; it now uses the workspace, falling back to an existing `~/.claude-marketing/sops` so saved SOPs stay reachable.
+
+**Tests**
+
+- New: `test_approval_gate.py` (23), `test_approval_honesty.py` (6), `test_path_containment.py` (15), `test_cli_path_args.py` (6), `test_url_guard.py` (9), `test_script_root_fallback.py` (5). Suite: 575 tests.
+
 ## [3.34.0] - 2026-10-10
 
 ### Every description fits the listing budget, and the model finds the right skill more often

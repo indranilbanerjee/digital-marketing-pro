@@ -21,6 +21,12 @@ from unittest import mock
 
 from _helpers import import_script, run_json
 
+
+def _public_dns():
+    """acme.example resolves to a public address, so the URL guard lets the
+    (mocked) fetch through; no real DNS lookup happens in these tests."""
+    return mock.patch("socket.getaddrinfo", return_value=[(2, 1, 6, "", ("93.184.216.34", 443))])
+
 ara = import_script("agent-readiness-audit.py", module_name="agent_readiness_audit")
 
 ROBOTS_OPEN = """\
@@ -443,7 +449,7 @@ class TestFetchIsOptIn(unittest.TestCase):
             robots.write_text(ROBOTS_OPEN, encoding="utf-8")
             # fetch() swallows exceptions by design, so record calls instead
             # of raising — a raise would be eaten and the test could not fail.
-            with mock.patch.object(ara.urllib.request, "urlopen") as urlopen:
+            with mock.patch.object(ara, "_http_open") as urlopen:
                 with mock.patch("sys.stdout"):
                     code = ara.main(["--robots", str(robots), "--site", "https://acme.example"])
         urlopen.assert_not_called()
@@ -456,7 +462,7 @@ class TestFetchIsOptIn(unittest.TestCase):
         def fake_urlopen(req, timeout=15):
             return _FakeResp(served[req.full_url])
 
-        with mock.patch.object(ara.urllib.request, "urlopen", side_effect=fake_urlopen):
+        with mock.patch.object(ara, "_http_open", side_effect=fake_urlopen), _public_dns():
             args = ara.build_parser().parse_args(["--site", "https://acme.example", "--fetch"])
             rep = ara.run_audit(args)
         self.assertEqual(len(rep["fetched"]), 2)
@@ -469,7 +475,7 @@ class TestFetchIsOptIn(unittest.TestCase):
                 raise ara.urllib.error.HTTPError(req.full_url, 404, "nf", {}, None)
             return _FakeResp(HTML_GOOD)
 
-        with mock.patch.object(ara.urllib.request, "urlopen", side_effect=fake_urlopen):
+        with mock.patch.object(ara, "_http_open", side_effect=fake_urlopen), _public_dns():
             args = ara.build_parser().parse_args(["--site", "https://acme.example", "--fetch"])
             rep = ara.run_audit(args)
         self.assertEqual(self.check_status(rep, "robots_ai_crawlers"), "pass")
@@ -480,7 +486,7 @@ class TestFetchIsOptIn(unittest.TestCase):
                 raise failure(req.full_url)
             return _FakeResp(HTML_GOOD)
 
-        with mock.patch.object(ara.urllib.request, "urlopen", side_effect=fake_urlopen):
+        with mock.patch.object(ara, "_http_open", side_effect=fake_urlopen), _public_dns():
             args = ara.build_parser().parse_args(["--site", "https://acme.example", "--fetch"])
             rep = ara.run_audit(args)
         return next(c for c in rep["checks"] if c["id"] == "robots_ai_crawlers")

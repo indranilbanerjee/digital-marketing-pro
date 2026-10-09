@@ -22,7 +22,7 @@ import argparse
 import hashlib
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -30,14 +30,19 @@ import _common  # noqa: E402
 
 BRANDS_DIR = _common.brands_root()
 
-# Default guardrails
+# Default guardrails. allowed_actions is EMPTY: autopilot proposes every
+# correction and waits for a typed yes. Actions can be pre-authorised only with
+# set-guardrails plus an approved standing approval (kind "autopilot"); configs
+# written before 3.35.0 that already list actions keep working as written.
+AUTOPILOT_ACTIONS = [
+    "pause_ad_set", "adjust_bid", "adjust_budget", "swap_creative",
+    "pause_campaign", "enable_backup_landing_page", "reduce_frequency_cap",
+]
 DEFAULT_GUARDRAILS = {
-    "allowed_actions": [
-        "pause_ad_set", "adjust_bid", "adjust_budget", "swap_creative",
-        "pause_campaign", "enable_backup_landing_page", "reduce_frequency_cap",
-    ],
-    "max_bid_adjustment_pct": 20,
-    "max_budget_adjustment_pct": 25,
+    "allowed_actions": [],
+    # Match the published limits (self-healing-ops-guide.md, PRIVACY.md): bids -15%, budgets -20%.
+    "max_bid_adjustment_pct": 15,
+    "max_budget_adjustment_pct": 20,
     "pause_on_landing_page_down": True,
     "escalation_thresholds": {
         "spend_overage_pct": 15,
@@ -417,7 +422,7 @@ def get_guardrails(slug):
     return _load_guardrails(brand_dir)
 
 
-def set_guardrails(slug, guardrails):
+def set_guardrails(slug, guardrails, approval_id=None):
     brand_dir, err = _get_brand_dir(slug)
     if err:
         return {"error": err}
@@ -427,6 +432,22 @@ def set_guardrails(slug, guardrails):
 
     # Merge with defaults
     current = _load_guardrails(brand_dir)
+    requested = guardrails.get("allowed_actions")
+    if requested:
+        unknown = sorted(set(requested) - set(AUTOPILOT_ACTIONS))
+        if unknown:
+            return {"error": f"unknown autopilot actions {unknown}; allowed: {AUTOPILOT_ACTIONS}"}
+        standing, why = _standing_for(slug, approval_id, requested)
+        if why:
+            return {"error": why, "approval_required": True,
+                    "next": ("Create the standing approval: approval-manager.py --brand "
+                             f"{slug} --action create-standing --data '{{\"kind\": \"autopilot\", "
+                             f"\"actions\": {json.dumps(requested)}, \"max_uses_per_day\": 5, \"days\": 30, "
+                             "\"summary\": \"...\"}}', show it to the user, approve it only after they type "
+                             "yes, then re-run set-guardrails with --approval-id <id>.")}
+        guardrails = dict(guardrails, standing_approval={
+            "approval_id": standing["approval_id"], "approved_at": standing.get("approved_at"),
+            "expires_at": standing.get("expires_at"), "max_uses_per_day": standing.get("max_uses_per_day")})
     current.update(guardrails)
 
     gp = config_dir / "guardrails.json"
@@ -435,10 +456,54 @@ def set_guardrails(slug, guardrails):
     return {"status": "saved", "guardrails": current, "path": str(gp)}
 
 
+def _standing_for(slug, approval_id, actions):
+    """(record, None) if approval_id is an approved, unexpired autopilot standing
+    approval covering every action, else (None, reason)."""
+    if not approval_id:
+        return None, ("pre-authorising autopilot actions needs --approval-id of an approved standing "
+                      "approval (kind 'autopilot') covering them")
+    path, err = _common.child_or_error(_common.approvals_dir(slug), approval_id, ".json")
+    if err:
+        return None, err
+    rec = _common.load_json_safe(path) if path.exists() else None
+    if not isinstance(rec, dict) or "error" in rec:
+        return None, f"approval '{approval_id}' not found"
+    scope = rec.get("scope") or {}
+    if rec.get("kind") != "standing" or scope.get("kind") != "autopilot":
+        return None, f"approval '{approval_id}' is not an autopilot standing approval"
+    if rec.get("status") != "approved":
+        return None, f"approval '{approval_id}' is '{rec.get('status')}', not 'approved'"
+    if _common._expired(rec.get("expires_at")):
+        return None, f"approval '{approval_id}' expired at {rec.get('expires_at')}"
+    missing = sorted(set(actions) - set(scope.get("actions") or []))
+    if missing:
+        return None, f"approval '{approval_id}' does not cover {missing}"
+    return rec, None
+
+
 def log_correction(slug, campaign_id, issue, correction_applied, was_auto, expected_impact):
     brand_dir, err = _get_brand_dir(slug)
     if err:
         return {"error": err}
+
+    # An automatic correction under a standing approval counts against its daily
+    # cap; at the cap, autopilot stops and must propose instead.
+    standing = (_load_guardrails(brand_dir).get("standing_approval") or {})
+    if was_auto and standing.get("approval_id"):
+        path, perr = _common.child_or_error(_common.approvals_dir(slug), standing["approval_id"], ".json")
+        rec = _common.load_json_safe(path) if (not perr and path.exists()) else None
+        if not isinstance(rec, dict) or "error" in rec or rec.get("status") != "approved" \
+                or _common._expired(rec.get("expires_at")):
+            return {"error": "the standing approval behind this automatic correction is missing, revoked or "
+                             "expired; propose the correction and wait for a typed yes", "cap_reached": True}
+        today = datetime.now(timezone.utc).date().isoformat()
+        used = sum(1 for u in rec.get("uses", []) if str(u.get("at", "")).startswith(today))
+        if used >= int(rec.get("max_uses_per_day") or 0):
+            return {"error": f"standing approval cap of {rec.get('max_uses_per_day')} automatic corrections "
+                             "per day reached; propose this one and wait for a typed yes", "cap_reached": True}
+        rec.setdefault("uses", []).append({"at": datetime.now(timezone.utc).isoformat(),
+                                           "campaign_id": campaign_id, "correction": correction_applied})
+        _common.atomic_write_json(path, rec)
 
     cdir = _corrections_dir(brand_dir)
     now = datetime.now()
@@ -572,7 +637,7 @@ def main():
                                  "get-guardrails", "set-guardrails", "log-correction",
                                  "corrections-history", "savings-report"],
                         help="Action to perform")
-    parser.add_argument("--brand", help="Brand slug")
+    parser.add_argument("--brand", type=_common.path_component, help="Brand slug")
     parser.add_argument("--campaign-id", dest="campaign_id", help="Campaign identifier")
     parser.add_argument("--campaign-type", dest="campaign_type",
                         choices=["awareness", "conversion", "retention", "engagement"],
@@ -587,6 +652,8 @@ def main():
     parser.add_argument("--severity", choices=["low", "medium", "high", "critical"],
                         help="Issue severity (for recommend-action)")
     parser.add_argument("--guardrails", help="JSON guardrail settings (for set-guardrails)")
+    parser.add_argument("--approval-id", dest="approval_id",
+                        help="Approved autopilot standing approval (required to pre-authorise allowed_actions)")
     parser.add_argument("--issue", help="Issue description (for log-correction)")
     parser.add_argument("--correction-applied", dest="correction_applied",
                         help="Correction applied (for log-correction)")
@@ -662,7 +729,7 @@ def main():
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --guardrails"}))
             sys.exit(1)
-        result = set_guardrails(args.brand, guardrails)
+        result = set_guardrails(args.brand, guardrails, approval_id=args.approval_id)
 
     elif args.action == "log-correction":
         if not args.brand:

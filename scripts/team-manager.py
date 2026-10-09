@@ -143,7 +143,9 @@ def add_member(slug, data):
         "updated_at": now,
     }
 
-    filepath = team_dir / f"{member_id}.json"
+    filepath, path_err = _common.child_or_error(team_dir, member_id, ".json")
+    if path_err:
+        return {"error": path_err}
     filepath.write_text(json.dumps(member, indent=2), encoding="utf-8")
 
     # Update roster index
@@ -170,7 +172,9 @@ def remove_member(slug, member_id):
         return {"error": err}
 
     team_dir = brand_dir / "team"
-    filepath = team_dir / f"{member_id}.json"
+    filepath, path_err = _common.child_or_error(team_dir, member_id, ".json")
+    if path_err:
+        return {"error": path_err}
 
     if not filepath.exists():
         return {"error": f"Member '{member_id}' not found."}
@@ -228,7 +232,9 @@ def update_role(slug, member_id, data):
         return {"error": err}
 
     team_dir = brand_dir / "team"
-    filepath = team_dir / f"{member_id}.json"
+    filepath, path_err = _common.child_or_error(team_dir, member_id, ".json")
+    if path_err:
+        return {"error": path_err}
     member, load_err = _load_json(filepath)
     if load_err:
         return {"error": f"Member '{member_id}' not found."}
@@ -364,7 +370,9 @@ def assign_task(slug, data):
         return {"error": "member_id and task_description are required in --data"}
 
     team_dir = brand_dir / "team"
-    member_path = team_dir / f"{member_id}.json"
+    member_path, path_err = _common.child_or_error(team_dir, member_id, ".json")
+    if path_err:
+        return {"error": path_err}
     member, load_err = _load_json(member_path)
     if load_err:
         return {"error": f"Member '{member_id}' not found."}
@@ -443,7 +451,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Team role and capacity management for Digital Marketing Pro"
     )
-    parser.add_argument("--brand", required=True, help="Brand slug")
+    parser.add_argument("--brand", type=_common.path_component, required=True, help="Brand slug")
     parser.add_argument(
         "--action", required=True,
         choices=[

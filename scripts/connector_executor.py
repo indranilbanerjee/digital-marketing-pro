@@ -8,7 +8,18 @@ connector_resolver.resolve_action(). Bridges the gap between
 
 Design constraints:
   * stdlib only (urllib.request) — no requests / httpx dependency
-  * Write operations require BOTH --execute and --confirm flags
+  * Write operations need --execute AND --approval-id. `--execute` without an id
+    builds the exact request, writes a PENDING record holding its sha256 and a
+    script-rendered preview, and exits 2. After the user types yes, the skill
+    runs `approval-manager.py --action approve`. The fire step rebuilds the
+    request and must match the hash; the record must be approved, inside its
+    window (30 min to review, 15 min to fire) and unused. It is consumed once
+    the request is sent (any HTTP status), released if nothing was sent.
+    Batches get one record with per-item hashes. --confirm is ignored.
+  * What this proves: the approval step ran for this exact request, once, in
+    its window. It cannot prove who typed yes (the model runs every command),
+    and MCP-server writes are outside it. Keep this script's --execute command
+    out of your host's command allowlist so the host asks you each time.
   * Every execution is logged to execution-tracker (audit trail)
   * Read operations are safe to auto-execute when --execute is passed
   * Auth handled inline: Bearer, custom-header (Klaviyo/Brevo), Basic, query-param
@@ -42,9 +53,10 @@ from pathlib import Path
 from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import _common  # noqa: E402
 from connector_resolver import ACTION_SPECS, resolve_action  # type: ignore  # noqa: E402
 
-BRANDS_DIR = Path.home() / ".claude-marketing" / "brands"
+APPROVAL_BLOCKED_EXIT = 2
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -174,8 +186,22 @@ _VAR_PATTERN = re.compile(r"\{([A-Z_][A-Z0-9_]*)\}")
 _DATA_PATTERN = re.compile(r"\{([a-z][a-z0-9_.]*)\}")
 
 
+def _scoped_env(env: dict, connector: str | None) -> dict:
+    """Only the connector's own variables may be substituted into a request.
+    Each executable connector's keys share its credential's vendor prefix
+    (SLACK_, HUBSPOT_, MAILCHIMP_, ...); nothing else in the environment can
+    leak into a URL, header or body through a {PLACEHOLDER}."""
+    profile = EXECUTE_PROFILES.get(connector or "", {})
+    env_var = profile.get("env_var")
+    if not env_var:
+        return {}
+    prefix = env_var.split("_", 1)[0] + "_"
+    return {k: v for k, v in env.items() if k.startswith(prefix)}
+
+
 def _substitute_env(value: Any, env: dict) -> Any:
-    """Replace {ENV_VAR_NAME} placeholders with env values. Recursive."""
+    """Replace {ENV_VAR_NAME} placeholders with env values. Recursive.
+    Callers pass _scoped_env(...) so only the connector's own keys resolve."""
     if isinstance(value, str):
         def replace(match):
             var = match.group(1)
@@ -269,6 +295,17 @@ def execute_manifest(http_request: dict, env: dict | None = None,
                      connector: str | None = None) -> dict:
     """Execute a single HTTP request manifest produced by connector_resolver.
     Returns a structured result dict — never raises on HTTP errors."""
+    built = build_request(http_request, env=env, data=data, connector=connector)
+    if built.get("status") != "built":
+        return built
+    return send_request(built, timeout=timeout)
+
+
+def build_request(http_request: dict, env: dict | None = None,
+                  data: dict | None = None, connector: str | None = None) -> dict:
+    """Resolve a manifest into the exact request that would be sent (no network).
+    The approval hash and the user-facing preview are computed from this, and
+    send_request() sends exactly this, so what was approved is what fires."""
     if env is None:
         env = dict(os.environ)
     if data is None:
@@ -276,11 +313,9 @@ def execute_manifest(http_request: dict, env: dict | None = None,
     if not http_request or not isinstance(http_request, dict):
         return {"status": "error", "error": "http_request is empty or not a dict"}
 
-    started = time.time()
-
-    # Substitute placeholders
+    # Substitute placeholders — only the connector's own variables (Hermes review)
     spec = deepcopy(http_request)
-    spec = _substitute_env(spec, env)
+    spec = _substitute_env(spec, _scoped_env(env, connector))
     if data:
         spec = _substitute_data(spec, data)
 
@@ -324,7 +359,15 @@ def execute_manifest(http_request: dict, env: dict | None = None,
         else:
             body_bytes = json.dumps(body_template).encode("utf-8")
 
-    # Build request
+    return {"status": "built", "method": method, "url": url, "headers": headers,
+            "body_bytes": body_bytes, "body": body_template}
+
+
+def send_request(built: dict, timeout: int = 30) -> dict:
+    """Send a request produced by build_request(). Never raises on HTTP errors.
+    A result without 'http_status' means nothing reached the platform."""
+    method, url, headers, body_bytes = built["method"], built["url"], built["headers"], built["body_bytes"]
+    started = time.time()
     req = urllib.request.Request(url, data=body_bytes, method=method)
     for h, v in headers.items():
         req.add_header(h, str(v))
@@ -450,6 +493,7 @@ def execute_action(action_id: str, brand: str, *,
                    execute: bool = True, confirm: bool = False,
                    data: dict | None = None, timeout: int = 30,
                    log_to_tracker: bool = True, env: dict | None = None,
+                   approval_id: str | None = None,
                    **kwargs) -> dict:
     """Resolve an action and either execute it or return the manifest.
 
@@ -457,7 +501,10 @@ def execute_action(action_id: str, brand: str, *,
       action_id:     one of ACTION_SPECS keys
       brand:         brand slug
       execute:       if False, returns the resolver response unchanged (no execution)
-      confirm:       REQUIRED for any operation=='write' action; rejects without it
+      confirm:       ignored (kept so old calls still parse); writes need approval_id
+      approval_id:   for operation=='write': an approved, unexpired, unused record
+                     whose payload hash matches this exact request. Without it a
+                     write prepares a pending record and returns its preview.
       data:          domain data for body_template substitution (e.g.
                      {"plan": {"campaign_name": "X"}})
       timeout:       HTTP timeout seconds
@@ -468,12 +515,18 @@ def execute_action(action_id: str, brand: str, *,
     if env is None:
         env = dict(os.environ)
 
-    # Step 1: resolve
-    resolved = resolve_action(action_id, brand, **kwargs)
+    # Step 1: resolve — with no side effects (local actions run only under execute)
+    resolved = resolve_action(action_id, brand, run_local=False, **kwargs)
     resolved_mode = resolved.get("mode")
 
     if not execute:
         return resolved
+
+    if resolved_mode == "local_ready":
+        # Local-only action (writes a local config, sends nothing): run it now.
+        local = resolve_action(action_id, brand, run_local=True, **kwargs)
+        local["execute_attempted"] = True
+        return local
 
     if resolved_mode == "stub_unconfigured":
         # No connector configured — execute mode can't help
@@ -481,35 +534,22 @@ def execute_action(action_id: str, brand: str, *,
         resolved["execute_blocked_reason"] = "no connector configured; nothing to execute"
         return resolved
 
-    if resolved_mode == "real":
-        # arm-watchdog already executed in resolve_action()
-        resolved["execute_attempted"] = True
-        return resolved
-
     if resolved_mode != "manifest_ready":
         resolved["execute_attempted"] = False
         resolved["execute_blocked_reason"] = f"unknown mode: {resolved_mode}"
         return resolved
 
-    # Step 2: check write gate
+    # Step 2: structural checks (nothing is sent by any of these)
     spec = ACTION_SPECS.get(action_id, {})
     operation = spec.get("operation", "read")
-    if operation == "write" and not confirm:
-        resolved["execute_attempted"] = False
-        resolved["execute_blocked_reason"] = (
-            f"action {action_id} is a write op (operation={operation}); "
-            f"--confirm flag is required. Re-run with confirm=True to fire."
-        )
-        return resolved
-
-    # Step 3: check connector executability
     chosen = resolved.get("chosen_connector")
     profile = EXECUTE_PROFILES.get(chosen, {})
     if profile.get("oauth_only"):
         resolved["execute_attempted"] = False
         resolved["execute_blocked_reason"] = profile.get("reason", "OAuth-only connector")
         resolved["alternative"] = (
-            f"Execute via the {chosen} MCP tool — Claude handles the OAuth flow. "
+            f"Execute via the {chosen} MCP tool, behind the skill's typed `yes` and your host's "
+            f"permission prompt. MCP writes are outside this executor's approval-record check. "
             f"The manifest above is the exact request shape the MCP will send."
         )
         return resolved
@@ -521,7 +561,6 @@ def execute_action(action_id: str, brand: str, *,
         )
         return resolved
 
-    # Step 4: check credential
     env_var = profile.get("env_var")
     credential = env.get(env_var) if env_var else None
     if not credential:
@@ -533,40 +572,168 @@ def execute_action(action_id: str, brand: str, *,
         )
         return resolved
 
-    # Step 5: inject auth header into the manifest
-    manifest = resolved.get("manifest", {})
-    http_request = deepcopy(manifest.get("http_request") or {})
-    http_request["headers"] = _build_auth_header(
-        profile, credential, http_request.get("headers", {})
-    )
-    # Strip any leftover {AUTH_PLACEHOLDER} that the manifest had
-    # (the build_auth_header overwrites the right header; we also need
-    # to clean any other auth-shaped placeholders in headers like {KLAVIYO_PRIVATE_KEY})
-    # The env substitution in execute_manifest will handle the rest.
+    # Step 3: build the exact request (auth injected, data substituted, no network)
+    built = _build_for_action(resolved, profile, credential, env, data, chosen)
+    if built.get("status") != "built":
+        resolved["execute_attempted"] = False
+        resolved["execution"] = built
+        return resolved
+    description = request_description(built, brand=brand, connector=chosen, action=action_id,
+                                      credential_env=env_var, credential=credential, profile=profile)
+    payload_hash = _common.action_payload_hash(description)
 
-    # Step 6: execute
-    exec_result = execute_manifest(http_request, env=env, data=data, timeout=timeout,
-                                   connector=chosen)
-    exec_result = _check_success(exec_result, profile)
+    # Step 4: the approval-record gate for writes
+    approval_path = approval_record = approval_item = None
+    if operation == "write":
+        if not approval_id:
+            new_id, _ = _common.write_approval_record(brand, "exec", {
+                "kind": "single", "type": "execute-action", "brand": brand, "platform": chosen,
+                "action": action_id, "credential_env": env_var, "payload_hash": payload_hash,
+                "preview": description, "content_summary": f"{action_id} via {chosen}",
+            })
+            resolved.update({
+                "execute_attempted": False,
+                "approval_required": True,
+                "approval_id": new_id,
+                "approval_payload_hash": payload_hash,
+                "preview": description,
+                "next_steps": _next_steps(brand, new_id),
+            })
+            return resolved
+        approval_path, approval_record, approval_item, why = _common.load_approval_for_execution(
+            brand, approval_id, payload_hash, connector=chosen, action=action_id)
+        if why:
+            resolved.update({
+                "execute_attempted": False,
+                "approval_required": True,
+                "execute_blocked_reason": why,
+                "approval_payload_hash": payload_hash,
+                "preview": description,
+                "next_steps": ["Re-run this command WITHOUT --approval-id to prepare a fresh record for "
+                               "this exact request, show its preview to the user, and continue only "
+                               "after they type yes."],
+            })
+            return resolved
+        _common.mark_approval_in_flight(approval_path, approval_record, approval_item)
+
+    # Step 5: send exactly what was built (and, for writes, approved)
+    exec_result = _check_success(send_request(built, timeout=timeout), profile)
     resolved["execute_attempted"] = True
     resolved["execution"] = exec_result
+    if approval_path is not None:
+        sent = exec_result.get("http_status") is not None
+        _common.settle_approval(approval_path, approval_record, approval_item, sent=sent,
+                                success=bool(exec_result.get("success")), request_hash=payload_hash,
+                                summary=exec_result.get("http_status") or exec_result.get("error"))
+        resolved["approval"] = {"approval_id": approval_id, "payload_hash": payload_hash,
+                                "consumed": sent, "status": approval_record.get("status")}
 
-    # Step 7: audit log
+    # Step 6: audit log, with a full copy of the approval record used
     if log_to_tracker:
-        _log_execution(action_id, brand, chosen, exec_result, operation)
+        _log_execution(action_id, brand, chosen, exec_result, operation,
+                       payload_hash=payload_hash, approval_record=approval_record)
 
     return resolved
 
 
+def _build_for_action(resolved, profile, credential, env, data, chosen) -> dict:
+    manifest = resolved.get("manifest", {})
+    http_request = deepcopy(manifest.get("http_request") or {})
+    http_request["headers"] = _build_auth_header(profile, credential, http_request.get("headers", {}))
+    return build_request(http_request, env=env, data=data, connector=chosen)
+
+
+def request_description(built: dict, *, brand: str, connector: str, action: str, credential_env: str,
+                        credential: str, profile: dict) -> dict:
+    """The fully resolved request, as hashed and as shown to the user: the
+    credential's NAME is included, its value never is."""
+    auth_header = (profile.get("auth_header") or "").lower()
+
+    def scrub(value):
+        if isinstance(value, str):
+            return value.replace(credential, "<" + credential_env + ">") if credential else value
+        if isinstance(value, dict):
+            return {k: scrub(v) for k, v in value.items()}
+        if isinstance(value, list):
+            return [scrub(v) for v in value]
+        return value
+
+    headers = {k: scrub(str(v)) for k, v in (built.get("headers") or {}).items()
+               if k.lower() != auth_header and k.lower() not in ("authorization", "api-key")}
+    return {
+        "brand": brand,
+        "connector": connector,
+        "action": action,
+        "credential_env": credential_env,
+        "method": built.get("method"),
+        "url": scrub(built.get("url")),
+        "headers": headers,
+        "body": scrub(built.get("body")),
+    }
+
+
+def _next_steps(brand: str, approval_id: str) -> list:
+    return [
+        "Show the user the `preview` above exactly as printed (it is the request that will be sent).",
+        "Only after the user types yes: python \"${CLAUDE_PLUGIN_ROOT}/scripts/approval-manager.py\" "
+        f"--brand {brand} --action approve --id {approval_id}",
+        f"Then re-run this same command with --approval-id {approval_id} (within "
+        f"{_common.APPROVAL_FIRE_MINUTES} minutes of approving). The record is single-use.",
+    ]
+
+
+def prepare_batch(brand: str, items: list, *, env: dict | None = None, timeout: int = 30) -> dict:
+    """One approval record for an ordered batch of writes, with an itemised
+    preview built from each fully resolved request. Each item is fired later
+    with the same --approval-id and is consumed on its own; a changed item fails
+    alone."""
+    if env is None:
+        env = dict(os.environ)
+    prepared, problems = [], []
+    for i, item in enumerate(items):
+        action_id = item.get("action")
+        kwargs = {k: v for k, v in item.items() if k not in ("action", "data") and v is not None}
+        resolved = resolve_action(action_id, brand, run_local=False, **kwargs)
+        chosen = resolved.get("chosen_connector")
+        profile = EXECUTE_PROFILES.get(chosen, {})
+        if resolved.get("mode") != "manifest_ready" or profile.get("oauth_only") or not profile:
+            problems.append({"index": i, "action": action_id, "reason": resolved.get("mode") or "not executable here"})
+            continue
+        credential = env.get(profile.get("env_var") or "")
+        if not credential:
+            problems.append({"index": i, "action": action_id, "reason": f"env var {profile.get('env_var')} is not set"})
+            continue
+        built = _build_for_action(resolved, profile, credential, env, item.get("data"), chosen)
+        if built.get("status") != "built":
+            problems.append({"index": i, "action": action_id, "reason": built.get("error")})
+            continue
+        description = request_description(built, brand=brand, connector=chosen, action=action_id,
+                                          credential_env=profile.get("env_var"), credential=credential,
+                                          profile=profile)
+        prepared.append({"index": i, "action": action_id, "connector": chosen,
+                         "payload_hash": _common.action_payload_hash(description), "preview": description})
+    if problems:
+        return {"status": "error", "error": "some batch items cannot be prepared; nothing was recorded",
+                "problems": problems}
+    approval_id, _ = _common.write_approval_record(brand, "batch", {
+        "kind": "batch", "type": "execute-action", "brand": brand, "items": prepared,
+        "content_summary": f"batch of {len(prepared)} writes",
+    })
+    return {"status": "prepared", "approval_id": approval_id, "items": prepared,
+            "approval_required": True, "next_steps": _next_steps(brand, approval_id)}
+
+
 def _log_execution(action_id: str, brand: str, connector: str,
-                   exec_result: dict, operation: str):
-    """Append an entry to ~/.claude-marketing/{brand}/executions/."""
-    brand_dir = BRANDS_DIR / brand
+                   exec_result: dict, operation: str, *, payload_hash: str | None = None,
+                   approval_record: dict | None = None):
+    """Append an entry to brands/{brand}/executions/. Writes carry a full copy of
+    the approval record that let them fire, so a forged record is visible later."""
+    brand_dir = _common.brand_dir(brand)
     if not brand_dir.exists():
         return  # don't fail just because brand doesn't exist
     executions_dir = brand_dir / "executions"
     executions_dir.mkdir(exist_ok=True)
-    ts = datetime.now().strftime("%Y%m%d-%H%M%S")
+    ts = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
     exec_id = f"exec-{connector}-{action_id}-{ts}"
     success = exec_result.get("success") or (exec_result.get("http_status") in (200, 201, 202)
                                              and exec_result.get("status") == "executed")
@@ -581,9 +748,11 @@ def _log_execution(action_id: str, brand: str, connector: str,
         "elapsed_ms": exec_result.get("elapsed_ms"),
         "executed_at": datetime.now().isoformat(),
         "error": exec_result.get("error") or exec_result.get("slack_error"),
+        "payload_hash": payload_hash,
+        "approval_record": deepcopy(approval_record) if approval_record else None,
     }
     try:
-        (executions_dir / f"{exec_id}.json").write_text(json.dumps(entry, indent=2))
+        (executions_dir / f"{exec_id}.json").write_text(json.dumps(entry, indent=2, default=str), encoding="utf-8")
     except Exception:
         pass  # logging never breaks the call
 
@@ -612,11 +781,17 @@ if __name__ == "__main__":
     # --action / --brand are NOT required: the --list-* flags must be reachable
     # without them (M1). Requiredness is enforced below only for execution.
     parser.add_argument("--action", help="action_id to execute")
-    parser.add_argument("--brand")
+    parser.add_argument("--brand", type=_common.path_component)
     parser.add_argument("--execute", action="store_true",
                         help="actually fire the request (default: dry-run / resolve only)")
     parser.add_argument("--confirm", action="store_true",
-                        help="REQUIRED for write actions")
+                        help="Ignored. Writes need --approval-id (see --help epilog / execute-action.md).")
+    parser.add_argument("--approval-id",
+                        help="Approved, unexpired, unused approval record for this exact write "
+                             "(omit it once to prepare one and get its preview)")
+    parser.add_argument("--prepare-batch", metavar="PLAN_JSON",
+                        help="Prepare ONE approval record for a list of writes: "
+                             '[{"action": "...", "data": {...}, "channel": "..."}, ...]')
     parser.add_argument("--data", help="JSON dict for body_template substitution")
     parser.add_argument("--channel", help="channel (for inventory/automations/cadence)")
     parser.add_argument("--automation-id", help="for enable-automation")
@@ -634,6 +809,20 @@ if __name__ == "__main__":
     if args.list_oauth_only:
         print(json.dumps({"oauth_only_connectors": list_oauth_only_connectors()}, indent=2))
         sys.exit(0)
+
+    if args.prepare_batch:
+        if not args.brand:
+            print(json.dumps({"error": "--brand is required with --prepare-batch"}, indent=2))
+            sys.exit(1)
+        try:
+            items = json.loads(Path(args.prepare_batch).read_text(encoding="utf-8"))
+            assert isinstance(items, list) and items
+        except Exception as exc:
+            print(json.dumps({"error": f"--prepare-batch needs a JSON list of items: {exc}"}, indent=2))
+            sys.exit(1)
+        batch = redact_secrets(prepare_batch(args.brand, items, timeout=args.timeout))
+        print(json.dumps(batch, indent=2, default=str))
+        sys.exit(APPROVAL_BLOCKED_EXIT if batch.get("status") == "prepared" else 1)
 
     # For an actual execution, --action and --brand are required.
     if not args.action or not args.brand:
@@ -659,12 +848,15 @@ if __name__ == "__main__":
 
     result = execute_action(args.action, args.brand,
                             execute=args.execute, confirm=args.confirm,
-                            data=data, timeout=args.timeout, **extra_kwargs)
+                            data=data, timeout=args.timeout,
+                            approval_id=args.approval_id, **extra_kwargs)
     # Redact any secrets that may have leaked into the output (e.g. a
     # substituted URL echoed by the missing_credential branch), then exit
     # non-zero when the execution reported failure (M1) so $? is trustworthy.
     result = redact_secrets(result)
     print(json.dumps(result, indent=2, default=str))
+    if isinstance(result, dict) and result.get("approval_required") and not result.get("execute_attempted"):
+        sys.exit(APPROVAL_BLOCKED_EXIT)  # 2: nothing fired; follow next_steps
     _success = True
     if isinstance(result, dict):
         if "error" in result:

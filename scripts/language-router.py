@@ -41,6 +41,10 @@ import sys
 import unicodedata
 from collections import Counter
 from pathlib import Path
+import os
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _common  # noqa: E402
 
 # Force UTF-8 stdout on Windows (avoids cp1252 encoding errors)
 if sys.stdout.encoding != "utf-8":
@@ -1004,7 +1008,7 @@ def build_parser():
         help="Target language code, e.g. 'hi' (for route/score actions).",
     )
     parser.add_argument(
-        "--brand",
+        "--brand", type=_common.path_component,
         help="Brand slug — lets route honor the brand's recorded translation "
              "preference for the target language (for route action).",
     )

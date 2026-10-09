@@ -7,6 +7,8 @@ user-invocable: true
 
 # /digital-marketing-pro:keyword-cluster
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Take a set of seed keywords and produce a publication-ready cluster plan: pillar pages with their spokes, intent-grouped, prioritised by an opinionated scoring formula, with an internal-link map and a four-gate quality scorecard. Output is structured for direct hand-off to `/digital-marketing-pro:content-brief` or `/digital-marketing-pro:content-engine`.

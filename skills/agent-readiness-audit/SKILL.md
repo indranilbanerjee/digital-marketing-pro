@@ -6,6 +6,8 @@ argument-hint: "[site URL, or paths to robots.txt / HTML / feed exports]"
 
 # /digital-marketing-pro:agent-readiness-audit
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Answer one question with evidence: **can AI agents and AI crawlers use this site?** Concretely, the audit checks five things:

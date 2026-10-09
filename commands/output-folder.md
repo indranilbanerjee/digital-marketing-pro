@@ -6,6 +6,8 @@ disable-model-invocation: false
 
 # Output Folder
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 Show the user where DMP actually saves the finished workflow deliverables, and (when supported) open that folder in the OS file manager. This is the answer to "where are my 50 engagement files?" — a real question from user-team feedback ("dm pro also taking too long to process" was partly about not knowing whether anything had finished saving).
 
 ## Trigger

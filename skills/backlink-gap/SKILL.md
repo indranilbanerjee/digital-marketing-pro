@@ -7,6 +7,8 @@ user-invocable: true
 
 # /digital-marketing-pro:backlink-gap
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Identify the highest-leverage backlink prospects — domains that link to multiple competitors but not to you — and rank them by an opinionated priority score that combines authority, link-overlap signal, downstream traffic, and topical relevance. Produces a numbered output bundle ready for outreach handoff.

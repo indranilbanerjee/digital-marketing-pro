@@ -5,6 +5,8 @@ description: "Orchestrate a campaign lifecycle: briefs, budget models, UTMs, pos
 
 # Campaign Orchestrator
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## When to Use This Skill
 
 Activate this module when the user's request involves any of the following:

@@ -47,6 +47,9 @@ from connector_resolver import (  # noqa: E402
     resolve_action,
 )
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _common  # noqa: E402
+
 # Model curator freshness check (degrades gracefully if curator is missing).
 try:
     from resolve_model import registry_age_days, get_registry  # noqa: E402
@@ -269,7 +272,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Per-action readiness diagnostic for Digital Marketing Pro."
     )
-    parser.add_argument("--brand", default="default",
+    parser.add_argument("--brand", type=_common.path_component, default="default",
                         help="Brand slug (used for write-side actions; readiness is brand-agnostic)")
     parser.add_argument("--action",
                         help="Drill into a single action and print resolve_action's full response.")

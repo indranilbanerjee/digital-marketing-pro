@@ -6,6 +6,8 @@ user-invocable: true
 
 # /digital-marketing-pro:intelligence-report
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Generate a comprehensive intelligence briefing from the brand's compound intelligence system. This command surfaces the accumulated knowledge that agents have built over time — total learnings captured, confidence distribution across insights, top patterns identified across agents and channels, actionable playbooks generated from proven strategies, and intelligence base health metrics showing where the knowledge is strong and where gaps exist. The intelligence report turns raw accumulated data into strategic advantage by synthesizing cross-agent patterns that no single agent would surface alone. Use it for quarterly planning, strategy reviews, onboarding new team members to a brand's marketing intelligence, or identifying which areas need more experimentation and data collection to strengthen decision-making confidence.

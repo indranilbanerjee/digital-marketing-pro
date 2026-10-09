@@ -32,6 +32,9 @@ from _connector_registry import (  # type: ignore  # noqa: E402
     redact_secrets as _redact_secrets,
 )
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _common  # noqa: E402
+
 PLUGIN_ROOT = Path(__file__).resolve().parent.parent
 MCP_JSON = PLUGIN_ROOT / ".mcp.json"
 
@@ -315,7 +318,7 @@ def main():
     parser.add_argument("--name", help="Connector name (for check/setup-guide)")
     parser.add_argument("name_positional", nargs="?", help="Connector name (positional)")
     # v3.7.6 — validate-profile skill support
-    parser.add_argument("--brand", help="Brand slug (context for probes; never written to output unless --probe-only)")
+    parser.add_argument("--brand", type=_common.path_component, help="Brand slug (context for probes; never written to output unless --probe-only)")
     parser.add_argument("--connectors", help="Comma-separated connector subset (with --probe-only)")
     parser.add_argument("--probe-only", action="store_true",
                         help="Credential-safe config-presence check for /validate-profile — does not test network reachability. Returns status (CONNECTED / NOT_CONNECTED / UNKNOWN_CONNECTOR) per connector without echoing credential values.")

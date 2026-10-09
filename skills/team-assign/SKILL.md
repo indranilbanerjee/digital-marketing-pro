@@ -5,6 +5,8 @@ description: "Assign marketing tasks to team members by role fit and workload. \
 
 # /digital-marketing-pro:team-assign
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Assign marketing tasks to team members with intelligent matching based on role, channel expertise, regional alignment, and current capacity. Supports viewing team workload distributions, managing active assignments, and rebalancing when utilization is uneven. Ensures every task lands with the right person at the right time, preventing overload and skill mismatches across the team.

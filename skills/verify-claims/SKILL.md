@@ -6,6 +6,8 @@ argument-hint: "[content-path]"
 
 # /digital-marketing-pro:verify-claims
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Cross-check marketing claims against user-provided evidence data. Extracts all verifiable claims from content — statistics, percentages, rankings, awards, certifications, named citations, performance metrics, customer counts, and time-bound assertions — then matches each against an evidence file and classifies it as verified, partially verified, unverified, or contradicted. This command is the dedicated deep-dive for claim integrity, while /digital-marketing-pro:eval-content includes claim verification as one dimension of its broader quality assessment.

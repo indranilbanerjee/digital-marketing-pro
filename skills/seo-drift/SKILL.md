@@ -7,6 +7,8 @@ user-invocable: true
 
 # /digital-marketing-pro:seo-drift
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Take two snapshots of SEO performance data — separated by weeks, a Core Update, a content refresh, or an algorithm change — and produce a structured drift report: top gainers, top losers, classifications (growth / decline / reshuffle / stable / new / lost), and diagnostic patterns. Works with classic GSC, the new GSC AI Performance Report, rank-tracker exports, and `aeo-audit` probe results.

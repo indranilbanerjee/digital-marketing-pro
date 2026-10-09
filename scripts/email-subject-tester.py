@@ -16,6 +16,10 @@ import argparse
 import json
 import re
 import sys
+import os
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _common  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -324,7 +328,7 @@ def main():
         help='JSON array of subject lines OR a single subject string',
     )
     parser.add_argument(
-        "--brand", default=None,
+        "--brand", type=_common.path_component, default=None,
         help="Brand slug for context (optional)",
     )
     args = parser.parse_args()

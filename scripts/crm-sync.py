@@ -398,7 +398,7 @@ from connector_resolver import resolve_action  # noqa: E402
 
 def main():
     parser = argparse.ArgumentParser(description="CRM data sync management for Digital Marketing Pro")
-    parser.add_argument("--brand", required=True, help="Brand slug")
+    parser.add_argument("--brand", type=_common.path_component, required=True, help="Brand slug")
     parser.add_argument("--action", required=True,
                         choices=["prepare-contact", "prepare-deal", "check-dedup",
                                  "log-synced", "get-sync-history", "get-crm-status",

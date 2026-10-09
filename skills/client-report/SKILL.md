@@ -5,6 +5,8 @@ description: "Write a white-labeled report for one client from tracked data. All
 
 # /digital-marketing-pro:client-report
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Generate a professional, white-labeled client report for a specific brand. Uses agency voice (not brand voice), includes KPI performance, channel breakdowns, strategic recommendations, and next steps. Designed for external client delivery via Slack, email, Google Sheets, or markdown — with approval gating before any external send to prevent accidental disclosure or premature delivery of draft findings.

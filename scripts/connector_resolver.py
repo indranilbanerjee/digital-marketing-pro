@@ -785,7 +785,9 @@ def _manifest_audit_current_seo(connector_name, brand, kwargs):
 def _execute_arm_watchdog(brand, kwargs):
     """Activate a day-1 KPI watchdog. Writes a watchdog config locally that
     the orchestrator (or a scheduled cron) can read to know what to monitor."""
-    brand_dir = BRANDS_DIR / brand
+    # Resolved at call time (not the import-time BRANDS_DIR) so CLAUDE_MARKETING_HOME /
+    # PLUGIN_DATA set after import are honoured, like every other script.
+    brand_dir = _common.brand_dir(brand)
     if not brand_dir.exists():
         return {
             "status": "error",
@@ -995,10 +997,14 @@ ACTION_SPECS: dict[str, dict[str, Any]] = {
 # Public API
 # ─────────────────────────────────────────────────────────────────────────────
 
-def resolve_action(action_id: str, brand: str, **kwargs) -> dict:
+def resolve_action(action_id: str, brand: str, run_local: bool = True, **kwargs) -> dict:
     """Resolve an action_id into one of three modes: real / manifest_ready /
     stub_unconfigured. Caller is responsible for invoking the right backing
-    script with the manifest if needed."""
+    script with the manifest if needed.
+
+    run_local=False resolves a local action WITHOUT running it (mode
+    "local_ready"): connector_executor uses this so resolving, and every dry
+    run, has no side effects; the local step runs only under --execute."""
     spec = ACTION_SPECS.get(action_id)
     if not spec:
         return {
@@ -1008,6 +1014,10 @@ def resolve_action(action_id: str, brand: str, **kwargs) -> dict:
         }
 
     # 1. Local execution — runs end-to-end with no connector needed
+    if spec["operation"] == "local" and not run_local:
+        return {"status": "local_ready", "mode": "local_ready", "action": action_id, "brand": brand,
+                "operation": "local", "purpose": spec["purpose"],
+                "note": "Local action: nothing runs until --execute."}
     if spec["operation"] == "local":
         executor = spec.get("local_executor")
         if executor is None:

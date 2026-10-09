@@ -99,7 +99,7 @@ def workspace_root() -> Path:
 
 
 def brand_profile_path(brand_slug: str) -> Path:
-    return workspace_root() / "brands" / brand_slug / "profile.json"
+    return _common.safe_child(workspace_root() / "brands", brand_slug) / "profile.json"
 
 
 def campaign_tracker_path() -> Path:
@@ -194,7 +194,7 @@ def save_via_campaign_tracker(brand_slug: str, payload: dict[str, Any]) -> dict[
 
 def save_directly(brand_slug: str, payload: dict[str, Any]) -> dict[str, Any]:
     """Fallback persistence: append to brands/{slug}/insights.json directly."""
-    insights_path = workspace_root() / "brands" / brand_slug / "insights.json"
+    insights_path = _common.safe_child(workspace_root() / "brands", brand_slug) / "insights.json"
     insights_path.parent.mkdir(parents=True, exist_ok=True)
     container: dict[str, Any]
     if insights_path.exists():
@@ -248,7 +248,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         prog="auto-save-insight.py",
         description="Conditionally save a marketing insight based on the brand's opt-in flag.",
     )
-    parser.add_argument("--brand", required=True, help="Brand slug")
+    parser.add_argument("--brand", type=_common.path_component, required=True, help="Brand slug")
     parser.add_argument("--type", required=True, help="Insight type (e.g., session_learning, campaign_outcome, voice_drift, audience_finding, competitive)")
     parser.add_argument("--insight", required=True, help="The insight text (1-2 sentences)")
     parser.add_argument("--context", default="", help="What work produced this insight")
@@ -256,6 +256,10 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser.add_argument("--force", action="store_true", help="Save regardless of opt-in flag")
     parser.add_argument("--dry-run", action="store_true", help="Print what would be saved without writing")
     args = parser.parse_args(argv)
+
+    if not _common.is_safe_component(args.brand):
+        print(json.dumps({"status": "error", "error": f"unsafe --brand {args.brand!r}: use the brand slug"}, indent=2))
+        return 1
 
     if not args.insight.strip():
         print(json.dumps({"status": "error", "error": "--insight cannot be empty"}, indent=2))

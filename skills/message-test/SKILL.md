@@ -5,6 +5,8 @@ description: "Pretest 2-6 message variants on CRM-grounded synthetic panels. \"w
 
 # /digital-marketing-pro:message-test
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Test message variants against synthetic audience panels before real-world deployment. Predict which variant will perform best overall and per segment, identify potential objections, and narrow down variants for real A/B testing. This command eliminates wasted ad spend and testing cycles by pre-screening message variants through AI-simulated audience segments grounded in real CRM behavioral data. Instead of testing six variants live and burning budget on underperformers, run them through synthetic panels first to identify the top two or three candidates worth real investment. Each variant is scored on five evaluation criteria — resonance, clarity, credibility, urgency, and differentiation — with per-segment breakdowns that reveal personalization opportunities where different segments prefer different messages.

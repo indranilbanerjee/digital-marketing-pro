@@ -7,6 +7,8 @@ argument-hint: "[data-source or dashboard-type]"
 
 # /digital-marketing-pro:live-dashboard
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Create and configure a live Google Looker Studio dashboard connected to the brand's marketing data sources. Auto-selects appropriate metrics, dimensions, and chart types based on the business model (SaaS, eCommerce, B2B, agency). Provides always-current visibility into marketing performance without manual data pulls. Eliminates the need for recurring report generation by giving stakeholders a self-service, real-time view of the metrics that matter most to their business model, with drill-down capability and date range controls built in.
@@ -18,7 +20,8 @@ By default this skill produces a dashboard **specification** for review. It must
 1. Present the full spec — data sources, connected accounts, sharing scope, refresh cadence — as an **Execution Summary**.
 2. The user must type `yes` (or an equivalent explicit approval) before any external dashboard is created or shared. ANY other input — ambiguous, implied, partial, or absent approval — cancels; the spec is saved but nothing is created externally.
 3. Never proceed on ambiguous input. Never auto-retry a failed creation.
-4. Record the approval with `python "${CLAUDE_PLUGIN_ROOT}/scripts/approval-manager.py" --brand {slug} --action create-approval --data '{"risk_level":"medium","summary":"..."}'` **before** creating, then `python "${CLAUDE_PLUGIN_ROOT}/scripts/approval-manager.py" --brand {slug} --action mark-executed --id {approval_id}` after it verifies.
+4. Only after the user types `yes`, record it: `python "${CLAUDE_PLUGIN_ROOT}/scripts/approval-manager.py" --brand {slug} --action create-approval --data '{"type":"live-dashboard","platform":"<platform>","content_summary":"<one line from the Execution Summary>","risk_level":"<tier>"}'`, then `python "${CLAUDE_PLUGIN_ROOT}/scripts/approval-manager.py" --brand {slug} --action approve --id {approval_id}`. If either command errors, stop and report the error; never work around it with another tool. The record proves the approval step ran for this action; it cannot prove who typed `yes`.
+5. Execute. A write sent through `connector_executor.py` needs `--approval-id` and fires only against a matching, unused, unexpired record (see `/digital-marketing-pro:execute-action`). A write through a connected MCP server tool is outside that code check: it relies on this typed `yes` and on your host's permission prompt. Afterwards run `python "${CLAUDE_PLUGIN_ROOT}/scripts/approval-manager.py" --brand {slug} --action mark-executed --id {approval_id} --data '{"execution_result":"success"}'` (or `failure`).
 
 ## Input Required
 

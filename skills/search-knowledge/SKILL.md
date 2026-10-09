@@ -5,6 +5,8 @@ description: "Search the brand's stored knowledge and memory, ranked with proven
 
 # /digital-marketing-pro:search-knowledge
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Semantic search across all stored brand knowledge in the vector database and knowledge graph. Answers questions like "What worked for email in Q4?", "What are our brand voice guidelines?", "Show me learnings about audience X", or "What did we learn about competitor Y's pricing?" Returns relevant entries ranked by similarity with full provenance context, so agents and users can make decisions informed by everything the brand has ever learned — not just what they remember from the current session. Searches all connected memory layers simultaneously: vector DB for semantic similarity, knowledge graph for entity relationships, and local index for un-synced recent entries.

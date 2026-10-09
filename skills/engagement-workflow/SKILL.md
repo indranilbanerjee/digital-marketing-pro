@@ -9,6 +9,8 @@ view-preference: both
 
 # /digital-marketing-pro:engagement-workflow — 12-Part Engagement Orchestrator
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 This skill orchestrates the full marketing engagement using the 12-Part sequential methodology. Every brand engagement runs through the same 12 parts in sequence, producing a canonical set of files at each stage.
 
 ## Context efficiency

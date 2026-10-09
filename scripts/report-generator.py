@@ -337,7 +337,7 @@ def format_sheets(slug, data):
 
 def main():
     parser = argparse.ArgumentParser(description="Report generation for Digital Marketing Pro")
-    parser.add_argument("--brand", required=True, help="Brand slug")
+    parser.add_argument("--brand", type=_common.path_component, required=True, help="Brand slug")
     parser.add_argument("--action", required=True,
                         choices=["generate-report", "format-slack",
                                  "format-email", "format-sheets"],

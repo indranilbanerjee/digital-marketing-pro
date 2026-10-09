@@ -5,6 +5,8 @@ description: "Recall past learnings for a channel or audience as a confidence-ra
 
 # /digital-marketing-pro:recall
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Retrieve relevant learnings from the brand's compound intelligence graph. Given a context — channel, audience, objective, or situation — return the most relevant validated insights ranked by confidence and recency. Turns accumulated marketing knowledge into an actionable playbook for any scenario, so past learnings directly inform current decisions without relying on memory or searching through old reports.

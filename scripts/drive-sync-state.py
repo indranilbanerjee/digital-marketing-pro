@@ -188,7 +188,7 @@ def profile_drive_state(brand: str) -> dict:
 # ---------------------------------------------------------------------------
 
 def _run_pending_path(brand: str, run_id: str) -> Path:
-    return _common.brand_dir(brand) / "runs" / run_id / "_sync-pending.json"
+    return _common.safe_child(_common.brand_dir(brand) / "runs", run_id) / "_sync-pending.json"
 
 
 def add_pending_upload(brand: str, run_id: str, file: str) -> dict:
@@ -316,8 +316,8 @@ def main():
         "add-pending-upload", "list-pending-uploads",
         "mark-uploaded", "list-runs-needing-sync",
     ])
-    parser.add_argument("--brand", help="brand slug or name")
-    parser.add_argument("--run-id", help="run identifier")
+    parser.add_argument("--brand", type=_common.path_component, help="brand slug or name")
+    parser.add_argument("--run-id", type=_common.path_component, help="run identifier")
     parser.add_argument("--file", help="file path / name")
     parser.add_argument("--drive-file-id", help="Drive file ID from MCP response")
     parser.add_argument("--drive-url", help="Drive webViewLink")

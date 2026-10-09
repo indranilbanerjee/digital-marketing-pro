@@ -5,6 +5,8 @@ description: "Tune eval thresholds: dimension minimums, weights, auto-reject flo
 
 # /digital-marketing-pro:eval-config
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Configure the evaluation system for a brand. Set minimum quality thresholds per dimension, adjust scoring weights based on industry priorities and content strategy, configure auto-reject thresholds that prevent substandard content from passing evaluation, and define content-type-specific quality standards that apply different bars to different formats.

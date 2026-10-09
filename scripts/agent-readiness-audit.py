@@ -782,17 +782,72 @@ def check_acp_feed(path: Path | None) -> dict:
 # Fetching (opt-in)
 # ─────────────────────────────────────────────────────────────────────────────
 
-def fetch(url: str, timeout: int = 15) -> tuple[int | None, str, str | None]:
-    """(http_status, body, error). Never raises."""
-    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+MAX_REDIRECTS = 5
+
+
+def _public_url_error(url: str) -> str | None:
+    """None if `url` may be fetched, else the reason: http/https only, and the host
+    must resolve only to public addresses (no loopback, private, link-local or
+    cloud-metadata ranges). Same rule as _common.public_url_error, kept local so
+    this script stays standalone (it is also published on its own);
+    tests/test_url_guard.py fails if the two ever disagree."""
+    import ipaddress
+    import socket
+    from urllib.parse import urlparse
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            charset = resp.headers.get_content_charset() or "utf-8"
-            return resp.status, resp.read().decode(charset, errors="replace"), None
-    except urllib.error.HTTPError as e:
-        return e.code, "", f"HTTP {e.code}"
-    except Exception as e:  # network, DNS, timeout
-        return None, "", f"{type(e).__name__}: {e}"
+        parsed = urlparse(url)
+    except ValueError:
+        return f"unparseable URL {url!r}"
+    if parsed.scheme not in ("http", "https"):
+        return f"only http:// and https:// URLs are fetched, not {parsed.scheme or 'no scheme'!r}"
+    host = parsed.hostname
+    if not host:
+        return f"URL has no host: {url!r}"
+    try:
+        port = parsed.port or (443 if parsed.scheme == "https" else 80)
+        infos = socket.getaddrinfo(host, port, proto=socket.IPPROTO_TCP)
+    except (socket.gaierror, UnicodeError, ValueError):
+        return None  # unresolvable: the fetch itself will fail and report it
+    for info in infos:
+        ip = ipaddress.ip_address(str(info[4][0]).split("%")[0])
+        if not ip.is_global or ip.is_multicast:
+            return (f"refusing to fetch {host}: it resolves to {ip}, a non-public address "
+                    "(loopback, private, link-local or cloud-metadata ranges are blocked)")
+    return None
+
+
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def _http_open(req, timeout):
+    """The ONE place this script touches the network (tests patch it)."""
+    return urllib.request.build_opener(_NoRedirect).open(req, timeout=timeout)
+
+
+def fetch(url: str, timeout: int = 15) -> tuple[int | None, str, str | None]:
+    """(http_status, body, error). Never raises. Redirects are followed by hand
+    and every hop is checked with _public_url_error before it is requested."""
+    from urllib.parse import urljoin
+    for _ in range(MAX_REDIRECTS + 1):
+        unsafe = _public_url_error(url)
+        if unsafe:
+            return None, "", unsafe
+        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+        try:
+            with _http_open(req, timeout) as resp:
+                charset = resp.headers.get_content_charset() or "utf-8"
+                return resp.status, resp.read().decode(charset, errors="replace"), None
+        except urllib.error.HTTPError as e:
+            location = e.headers.get("Location") if e.headers else None
+            if e.code in (301, 302, 303, 307, 308) and location:
+                url = urljoin(url, location)
+                continue
+            return e.code, "", f"HTTP {e.code}"
+        except Exception as e:  # network, DNS, timeout
+            return None, "", f"{type(e).__name__}: {e}"
+    return None, "", f"too many redirects (>{MAX_REDIRECTS})"
 
 
 # ─────────────────────────────────────────────────────────────────────────────

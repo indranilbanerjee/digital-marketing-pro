@@ -5,6 +5,8 @@ description: "Sync session learnings to persistent memory incrementally, with a 
 
 # /digital-marketing-pro:sync-memory
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Batch sync current session learnings, insights.json entries, and campaign history to the persistent memory layer. Ensures valuable knowledge from this session is preserved for future sessions without requiring the user to manually save each item via `/digital-marketing-pro:save-knowledge`. Syncs incrementally — only new items since the last sync checkpoint — so repeated syncs are fast, idempotent, and safe. Handles the full pipeline from diff detection through storage to checkpoint update, with detailed reporting on what was synced, skipped, or failed. Run this before ending a productive session to capture everything worth remembering.

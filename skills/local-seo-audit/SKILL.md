@@ -5,6 +5,8 @@ description: "Audit local SEO health by script: profile, NAP, citations, reviews
 
 # /digital-marketing-pro:local-seo-audit
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Run a comprehensive local SEO audit that evaluates all factors affecting local search visibility: Google Business Profile completeness, NAP consistency, citation presence, local content, reviews, and local schema. Produces a prioritized action plan to improve local pack rankings and drive foot traffic or service inquiries.

@@ -8,6 +8,8 @@ allowed-tools: Read Bash Glob Grep
 
 # /digital-marketing-pro:check — Unified Pre-Publish Quality Gate
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 This skill is the canonical pre-publish gate for marketing content. It wraps the evaluation suite (`scripts/eval-runner.py`) and produces a single pass/fail decision with actionable issues.
 
 ## Context efficiency
@@ -163,7 +165,7 @@ The check gains a compliance dimension for AI-generated assets in EU-targeted ca
 1. The active (or `--brand`) profile's `target_markets` include any EU/EEA jurisdiction, **and**
 2. An accompanying asset is declared AI-generated — either the file metadata says so, or the `--evidence` JSON declares `ai_generated: true` for it.
 
-When both hold, the gate runs a C2PA manifest presence check on the asset via `embed-c2pa.py` (presence/verify mode — it does not modify the asset). A **missing or invalid C2PA provenance manifest is a CRITICAL issue → decision = BLOCKED.** Article 50 applies from **2 Aug 2026** (penalty up to EUR 15M or 3% of global turnover). To embed a compliant manifest, run `/digital-marketing-pro:c2pa-metadata`.
+When both hold, the gate checks the asset read-only with `python "${CLAUDE_PLUGIN_ROOT}/scripts/embed-c2pa.py" --verify <asset>`: exit 0 = manifest present and valid (a self-signed dev signer is reported as `untrusted_signer`, not failed), 6 = no manifest, 7 = manifest fails validation, 2 = c2pa-python not installed (report the dimension as SKIPPED with the printed install command; never PASS it). A **missing or invalid C2PA provenance manifest (exit 6 or 7) is a CRITICAL issue → decision = BLOCKED.** Article 50 applies from **2 Aug 2026** (penalty up to EUR 15M or 3% of global turnover). To embed a compliant manifest, run `/digital-marketing-pro:c2pa-metadata`.
 
 If `embed-c2pa.py` is not present in the script inventory or the asset cannot be resolved, surface the dimension as SKIPPED with a warning (never silently PASS an EU AI-asset check).
 

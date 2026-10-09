@@ -5,6 +5,8 @@ description: "Detect growth loops in the business and model each loop's amplific
 
 # /digital-marketing-pro:loop-detect
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Detect, model, and optimize growth loops in the business. Identify existing compounding loops — viral (users invite users), content (content attracts users who create content), data (more users improve the product which attracts more users), paid (revenue funds ads that generate more revenue), ecosystem (integrations attract users who build integrations), and community (members attract members who contribute value). Model each loop's effectiveness with amplification factors and cycle times, find bottlenecks that limit compounding, and propose new loops based on the business model and current strengths.

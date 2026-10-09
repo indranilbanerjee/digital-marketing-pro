@@ -28,6 +28,7 @@ requests>=2.31
 # --- Optional: C2PA content provenance (embed-c2pa.py) — EU AI Act Article 50 compliance ---
 # Required for embedding machine-readable provenance manifests in AI-generated assets
 # (images, video, audio, PDF) before EU publication. Article 50 enforcement: 2 Aug 2026.
-# pip install c2pa-python cryptography
-# c2pa-python>=0.5.0
-# cryptography>=42.0
+# embed-c2pa.py never installs these; it prints this command and exits 2 when they are missing.
+# Exact versions it was verified with:
+# c2pa-python==0.38.0
+# cryptography==46.0.3

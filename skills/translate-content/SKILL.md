@@ -6,6 +6,8 @@ argument-hint: "[target-language]"
 
 # /digital-marketing-pro:translate-content
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Translate marketing content with capability-first service routing and quality assurance. For each target language the router names what the language family needs from a translation service (native script-aware models for Indic targets, formality registers for European, segmentation and script mixing for CJK) and resolves a concrete service at run time — from the brand's recorded preference or from translation MCP servers the user has already connected. When nothing resolves, translation proceeds through the harness's own multilingual capability with mandatory quality scoring — no product is ever named from memory, and none is required. Brand voice, formatting, and key terminology are preserved throughout.

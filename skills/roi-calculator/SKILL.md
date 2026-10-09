@@ -6,6 +6,8 @@ argument-hint: "[campaign-name]"
 
 # /digital-marketing-pro:roi-calculator
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Campaign ROI calculator with multi-touch attribution models. Produces a comprehensive ROI analysis across channels for budget justification, optimization recommendations, and executive reporting.

@@ -5,6 +5,8 @@ description: "Show integrations status: connected and available connectors, what
 
 # /digital-marketing-pro:integrations
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Show a complete integration status dashboard — which MCP connectors are currently connected, which are available but not yet configured, and which skills each connector unlocks. This is the first thing users should check after installing the plugin to understand what capabilities are active and what additional connections they can set up.

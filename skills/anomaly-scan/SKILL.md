@@ -5,6 +5,8 @@ description: "Scan connected platforms for anomalies against stored baselines, w
 
 # /digital-marketing-pro:anomaly-scan
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Scan all connected marketing platforms for anomalies — statistically significant deviations from established baselines that could indicate problems (traffic drops, CPA spikes, deliverability collapse, budget overruns) or opportunities (viral content, conversion rate improvements, unexpected channel growth). Designed to catch issues early, before they compound into costly problems, and to surface wins worth amplifying.

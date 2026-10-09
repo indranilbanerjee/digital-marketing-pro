@@ -5,6 +5,8 @@ description: "Calculate share of voice by script vs competitors in search, socia
 
 # /digital-marketing-pro:share-of-voice
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Calculate and track share of voice across multiple competitive dimensions. Measure how visible the brand is relative to competitors across organic search (keyword rankings weighted by search volume), paid search (impression share and auction dynamics), social media (mention volume and sentiment-weighted presence), and AI engines (GEO visibility and citation rates). Share of voice is a leading indicator of market share — brands that consistently outperform competitors in visibility tend to gain market share over time, making SOV one of the most strategically important competitive metrics to track. This command provides a comprehensive competitive visibility picture by aggregating dimension-specific SOV scores into an overall competitive position assessment, with trend tracking to surface momentum shifts before they impact pipeline or revenue. Supports both point-in-time snapshots for current competitive standing and historical trend analysis when previous SOV measurements exist from prior runs.

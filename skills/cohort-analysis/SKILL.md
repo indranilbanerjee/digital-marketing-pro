@@ -5,6 +5,8 @@ description: "Run cohort analysis: retention matrix and LTV by cohort. Churn sco
 
 # /digital-marketing-pro:cohort-analysis
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Perform customer cohort analysis to understand lifecycle patterns, retention, and value over time. Segment customers into cohorts by acquisition date, channel, behavior, or value tier, then track retention curves, compare cohort performance, and identify which acquisition sources produce the highest-value customers. This analysis reveals whether the business is acquiring better or worse customers over time, which channels drive long-term value versus one-time transactions, and where lifecycle interventions (onboarding improvements, re-engagement campaigns, loyalty programs) would have the greatest impact on retention and revenue.

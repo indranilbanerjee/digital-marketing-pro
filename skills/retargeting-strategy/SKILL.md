@@ -5,6 +5,8 @@ description: "Design a retargeting strategy: audience windows, sequencing, frequ
 
 # /digital-marketing-pro:retargeting-strategy
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Design a cross-platform retargeting strategy with audience segmentation by funnel stage and behavior, creative sequencing, frequency management, and budget allocation. Produces a complete retargeting playbook ready for implementation across advertising platforms.

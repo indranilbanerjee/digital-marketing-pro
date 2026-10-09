@@ -6,6 +6,8 @@ argument-hint: "[brand-name or site URL]"
 
 # /digital-marketing-pro:gsc-ai-performance
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Google rolled out a new **GSC AI Performance Report** on **3 June 2026** ([Search Engine Land announcement](https://searchengineland.com/google-search-console-ai-performance-reports-and-controls-to-block-your-content-in-ai-responses-479298)) covering both AI Overviews and AI Mode in a single combined surface. This skill helps you (a) baseline a brand's visibility in the new report, (b) understand the metric trade-offs, and (c) decide whether to use the new in-SC opt-out toggle.

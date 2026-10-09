@@ -5,6 +5,8 @@ description: "Monitor competitors over time: baseline sites, pricing and ads by 
 
 # /digital-marketing-pro:competitor-monitor
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Set up and manage ongoing competitor monitoring. Define which competitors to track, what to monitor (content changes, pricing updates, ad activity, social mentions, SEO rankings, SERP feature ownership), how often to scan each dimension, and what alerts to trigger when significant changes are detected. This command establishes competitive intelligence baselines by capturing the current state of each competitor across all monitored dimensions, then configures recurring scans to detect and surface changes over time. Baselines serve as the reference point for all future change detection — without them, alerts have no context for what constitutes a meaningful shift versus normal fluctuation. Supports per-dimension scan frequencies so high-velocity dimensions like pricing and ads can be checked daily while slower-moving dimensions like content strategy and SEO authority are reviewed weekly or monthly. The monitoring configuration persists across sessions and powers both the competitor-alerts notification system and the share-of-voice trend tracking.

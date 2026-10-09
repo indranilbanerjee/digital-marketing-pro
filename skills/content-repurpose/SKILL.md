@@ -5,6 +5,8 @@ description: "Repurpose one content piece into 10+ channel formats with drafts a
 
 # /digital-marketing-pro:content-repurpose
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Take one piece of existing content and generate a comprehensive repurposing plan across multiple channels and formats. Produces derivative content pieces, a posting schedule, and platform-specific adaptations to maximize the ROI of every content investment.

@@ -6,6 +6,8 @@ argument-hint: "[element-to-test]"
 
 # /digital-marketing-pro:ab-test-plan
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Dedicated A/B test planning with a structured hypothesis framework, statistical sample size calculation, variant design, and monitoring plan. Produces a complete experiment specification with statistical rigor and clear decision criteria.

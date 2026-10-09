@@ -195,7 +195,7 @@ def _format_text(summary: dict) -> str:
 
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--brand", required=True, help="Brand slug")
+    p.add_argument("--brand", type=_common.path_component, required=True, help="Brand slug")
     p.add_argument("--csv", help="Path to GSC AI report CSV export")
     p.add_argument("--api", action="store_true", help="Try the API path (currently not supported by Google)")
     p.add_argument("--site", help="Site URL for --api mode")

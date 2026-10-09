@@ -5,6 +5,8 @@ description: "Score churn risk per segment by script, with tiered retention play
 
 # /digital-marketing-pro:churn-risk
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Assess churn risk across customer segments and generate intervention strategies. Score segments using behavioral signals — email engagement decline, purchase frequency drops, login pattern changes, support ticket escalations — to categorize each segment into risk tiers and produce actionable intervention playbooks. This command bridges the gap between knowing customers are churning and knowing what to do about it. Instead of reactive "win-back" campaigns after customers have already left, it identifies at-risk segments early enough to intervene while the relationship is still recoverable. Each intervention playbook includes specific actions, timing windows, channel recommendations, and messaging approaches calibrated to the risk tier and customer value.

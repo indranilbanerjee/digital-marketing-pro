@@ -6,6 +6,8 @@ user-invocable: true
 
 # /digital-marketing-pro:performance-check
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Pull live metrics from all connected analytics MCPs and produce a comprehensive performance snapshot. Compares current performance to KPI targets defined in the brand profile, previous-period benchmarks, and industry averages. Designed for quick health checks — run it daily, weekly, or on-demand to stay on top of marketing performance without switching between platforms.

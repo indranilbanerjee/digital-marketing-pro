@@ -5,6 +5,8 @@ description: "Show autopilot status: health, auto-corrections, guardrails, escal
 
 # /digital-marketing-pro:autopilot-status
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Campaign operations autopilot dashboard. Show health scores for all active campaigns, list any auto-corrections taken recently, display current guardrail configuration, flag campaigns needing human attention, and report savings from automated interventions. Provides a single-view operational picture of how the autopilot system is managing campaign health — so the user can trust what's running smoothly, focus attention on what needs it, and quantify the value of automated monitoring.

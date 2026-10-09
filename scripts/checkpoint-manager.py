@@ -103,7 +103,8 @@ def _runs_dir(brand: str) -> Path:
 
 
 def _run_dir(brand: str, run_id: str) -> Path:
-    return _runs_dir(brand) / run_id
+    # run_id comes from the model; contain it so `discard` can never rmtree outside runs/.
+    return _common.safe_child(_runs_dir(brand), run_id)
 
 
 def _now_iso() -> str:
@@ -318,13 +319,13 @@ def main() -> int:
     sub = parser.add_subparsers(dest="action", required=True)
 
     p_init = sub.add_parser("init", help="Start a tracked workflow run")
-    p_init.add_argument("--brand", required=True)
+    p_init.add_argument("--brand", type=_common.path_component, required=True)
     p_init.add_argument("--workflow", required=True, choices=list(WORKFLOW_PRESETS))
     p_init.add_argument("--topic", default=None, help="Run topic/label for the run_id")
 
     p_save = sub.add_parser("save", help="Save the output of a step")
-    p_save.add_argument("--brand", required=True)
-    p_save.add_argument("--run-id", required=True)
+    p_save.add_argument("--brand", type=_common.path_component, required=True)
+    p_save.add_argument("--run-id", type=_common.path_component, required=True)
     p_save.add_argument("--step", required=True, help="Step / part identifier (engagement: 1..12; others: any)")
     g = p_save.add_mutually_exclusive_group(required=True)
     g.add_argument("--content", help="Step content inline")
@@ -333,31 +334,31 @@ def main() -> int:
     p_save.add_argument("--label", help="Step label (only used for workflows without a fixed preset)")
 
     p_status = sub.add_parser("status", help="Show run status, completed + remaining steps")
-    p_status.add_argument("--brand", required=True)
-    p_status.add_argument("--run-id", required=True)
+    p_status.add_argument("--brand", type=_common.path_component, required=True)
+    p_status.add_argument("--run-id", type=_common.path_component, required=True)
 
     p_load = sub.add_parser("load", help="Print the saved content for a step")
-    p_load.add_argument("--brand", required=True)
-    p_load.add_argument("--run-id", required=True)
+    p_load.add_argument("--brand", type=_common.path_component, required=True)
+    p_load.add_argument("--run-id", type=_common.path_component, required=True)
     p_load.add_argument("--step", required=True)
 
     p_list = sub.add_parser("list", help="List runs for a brand (optional workflow filter)")
-    p_list.add_argument("--brand", required=True)
+    p_list.add_argument("--brand", type=_common.path_component, required=True)
     p_list.add_argument("--workflow", default=None, choices=list(WORKFLOW_PRESETS))
 
     p_resume = sub.add_parser("resume", help="Pick the run to resume (latest in_progress, or --run-id)")
-    p_resume.add_argument("--brand", required=True)
-    p_resume.add_argument("--run-id", default=None)
+    p_resume.add_argument("--brand", type=_common.path_component, required=True)
+    p_resume.add_argument("--run-id", type=_common.path_component, default=None)
     p_resume.add_argument("--workflow", default=None, choices=list(WORKFLOW_PRESETS))
 
     p_fin = sub.add_parser("finalize", help="Mark a run completed/failed/abandoned")
-    p_fin.add_argument("--brand", required=True)
-    p_fin.add_argument("--run-id", required=True)
+    p_fin.add_argument("--brand", type=_common.path_component, required=True)
+    p_fin.add_argument("--run-id", type=_common.path_component, required=True)
     p_fin.add_argument("--status", default="completed", choices=["completed", "failed", "abandoned"])
 
     p_dis = sub.add_parser("discard", help="Delete a run's checkpoint directory")
-    p_dis.add_argument("--brand", required=True)
-    p_dis.add_argument("--run-id", required=True)
+    p_dis.add_argument("--brand", type=_common.path_component, required=True)
+    p_dis.add_argument("--run-id", type=_common.path_component, required=True)
 
     args = parser.parse_args()
 

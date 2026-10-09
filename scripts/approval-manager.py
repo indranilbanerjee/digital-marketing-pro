@@ -4,8 +4,15 @@ approval-manager.py
 ===================
 Manages the approval lifecycle for execution actions in Digital Marketing Pro.
 
-Tracks drafts through pending -> approved -> executed (or rejected/failed) so
-the plugin never publishes, sends, or launches without explicit user sign-off.
+Tracks approvals through pending -> approved -> executed (or rejected/failed).
+
+What a record proves: the approval step ran for this payload, at this time,
+inside its window (30 minutes to review, 15 to fire), and, for writes sent by
+connector_executor.py, that it was used once. It cannot prove who typed `yes`:
+the model runs every command, including this one. Skills run `approve` only
+after the user types yes for the exact preview. Writes through an MCP server
+tool are outside the executor's code check; for them this record is the audit
+trail of the typed-yes gate.
 
 Storage: ~/.claude-marketing/brands/{slug}/approvals/
 
@@ -17,12 +24,13 @@ Usage:
     python approval-manager.py --brand acme --action mark-executed --id publish-blog-20260212-1 --data '{"execution_result": "success", "platform_response": "Published", "url": "https://example.com/post"}'
     python approval-manager.py --brand acme --action get-approval --id publish-blog-20260212-1
     python approval-manager.py --brand acme --action get-execution-log
+    python approval-manager.py --brand acme --action create-standing --data '{"kind": "executor", "connector": "slack", "actions": ["internal-kickoff"], "max_uses_per_day": 5, "days": 7, "summary": "launch-day pings"}'
 """
 
 import argparse
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -33,6 +41,9 @@ BRANDS_DIR = _common.brands_root()
 VALID_TYPES = [
     "publish-blog", "send-email", "launch-ad", "schedule-social",
     "send-report", "crm-sync", "send-sms",
+    "credential-switch", "data-export", "data-import", "lead-import", "live-dashboard",
+    "pipeline-update", "redirect-manager", "segment-audience", "send-notification",
+    "seo-implement", "execute-action", "autopilot-correction",
 ]
 VALID_RISK_LEVELS = ["low", "medium", "high", "critical"]
 
@@ -123,8 +134,12 @@ def create_approval(slug, data):
         "content_summary": content_summary,
         "compliance_check": data.get("compliance_check", None),
         "brand_voice_score": data.get("brand_voice_score", None),
-        "created_at": datetime.now().isoformat(),
-        "approved_by": None,
+        "created_at": _common._iso(_common._utcnow()),
+        "pending_expires_at": _common._iso(_common._utcnow() + timedelta(minutes=_common.APPROVAL_PENDING_MINUTES)),
+        "kind": "single",
+        "brand": slug,
+        "payload_hash": data.get("payload_hash"),
+        "approved_via": None,
         "approved_at": None,
         "rejected_reason": None,
         "executed_at": None,
@@ -134,7 +149,9 @@ def create_approval(slug, data):
         "rollback_data": None,
     }
 
-    filepath = approvals_dir / f"{approval_id}.json"
+    filepath, path_err = _common.child_or_error(approvals_dir, approval_id, ".json")
+    if path_err:
+        return {"error": path_err}
     _common.atomic_write_json(filepath, approval)
 
     return {
@@ -168,7 +185,9 @@ def approve(slug, approval_id):
     if err:
         return {"error": err}
 
-    filepath = brand_dir / "approvals" / f"{approval_id}.json"
+    filepath, path_err = _common.child_or_error(brand_dir / "approvals", approval_id, ".json")
+    if path_err:
+        return {"error": path_err}
     if not filepath.exists():
         return {"error": f"Approval '{approval_id}' not found."}
 
@@ -178,10 +197,22 @@ def approve(slug, approval_id):
 
     if approval["status"] != "pending":
         return {"error": f"Cannot approve: current status is '{approval['status']}', expected 'pending'."}
+    if _common._expired(approval.get("pending_expires_at")) and approval.get("pending_expires_at"):
+        approval["status"] = "expired"
+        _common.atomic_write_json(filepath, approval)
+        return {"error": f"Approval '{approval_id}' expired unreviewed at {approval['pending_expires_at']}; "
+                         "prepare a new one and show its preview again."}
 
+    now = _common._utcnow()
     approval["status"] = "approved"
-    approval["approved_by"] = "user"
-    approval["approved_at"] = datetime.now().isoformat()
+    # Record only what code knows: the approval step ran, now. Not who typed yes.
+    approval["approved_via"] = "approval-step"
+    approval["approved_at"] = _common._iso(now)
+    approval.pop("approved_by", None)
+    if approval.get("kind") == "standing":
+        approval["expires_at"] = _common._iso(now + timedelta(days=int(approval.get("days") or 1)))
+    else:
+        approval["fire_expires_at"] = _common._iso(now + timedelta(minutes=_common.APPROVAL_FIRE_MINUTES))
 
     _common.atomic_write_json(filepath, approval)
 
@@ -189,7 +220,44 @@ def approve(slug, approval_id):
         "status": "approved",
         "approval_id": approval_id,
         "approved_at": approval["approved_at"],
+        "approved_via": "approval-step",
+        "fire_expires_at": approval.get("fire_expires_at"),
+        "expires_at": approval.get("expires_at"),
     }
+
+
+def create_standing(slug, data):
+    """A bounded standing approval: scope (kind, connector, actions), a daily cap
+    and an expiry in days (executor <= 7, autopilot <= 30). It still has to be
+    approved, and every use is logged against it."""
+    brand_dir, err = get_brand_dir(slug)
+    if err:
+        return {"error": err}
+    kind = data.get("kind")
+    if kind not in _common.STANDING_MAX_DAYS:
+        return {"error": f"kind must be one of {sorted(_common.STANDING_MAX_DAYS)}"}
+    actions = data.get("actions") or []
+    if not isinstance(actions, list) or not actions:
+        return {"error": "actions must be a non-empty list of action ids this rule covers"}
+    try:
+        days = int(data.get("days") or 0)
+        cap = int(data.get("max_uses_per_day") or 0)
+    except (TypeError, ValueError):
+        return {"error": "days and max_uses_per_day must be integers"}
+    if not 1 <= days <= _common.STANDING_MAX_DAYS[kind]:
+        return {"error": f"days must be 1-{_common.STANDING_MAX_DAYS[kind]} for a {kind} standing approval"}
+    if not 1 <= cap <= 50:
+        return {"error": "max_uses_per_day must be 1-50"}
+    summary = data.get("summary")
+    if not summary:
+        return {"error": "Missing required field: summary (shown to the user before they approve)"}
+    approval_id, path = _common.write_approval_record(slug, "standing", {
+        "kind": "standing", "type": "standing-rule", "brand": slug,
+        "scope": {"kind": kind, "connector": data.get("connector"), "actions": actions},
+        "max_uses_per_day": cap, "days": days, "content_summary": summary, "uses": [],
+    })
+    return {"status": "created", "approval_id": approval_id, "path": str(path),
+            "next": "Show the summary and scope to the user; run approve only after they type yes."}
 
 
 def reject(slug, approval_id, data):
@@ -202,7 +270,9 @@ def reject(slug, approval_id, data):
     if not reason:
         return {"error": "Missing required field: reason"}
 
-    filepath = brand_dir / "approvals" / f"{approval_id}.json"
+    filepath, path_err = _common.child_or_error(brand_dir / "approvals", approval_id, ".json")
+    if path_err:
+        return {"error": path_err}
     if not filepath.exists():
         return {"error": f"Approval '{approval_id}' not found."}
 
@@ -235,7 +305,9 @@ def mark_executed(slug, approval_id, data):
     if execution_result not in ("success", "failure"):
         return {"error": "execution_result must be 'success' or 'failure'."}
 
-    filepath = brand_dir / "approvals" / f"{approval_id}.json"
+    filepath, path_err = _common.child_or_error(brand_dir / "approvals", approval_id, ".json")
+    if path_err:
+        return {"error": path_err}
     if not filepath.exists():
         return {"error": f"Approval '{approval_id}' not found."}
 
@@ -243,6 +315,9 @@ def mark_executed(slug, approval_id, data):
     if not approval:
         return {"error": f"Approval file corrupted: {approval_id}"}
 
+    if approval["status"] in ("executed", "failed") and approval.get("consumed_at"):
+        return {"status": approval["status"], "approval_id": approval_id,
+                "note": "connector_executor.py already recorded this execution"}
     if approval["status"] != "approved":
         return {"error": f"Cannot mark executed: current status is '{approval['status']}', expected 'approved'."}
 
@@ -269,7 +344,9 @@ def get_approval(slug, approval_id):
     if err:
         return {"error": err}
 
-    filepath = brand_dir / "approvals" / f"{approval_id}.json"
+    filepath, path_err = _common.child_or_error(brand_dir / "approvals", approval_id, ".json")
+    if path_err:
+        return {"error": path_err}
     if not filepath.exists():
         return {"error": f"Approval '{approval_id}' not found."}
 
@@ -318,9 +395,9 @@ def get_execution_log(slug):
 
 def main():
     parser = argparse.ArgumentParser(description="Approval lifecycle manager for Digital Marketing Pro")
-    parser.add_argument("--brand", required=True, help="Brand slug")
+    parser.add_argument("--brand", type=_common.path_component, required=True, help="Brand slug")
     parser.add_argument("--action", required=True,
-                        choices=["create-approval", "list-pending", "approve", "reject",
+                        choices=["create-approval", "create-standing", "list-pending", "approve", "reject",
                                  "mark-executed", "get-approval", "get-execution-log"],
                         help="Action to perform")
     parser.add_argument("--data", help="JSON data (for create/reject/mark-executed)")
@@ -337,6 +414,14 @@ def main():
             print(json.dumps({"error": "Invalid JSON in --data"}))
             sys.exit(1)
         result = create_approval(args.brand, data)
+
+    elif args.action == "create-standing":
+        try:
+            data = json.loads(args.data or "")
+        except json.JSONDecodeError:
+            print(json.dumps({"error": "Provide --data with the standing-approval JSON"}))
+            sys.exit(1)
+        result = create_standing(args.brand, data)
 
     elif args.action == "list-pending":
         result = list_pending(args.brand)

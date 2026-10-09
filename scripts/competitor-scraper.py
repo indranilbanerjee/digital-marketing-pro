@@ -75,12 +75,37 @@ def robots_verdict(status_code, robots_text, url, agent=CRAWLER_NAME):
     return False, f"Blocked by robots.txt for {agent}"
 
 
+MAX_REDIRECTS = 5
+
+
+class UnsafeURL(Exception):
+    """A URL (or a redirect hop) points at a non-public address or scheme."""
+
+
+def get_public(url, timeout, headers):
+    """requests.get with redirects followed by hand, so every hop is checked
+    against _common.public_url_error (http/https, public addresses only)."""
+    for _ in range(MAX_REDIRECTS + 1):
+        unsafe = _common.public_url_error(url)
+        if unsafe:
+            raise UnsafeURL(unsafe)
+        resp = requests.get(url, timeout=timeout, headers=headers, allow_redirects=False)
+        location = resp.headers.get("Location") or resp.headers.get("location")
+        if resp.status_code in (301, 302, 303, 307, 308) and location:
+            url = urljoin(url, location)
+            continue
+        return resp
+    raise UnsafeURL(f"too many redirects (>{MAX_REDIRECTS})")
+
+
 def check_robots_txt(url):
     """Check if scraping is allowed by robots.txt. Returns (allowed, message)."""
     parsed = urlparse(url)
     robots_url = f"{parsed.scheme}://{parsed.netloc}/robots.txt"
     try:
-        resp = requests.get(robots_url, timeout=5, headers={"User-Agent": USER_AGENT})
+        resp = get_public(robots_url, timeout=5, headers={"User-Agent": USER_AGENT})
+    except UnsafeURL as exc:
+        return False, str(exc)
     except requests.RequestException:
         return robots_verdict(None, "", url)
     return robots_verdict(resp.status_code, resp.text, url)
@@ -160,8 +185,10 @@ def scrape_url(url):
 
     headers = {"User-Agent": USER_AGENT}
     try:
-        resp = requests.get(url, timeout=15, headers=headers, allow_redirects=True)
+        resp = get_public(url, timeout=15, headers=headers)
         resp.raise_for_status()
+    except UnsafeURL as e:
+        return {"error": str(e), "url": url}
     except requests.RequestException as e:
         return {"error": f"Request failed: {str(e)}", "url": url}
 

@@ -6,6 +6,8 @@ argument-hint: "[connector-name]"
 
 # /digital-marketing-pro:connect
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Guide users through connecting a specific MCP integration to the Digital Marketing Pro plugin. Provides platform-specific setup instructions, credential requirements, configuration steps, and verification. This is the user-friendly entry point for adding integrations — it handles the common cases (known connectors with established setup paths) while `/digital-marketing-pro:add-integration` handles custom or unknown MCP servers.

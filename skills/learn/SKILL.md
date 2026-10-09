@@ -5,6 +5,8 @@ description: "Log a marketing learning to the brand intelligence graph with conf
 
 # /digital-marketing-pro:learn
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Save a structured marketing learning to the brand's intelligence graph. Captures what was learned, under what conditions it applies, confidence level, and source agent. Builds compound intelligence that makes every future campaign smarter — turning one-off observations into a persistent knowledge base that compounds across campaigns, channels, and team members over time.

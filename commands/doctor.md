@@ -6,6 +6,8 @@ allowed-tools: Bash Read
 
 # /digital-marketing-pro:doctor — Per-Action Readiness Check
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 Resolves every action in the campaign-audit and launch-campaign skill surfaces against the currently configured connectors and reports which mode each one is in:
 
 | Mode | What it means |

@@ -6,6 +6,8 @@ argument-hint: "[target-markets]"
 
 # /digital-marketing-pro:localize-campaign
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Full campaign localization across multiple target markets. This command takes all campaign assets — emails, ads, social posts, landing pages, video scripts, push notifications — and adapts them for each target market. It goes far beyond translation: cultural references are adjusted, compliance elements are modified per region, SEO is localized, creative recommendations are adapted, and assets are prepared for multilingual publishing.

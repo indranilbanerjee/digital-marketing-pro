@@ -6,6 +6,8 @@ argument-hint: "[total-budget]"
 
 # /digital-marketing-pro:budget-optimizer
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Data-driven marketing budget optimization across channels using performance data and industry benchmarks. Analyzes current spend efficiency, models diminishing returns per channel, and produces an optimized allocation with projected ROI improvement and a phased reallocation timeline.

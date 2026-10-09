@@ -6,6 +6,8 @@ argument-hint: "[URL]"
 
 # /digital-marketing-pro:seo-audit
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Perform a comprehensive SEO audit that evaluates a website across all major ranking dimensions. Produces a prioritized action plan with estimated impact and effort for each recommendation.

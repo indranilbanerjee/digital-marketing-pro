@@ -24,7 +24,10 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import _common  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -122,6 +125,11 @@ def follow_redirects(url, timeout):
             return current_url, None, hops, {}, b"", 0, "Redirect loop detected"
         visited.add(current_url)
 
+        # Every hop: http/https only, public addresses only (Hermes review).
+        unsafe = _common.public_url_error(current_url)
+        if unsafe:
+            return current_url, None, hops, {}, b"", 0, unsafe
+
         req = _build_request(current_url)
         try:
             # Use a custom opener that does NOT auto-follow redirects
@@ -146,10 +154,8 @@ def follow_redirects(url, timeout):
                 location = headers.get("location", "")
                 if not location:
                     return current_url, status, hops, headers, b"", ttfb_ms, "Redirect without Location header"
-                # Resolve relative redirects
-                if location.startswith("/"):
-                    parsed = urlparse(current_url)
-                    location = f"{parsed.scheme}://{parsed.netloc}{location}"
+                # Resolve relative redirects (checked as the next hop)
+                location = urljoin(current_url, location)
                 hops.append({"from": current_url, "to": location, "status": status})
                 current_url = location
                 continue

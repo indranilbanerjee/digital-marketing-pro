@@ -285,7 +285,7 @@ def get_violations(slug, category=None, severity=None, limit=50):
 
 def main():
     parser = argparse.ArgumentParser(description="Campaign data persistence for Digital Marketing Pro")
-    parser.add_argument("--brand", required=True, help="Brand slug")
+    parser.add_argument("--brand", type=_common.path_component, required=True, help="Brand slug")
     parser.add_argument("--action", required=True,
                         choices=["save-campaign", "list-campaigns", "get-campaign",
                                  "save-performance", "save-insight", "get-insights",

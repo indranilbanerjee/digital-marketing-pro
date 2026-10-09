@@ -428,7 +428,7 @@ def main():
                         choices=["score-segment", "score-batch", "intervention-plan",
                                  "trend", "cohort-risk", "summary"],
                         help="Action to perform")
-    parser.add_argument("--brand", help="Brand slug")
+    parser.add_argument("--brand", type=_common.path_component, help="Brand slug")
     parser.add_argument("--segment-name", dest="segment_name",
                         help="Segment name (for score-segment, trend)")
     parser.add_argument("--signals", help="JSON behavioral signals (for score-segment)")

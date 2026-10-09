@@ -5,6 +5,8 @@ description: "Plan CRO for pages, forms and checkout with ICE-ranked fixes. One 
 
 # CRO (Conversion Rate Optimization)
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## When to Use This Skill
 
 Activate this skill when the user's request involves any of the following:

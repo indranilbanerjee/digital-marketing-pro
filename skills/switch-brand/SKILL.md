@@ -6,6 +6,8 @@ argument-hint: "[brand-slug]"
 
 # Switch Brand
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## When to Use
 - User says "switch to [brand name]" or "change brand to..."
 - User wants to work on a different client/brand

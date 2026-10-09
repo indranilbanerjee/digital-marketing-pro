@@ -5,6 +5,8 @@ description: "Write an executive summary from tracked marketing results for CEO,
 
 # /digital-marketing-pro:exec-summary
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Generate a concise, C-suite-ready executive summary of marketing performance. Focuses on business-level metrics — ROI, CAC, LTV, market share — rather than operational detail. Synthesizes strategic wins and risks, competitive positioning, and high-level recommendations into a format designed for executive decision-making. Supports single-brand summaries or portfolio-wide aggregation across all managed brands, and adapts depth and terminology to the target audience (CEO, CMO, board).

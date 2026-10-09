@@ -369,7 +369,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--brand",
-        type=str,
+        type=_common.path_component,
         default=None,
         help="Brand slug (if omitted, reads from active brand).",
     )

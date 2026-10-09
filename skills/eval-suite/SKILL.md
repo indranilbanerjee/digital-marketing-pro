@@ -5,6 +5,8 @@ description: "Evaluate a batch of content in one run: ranked quality report, sys
 
 # /digital-marketing-pro:eval-suite
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Batch evaluation across multiple content pieces to produce a portfolio-level quality assessment. Evaluate an entire content library, all assets in a campaign, or a set of deliverables in one run. Instead of evaluating content one piece at a time, this command processes everything together and delivers a holistic view of content quality.

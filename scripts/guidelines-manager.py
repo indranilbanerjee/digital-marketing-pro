@@ -36,9 +36,24 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 
-MEMORY_ROOT = Path.home() / ".claude-marketing"
-BRANDS_DIR = MEMORY_ROOT / "brands"
-SOPS_DIR = MEMORY_ROOT / "sops"
+def _sops_root() -> Path:
+    """Agency SOPs live under the same workspace as everything else
+    (CLAUDE_MARKETING_HOME / PLUGIN_DATA / ~/.claude-marketing). Before 3.35.0
+    this script ignored those overrides and always used ~/.claude-marketing/sops;
+    if that legacy folder holds SOPs and the workspace one does not exist yet,
+    keep using it so nothing disappears. An explicit CLAUDE_MARKETING_HOME
+    (tests, isolated runs) never falls back."""
+    current = _common.workspace_root() / "sops"
+    legacy = Path.home() / ".claude-marketing" / "sops"
+    if (not os.environ.get("CLAUDE_MARKETING_HOME") and not current.exists() and legacy.is_dir()
+            and legacy.resolve() != current.resolve()):
+        return legacy
+    return current
+
+
+MEMORY_ROOT = _common.workspace_root()
+BRANDS_DIR = _common.brands_root()
+SOPS_DIR = _sops_root()
 
 GUIDELINE_CATEGORIES = {
     "voice-and-tone": {
@@ -310,7 +325,9 @@ def save_category(slug, category, content=None, filepath=None):
         safe_name = category.lower().replace(" ", "-")
         if not safe_name.endswith(".md"):
             safe_name += ".md"
-        target = custom_dir / safe_name
+        target, path_err = _common.child_or_error(custom_dir, safe_name)
+        if path_err:
+            return {"error": path_err}
     else:
         cat_info = GUIDELINE_CATEGORIES[category]
         target = guidelines_dir / cat_info["file"]
@@ -374,7 +391,9 @@ def delete_category(slug, category):
     if category in GUIDELINE_CATEGORIES:
         target = guidelines_dir / GUIDELINE_CATEGORIES[category]["file"]
     else:
-        target = guidelines_dir / "custom" / category
+        target, path_err = _common.child_or_error(guidelines_dir / "custom", category)
+        if path_err:
+            return {"error": path_err}
         if not target.suffix:
             target = target.with_suffix(".md")
 
@@ -417,10 +436,12 @@ def get_template(slug, name):
     if err:
         return {"error": err}
 
-    filepath = templates_dir / f"{name}.md"
+    filepath, path_err = _common.child_or_error(templates_dir, name, ".md")
+    if path_err:
+        return {"error": path_err}
     if not filepath.exists():
         # Try with original name
-        filepath = templates_dir / name
+        filepath = templates_dir / name.strip()
         if not filepath.exists():
             return {"error": f"Template '{name}' not found."}
 
@@ -438,7 +459,9 @@ def save_template(slug, name, content=None, filepath=None, description=""):
         return {"error": err}
 
     safe_name = name.lower().replace(" ", "-")
-    target = templates_dir / f"{safe_name}.md"
+    target, path_err = _common.child_or_error(templates_dir, safe_name, ".md")
+    if path_err:
+        return {"error": path_err}
 
     if filepath:
         source = Path(filepath)
@@ -472,7 +495,9 @@ def delete_template(slug, name):
     if err:
         return {"error": err}
 
-    target = templates_dir / f"{name}.md"
+    target, path_err = _common.child_or_error(templates_dir, name, ".md")
+    if path_err:
+        return {"error": path_err}
     if not target.exists():
         return {"error": f"Template '{name}' not found."}
 
@@ -510,9 +535,11 @@ def list_sops():
 def get_sop(name):
     """Get a specific SOP."""
     SOPS_DIR.mkdir(parents=True, exist_ok=True)
-    filepath = SOPS_DIR / f"{name}.md"
+    filepath, path_err = _common.child_or_error(SOPS_DIR, name, ".md")
+    if path_err:
+        return {"error": path_err}
     if not filepath.exists():
-        filepath = SOPS_DIR / name
+        filepath = SOPS_DIR / name.strip()
         if not filepath.exists():
             return {"error": f"SOP '{name}' not found."}
 
@@ -528,7 +555,9 @@ def save_sop(name, content=None, filepath=None, description=""):
     SOPS_DIR.mkdir(parents=True, exist_ok=True)
 
     safe_name = name.lower().replace(" ", "-")
-    target = SOPS_DIR / f"{safe_name}.md"
+    target, path_err = _common.child_or_error(SOPS_DIR, safe_name, ".md")
+    if path_err:
+        return {"error": path_err}
 
     if filepath:
         source = Path(filepath)
@@ -557,7 +586,9 @@ def save_sop(name, content=None, filepath=None, description=""):
 
 def delete_sop(name):
     """Delete an agency SOP."""
-    target = SOPS_DIR / f"{name}.md"
+    target, path_err = _common.child_or_error(SOPS_DIR, name, ".md")
+    if path_err:
+        return {"error": path_err}
     if not target.exists():
         return {"error": f"SOP '{name}' not found."}
 
@@ -577,7 +608,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Brand guidelines, templates, and SOP management for Digital Marketing Pro"
     )
-    parser.add_argument("--brand", help="Brand slug (required for brand-level actions)")
+    parser.add_argument("--brand", type=_common.path_component, help="Brand slug (required for brand-level actions)")
     parser.add_argument(
         "--action",
         required=True,

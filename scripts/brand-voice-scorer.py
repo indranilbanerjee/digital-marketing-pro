@@ -483,7 +483,7 @@ def build_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
-        "--brand", required=True,
+        "--brand", type=_common.path_component, required=True,
         help="Brand slug (matches folder name under ~/.claude-marketing/brands/)",
     )
     input_group = parser.add_mutually_exclusive_group(required=True)

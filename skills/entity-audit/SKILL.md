@@ -5,6 +5,8 @@ description: "Audit brand entity facts AI engines trust: Wikidata, Knowledge Pan
 
 # /digital-marketing-pro:entity-audit
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Audit brand entity data consistency across the platforms that AI engines use as knowledge sources. Check Wikidata entries, Google Knowledge Panel accuracy, Wikipedia presence and notability, and industry directory listings for consistency. Inconsistent entity data degrades AI engine trust and visibility — when knowledge sources disagree about basic facts like the official website, founding date, headquarters location, or industry classification, AI engines either omit the brand entirely or present conflicting information. This command provides a systematic, platform-by-platform audit with specific discrepancies flagged and a prioritized fix plan ordered by impact on AI visibility.

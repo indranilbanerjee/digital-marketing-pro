@@ -84,9 +84,9 @@ def get_internal_tracking_dir(brand: str, workflow: str | None = None,
                                 run_id: str | None = None) -> Path:
     base = _common.brand_dir(brand) / "output"
     if workflow:
-        base = base / workflow
+        base = _common.safe_child(base, workflow)
     if run_id:
-        base = base / run_id
+        base = _common.safe_child(base, run_id)
     return base
 
 
@@ -138,7 +138,7 @@ def publish(args) -> dict:
 
 def publish_run(args) -> dict:
     """Publish every artifact a checkpoint-manager run produced."""
-    run_dir = _common.brand_dir(args.brand) / "runs" / args.run_id
+    run_dir = _common.safe_child(_common.brand_dir(args.brand) / "runs", args.run_id)
     manifest_file = run_dir / "run.json"
     if not manifest_file.exists():
         return {"error": f"no run found: brand={args.brand} run_id={args.run_id}"}
@@ -228,7 +228,7 @@ def main() -> int:
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     common_pub_args = lambda p: (
-        p.add_argument("--brand", required=True),
+        p.add_argument("--brand", type=_common.path_component, required=True),
         p.add_argument("--workflow", default="engagement"),
         p.add_argument("--publish-dir", default=None,
                        help="Override visible-publish root ($DIGITAL_MARKETING_PRO_PUBLISH_DIR or ~/Documents/DigitalMarketingPro/)"),
@@ -242,7 +242,7 @@ def main() -> int:
 
     p_run = sub.add_parser("publish-run", help="Publish every artifact in a checkpoint-manager run")
     common_pub_args(p_run)
-    p_run.add_argument("--run-id", required=True)
+    p_run.add_argument("--run-id", type=_common.path_component, required=True)
 
     p_where = sub.add_parser("where", help="Print the visible-publish path (no copy)")
     common_pub_args(p_where)

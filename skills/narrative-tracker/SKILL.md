@@ -5,6 +5,8 @@ description: "Track the brand narrative in AI engines against desired positionin
 
 # /digital-marketing-pro:narrative-tracker
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Track and analyze the narrative that AI engines construct about the brand. Monitor what ChatGPT, Perplexity, Gemini, and others say when asked about the brand, compare to desired positioning, detect drift or misrepresentation, and identify when competitors are gaining narrative territory in AI responses. Unlike visibility monitoring (which measures whether the brand appears), narrative tracking measures what is said — the qualitative story AI engines tell about the brand, whether it aligns with intended positioning, and how it changes over time. This gives marketers the insight to proactively shape AI perception through targeted content strategy rather than reacting after damage is done.

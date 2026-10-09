@@ -445,7 +445,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Competitor intelligence tracking for Digital Marketing Pro"
     )
-    parser.add_argument("--brand", required=True, help="Brand slug")
+    parser.add_argument("--brand", type=_common.path_component, required=True, help="Brand slug")
     parser.add_argument(
         "--action", required=True,
         choices=[

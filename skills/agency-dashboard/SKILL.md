@@ -6,6 +6,8 @@ user-invocable: true
 
 # /digital-marketing-pro:agency-dashboard
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Generate a portfolio-level dashboard aggregating health metrics across ALL client brands. Shows campaign activity, budget pacing, KPI attainment, content pipeline, and team utilization at a glance — giving agency leadership a single view of operational health without opening each account individually. Designed for daily standups, weekly agency reviews, or on-demand health checks.

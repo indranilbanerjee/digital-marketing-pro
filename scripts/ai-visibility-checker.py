@@ -261,7 +261,7 @@ def run_api_mode(brand, queries, competitors=None, openai_model_override=None, a
 
 def main():
     parser = argparse.ArgumentParser(description="Check brand visibility in AI responses")
-    parser.add_argument("--brand", required=False, default="", help="Brand name to check (required unless --list-models)")
+    parser.add_argument("--brand", type=_common.path_component, required=False, default="", help="Brand name to check (required unless --list-models)")
     parser.add_argument("--queries", help="Comma-separated queries to test")
     parser.add_argument("--mode", choices=["manual", "api"], default="manual",
                         help="manual = checklist, api = run queries via APIs")

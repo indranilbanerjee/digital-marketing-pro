@@ -6,6 +6,8 @@ argument-hint: "[brand-name or --full]"
 
 # Brand Setup — Interactive Brand Profiling
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## When to Use This Skill
 
 - User says "set up a new brand" or "create a brand profile"

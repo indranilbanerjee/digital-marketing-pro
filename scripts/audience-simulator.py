@@ -729,7 +729,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Audience Simulator — Synthetic audience for message and pricing testing for Digital Marketing Pro"
     )
-    parser.add_argument("--brand", required=True, help="Brand slug")
+    parser.add_argument("--brand", type=_common.path_component, required=True, help="Brand slug")
     parser.add_argument(
         "--action", required=True,
         choices=["create-panel", "list-panels", "focus-group", "test-message",

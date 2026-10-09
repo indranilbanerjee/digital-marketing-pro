@@ -6,6 +6,8 @@ argument-hint: "[funnel-stage or URL]"
 
 # /digital-marketing-pro:funnel-audit
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Analyze the complete customer acquisition and conversion funnel to identify where prospects drop off, why they disengage, and what changes will have the highest impact on overall conversion rate.

@@ -5,6 +5,8 @@ description: "Rate market weather by script: economy, competition, platform and 
 
 # /digital-marketing-pro:market-weather
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Generate a Marketing Weather Report — a single-page assessment combining all external signals that affect marketing effectiveness right now. Score current conditions for marketing action (green, yellow, or red) across five dimensions: economic climate, cultural moments, industry and competitive activity, platform changes, and regulatory updates. This command gives marketers a quick go/no-go signal before launching campaigns, adjusting budgets, or making timing decisions. Instead of checking multiple dashboards and news sources, get one consolidated view of whether conditions favor aggressive marketing action, cautious optimization, or defensive positioning. Reports are time-horizon-aware — this week's weather may differ from this quarter's forecast.

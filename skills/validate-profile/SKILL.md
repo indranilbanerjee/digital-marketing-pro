@@ -7,6 +7,8 @@ allowed-tools: Read Bash Glob Grep
 
 # /digital-marketing-pro:validate-profile — Brand Profile + Credential Health Check
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 This skill is the canonical "is this brand ready to ship work?" gate. It validates a brand profile is complete enough for production use AND that every credential/connector referenced by the profile is actually reachable — **without ever printing credential values**.
 
 Use this skill:

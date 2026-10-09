@@ -6,6 +6,8 @@ argument-hint: "[URL]"
 
 # /digital-marketing-pro:tech-seo-audit
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Run a comprehensive technical SEO audit that covers the infrastructure and code-level factors that affect search engine crawling, indexation, and ranking. This audit focuses on the technical foundation rather than content or backlinks. Produces a prioritized report with specific fixes, expected impact, and implementation guidance.

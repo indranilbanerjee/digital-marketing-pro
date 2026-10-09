@@ -7,6 +7,8 @@ effort: low
 
 # /digital-marketing-pro:cowork-setup
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 The one-time setup that makes Digital Marketing Pro persistent in Cowork by a team. Wires up the Cowork → Drive routing so brand profiles, campaign plans, audit reports, and run records survive past the end of the current Cowork session.
 
 Run it the first time a team installs DMP in Cowork, when brand profiles stop persisting across Cowork sessions, or when switching to a different team's Drive root folder. Examples: `/digital-marketing-pro:cowork-setup`, `... --brand acme`, `... --drive-root "ACME DigitalMarketingPro"`.

@@ -849,7 +849,7 @@ def build_parser():
 
     parser.add_argument(
         "--brand",
-        type=str,
+        type=_common.path_component,
         default=None,
         help=(
             "Brand slug for brand-voice scoring. Defaults to the active brand "

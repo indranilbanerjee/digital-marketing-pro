@@ -145,7 +145,7 @@ def compute_adaptive_weights(brand_context, content_type):
 
 def main():
     parser = argparse.ArgumentParser(description="Adaptive content scoring for Digital Marketing Pro")
-    parser.add_argument("--brand", required=True, help="Brand slug")
+    parser.add_argument("--brand", type=_common.path_component, required=True, help="Brand slug")
     parser.add_argument("--type", dest="content_type", required=True,
                         choices=["blog", "email", "ad", "landing_page", "social"],
                         help="Content type")

@@ -5,6 +5,8 @@ description: "Map the competitive narrative landscape and score unclaimed positi
 
 # /digital-marketing-pro:narrative-landscape
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Map the competitive narrative landscape to identify positioning opportunities the brand can own. Analyze how each competitor positions itself across key market dimensions — price-value, innovation-reliability, specialist-generalist, premium-accessible, or custom dimensions relevant to the industry. Find crowded territories where multiple competitors cluster, unoccupied gaps where no brand has staked a claim, and recommend the highest-value positioning territory for the brand to claim based on customer desirability and brand credibility.

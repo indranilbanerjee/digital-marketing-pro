@@ -797,7 +797,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
 
     def add_brand_id(p: argparse.ArgumentParser) -> None:
-        p.add_argument("--brand", required=True, help="Brand slug (e.g., 'acme')")
+        p.add_argument("--brand", type=_common.path_component, required=True, help="Brand slug (e.g., 'acme')")
         p.add_argument("--id", required=True, help="Engagement ID (e.g., '2026-q2')")
 
     p_init = sub.add_parser("init", help="Initialise a new engagement directory tree")
@@ -870,14 +870,14 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_ckpt = sub.add_parser("set-checkpoint-run", help="Link a checkpoint-manager run_id to this engagement")
     add_brand_id(p_ckpt)
-    p_ckpt.add_argument("--run-id", required=True, help="checkpoint-manager run id")
+    p_ckpt.add_argument("--run-id", type=_common.path_component, required=True, help="checkpoint-manager run id")
 
     p_vpart = sub.add_parser("validate-part", help="Diff a part's files vs the PART_DEFINITIONS manifest")
     add_brand_id(p_vpart)
     p_vpart.add_argument("--part", required=True, help="Part identifier (e.g., '5')")
 
     p_list = sub.add_parser("list-engagements", help="List engagements (optionally filter by brand)")
-    p_list.add_argument("--brand", default=None)
+    p_list.add_argument("--brand", type=_common.path_component, default=None)
 
     return parser
 

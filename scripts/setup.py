@@ -546,7 +546,7 @@ def main():
     # create_brand() has always accepted a slug; the CLI never exposed it, so a
     # caller who needed a specific slug had to import the module and call the
     # function directly. The storage path IS the slug, so this was not optional.
-    parser.add_argument("--slug", metavar="SLUG",
+    parser.add_argument("--slug", type=_common.path_component, metavar="SLUG",
                         help="Explicit slug for --create-brand (default: slugified name). "
                              "The slug is the directory name under ~/.claude-marketing/brands/.")
     parser.add_argument("--list-brands", action="store_true", help="List all brands")

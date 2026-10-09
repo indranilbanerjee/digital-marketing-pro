@@ -51,7 +51,9 @@ def _journey_id_from_name(name):
 
 
 def _load_journey(brand_dir, journey_id):
-    fp = _journeys_dir(brand_dir) / f"{journey_id}.json"
+    fp, path_err = _common.child_or_error(_journeys_dir(brand_dir), journey_id, ".json")
+    if path_err:
+        return None, path_err
     if not fp.exists():
         return None, f"Journey '{journey_id}' not found."
     try:
@@ -109,7 +111,9 @@ def create_journey(slug, name, states, transitions):
     }
 
     jdir = _journeys_dir(brand_dir)
-    fp = jdir / f"{journey_id}.json"
+    fp, path_err = _common.child_or_error(jdir, journey_id, ".json")
+    if path_err:
+        return {"error": path_err}
     fp.write_text(json.dumps(journey, indent=2), encoding="utf-8")
 
     return {
@@ -434,7 +438,9 @@ def delete_journey(slug, journey_id):
     if err:
         return {"error": err}
 
-    fp = _journeys_dir(brand_dir) / f"{journey_id}.json"
+    fp, path_err = _common.child_or_error(_journeys_dir(brand_dir), journey_id, ".json")
+    if path_err:
+        return {"error": path_err}
     if not fp.exists():
         return {"error": f"Journey '{journey_id}' not found."}
 
@@ -455,7 +461,7 @@ def main():
                                  "get-journey", "analyze-bottleneck",
                                  "touchpoint-map", "delete-journey"],
                         help="Action to perform")
-    parser.add_argument("--brand", help="Brand slug")
+    parser.add_argument("--brand", type=_common.path_component, help="Brand slug")
     parser.add_argument("--name", help="Journey name (for create-journey)")
     parser.add_argument("--states", help="JSON array of state objects (for create-journey)")
     parser.add_argument("--transitions", help="JSON array of transition objects (for create-journey)")

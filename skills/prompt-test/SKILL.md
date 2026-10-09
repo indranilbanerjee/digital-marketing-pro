@@ -5,6 +5,8 @@ description: "A/B test content variants by eval score and declare a winner with 
 
 # /digital-marketing-pro:prompt-test
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 A/B test content output variations by comparing quality scores across different prompt approaches, headline styles, CTA phrasing, or complete content strategy variations. Create named tests, log variants with their evaluation scores, and determine which approach produces the best quality results.

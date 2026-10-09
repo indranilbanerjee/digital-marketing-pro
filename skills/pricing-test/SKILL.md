@@ -5,6 +5,8 @@ description: "Test 3-8 price points on CRM-grounded synthetic panels by script, 
 
 # /digital-marketing-pro:pricing-test
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Test pricing scenarios against synthetic audience panels grounded in real CRM data. Estimate willingness-to-pay by segment, find optimal price points, acceptable price ranges, and the spread between revenue-maximizing and volume-maximizing prices. This command brings Van Westendorp and Gabor-Granger style pricing analysis to AI-simulated panels — giving directional pricing intelligence without the cost and lead time of formal pricing research. Use it before launching a new product, adjusting existing pricing, introducing tiers, or evaluating competitive price positioning. Every output includes confidence limitations so results are treated as informed estimates requiring real-world validation for high-stakes pricing decisions.

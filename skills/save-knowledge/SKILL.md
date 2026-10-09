@@ -5,6 +5,8 @@ description: "Save one piece of brand knowledge to persistent memory with dedup 
 
 # /digital-marketing-pro:save-knowledge
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Save brand knowledge to the persistent memory layer (a vector database you've connected — for example Pinecone via `@pinecone-database/mcp`) for semantic retrieval in future sessions. Stores campaign learnings, competitive intelligence, brand guidelines, and performance insights with proper metadata tagging so that valuable knowledge is never lost between sessions. Every stored item is content-hashed for deduplication, tagged with brand context, and indexed for natural language search — turning ad-hoc learnings into durable institutional memory that every agent can draw from. Designed for targeted, intentional knowledge capture — for bulk session syncing, use `/digital-marketing-pro:sync-memory` instead.

@@ -6,6 +6,8 @@ user-invocable: true
 
 # /digital-marketing-pro:content-decay-scan
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Scan the entire content library for decay signals and prioritize refreshes by business impact. Content decay is invisible revenue loss — pages that once ranked well and drove conversions silently lose traffic as competitors publish fresher content, search algorithms evolve, statistics become outdated, and AI systems stop citing stale sources. This command detects declining organic traffic, falling keyword positions, outdated content (stale dates, broken links, deprecated information), lost AI citations, and conversion rate drops. It then ranks every piece of content by business impact — traffic multiplied by conversion rate multiplied by revenue per conversion — so you refresh the content that recovers the most revenue first, not just the content that lost the most traffic.

@@ -302,7 +302,7 @@ def main():
                         choices=["simulate", "what-if", "sensitivity",
                                  "channel-interaction", "saturation-check"],
                         help="Action to perform")
-    parser.add_argument("--brand", help="Brand slug (reserved)")
+    parser.add_argument("--brand", type=_common.path_component, help="Brand slug (reserved)")
     parser.add_argument("--scenarios", help="JSON array of scenario objects (for simulate)")
     parser.add_argument("--current", help="JSON current allocation (for what-if)")
     parser.add_argument("--base-scenario", dest="base_scenario",

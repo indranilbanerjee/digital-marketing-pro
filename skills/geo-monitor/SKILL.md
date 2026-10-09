@@ -5,6 +5,8 @@ description: "Monitor GEO visibility over time across six AI answer engines, wit
 
 # /digital-marketing-pro:geo-monitor
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Monitor and track brand visibility across generative AI engines. Systematically test how AI platforms respond to queries relevant to the brand, score visibility using a structured rubric, track changes over time, and identify opportunities to improve AI presence. This command provides a repeatable, quantitative framework for understanding where and how the brand appears (or fails to appear) in AI-generated responses — giving marketers the data they need to optimize for the emerging generative engine optimization (GEO) channel. Supports baselining, trend tracking, competitive benchmarking, and narrative alignment checks across all major AI platforms.

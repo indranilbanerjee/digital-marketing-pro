@@ -5,6 +5,8 @@ description: "Show status of every tracked campaign: health, spend, executions, 
 
 # /digital-marketing-pro:campaign-status
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Provide a unified view of all active campaigns across every connected platform — ads, email, social, blog — with their current status, live performance metrics, execution history, and any pending approvals or scheduled actions. Eliminates the need to check each platform individually and surfaces issues (paused campaigns, failed executions, stale content) before they become problems.

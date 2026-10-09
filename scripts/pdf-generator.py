@@ -200,7 +200,10 @@ def schedule_report(slug, report_type, frequency, title, recipients, channel):
         "active": True,
         "created_at": datetime.now().isoformat(),
     }
-    _save_json(sched_dir / f"{schedule_id}.json", schedule)
+    sched_path, path_err = _common.child_or_error(sched_dir, schedule_id, ".json")
+    if path_err:
+        return {"error": path_err}
+    _save_json(sched_path, schedule)
 
     return schedule
 
@@ -229,7 +232,9 @@ def cancel_schedule(slug, schedule_id):
         return {"error": err}
 
     sched_dir = brand_dir / "reports" / "schedules"
-    fp = sched_dir / f"{schedule_id}.json"
+    fp, path_err = _common.child_or_error(sched_dir, schedule_id, ".json")
+    if path_err:
+        return {"error": path_err}
     if not fp.exists():
         return {"error": f"Schedule '{schedule_id}' not found."}
 
@@ -329,7 +334,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="PDF Report Generator — manage report generation and scheduling"
     )
-    parser.add_argument("--brand", required=True, help="Brand slug")
+    parser.add_argument("--brand", type=_common.path_component, required=True, help="Brand slug")
     parser.add_argument("--action", required=True,
                         choices=["generate-report", "schedule-report", "list-schedules",
                                  "cancel-schedule", "list-reports", "get-report",

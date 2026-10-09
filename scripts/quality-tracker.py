@@ -468,7 +468,7 @@ def build_parser():
         help="Action to perform.",
     )
     parser.add_argument(
-        "--brand", default=None,
+        "--brand", type=_common.path_component, default=None,
         help="Brand slug (defaults to active brand).",
     )
     parser.add_argument(

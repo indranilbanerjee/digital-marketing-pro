@@ -17,6 +17,10 @@ Usage:
 import argparse
 import json
 import sys
+import os
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _common  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Repurposing matrix — maps source content type to derivative formats
@@ -548,7 +552,7 @@ def main():
         help="JSON array of target platforms (default: all common platforms)",
     )
     parser.add_argument(
-        "--brand", default=None,
+        "--brand", type=_common.path_component, default=None,
         help="Brand slug for voice context",
     )
     args = parser.parse_args()

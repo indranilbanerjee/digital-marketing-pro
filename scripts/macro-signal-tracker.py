@@ -283,7 +283,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Macro Signal Tracker — Monitor economic, cultural, and industry signals for Digital Marketing Pro"
     )
-    parser.add_argument("--brand", required=True, help="Brand slug")
+    parser.add_argument("--brand", type=_common.path_component, required=True, help="Brand slug")
     parser.add_argument("--action", required=True,
                         choices=["record-signal", "weather-report", "list-signals",
                                  "trend", "alert-check", "acknowledge", "summary"],

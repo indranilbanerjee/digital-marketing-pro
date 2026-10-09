@@ -5,6 +5,8 @@ description: "Project ad budget pacing by script from live accounts or given num
 
 # /digital-marketing-pro:budget-tracker
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Track advertising budget in real-time across all connected ad platforms. Analyze spend pacing against targets, project end-of-period totals, flag overspend risks and underspend inefficiencies, calculate daily burn rates, and recommend budget reallocations to maximize ROI within the remaining budget window. Designed for media buyers and marketing managers who need a single view of where money is going and whether it is being spent effectively.

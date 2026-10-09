@@ -5,6 +5,8 @@ description: "Build a counter-narrative playbook for a competitor's rebrand, cat
 
 # /digital-marketing-pro:counter-narrative
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Generate a counter-narrative playbook in response to a competitor's strategic positioning move. When a competitor rebrands, launches a new feature with bold claims, creates a new category, runs an aggressive campaign, changes pricing, or announces a major partnership, the brand needs a structured response — not reactive panic. This command analyzes the competitor's move, assesses impact on the brand's positioning, selects the optimal counter-narrative approach, and produces a multi-channel response plan with specific content angles, ad concepts, PR angles, social messaging, and a timeline calibrated to urgency.

@@ -356,7 +356,7 @@ For planning rather than execution: `/digital-marketing-pro:keyword-cluster` tur
 
 ### Checking what's actually wired up
 
-Not every action can run everywhere — some need credentials that only you can supply. `/digital-marketing-pro:doctor` reports, per action, what is live versus blocked in your current environment and gives a one-step setup hint for anything blocked. When you are ready to fire a real API call rather than review a plan, `/digital-marketing-pro:execute-action` does that: read operations run with `--execute`, write operations additionally require `--confirm`, and every execution is written to the audit trail.
+Not every action can run everywhere — some need credentials that only you can supply. `/digital-marketing-pro:doctor` reports, per action, what is live versus blocked in your current environment and gives a one-step setup hint for anything blocked. When you are ready to fire a real API call rather than review a plan, `/digital-marketing-pro:execute-action` does that: read operations run with `--execute`; a write first prepares an approval record with a preview of the exact request, fires only after you type `yes` and the record is approved, and every execution is written to the audit trail with that record.
 
 ### Competitor Monitoring
 

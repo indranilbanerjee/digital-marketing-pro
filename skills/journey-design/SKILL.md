@@ -5,6 +5,8 @@ description: "Design cross-channel journeys as state machines, simulation-tested
 
 # /digital-marketing-pro:journey-design
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Design comprehensive cross-channel customer journeys as state machines. Define journey states (awareness through advocacy), transitions triggered by engagement signals, touchpoints with channel-specific content, branching logic for personalization, and simulate expected outcomes before launch. Turns abstract customer lifecycle stages into concrete, executable journey maps with specific content, timing, and channels at every step — then validates the design with Monte Carlo simulation before committing resources to implementation.

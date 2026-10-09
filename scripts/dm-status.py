@@ -595,7 +595,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         prog="dm-status.py",
         description="Unified Digital Marketing Pro status snapshot.",
     )
-    parser.add_argument("--brand", help="Brand slug (defaults to active brand)")
+    parser.add_argument("--brand", type=_common.path_component, help="Brand slug (defaults to active brand)")
     parser.add_argument("--json", action="store_true", help="Emit JSON instead of formatted text")
     parser.add_argument("--quiet", action="store_true", help="Compact one-line status")
     parser.add_argument(

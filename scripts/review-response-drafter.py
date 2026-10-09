@@ -438,7 +438,7 @@ def main():
         help="Response tone (default: professional)",
     )
     parser.add_argument(
-        "--brand", default=None,
+        "--brand", type=_common.path_component, default=None,
         help="Brand slug for context (optional)",
     )
     args = parser.parse_args()

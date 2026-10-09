@@ -5,6 +5,8 @@ description: "Manage the agency SOP library: templates, assignments, compliance.
 
 # /digital-marketing-pro:sop-library
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Manage the agency's Standard Operating Procedure library. Create SOPs from templates, assign them to specific brands, track compliance against recent executions, and maintain version control. SOPs define mandatory steps for common marketing operations — ensuring consistency, quality, and accountability across all client engagements regardless of which team member is executing the work.

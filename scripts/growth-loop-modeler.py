@@ -380,7 +380,7 @@ def main():
                         choices=["model-loop", "compare-loops", "detect-loops",
                                  "bottleneck-analysis", "investment-plan"],
                         help="Action to perform")
-    parser.add_argument("--brand", help="Brand slug (optional, for saving results)")
+    parser.add_argument("--brand", type=_common.path_component, help="Brand slug (optional, for saving results)")
     parser.add_argument("--name", help="Loop name (for model-loop, bottleneck-analysis)")
     parser.add_argument("--type", dest="loop_type",
                         choices=["viral", "content", "data", "paid", "ecosystem", "community"],

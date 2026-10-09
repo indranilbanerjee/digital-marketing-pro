@@ -164,7 +164,9 @@ def prepare_store(slug, data):
     # Save to pending directory for MCP pickup
     pending_dir = memory_dir / "pending"
     pending_dir.mkdir(exist_ok=True)
-    filepath = pending_dir / f"{content_hash}.json"
+    filepath, path_err = _common.child_or_error(pending_dir, content_hash, ".json")
+    if path_err:
+        return {"error": path_err}
     _save_json(filepath, payload)
 
     return {
@@ -193,7 +195,9 @@ def log_stored(slug, data):
         return {"error": "Missing required field: storage_id"}
 
     memory_dir = brand_dir / "memory"
-    pending_path = memory_dir / "pending" / f"{content_hash}.json"
+    pending_path, path_err = _common.child_or_error(memory_dir / "pending", content_hash, ".json")
+    if path_err:
+        return {"error": path_err}
     stored_dir = memory_dir / "stored"
     stored_dir.mkdir(exist_ok=True)
 
@@ -201,7 +205,7 @@ def log_stored(slug, data):
     if pending_path.exists():
         payload = _load_json(pending_path, {})
         # Move to stored
-        stored_path = stored_dir / f"{content_hash}.json"
+        stored_path = _common.safe_child(stored_dir, content_hash, ".json")
         payload["vector_db"] = vector_db
         payload["storage_id"] = storage_id
         payload["stored_at"] = datetime.now().isoformat()
@@ -322,7 +326,7 @@ def sync_insights(slug):
             "created_at": datetime.now().isoformat(),
             "original_recorded_at": insight.get("recorded_at", ""),
         }
-        _save_json(pending_dir / f"{content_hash}.json", payload)
+        _save_json(_common.safe_child(pending_dir, content_hash, ".json"), payload)
         payloads.append(payload)
 
     # Update last sync timestamp
@@ -370,7 +374,7 @@ def get_memory_status(slug):
 
 def main():
     parser = argparse.ArgumentParser(description="Memory management for Digital Marketing Pro")
-    parser.add_argument("--brand", required=True, help="Brand slug")
+    parser.add_argument("--brand", type=_common.path_component, required=True, help="Brand slug")
     parser.add_argument("--action", required=True,
                         choices=["prepare-store", "log-stored", "search-local",
                                  "prepare-graph", "sync-insights", "get-memory-status"],

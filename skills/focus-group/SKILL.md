@@ -5,6 +5,8 @@ description: "Run a simulated focus group of CRM-grounded personas reacting to m
 
 # /digital-marketing-pro:focus-group
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Run a simulated focus group using synthetic audience panels built from real CRM data. Present stimuli (messaging, pricing, creative concepts, positioning statements) to AI-simulated personas representing actual customer segments and get structured response predictions with sentiment analysis. This command bridges the gap between gut-feel decisions and expensive real-world research by generating directional feedback grounded in behavioral profiles derived from your actual customer base. Synthetic focus groups are fast, repeatable, and free to run — making them ideal for narrowing options before committing budget to real qualitative research or live campaigns. Every output includes explicit confidence limitations so results are treated as informed hypotheses, not validated data.

@@ -111,10 +111,12 @@ Reference: [opensource.contentauthenticity.org/docs/manifest/signing-manifests/]
 
 ## Python dependencies
 
-- `c2pa-python>=0.5.0` — auto-installed on first run via `pip install`
-- `cryptography` — only needed for the dev self-signed cert path; auto-installed if missing
+- `c2pa-python==0.38.0`: required for signing and for `--verify`
+- `cryptography==46.0.3`: only needed for the dev self-signed cert path
 
-Both are part of the plugin's **Full mode** (~50 MB) — see `pip install -r scripts/requirements.txt` in the README.
+The script never installs anything. If either package is missing it prints the exact `python -m pip install "…"` command and exits with code 2; show that command to the user and let them decide whether to run it. Do not run pip on their behalf.
+
+Each signature requests a timestamp from `http://timestamp.digicert.com` (a hash of the claim, not the asset). The dev key, when used, is deleted as soon as the script exits.
 
 ## Output
 

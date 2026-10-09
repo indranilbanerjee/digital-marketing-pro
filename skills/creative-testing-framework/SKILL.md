@@ -6,6 +6,8 @@ user-invocable: true
 
 # /digital-marketing-pro:creative-testing-framework
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`.
+
 ## Purpose
 
 Design a systematic creative testing framework that maximizes learning velocity while maintaining statistical rigor across advertising platforms. Produces a complete testing playbook with variable prioritization, sample size requirements, iteration cadence, and documentation standards for continuous creative optimization.
