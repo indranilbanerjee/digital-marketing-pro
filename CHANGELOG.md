@@ -20,13 +20,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
   characters, so on a 1M window every description was cut to about 195
   characters and its trigger phrases never reached the model. It is now
   25,974 (median description 109 characters), which leaves room for other
-  plugins inside a 1M window's 40,000. On a 200k
-  window the listing is still over budget and descriptions are shortened;
-  each now opens with what the skill does, so the part that survives is the
-  part that routes.
-- Each description says what the skill does, why to load it rather than
-  answer in chat (it runs a script, has an approval gate, reads the brand
-  profile), and one phrase a user would type. Slash aliases and "Triggers on"
+  plugins inside a 1M window's 40,000. On a 200k window DMP's 170 names alone
+  take about 6,900 of the 8,000 characters, so the model sees names only (a
+  few most-used skills keep their text once there is usage history). To see
+  descriptions there, set `skillListingBudgetFraction` to 0.05 in
+  `settings.json`.
+- Each description says what the skill does and one phrase a user would
+  type; where the skill runs a script, has an approval gate or reads the
+  brand profile, it says so, which is the model's reason to load it rather
+  than answer in chat. Slash aliases and "Triggers on"
   lists are gone from the listing and remain in the skill bodies.
 - `tests/test_description_density.py` enforces the rule: 60-150 characters,
   median <= 110, one owner per quoted phrase, 24 registered near-miss pairs
@@ -44,7 +46,8 @@ so the comparison measures wording rather than truncation, first action
 graded, 3 runs per case and 5 for near-miss pairs):
 
 - Same 45 cases before and after: 136/169 runs pass before, 153/169 after
-  (80.5% to 90.5%). ab-test-plan, check, funnel-audit and seo-audit went
+  (80.5% to 90.5%), and 159/169 (94.1%) with the two cases fixed below
+  re-run on the shipped text. ab-test-plan, check, funnel-audit and seo-audit went
   from 0 or 1 of 3 to 3 of 3. "Should not trigger" cases stay
   quiet (12/12), and every near-miss pair holds at 4/5 or better except
   translate-content.
@@ -56,14 +59,18 @@ graded, 3 runs per case and 5 for near-miss pairs):
 - Each fix was checked against a second, differently worded request, and
   counts only if that passes too. It holds for ab-test-plan, budget-tracker,
   check, funnel-audit, seo-audit, competitor-analysis and verify-claims (3/3
-  each). paid-advertising passes its original case 3/3 but its reworded twin
-  0/3 (the model answers in chat), so that fix is not counted.
+  each). paid-advertising passes its original case (Performance Max or AI
+  Max?) 3/3 but its reworded twin, a broad account-restructure question, 0/3
+  (the model answers in chat), so that fix is not counted.
 - Not fixed, reported as is: translate-content (the model translates a
   one-line request itself, 0/5 before and after) and hreflang-check (its test
-  prompt never attaches the page it asks about; recorded in `evals/README.md`
-  as a case defect, kept unchanged so the comparison stays paired).
-- At Claude Code's default budget, without the pin, the same cases pass and
-  fail (42 of 45).
+  prompt never attaches the page it asks about; the same request with the
+  page's tags attached routes 3/3; recorded in `evals/README.md` as a case
+  defect, kept unchanged so the comparison stays paired).
+- Without the pin, at Claude Code's default budget on the eval machine, 42 of
+  45 cases routed as in the pinned run. That was measured on the first
+  after-run text, before the two fixes above, so competitor-analysis's miss
+  there predates its fix.
 
 ## [3.33.3] - 2026-10-04
 
