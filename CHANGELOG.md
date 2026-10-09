@@ -6,6 +6,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.35.1] - 2026-10-10
+
+### C2PA signing with `--prompt` works on the current c2pa-python, and the 3.35.0 C2PA fixes are tested
+
+**Fixed**
+
+- `embed-c2pa.py --prompt` failed to sign on c2pa-python 0.38.0, the version 3.35.0 pins: the prompt was written as a second `c2pa.opened` action, and a manifest may now hold only one `c2pa.created` or `c2pa.opened` action, and `c2pa.opened` needs an ingredient. The prompt now goes on the created action as its description. All three AI claims sign and verify with `--prompt`, `--reviewer` and `--ai-disclosure` in any combination. Found by a cross-plugin check of the same code.
+
+**Tests**
+
+- New `tests/test_c2pa_embed.py` (10 tests, a fake `c2pa` module, so the package is not needed): the script has no subprocess or pip path; a missing package prints the pinned install command and exits 2; the pins are exact; the created action carries the IPTC digital-source-type and is the only created or opened action, holding the prompt; the dev signing key's directory is deleted even when signing fails; `--verify` exits 6 for no manifest, 0 for a valid one (an untrusted dev signer is reported, not failed) and 7 for an invalid one; PRIVACY.md discloses the DigiCert timestamp request and the NLTK downloads. 3.35.0 verified those fixes by hand; these tests make them stick. Suite: 585 tests.
+
 ## [3.35.0] - 2026-10-10
 
 ### Live writes need a matching approval record, and the Hermes review is answered point by point

@@ -6,19 +6,19 @@ Run `/digital-marketing-pro:engagement` against each brand. Same 12-Part Strateg
 
 Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Act Article 50 ready, Cowork team-persistent**. Built for marketing agencies, in-house teams running 50–200 brands, and consultancies. Installs on **Claude Code** (CLI + IDE), **Anthropic Cowork**, **OpenAI Codex**, **Cursor 2.5+**, **GitHub Copilot CLI**, **Google Antigravity 2.0**, **Hermes Agent**, **OpenClaw**, and **Grok** + 35+ Agent Skills platforms. Created by [Indranil Banerjee](https://indranil.in) · [LinkedIn](https://www.linkedin.com/in/askneelnow/) · [X](https://x.com/askneelnow).
 
-[![Version](https://img.shields.io/badge/version-3.35.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.35.1-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=yellow)](https://github.com/indranilbanerjee/digital-marketing-pro/stargazers)
 [![Forks](https://img.shields.io/github/forks/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=blue)](https://github.com/indranilbanerjee/digital-marketing-pro/network/members)
 [![Issues](https://img.shields.io/github/issues/indranilbanerjee/digital-marketing-pro?logo=github)](https://github.com/indranilbanerjee/digital-marketing-pro/issues)
 [![Last commit](https://img.shields.io/github/last-commit/indranilbanerjee/digital-marketing-pro?logo=github)](https://github.com/indranilbanerjee/digital-marketing-pro/commits/main)
-[![Tests](https://img.shields.io/badge/tests-575%2F575%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-585%2F585%20passing-brightgreen.svg)](tests/)
 [![Platforms](https://img.shields.io/badge/platforms-9%20native%20%2B%2035%20Agent%20Skills-success.svg)](#works-on-40-agent-harnesses-via-the-agent-skills-open-standard)
-[![Cowork](https://img.shields.io/badge/cowork-team%20persistent-purple.svg)](#supported-surfaces-v3350)
+[![Cowork](https://img.shields.io/badge/cowork-team%20persistent-purple.svg)](#supported-surfaces-v3351)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Article%2050%20ready-darkred.svg)](skills/context-engine/compliance-rules.md)
 [![Sponsor](https://img.shields.io/badge/sponsor-%E2%9D%A4-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/indranilbanerjee)
 
-> 🆕 **Just shipped — v3.35.0 (October 10, 2026): live writes need a matching approval record.** A write the plugin sends itself now fires only against a single-use approval record for that exact request: the script shows a preview, the skill approves it after you type `yes`, and the request must match within 15 minutes. What that proves is stated plainly (the approval step ran for this request, once; not who typed `yes`), MCP-tool writes are named as outside the check, and autopilot now proposes by default. Also from the Hermes maintainer review: no script installs packages on its own (which exposed and fixed a C2PA signing failure on the current c2pa-python), model-supplied names can no longer reach files outside the plugin's folders, fetchers refuse private and metadata addresses on every redirect, and PRIVACY.md lists every network call. [Read what's new →](#whats-new) · [Full changelog →](CHANGELOG.md)
+> 🆕 **Just shipped — v3.35.1 (October 10, 2026): live writes need a matching approval record (v3.35.0), and C2PA signing with a prompt works on the current c2pa-python (v3.35.1).** A write the plugin sends itself now fires only against a single-use approval record for that exact request: the script shows a preview, the skill approves it after you type `yes`, and the request must match within 15 minutes. What that proves is stated plainly (the approval step ran for this request, once; not who typed `yes`), MCP-tool writes are named as outside the check, and autopilot now proposes by default. Also from the Hermes maintainer review: no script installs packages on its own (which exposed and fixed a C2PA signing failure on the current c2pa-python), model-supplied names can no longer reach files outside the plugin's folders, fetchers refuse private and metadata addresses on every redirect, and PRIVACY.md lists every network call. [Read what's new →](#whats-new) · [Full changelog →](CHANGELOG.md)
 >
 > <sub>Previously — **v3.34.0 (October 10, 2026):** every description fits the skill-listing budget, so the model picks the right skill first on 90.5% of trigger runs, up from 80.5%. [Full changelog →](CHANGELOG.md)</sub>
 
@@ -256,7 +256,7 @@ Output: real API calls fired against your stack, each write against a single-use
 - **Keep the gate you control.** Leave `connector_executor.py --execute` and MCP write tools out of your host's command allowlist so it asks you every time; bypass or auto-approve modes remove that check.
 - **Autopilot proposes by default.** It applies a correction on its own only under a standing approval you approved: scoped, capped per day, at most 30 days. Details in [PRIVACY.md](PRIVACY.md).
 
-## Supported surfaces (v3.35.0)
+## Supported surfaces (v3.35.1)
 
 | Platform | Install command | Manifest path | Status |
 |---|---|---|---|
@@ -366,6 +366,10 @@ If you run into a platform-specific install snag, file a [GitHub issue](https://
 ---
 
 ## What's new
+
+### v3.35.1 — C2PA signing with a prompt works on the current c2pa-python (October 10, 2026)
+
+`embed-c2pa.py --prompt` failed to sign on c2pa-python 0.38.0, the version v3.35.0 pins, because the prompt was written as a second `c2pa.opened` action; it now rides on the created action. New `tests/test_c2pa_embed.py` (10 tests) pins v3.35.0's C2PA fixes, which had been verified by hand: no install path, pinned install command and exit 2 when a package is missing, the dev key removed even on failure, the `--verify` exit codes, and the PRIVACY.md disclosures. 585 tests.
 
 ### v3.35.0 — live writes need a matching approval record (October 10, 2026)
 
@@ -863,7 +867,7 @@ Yes. Each brand has its own `~/.claude-marketing/<brand-slug>/` directory and Py
 Skip to `/digital-marketing-pro:campaign-plan`. Every individual surface (campaign / SEO / content / competitor / email / report) is independently runnable. The full engagement is the canonical path, not the only path.
 
 **Q: Will this work on Codex / Cursor / Copilot CLI / Antigravity?**
-Yes — verified-real native manifests ship for all 9 surfaces (CC, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok). See [Supported surfaces](#supported-surfaces-v3350) above for per-platform install commands.
+Yes — verified-real native manifests ship for all 9 surfaces (CC, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok). See [Supported surfaces](#supported-surfaces-v3351) above for per-platform install commands.
 
 **Q: I run my team on Anthropic Cowork. Does brand state persist between sessions?**
 Yes — but you need to run `/digital-marketing-pro:cowork-setup` once per team first (v3.12.0). Cowork's per-session filesystem is ephemeral, and `${CLAUDE_PLUGIN_DATA}` is too ([open issue #51398](https://github.com/anthropics/claude-code/issues/51398)). The setup wizard routes brand profiles + plans + reports through a Google Drive MCP so everything survives across sessions and is shared across the team. Multi-team isolation via per-team folder names.
@@ -932,7 +936,7 @@ Use the direct repo form: `grok plugin install indranilbanerjee/digital-marketin
 ### General (any platform)
 
 **"Tests in `tests/` fail when I `git clone` locally"**
-Run `python tests/run_all.py` from the repo root. All 575 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.8+) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
+Run `python tests/run_all.py` from the repo root. All 585 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.8+) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
 
 **"`/digital-marketing-pro:doctor` shows my action as stub_unconfigured"**
 That action needs an MCP connector configured. Run `python scripts/connector-status.py --action setup-guide --name <connector-name>` for the exact setup snippet. Add it to your `.mcp.json` under `mcpServers`, restart your agent, and the action becomes `manifest_ready`. See [Connector-aware action resolver](#connector-aware-action-resolver-v3710) for the full readiness model.

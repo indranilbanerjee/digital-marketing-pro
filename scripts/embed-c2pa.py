@@ -162,11 +162,10 @@ def build_manifest_json(brand, generator, ai_claim, created, prompt, reviewer,
         }
     ]
     if prompt:
-        actions.append({
-            "action": "c2pa.opened",
-            "when": created,
-            "parameters": {"description": f"Source prompt: {prompt}"},
-        })
+        # On the created action itself: since c2pa-python 0.38 a manifest may hold
+        # only one c2pa.created/c2pa.opened action, and c2pa.opened needs an
+        # ingredient (found by a cross-plugin check, 2026-10-10).
+        actions[0]["description"] = f"Source prompt: {prompt}"
     if reviewer:
         actions.append({
             "action": "c2pa.edited",
