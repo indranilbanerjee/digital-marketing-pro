@@ -130,40 +130,49 @@ def score_health(creative_id, data):
 # ── Predict Fatigue ──────────────────────────────────────────────────────────
 
 def predict_fatigue(creative_id, history):
-    if len(history) < 3:
+    if not isinstance(history, list) or len(history) < 3:
         return {"creative_id": creative_id, "error": "Need at least 3 data points for prediction"}
 
-    x = list(range(len(history)))
-    ctrs = [h.get("ctr", 0) for h in history]
-    cpms = [h.get("cpm", 0) for h in history]
+    try:
+        dates = [datetime.strptime(h["date"], "%Y-%m-%d") for h in history]
+        ctrs = [h["ctr"] for h in history]
+        cpms = [h["cpm"] for h in history]
+        if any(b <= a for a, b in zip(dates, dates[1:])):
+            raise ValueError("Dates must be strictly increasing")
+        if any(isinstance(v, bool) or not isinstance(v, (int, float))
+               or not math.isfinite(v) or v < 0 for v in ctrs + cpms):
+            raise ValueError("CTR and CPM must be finite nonnegative numbers")
+        if ctrs[0] <= 0 or cpms[0] <= 0:
+            raise ValueError("Baseline CTR and CPM must be positive")
+    except (KeyError, TypeError, ValueError) as exc:
+        return {"creative_id": creative_id, "error": f"Invalid performance history: {exc}"}
+    x = [(date - dates[0]).days for date in dates]
 
     ctr_slope, ctr_intercept = _linear_regression(x, ctrs)
     cpm_slope, cpm_intercept = _linear_regression(x, cpms)
 
-    baseline_ctr = ctrs[0] if ctrs[0] > 0 else 0.01
-    baseline_cpm = cpms[0] if cpms[0] > 0 else 1.0
+    baseline_ctr = ctrs[0]
+    baseline_cpm = cpms[0]
     fatigue_ctr = baseline_ctr * 0.70
     fatigue_cpm = baseline_cpm * 1.30
 
     # Find crossover points
-    ctr_days = None
-    if ctr_slope < 0:
+    ctr_days = 0 if ctrs[-1] <= fatigue_ctr else None
+    if ctr_days is None and ctr_slope < 0:
         # Solve: ctr_slope * x + ctr_intercept = fatigue_ctr
         ctr_x = (fatigue_ctr - ctr_intercept) / ctr_slope
-        if ctr_x > len(history):
-            ctr_days = int(ctr_x - len(history))
+        ctr_days = max(0, math.ceil(round(ctr_x - x[-1], 10)))
 
-    cpm_days = None
-    if cpm_slope > 0:
+    cpm_days = 0 if cpms[-1] >= fatigue_cpm else None
+    if cpm_days is None and cpm_slope > 0:
         cpm_x = (fatigue_cpm - cpm_intercept) / cpm_slope
-        if cpm_x > len(history):
-            cpm_days = int(cpm_x - len(history))
+        cpm_days = max(0, math.ceil(round(cpm_x - x[-1], 10)))
 
     # Take the sooner of the two
     candidates = [d for d in [ctr_days, cpm_days] if d is not None]
     days_remaining = min(candidates) if candidates else None
 
-    # Confidence based on data points and trend clarity
+    # Legacy confidence labels describe sample count, not calibrated uncertainty.
     n = len(history)
     if n >= 14:
         confidence = "high"
@@ -184,7 +193,9 @@ def predict_fatigue(creative_id, history):
 
     # Recommendation
     if days_remaining is None:
-        rec = "No fatigue trend detected. Creative is performing steadily."
+        rec = "No threshold crossing projected by the linear model; review other fatigue signals."
+    elif days_remaining == 0:
+        rec = "URGENT: Fatigue threshold reached or projected at the latest observation. Review replacement creative now."
     elif days_remaining <= 7:
         rec = "URGENT: Creative fatigue imminent. Prepare replacement creative immediately."
     elif days_remaining <= 14:
@@ -199,6 +210,8 @@ def predict_fatigue(creative_id, history):
         "predicted_fatigue_date": predicted_date,
         "days_remaining": days_remaining,
         "confidence": confidence,
+        "confidence_basis": "Heuristic sample-count label; not a statistical confidence interval",
+        "trend_time_unit": "calendar_day",
         "ctr_trend_slope": round(ctr_slope, 6),
         "cpm_trend_slope": round(cpm_slope, 4),
         "recommendation": rec,
