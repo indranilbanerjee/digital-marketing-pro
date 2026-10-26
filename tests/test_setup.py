@@ -65,5 +65,36 @@ class TestNoPython3InSource(unittest.TestCase):
         self.assertNotIn("python3 ", src)
 
 
+class TestPythonVersionNotice(SetupBase):
+    """Python 3.10 reached end of life in October 2026; 3.37.0 will require 3.11.
+    setup.py says so now, on stderr, without failing or changing stdout."""
+
+    def _module(self):
+        import importlib.util
+        import sys
+        scripts = Path(__file__).resolve().parent.parent / "scripts"
+        sys.path.insert(0, str(scripts))
+        spec = importlib.util.spec_from_file_location("dmp_setup", scripts / "setup.py")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod
+
+    def test_warns_on_3_10_only(self):
+        mod = self._module()
+        notice = mod.python_version_notice((3, 10, 14, "final", 0))
+        self.assertIn("3.11", notice)
+        self.assertIn("3.37.0", notice)
+        self.assertTrue(notice.startswith("PYTHON_WARNING:"))
+        self.assertIsNone(mod.python_version_notice((3, 11, 0, "final", 0)))
+        self.assertIsNone(mod.python_version_notice((3, 13, 1, "final", 0)))
+
+    def test_running_python_is_reported_correctly(self):
+        import sys
+        proc = self.setup("--init")
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertNotIn("PYTHON_WARNING", proc.stdout)
+        self.assertEqual("PYTHON_WARNING" in proc.stderr, sys.version_info[:2] < (3, 11))
+
+
 if __name__ == "__main__":
     unittest.main()

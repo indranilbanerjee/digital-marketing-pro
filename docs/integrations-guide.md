@@ -194,13 +194,13 @@ You: Which queries have high impressions but low CTR? I want to optimize those p
 | Variable | Description |
 |---|---|
 | `GOOGLE_ADS_CUSTOMER_ID` | Your Google Ads customer ID (format: `123-456-7890`, without dashes in the env var) |
-| `GOOGLE_ADS_DEVELOPER_TOKEN` | Developer token from Google Ads API Center |
 | `GOOGLE_APPLICATION_CREDENTIALS` | Path to a Google Cloud service account JSON key file |
 
 **Where to get credentials:**
 1. Customer ID: Google Ads > top-right corner (the 10-digit number)
-2. Developer token: Google Ads > Tools & Settings > API Center. Apply for a developer token if you do not have one. Basic access is sufficient for read-only operations.
-3. Service account: Same Google Cloud setup. Enable the Google Ads API in your GCP project and link the service account.
+2. Service account: Same Google Cloud setup. Enable the Google Ads API in your GCP project and link the service account. Your API access level (Explorer, Basic or Standard) belongs to this Google Cloud project.
+
+No developer token: Google sunset developer tokens on 9 Sep 2026, and API access now comes from the Google Cloud project behind your OAuth client or service account ([Google's guide](https://developers.google.com/google-ads/api/docs/api-policy/developer-token)). If a server you wired yourself still asks for `GOOGLE_ADS_DEVELOPER_TOKEN`, Google ignores the header; there is no token to apply for.
 
 **Example usage:**
 ```
@@ -1866,7 +1866,7 @@ When connecting MCP integrations that access personal data (especially GA4, HubS
 |---|---|---|
 | Google Analytics 4 | `GA_PROPERTY_ID`, `GOOGLE_APPLICATION_CREDENTIALS` | GCP service account |
 | Google Search Console | `GSC_SITE_URL`, `GOOGLE_APPLICATION_CREDENTIALS` | GCP service account |
-| Google Ads | `GOOGLE_ADS_CUSTOMER_ID`, `GOOGLE_ADS_DEVELOPER_TOKEN`, `GOOGLE_APPLICATION_CREDENTIALS` | GCP service account |
+| Google Ads | `GOOGLE_ADS_CUSTOMER_ID`, `GOOGLE_APPLICATION_CREDENTIALS` | GCP service account |
 | Meta Business Suite | `META_ACCESS_TOKEN`, `META_AD_ACCOUNT_ID` | -- |
 | HubSpot CRM | `HUBSPOT_ACCESS_TOKEN` | -- |
 | Mailchimp | `MAILCHIMP_API_KEY` | -- |

@@ -1,6 +1,6 @@
 ---
 name: brand-guardian
-description: Invoke when marketing content needs quality control review — brand voice consistency checks, regulatory compliance verification (GDPR, CAN-SPAM, CCPA, HIPAA, FTC, industry-specific), accessibility auditing (WCAG 2.2), inclusive language review, or brand safety assessment. Automatically invoked as a final review step before any content is published or delivered.
+description: "Brand and compliance review before publishing: voice consistency, GDPR, CAN-SPAM and FTC rules, WCAG accessibility, inclusive language."
 maxTurns: 15
 tools: Read, Grep, Glob, Bash
 ---

@@ -1,6 +1,6 @@
 ---
 name: analytics-analyst
-description: Invoke when the user needs help with marketing measurement, KPI definition, dashboard design, attribution reporting, performance analysis, competitive benchmarking, or translating data into marketing decisions. Triggers on requests involving metrics, reporting, analytics setup, or data interpretation.
+description: "Marketing analytics: KPI definition, dashboards, attribution reporting, performance analysis, and turning data into decisions."
 maxTurns: 15
 tools: Read, Grep, Glob, Bash
 ---

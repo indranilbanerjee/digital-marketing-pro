@@ -119,7 +119,7 @@
       "url": "https://mcp.pipedream.com/app/google_ads",
       "_auth": "OAuth on first connect (free Pipedream account required)",
       "_purpose": "Cowork-compatible Google Ads — campaign performance, keyword data, bid optimization.",
-      "_api_version_note": "DMP pins Google Ads API v24.2 (deliberate stable target; v25 released July 2026 — see skills/paid-advertising/google-ads.md) — videos+logo_images are now REQUIRED in DemandGenVideoResponsiveAdInfo and VideoResponsiveAdInfo; Campaign.video_brand_safety_suitability removed (moved to Customer level). v23.1 (2026-02-25) added text_guidelines.term_exclusions and messaging_restrictions for AI-generated PMax/Search assets. See skills/paid-advertising/google-ads.md."
+      "_api_version_note": "DMP's own request templates use the Google Ads API version in scripts/connector_resolver.py API_VERSIONS (currently v26, released 14 Oct 2026; sunset November 2027). A hosted server such as this one calls whatever version its provider ships. No developer token since Google sunset them on 9 Sep 2026. Breaking changes from v24 to v26 are in skills/paid-advertising/google-ads.md."
     },
     "pipedream-google-sheets": {
       "type": "http",
@@ -215,12 +215,12 @@
     "google-ads-mcp": {
       "type": "http",
       "url": "https://<your-self-hosted-host>/mcp",
-      "_auth": "OAuth 2.0 (Application Default Credentials, or OAuth client ID/secret when run behind its OAuth proxy) with the https://www.googleapis.com/auth/adwords scope; a Google Ads developer token is recommended for production access. Service accounts also supported per Google's guide.",
+      "_auth": "OAuth 2.0 (Application Default Credentials, or OAuth client ID/secret when run behind its OAuth proxy) with the https://www.googleapis.com/auth/adwords scope, plus GOOGLE_PROJECT_ID: the Google Cloud project whose API access level applies. No developer token: Google sunset them on 9 Sep 2026 and ignores the header. Service accounts also supported per Google's guide.",
       "_access": "read-only",
       "_purpose": "Google's open-source Google Ads MCP server (Apache-2.0). Tools: list_accessible_customers, search (GAQL), get_resource_metadata. Google: 'This implementation is strictly read-only. It cannot modify bids, pause campaigns, or create new assets.' Use it for audits, pacing and reporting; Google Ads writes still go through a write-capable connector behind the approval gate.",
       "_local_stdio_alternative": "Default mode is local stdio, Claude Code only (not Cowork): {\"command\": \"pipx\", \"args\": [\"run\", \"--spec\", \"google-ads-mcp==<pinned-version>\", \"google-ads-mcp\"]}. The server switches to Streamable HTTP when its OAuth-proxy environment variables are set (self-hosting, e.g. Cloud Run) — that is the URL form above.",
       "_source": "https://github.com/googleads/google-ads-mcp ; https://developers.google.com/google-ads/api/docs/developer-toolkit/mcp-server",
-      "_checked": "2026-10-04"
+      "_checked": "2026-10-27"
     },
     "amazon-ads-mcp": {
       "type": "http",

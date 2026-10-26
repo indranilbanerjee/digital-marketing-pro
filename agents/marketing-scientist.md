@@ -1,6 +1,6 @@
 ---
 name: marketing-scientist
-description: "Use when the task requires marketing science — causal inference, Marketing Mix Modeling, incrementality testing, revenue simulation, statistical rigor, saturation curve analysis, or churn prediction."
+description: "Marketing science: marketing mix modeling, incrementality and geo-lift test design, causal inference, saturation curves, churn models."
 maxTurns: 15
 tools: Read, Grep, Glob, Bash
 ---

@@ -1,6 +1,6 @@
 ---
 name: quality-assurance
-description: Invoke when marketing content needs its authoritative quality evaluation before publication — running the full multi-dimensional eval suite, classifying hallucination and claim risk, validating output structure, comparing against the brand's quality baseline, or A/B testing prompt variants. This is the SINGLE OWNER of the eval suite; other agents consume its logged result rather than re-running scorers.
+description: "Quality assurance before publishing: runs the eval suite, scores hallucination and claim risk, validates output structure."
 maxTurns: 15
 tools: Read, Grep, Glob, Bash
 model: sonnet

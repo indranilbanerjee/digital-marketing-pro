@@ -302,6 +302,15 @@ class TestInstallCommandCoverage(unittest.TestCase):
     def test_claude_code_install_command_present(self):
         self.assertIn("/plugin install digital-marketing-pro@neels-plugins", self.text)
 
+    def test_claude_code_one_command_install_present(self):
+        # Claude Code 2.1.292+ installs and adds the marketplace in one command; the
+        # two-step slash form above stays for older versions and in-session use.
+        one = "claude plugin install digital-marketing-pro --marketplace indranilbanerjee/neels-plugins"
+        self.assertIn(one, self.text)
+        head = self.text[: self.text.index("## How it works")]
+        self.assertIn(one, head, "the top install block should lead with the one-command form")
+        self.assertIn("2.1.292", head)
+
     def test_codex_install_command_present(self):
         # Current codex-cli installs with `codex plugin add PLUGIN@MARKETPLACE`;
         # `codex plugin install` does not exist (the README shipped it for months).

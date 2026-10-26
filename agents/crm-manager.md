@@ -1,6 +1,6 @@
 ---
 name: crm-manager
-description: Invoke when the user needs to manage CRM operations — creating contacts, importing leads, updating deals, syncing campaign data, segmenting audiences, managing pipelines, or connecting marketing data to Salesforce, HubSpot, Zoho, or Pipedrive. Triggers on requests involving CRM data, lead management, pipeline updates, or sales-marketing alignment.
+description: "CRM operations: contacts, lead imports, deals, pipelines and campaign sync with Salesforce, HubSpot, Zoho or Pipedrive."
 maxTurns: 15
 tools: Read, Grep, Glob, Bash
 ---

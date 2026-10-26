@@ -49,6 +49,20 @@ FULL_PACKAGES = LITE_PACKAGES + [
 LITE_DEPS = _common.pinned_specs(LITE_PACKAGES)
 FULL_DEPS = _common.pinned_specs(FULL_PACKAGES)
 
+# Python 3.10 reached end of life in October 2026. This release still runs on it;
+# the next minor release (3.37.0) requires 3.11, so setup says so now.
+NEXT_MINIMUM_PYTHON = (3, 11)
+
+
+def python_version_notice(version_info=sys.version_info):
+    """A warning line when this Python is older than the next release's minimum, else None."""
+    if tuple(version_info[:2]) >= NEXT_MINIMUM_PYTHON:
+        return None
+    running = f"{version_info[0]}.{version_info[1]}"
+    return (f"PYTHON_WARNING: you are running Python {running}. Python 3.10 reached end of life in "
+            f"October 2026, and Digital Marketing Pro requires Python 3.11 or newer from its next "
+            f"minor release (3.37.0). This version still runs on {running}; upgrade before updating.")
+
 
 def init_memory_dirs():
     """Create the persistent memory directory structure."""
@@ -561,6 +575,11 @@ def main():
     parser.add_argument("--summary", action="store_true", help="Print rich brand context summary")
 
     args = parser.parse_args()
+
+    # stderr, so callers that parse DEPS_OK / INSTALL_OK lines on stdout are unaffected.
+    notice = python_version_notice()
+    if notice:
+        print(notice, file=sys.stderr)
 
     # Always ensure memory dirs exist
     init_memory_dirs()

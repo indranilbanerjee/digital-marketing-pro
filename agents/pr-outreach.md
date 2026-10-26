@@ -1,6 +1,6 @@
 ---
 name: pr-outreach
-description: Invoke when the user needs help with digital PR, media outreach, press release writing, journalist pitching, responses to journalist request platforms, thought leadership strategy, newsjacking opportunities, E-E-A-T authority building, or executive branding. Triggers on requests involving press coverage, media relations, PR campaigns, or building domain authority through earned media.
+description: "Digital PR and media outreach: press releases, journalist pitches, newsjacking, thought leadership and E-E-A-T authority building."
 maxTurns: 15
 tools: Read, Write, Grep, Glob, Bash, WebSearch, WebFetch
 ---

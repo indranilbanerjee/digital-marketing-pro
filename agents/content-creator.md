@@ -1,6 +1,6 @@
 ---
 name: content-creator
-description: Invoke when the user needs any form of marketing content created or refined — blog posts, ad copy, email campaigns, social media posts, landing page copy, press releases, video scripts, product descriptions, or newsletter content. Triggers on requests to write, draft, rewrite, or improve marketing copy.
+description: "Writes and refines marketing content: blog posts, ad copy, emails, social posts, landing pages, press releases, video scripts."
 maxTurns: 30
 tools: Read, Write, Grep, Glob, Bash
 ---

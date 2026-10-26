@@ -96,7 +96,10 @@ class TestCatalogTransport(unittest.TestCase):
                 self.assertEqual(entry["url"], url, name)
             self.assertEqual(entry.get("_access"), access, name)
             self.assertTrue(entry.get("_source", "").startswith("https://"), name)
-            self.assertEqual(entry.get("_checked"), "2026-10-04", name)
+            # Re-checked entries move forward (google-ads-mcp on 2026-10-27, when Google
+            # dropped the developer token); none may predate the 2026-10-04 review.
+            self.assertRegex(entry.get("_checked", ""), r"^\d{4}-\d{2}-\d{2}$", name)
+            self.assertGreaterEqual(entry["_checked"], "2026-10-04", name)
         for name in ("meta-ads", "amazon-ads-mcp"):
             policy = cat[name]["_write_policy"]
             self.assertIn("PAUSED", policy + cat["_section_official_ad_platform_mcps"], name)

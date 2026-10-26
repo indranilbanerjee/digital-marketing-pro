@@ -1,6 +1,6 @@
 ---
 name: email-specialist
-description: Invoke when the user needs help with email marketing — campaign strategy, automation flows, deliverability optimization, A/B testing methodology, list segmentation, lifecycle sequences, re-engagement campaigns, win-back flows, transactional email optimization, or newsletter strategy. Triggers on requests involving email campaigns, drip sequences, email deliverability, list management, or email automation.
+description: "Email marketing: campaign strategy, automation flows, deliverability, list segmentation, lifecycle and win-back sequences."
 maxTurns: 15
 tools: Read, Write, Grep, Glob, Bash
 ---

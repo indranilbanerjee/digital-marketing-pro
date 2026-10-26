@@ -1,6 +1,6 @@
 ---
 name: memory-manager
-description: Invoke for storage-plumbing operations on the memory system — dedup-and-store a payload, index it, run a metadata/index lookup, sync session insights to persistent storage, or report memory health. This agent moves and indexes knowledge; it does NOT interpret it. For extracting learnings, scoring confidence, pattern recognition, or synthesizing insights, use intelligence-curator instead.
+description: "Memory storage plumbing: dedup-and-store, index, look up and sync knowledge, report memory health; interpreting → intelligence-curator."
 maxTurns: 10
 tools: Read, Grep, Glob, Bash
 ---

@@ -1,6 +1,6 @@
 ---
 name: media-buyer
-description: Invoke when the user needs help with paid advertising — campaign setup, audience targeting, bid strategies, ad creative recommendations, budget pacing, performance optimization, or media plans across Google Ads, Meta Ads, LinkedIn Ads, TikTok Ads, Pinterest Ads, Amazon Ads, programmatic, or retail media networks.
+description: "Paid media buying: campaign setup, targeting, bidding, budget pacing and optimization on Google, Meta, LinkedIn, TikTok and Amazon Ads."
 maxTurns: 15
 tools: Read, Grep, Glob, Bash
 ---

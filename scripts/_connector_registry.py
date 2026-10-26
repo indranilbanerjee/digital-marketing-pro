@@ -283,8 +283,7 @@ CONNECTOR_REGISTRY = {
                 "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "Google Ads — campaigns, keywords, bid optimization",
                 "env_vars": [
-                    "GOOGLE_ADS_CUSTOMER_ID", "GOOGLE_ADS_DEVELOPER_TOKEN",
-                    "GOOGLE_APPLICATION_CREDENTIALS",
+                    "GOOGLE_ADS_CUSTOMER_ID", "GOOGLE_APPLICATION_CREDENTIALS",
                 ],
                 "skills_unlocked": [
                     "launch-ad-campaign", "performance-check",
@@ -352,7 +351,9 @@ CONNECTOR_REGISTRY = {
                 "setup_note": ("Google's open-source server: runs locally over stdio by default "
                                "(pipx run --spec google-ads-mcp==<version> google-ads-mcp — Claude Code only), "
                                "or self-hosted over Streamable HTTP behind its OAuth proxy. Needs OAuth "
-                               "(adwords scope) and, for production, a developer token. Strictly READ-ONLY: "
+                               "(adwords scope) and a Google Cloud project with Google Ads API access "
+                               "(GOOGLE_PROJECT_ID); no developer token, since Google sunset them on "
+                               "9 Sep 2026. Strictly READ-ONLY: "
                                "search (GAQL), list_accessible_customers, get_resource_metadata."),
                 "source": "https://github.com/googleads/google-ads-mcp",
                 "description": "Google Ads MCP (official, open source, READ-ONLY) — GAQL reporting and account metadata",

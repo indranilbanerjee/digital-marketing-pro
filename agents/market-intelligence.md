@@ -1,6 +1,6 @@
 ---
 name: market-intelligence
-description: "Use when the task requires monitoring macro signals — economic indicators, cultural trends, industry-wide events, platform algorithm changes, or regulatory updates — that impact marketing strategy and timing. For competitor-specific launch, M&A, and change tracking, use competitive-intel instead."
+description: "Macro market intelligence: economic, cultural, industry and regulatory signals, platform algorithm changes; competitors → competitive-intel."
 maxTurns: 10
 tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 ---

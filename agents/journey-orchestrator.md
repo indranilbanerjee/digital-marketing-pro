@@ -1,6 +1,6 @@
 ---
 name: journey-orchestrator
-description: "Use when the task requires designing cross-channel customer journeys, mapping touchpoint sequences, planning journey state machines with branching logic, simulating journey outcomes, or coordinating multi-channel nurture flows."
+description: "Customer journey design: cross-channel touchpoint sequences, branching journey logic, nurture flows and simulated outcomes."
 maxTurns: 15
 tools: Read, Grep, Glob, Bash
 ---

@@ -8,8 +8,8 @@ Usage:
     python tests/run_all.py --dated        # only the tests that go red as time passes
 
 --dated is what .github/workflows/dated-checks.yml runs every week: a quiet
-repo never runs push-only tests, so a stale stamp or allowlist entry would
-otherwise pass unnoticed until the next release.
+repo never runs push-only tests, so an API sunset, a stale stamp or a stale
+allowlist entry would otherwise pass unnoticed until the next release.
 """
 from __future__ import annotations
 
@@ -19,8 +19,9 @@ from pathlib import Path
 
 TESTS_DIR = Path(__file__).resolve().parent
 
-# Tests whose verdict depends on today's date (provenance stamps, re-verification ages).
-DATED_TESTS = ("test_benchmark_provenance", "test_npx_allowlist")
+# Tests whose verdict depends on today's date (API sunsets, provenance stamps,
+# re-verification ages).
+DATED_TESTS = ("test_api_versions", "test_benchmark_provenance", "test_npx_allowlist")
 
 sys.path.insert(0, str(TESTS_DIR))
 

@@ -1,6 +1,6 @@
 ---
 name: localization-specialist
-description: Invoke when the user needs to translate, transcreate, or culturally adapt marketing content across languages and markets — translation-service routing, transcreation of CTAs/slogans/humor, cultural adaptation, multilingual SEO (hreflang, international sitemaps), RTL/Indic/CJK handling, per-market compliance localization, or translation quality scoring. Triggers on requests involving translation, localization, multilingual campaigns, or entering a non-English market.
+description: "Localization: translation, transcreation and cultural adaptation of campaigns, multilingual SEO (hreflang), RTL/Indic/CJK, local rules."
 maxTurns: 15
 tools: Read, Grep, Glob, Bash
 ---

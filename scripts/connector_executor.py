@@ -128,7 +128,7 @@ EXECUTE_PROFILES = {
         "auth_header": "Authorization",
         "auth_format": "Klaviyo-API-Key {credential}",
         "success_codes": [200, 201, 202],
-        "notes": "Private API key. Revision header bumped to 2026-04-15. "
+        "notes": "Private API key. The revision header comes from connector_resolver.API_VERSIONS. "
                  "PATCH ops require Content-Type: application/vnd.api+json.",
     },
     "sendgrid": {
@@ -177,7 +177,7 @@ EXECUTE_PROFILES = {
     },
 
     # OAuth-only connectors — execute path returns auth_required_oauth
-    "google-ads":         {"oauth_only": True, "reason": "Google Ads requires OAuth2 + developer-token; use MCP path."},
+    "google-ads":         {"oauth_only": True, "reason": "Google Ads requires OAuth2 (API access comes from the Google Cloud project); use MCP path."},
     "meta-marketing":     {"oauth_only": True, "reason": "Meta Marketing API requires long-lived access token from FB Login flow; use MCP path."},
     "linkedin-marketing": {"oauth_only": True, "reason": "LinkedIn Marketing API requires OAuth2 with marketing scopes; use MCP path."},
     "linkedin-publishing":{"oauth_only": True, "reason": "LinkedIn Publishing API requires OAuth2; use MCP path."},

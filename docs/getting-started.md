@@ -36,7 +36,7 @@ That is it. Everything else is optional.
 
 **Optional but nice to have:**
 
-- **Python 3.10 or newer** --- unlocks advanced scoring features like brand voice analysis and content readability. The plugin works perfectly without Python; you just get bonus capabilities if it is installed.
+- **Python 3.10 or newer** (3.11 or newer from release 3.37.0; Python 3.10 reached end of life in October 2026) --- unlocks advanced scoring features like brand voice analysis and content readability. The plugin works perfectly without Python; you just get bonus capabilities if it is installed.
 - **No API keys required** --- the plugin ships with 177 reference knowledge files that power all 16 marketing modules (including the v3.0 methodology and framework reference docs). The optional MCP integrations (13 registry-backed HTTP connectors (11 work in Cowork as-is; Google Ads MCP and Amazon Ads MCP need your own endpoint first), plus a few vendor-published npm packages pinned to an exact version, for Claude Code) use your own account credentials and can be configured later. Run `/digital-marketing-pro:integrations` to see which connectors are available and `/digital-marketing-pro:connect <name>` for step-by-step setup.
 
 > **Bottom line:** If you can run Claude Code or Claude Cowork, you can use this plugin right now.

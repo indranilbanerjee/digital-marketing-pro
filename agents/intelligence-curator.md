@@ -1,6 +1,6 @@
 ---
 name: intelligence-curator
-description: "Use when the task requires interpreting, synthesizing, or distributing marketing learnings across agents — compound intelligence, pattern recognition, confidence scoring, playbook generation, conflict resolution, or institutional knowledge management. This is the sole intake/interpretation hub; durable storage/dedup/sync is delegated to memory-manager."
+description: "Intelligence curation: interprets marketing learnings, finds patterns, scores confidence, writes playbooks, resolves conflicting insights."
 maxTurns: 10
 tools: Read, Grep, Glob, Bash
 ---

@@ -124,8 +124,10 @@ If the plugin has been published to the [Claude plugin marketplace](https://clau
 **Method 3: Install via CLI (if you also have Claude Code)**
 
 ```
-claude plugin install digital-marketing-pro
+claude plugin install digital-marketing-pro --marketplace indranilbanerjee/neels-plugins
 ```
+
+That one command needs Claude Code 2.1.292 or newer; on older versions run `claude plugin marketplace add indranilbanerjee/neels-plugins` first, then `claude plugin install digital-marketing-pro@neels-plugins`.
 
 This installs the plugin for both Claude Code and Cowork on the same machine.
 

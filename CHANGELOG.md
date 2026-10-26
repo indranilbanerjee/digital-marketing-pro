@@ -6,6 +6,57 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.36.0] - 2026-10-27
+
+### Ad platform APIs in one dated table, Meta v26.0 before v24.0 stops working, shorter agent descriptions
+
+From the 2026-10-27 freshness review. Meta Marketing API v24.0, which DMP's request templates used at four call sites, stops working on 10 Nov 2026, and nothing in the repo knew the date. Each fix below has a test that fails on the 3.35.9 code. API facts were read from the vendors' pages on 2026-10-27, not from live calls.
+
+**Changed — one table for every pinned platform API version**
+
+- `scripts/connector_resolver.py` gains `API_VERSIONS`: the version, sunset date, how the date was read, source page and the day it was last read, per platform. Every request template now takes its version from the table:
+  - Meta v26.0 (introduced 29 Jul 2026; v24.0 ends 10 Nov 2026, v25.0 on 23 Feb 2027);
+  - LinkedIn `202610` (latest; supported at least a year);
+  - Google Ads v26 (released 14 Oct 2026; sunset November 2027);
+  - TikTok v1.3 and X Ads v12 (no announced sunset);
+  - Klaviyo revision `2026-04-15` (retired 2028-04-15 under Klaviyo's policy).
+- LinkedIn campaigns use the documented `/rest/adAccounts/{LINKEDIN_AD_ACCOUNT_ID}/adCampaigns` path. `/rest/adCampaignsV2` is not in the versioned docs; this was checked against the docs, not by a live call.
+- Google sunset developer tokens on 9 Sep 2026. The templates no longer send the header, and the integrations guide, `.mcp.json.example`, the connector registry and the official Google Ads MCP note no longer ask for one: API access comes from the Google Cloud project behind your OAuth client.
+- The Meta posting-cadence template asked for `post_impressions` (deprecated above v25) and `post_engaged_users` (no longer documented). It now asks for `post_media_view` and `post_total_media_view_unique`, and takes reactions, comments and shares from the post itself.
+
+**Fixed — docs that disagreed with the code**
+
+- Prose told readers to "target v24.2" and to "move integrations to 202609" while the code sent 202606. `skills/paid-advertising/google-ads.md` and `SKILL.md` now point at the table and add v26's breaking changes and the dated changes outside the version cycle: Smart campaign creation blocked, manual language targeting removed, call-only ads ending in February 2027, and the Performance Max image-extraction change from 4 Dec 2026 (reported; check Google's post for the opt-out field).
+- Five places said "v26 (Sept 2026) pauses remaining ASC/AAC campaigns". v26.0 came out on 29 Jul 2026. It blocks edits to every legacy Advantage+ Shopping and App campaign and pauses only the Shopping campaigns that use `existing_customer_budget_percentage`.
+- The Meta notes add the changes that reached every version on 27 Oct 2026: no new poll ads, no Messenger `story` placement, no `web_only` creatives in Website + App campaigns, and three delivery-estimate fields removed.
+
+**Changed — the 24 agent descriptions**
+
+- Claude Code lists every agent with its full description in every session. The descriptions ran 199 to 470 characters of "Invoke when the user needs help with … Triggers on …". They now run 112 to 140 characters, front-loaded, with the words that should route work to each agent kept.
+- `claude plugin details` (CLI 2.1.311, both measured the same way in an isolated config): always-on cost fell from about 8,489 to 7,168 tokens, with agents going from about 2,210 to 930.
+
+**Added**
+
+- `tests/test_api_versions.py`, which fails:
+  - 30 days before a listed sunset;
+  - when a table row has gone 120 days without being re-read;
+  - when a template hard-codes a version, uses `adCampaignsV2` or sends a developer token;
+  - when prose names a target version without pointing at the table, or names one the table doesn't hold.
+  The old Meta v24.0 row fails it on 2026-10-27.
+- `tests/test_agent_descriptions.py`: the 60–150 character rule, a median of 135 or less, no "Invoke when" or "Triggers on" boilerplate, and the agent's name in the first 100 characters. It also runs delegation checks:
+  - the routing words for each agent stay in its description;
+  - near-miss pairs point one way (market-intelligence → competitive-intel, growth-engineer → cro-specialist, memory-manager → intelligence-curator);
+  - every agent a skill lists under "Agents Used" exists;
+  - every agent is named somewhere.
+- The weekly dated-checks job now also runs `test_api_versions` (`tests/run_all.py --dated`).
+- One-command install for Claude Code 2.1.292 or newer: `claude plugin install digital-marketing-pro --marketplace indranilbanerjee/neels-plugins`. The two-step `/plugin marketplace add` plus `/plugin install` stays for older versions and in-session use.
+- `scripts/setup.py` prints a `PYTHON_WARNING` on stderr under Python 3.10, which reached end of life in October 2026. This release still runs on 3.10; 3.37.0 will require 3.11.
+
+**Tests**
+
+- New: `tests/test_api_versions.py`, `tests/test_agent_descriptions.py` and the Python-notice tests in `tests/test_setup.py`. Updated: the one-command install check in `tests/test_release_consistency.py`, the announced-minimum rule in `tests/test_doc_counts.py`, and the re-check date rule in `tests/test_ai_surfaces_and_official_mcps.py`.
+- Suite: 738 tests.
+
 ## [3.35.9] - 2026-10-27
 
 ### Connector setup offers only vendor-verified, version-pinned packages

@@ -1,6 +1,6 @@
 ---
 name: growth-engineer
-description: Invoke when the user needs help with product-led growth strategy, referral programs, viral loop design, launch strategy, retention optimization, growth experiments, or activation funnels. Triggers on requests involving growth models, PLG, user acquisition loops, experiment design, or retention mechanics for SaaS, marketplace, and consumer products. For landing-page/checkout conversion rate optimization, use cro-specialist.
+description: "Growth engineering: product-led growth, referral programs, viral loops, activation and retention experiments; page CRO → cro-specialist."
 maxTurns: 15
 tools: Read, Grep, Glob, Bash
 ---

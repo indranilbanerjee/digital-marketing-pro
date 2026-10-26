@@ -6,22 +6,23 @@ Run `/digital-marketing-pro:engagement` against each brand. Same 12-Part Strateg
 
 Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Act Article 50 ready, Cowork team-persistent**. Built for marketing agencies, in-house teams running 50–200 brands, and consultancies. Installs on **Claude Code** (CLI + IDE), **Anthropic Cowork**, **OpenAI Codex**, **Cursor 2.5+**, **GitHub Copilot CLI**, **Google Antigravity 2.0**, **Hermes Agent**, **OpenClaw**, and **Grok** + 35+ Agent Skills platforms. Created by [Indranil Banerjee](https://indranil.in) · [LinkedIn](https://www.linkedin.com/in/askneelnow/) · [X](https://x.com/askneelnow).
 
-[![Version](https://img.shields.io/badge/version-3.35.9-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.36.0-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=yellow)](https://github.com/indranilbanerjee/digital-marketing-pro/stargazers)
-[![Tests](https://img.shields.io/badge/tests-717%2F717%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-738%2F738%20passing-brightgreen.svg)](tests/)
 [![Platforms](https://img.shields.io/badge/platforms-9%20native%20%2B%2035%20Agent%20Skills-success.svg)](#works-on-40-agent-harnesses-via-the-agent-skills-open-standard)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Article%2050%20ready-darkred.svg)](skills/context-engine/compliance-rules.md)
 
 [![Built by Indranil "Neel" Banerjee — Neelverse Marketing Suite — Sponsor this project](docs/assets/author-banner.svg)](https://github.com/sponsors/indranilbanerjee)
 
-> 🆕 **Just shipped — v3.35.9 (October 27, 2026):** connector setup offers only vendor-verified, version-pinned packages, and a weekly check confirms each one still exists on npm. [What's new](#whats-new) · [Changelog](CHANGELOG.md)
+> 🆕 **Just shipped — v3.36.0 (October 27, 2026):** every ad-platform API version lives in one dated table with sunset tests, Meta moves to v26.0 before v24.0 stops working on 10 Nov, and agent descriptions are a third of their old length. [What's new](#whats-new) · [Changelog](CHANGELOG.md)
 
 ```bash
-# Install — one line
-/plugin marketplace add indranilbanerjee/neels-plugins
-/plugin install digital-marketing-pro@neels-plugins
+# Install — one command (Claude Code 2.1.292 or newer)
+claude plugin install digital-marketing-pro --marketplace indranilbanerjee/neels-plugins
 ```
+
+Older Claude Code, or inside a session: `/plugin marketplace add indranilbanerjee/neels-plugins`, then `/plugin install digital-marketing-pro@neels-plugins`.
 
 > If this saves you time, [give it a star ⭐](https://github.com/indranilbanerjee/digital-marketing-pro/stargazers) — it's the single thing that helps other marketers find it.
 
@@ -94,6 +95,14 @@ That's it. You never touched a command line. Your team Drive will hold the outpu
 ## Quick start
 
 ### 1. Install on Claude Code (canonical)
+
+One command from your terminal (Claude Code 2.1.292 or newer; it adds the marketplace if needed):
+
+```bash
+claude plugin install digital-marketing-pro --marketplace indranilbanerjee/neels-plugins
+```
+
+Older Claude Code, or inside a session, takes two steps:
 
 ```bash
 /plugin marketplace add indranilbanerjee/neels-plugins
@@ -195,7 +204,7 @@ Other marketing plugins exist, including Anthropic's own marketing plugin and co
 | AEO / GEO | **A 6-platform audit, including Google AI Mode** |
 | Where it runs | **9 native hosts**: Claude Code, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes, OpenClaw, Grok |
 | Live-write safety | **Single-use approval record for writes it sends itself; MCP writes: typed yes + host prompt** |
-| Tests | **717 stdlib unittest** tests |
+| Tests | **738 stdlib unittest** tests |
 | License | **MIT: no telemetry, no seats** |
 
 ---
@@ -292,11 +301,11 @@ Output: HTTP calls for the 8 executable connectors (Slack, HubSpot, Klaviyo, Sen
 
 ---
 
-## Supported surfaces (v3.35.9)
+## Supported surfaces (v3.36.0)
 
 | Platform | Install command | Manifest path | Status |
 |---|---|---|---|
-| **Claude Code** CLI + IDE extensions | `/plugin install digital-marketing-pro@neels-plugins` | `.claude-plugin/plugin.json` | Full support (canonical) |
+| **Claude Code** CLI + IDE extensions | `claude plugin install digital-marketing-pro --marketplace indranilbanerjee/neels-plugins` (2.1.292+), or `/plugin marketplace add indranilbanerjee/neels-plugins` then `/plugin install digital-marketing-pro@neels-plugins` | `.claude-plugin/plugin.json` | Full support (canonical) |
 | **Anthropic Cowork** | Plugins UI → Add marketplace → `indranilbanerjee/neels-plugins` → Install | same `.claude-plugin/` files | Full support — no `/plugin` slash commands in Cowork (UI-only) |
 | **OpenAI Codex** CLI + IDE + App | `codex plugin marketplace add indranilbanerjee/neels-plugins` then `codex plugin add digital-marketing-pro@neels-plugins` | `.codex-plugin/plugin.json` (published OpenAI schema) | Full skills + MCP support |
 | **Cursor 2.5+** | In any Cursor Agent chat: `/add-plugin digital-marketing-pro@https://github.com/indranilbanerjee/digital-marketing-pro` | `.cursor-plugin/plugin.json` (published Cursor JSON Schema) | Full skills + agents + commands support |
@@ -404,6 +413,10 @@ If you run into a platform-specific install snag, file a [GitHub issue](https://
 
 ## What's new
 
+### v3.36.0 — API versions in one dated table; Meta v26.0; shorter agents (October 27, 2026)
+
+Meta's Marketing API v24.0, which DMP's ad templates used, stops working on 10 November 2026, and nothing in the repo knew. Every pinned platform API version now lives in one table with its sunset date and source page: Meta v26.0, LinkedIn 202610 on the documented campaign path, Google Ads v26 without the developer token Google retired in September, plus TikTok, X Ads and Klaviyo. Tests fail 30 days before a sunset and whenever the docs name a different version from the code, and the weekly GitHub job runs them. The 24 agent descriptions, which Claude Code lists in full in every session, are now 112 to 140 characters with each agent's routing words kept, cutting the plugin's always-on cost by about 1,300 tokens. Claude Code 2.1.292+ installs in one command, and setup warns on Python 3.10, since 3.37.0 will require 3.11. 738 tests.
+
 ### v3.35.9 — connector setup offers only vendor-verified packages (October 27, 2026)
 
 `npx -y <package>` runs whatever is published under that name, with your API keys in its environment. DMP's connector catalog named many npm packages the vendor doesn't publish; most didn't exist at all, and anyone could register such a name and receive the keys. Now a runnable command ships only for a package the vendor itself publishes, pinned to an exact version (Pinecone, DataForSEO, DeepL). Every other service points to the vendor's hosted HTTP server or says plainly that there is no verified connector, and DMP prints no `npx` line or environment block for it. A test enforces the rule, and a weekly GitHub job checks each package against the npm registry and opens an issue if one disappears. 717 tests.
@@ -411,10 +424,6 @@ If you run into a platform-specific install snag, file a [GitHub issue](https://
 ### v3.35.8 — the propose-only command works from any folder (October 12, 2026)
 
 From the fresh-install smoke test's recheck. PRIVACY.md's command for returning autopilot to propose-only used a relative `scripts/` path that fails from your own project; it now uses the plugin's folder. The check that every script-running file says where the scripts are now covers every document by default instead of a list of folders. Printed commands carry no text after them, so a PowerShell note never swallows it, and a test confirms no script waits for input on Claude Code's open stdin pipe. 700 tests.
-
-### v3.35.7 — errors exit non-zero; commands paste into Git Bash (October 12, 2026)
-
-From the fresh-install smoke test's recheck. Fifteen scripts printed an error and exited 0, so a caller checking `$?` read a failure as success: utm-generator (a missing CSV, or a CSV where every row failed), the SEO and local-SEO auditors, the budget, ROI and lifetime-value calculators, the scorers and others. A bad argument now exits 2 and a failure 1; utm-generator exits 3 for a partly failed batch, as its `--help` says. Printed commands use forward slashes, so they run in Git Bash (Claude Code's Bash tool on Windows) as well as PowerShell. 694 tests.
 
 Older releases are in [CHANGELOG.md](CHANGELOG.md).
 
@@ -715,7 +724,7 @@ Yes. Each brand has its own `~/.claude-marketing/brands/<brand-slug>/` directory
 Skip to `/digital-marketing-pro:campaign-plan`. Every individual surface (campaign / SEO / content / competitor / email / report) is independently runnable. The full engagement is the canonical path, not the only path.
 
 **Q: Will this work on Codex / Cursor / Copilot CLI / Antigravity?**
-Yes — verified-real native manifests ship for all 9 surfaces (CC, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok). See [Supported surfaces](#supported-surfaces-v3359) above for per-platform install commands.
+Yes — verified-real native manifests ship for all 9 surfaces (CC, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok). See [Supported surfaces](#supported-surfaces-v3360) above for per-platform install commands.
 
 **Q: I run my team on Anthropic Cowork. Does brand state persist between sessions?**
 Yes — but you need to run `/digital-marketing-pro:cowork-setup` once per team first (v3.12.0). Cowork's per-session filesystem is ephemeral, and `${CLAUDE_PLUGIN_DATA}` is too ([open issue #51398](https://github.com/anthropics/claude-code/issues/51398)). The setup wizard routes brand profiles + plans + reports through a Google Drive MCP so everything survives across sessions and is shared across the team. Multi-team isolation via per-team folder names.
@@ -788,7 +797,7 @@ Use the direct repo form: `grok plugin install indranilbanerjee/digital-marketin
 ### General (any platform)
 
 **"Tests in `tests/` fail when I `git clone` locally"**
-Run `python tests/run_all.py` from the repo root. All 717 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
+Run `python tests/run_all.py` from the repo root. All 738 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+ in this release; 3.37.0 will require 3.11+, and `scripts/setup.py` warns on 3.10) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
 
 **"`/digital-marketing-pro:doctor` shows my action as stub_unconfigured"**
 That action needs an MCP connector configured. Run `python scripts/connector-status.py --action setup-guide --name <connector-name>` for the exact setup snippet. Add it to your `.mcp.json` under `mcpServers`, restart your agent, and the action becomes `manifest_ready`. See [Connector-aware action resolver](#connector-aware-action-resolver) for the full readiness model.
@@ -844,6 +853,8 @@ DM Pro is part of a three-plugin suite by [Indranil Banerjee](https://indranil.i
 /plugin install contentforge@neels-plugins
 /plugin install socialforge@neels-plugins
 ```
+
+On Claude Code 2.1.292 or newer, each is one terminal command: `claude plugin install <name> --marketplace indranilbanerjee/neels-plugins`.
 
 ---
 

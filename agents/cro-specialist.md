@@ -1,6 +1,6 @@
 ---
 name: cro-specialist
-description: Invoke when the user needs help with conversion rate optimization — landing page audits, A/B test design, form optimization, pricing page strategy, checkout flow improvement, personalization, statistical significance calculations, page speed impact analysis, or mobile conversion optimization. Triggers on requests involving conversions, landing pages, A/B testing, or optimization experiments.
+description: "Conversion rate optimization (CRO): landing page audits, A/B test design, forms, pricing pages, checkout flows, significance math."
 maxTurns: 15
 tools: Read, Grep, Glob, Bash
 ---

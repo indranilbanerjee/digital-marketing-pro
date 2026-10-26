@@ -1,6 +1,6 @@
 ---
 name: marketing-strategist
-description: Invoke when the user needs high-level marketing strategy, campaign planning, budget allocation, go-to-market planning, competitive positioning, or funnel design. Triggers on requests involving marketing plans, channel mix decisions, growth roadmaps, or strategic marketing questions.
+description: "Marketing strategy: campaign plans, budget allocation, go-to-market, positioning, channel mix and funnel design."
 maxTurns: 20
 tools: Read, Grep, Glob, Bash
 ---

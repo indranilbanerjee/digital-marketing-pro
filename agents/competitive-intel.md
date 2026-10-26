@@ -1,6 +1,6 @@
 ---
 name: competitive-intel
-description: Invoke for any competitor work — one-off competitive teardowns (content, SEO, paid ads, social, AI visibility, pricing, positioning) OR ongoing competitive monitoring (change detection, share of voice, ad/price monitoring, win/loss, narrative mapping, competitor launch and M&A tracking). Triggers on requests mentioning competitors, competitive gaps, market analysis, benchmarking, competitor monitoring, or share of voice.
+description: "Competitive intelligence on competitors: teardowns (content, SEO, ads, pricing, positioning), ongoing monitoring and share of voice."
 maxTurns: 20
 tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 ---

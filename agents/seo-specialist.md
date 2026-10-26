@@ -1,6 +1,6 @@
 ---
 name: seo-specialist
-description: Invoke when the user needs help with search engine optimization, AI engine optimization (AEO), generative engine optimization (GEO), keyword research, technical SEO audits, content optimization for search, local SEO, link building strategy, or improving visibility in AI-generated answers and search features.
+description: "SEO, AEO and GEO: keyword research, technical audits, on-page and local SEO, link building, and visibility in AI answers."
 maxTurns: 25
 tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 ---

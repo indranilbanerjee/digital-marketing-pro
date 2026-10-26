@@ -58,6 +58,90 @@ BRANDS_DIR = _common.brands_root()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# API_VERSIONS — every platform API version DMP pins, in one place
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Change a version here and every manifest below follows. Per row:
+#   version       what the request templates send (URL segment or header)
+#   sunset        ISO date the version stops working, or None when the vendor
+#                 has not announced one
+#   sunset_basis  how the sunset date was read (exact, month only, or policy)
+#   source        the vendor page that states it
+#   verified_on   the day someone last read that page (None = not yet
+#                 confirmed; verify_note says why)
+#
+# tests/test_api_versions.py fails 30 days before a sunset and when a row has
+# gone 120 days without being re-read, and checks that skill prose naming a
+# target version agrees with this table. .github/workflows/dated-checks.yml
+# runs those tests weekly, because a quiet repo never runs push-only tests.
+API_VERSIONS = {
+    "meta": {
+        "version": "v26.0",
+        "sunset": None,
+        "sunset_basis": "Marketing API changelog lists v26.0 (introduced 29 Jul 2026) "
+                        "as available until TBD; ad endpoints follow the Marketing API "
+                        "date, which comes before the Graph API one",
+        "source": "https://developers.facebook.com/docs/marketing-api/marketing-api-changelog",
+        "verified_on": "2026-10-27",
+    },
+    "linkedin": {
+        "version": "202610",
+        "sunset": "2027-10-15",
+        "sunset_basis": "estimate: LinkedIn supports each monthly version for at least one "
+                        "year and sunset 202510 on 15 Oct 2026; replace with the published "
+                        "date once LinkedIn lists one",
+        "source": "https://learn.microsoft.com/en-us/linkedin/marketing/versioning",
+        "verified_on": "2026-10-27",
+    },
+    "google_ads": {
+        "version": "v26",
+        "sunset": "2027-11-01",
+        "sunset_basis": "sunset-dates page lists v26 (released 14 Oct 2026) as sunsetting "
+                        "in November 2027; month only, first day used",
+        "source": "https://developers.google.com/google-ads/api/docs/sunset-dates",
+        "verified_on": "2026-10-27",
+    },
+    "tiktok": {
+        "version": "v1.3",
+        "sunset": None,
+        "sunset_basis": "no sunset known",
+        "source": "https://business-api.tiktok.com/portal/docs",
+        "verified_on": None,
+        "verify_note": "TikTok's developer site timed out on 2026-10-27; the owner checks "
+                       "by hand (reported: legacy manual Sales, App and Lead Gen campaigns "
+                       "move to the Smart+ APIs from 1 Jan 2027)",
+    },
+    "x_ads": {
+        "version": "12",
+        "sunset": None,
+        "sunset_basis": "X lists version 12 deprecation and end of life as TBD",
+        "source": "https://docs.x.com/x-ads-api/fundamentals/versioning",
+        "verified_on": "2026-10-27",
+    },
+    "klaviyo": {
+        "version": "2026-04-15",
+        "sunset": "2028-04-15",
+        "sunset_basis": "Klaviyo policy: a revision is stable for 1 year, deprecated for "
+                        "the next year (from 2027-04-15) and retired 2 years after release",
+        "source": "https://developers.klaviyo.com/en/docs/api_versioning_and_deprecation_policy",
+        "verified_on": "2026-10-27",
+    },
+}
+
+META_GRAPH_BASE = "https://graph.facebook.com/" + API_VERSIONS["meta"]["version"]
+GOOGLE_ADS_BASE = "https://googleads.googleapis.com/" + API_VERSIONS["google_ads"]["version"]
+LINKEDIN_VERSION = API_VERSIONS["linkedin"]["version"]
+TIKTOK_BASE = "https://business-api.tiktok.com/open_api/" + API_VERSIONS["tiktok"]["version"]
+X_ADS_BASE = "https://ads-api.twitter.com/" + API_VERSIONS["x_ads"]["version"]
+KLAVIYO_REVISION = API_VERSIONS["klaviyo"]["version"]
+# Google sunset developer tokens on 9 Sep 2026: API access now comes from the
+# Google Cloud project behind the OAuth client, and the header is ignored.
+GOOGLE_ADS_AUTH_PATTERN = ("OAuth2 Bearer; API access comes from the Google Cloud project "
+                           "that owns the OAuth client (developer tokens were sunset "
+                           "9 Sep 2026)")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # ACTION_SPECS — the canonical map of action_id → connector requirements
 # ─────────────────────────────────────────────────────────────────────────────
 #
@@ -156,20 +240,19 @@ def _manifest_inventory(connector_name, brand, kwargs):
     endpoints = {
         "google-ads": {
             "method": "POST",
-            "url": "https://googleads.googleapis.com/v24/customers/{customer_id}/googleAds:search",
+            "url": GOOGLE_ADS_BASE + "/customers/{customer_id}/googleAds:search",
             "headers": {
                 "Authorization": "Bearer {GOOGLE_ADS_OAUTH_TOKEN}",
-                "developer-token": "{GOOGLE_ADS_DEVELOPER_TOKEN}",
                 "login-customer-id": "{GOOGLE_ADS_CUSTOMER_ID}",
             },
             "body_template": {
                 "query": "SELECT campaign.id, campaign.name, campaign.status, campaign_budget.amount_micros, metrics.cost_micros, metrics.conversions FROM campaign WHERE segments.date DURING LAST_30_DAYS"
             },
-            "auth_pattern": "OAuth2 + developer-token header",
+            "auth_pattern": GOOGLE_ADS_AUTH_PATTERN,
         },
         "meta-marketing": {
             "method": "GET",
-            "url": "https://graph.facebook.com/v24.0/act_{META_AD_ACCOUNT_ID}/campaigns",
+            "url": META_GRAPH_BASE + "/act_{META_AD_ACCOUNT_ID}/campaigns",
             "params": {
                 "fields": "id,name,status,daily_budget,updated_time,insights{spend,actions}",
                 "date_preset": "last_30d",
@@ -179,25 +262,25 @@ def _manifest_inventory(connector_name, brand, kwargs):
         },
         "linkedin-marketing": {
             "method": "GET",
-            "url": "https://api.linkedin.com/rest/adCampaignsV2",
+            "url": "https://api.linkedin.com/rest/adAccounts/{LINKEDIN_AD_ACCOUNT_ID}/adCampaigns",
             "headers": {
                 "Authorization": "Bearer {LINKEDIN_ACCESS_TOKEN}",
-                "LinkedIn-Version": "202606",
+                "LinkedIn-Version": LINKEDIN_VERSION,
                 "X-Restli-Protocol-Version": "2.0.0",
             },
-            "params": {"q": "search", "search.account.values[0]": "urn:li:sponsoredAccount:{LINKEDIN_AD_ACCOUNT_ID}"},
+            "params": {"q": "search"},
             "auth_pattern": "OAuth2 Bearer + LinkedIn-Version header",
         },
         "tiktok-ads": {
             "method": "GET",
-            "url": "https://business-api.tiktok.com/open_api/v1.3/campaign/get/",
+            "url": TIKTOK_BASE + "/campaign/get/",
             "headers": {"Access-Token": "{TIKTOK_ACCESS_TOKEN}"},
             "params": {"advertiser_id": "{TIKTOK_ADVERTISER_ID}"},
             "auth_pattern": "Access-Token header",
         },
         "twitter-x": {
             "method": "GET",
-            "url": "https://ads-api.twitter.com/12/accounts/{account_id}/campaigns",
+            "url": X_ADS_BASE + "/accounts/{account_id}/campaigns",
             "headers": {"Authorization": "OAuth1.0a {TWITTER_OAUTH_HEADER}"},
             "auth_pattern": "OAuth 1.0a user context",
         },
@@ -234,7 +317,7 @@ def _manifest_automations(connector_name, brand, kwargs):
             "url": "https://a.klaviyo.com/api/flows/",
             "headers": {
                 "Authorization": "Klaviyo-API-Key {KLAVIYO_PRIVATE_KEY}",
-                "revision": "2026-04-15",
+                "revision": KLAVIYO_REVISION,
                 "accept": "application/json",
             },
             "params": {"filter": "equals(status,'live')", "page[size]": "100"},
@@ -289,9 +372,14 @@ def _manifest_cadence(connector_name, brand, kwargs):
     endpoints = {
         "meta-graph": {
             "method": "GET",
-            "url": "https://graph.facebook.com/v24.0/{META_PAGE_ID}/posts",
+            "url": META_GRAPH_BASE + "/{META_PAGE_ID}/posts",
             "params": {
-                "fields": "id,created_time,message,insights.metric(post_engaged_users,post_impressions)",
+                # post_impressions is deprecated above v25 and post_engaged_users is no
+                # longer documented (Insights reference, checked 2026-10-27); engagement
+                # comes from the post's own edges instead.
+                "fields": ("id,created_time,message,shares,reactions.summary(total_count),"
+                           "comments.summary(total_count),"
+                           "insights.metric(post_media_view,post_total_media_view_unique)"),
                 "since": "{90_days_ago_unix}",
                 "access_token": "{META_PAGE_ACCESS_TOKEN}",
                 "limit": "100",
@@ -303,7 +391,7 @@ def _manifest_cadence(connector_name, brand, kwargs):
             "url": "https://api.linkedin.com/rest/posts",
             "headers": {
                 "Authorization": "Bearer {LINKEDIN_ACCESS_TOKEN}",
-                "LinkedIn-Version": "202606",
+                "LinkedIn-Version": LINKEDIN_VERSION,
             },
             "params": {"q": "author", "author": "urn:li:organization:{LINKEDIN_COMPANY_ID}",
                        "count": "100"},
@@ -470,7 +558,7 @@ def _manifest_enable_automation(connector_name, brand, kwargs):
             "url": f"https://a.klaviyo.com/api/flows/{automation_id}",
             "headers": {
                 "Authorization": "Klaviyo-API-Key {KLAVIYO_PRIVATE_KEY}",
-                "revision": "2026-04-15",
+                "revision": KLAVIYO_REVISION,
                 "Content-Type": "application/vnd.api+json",
             },
             "body_template": {"data": {"type": "flow", "id": automation_id,
@@ -501,7 +589,7 @@ def _manifest_schedule_posts(connector_name, brand, kwargs):
     endpoints = {
         "meta-graph": {
             "method": "POST",
-            "url": "https://graph.facebook.com/v24.0/{META_PAGE_ID}/feed",
+            "url": META_GRAPH_BASE + "/{META_PAGE_ID}/feed",
             "params": {"access_token": "{META_PAGE_ACCESS_TOKEN}"},
             "body_template": {"message": "{post.copy}", "published": "false",
                               "scheduled_publish_time": "{post.scheduled_unix}"},
@@ -510,7 +598,7 @@ def _manifest_schedule_posts(connector_name, brand, kwargs):
             "method": "POST",
             "url": "https://api.linkedin.com/rest/posts",
             "headers": {"Authorization": "Bearer {LINKEDIN_ACCESS_TOKEN}",
-                        "LinkedIn-Version": "202606",
+                        "LinkedIn-Version": LINKEDIN_VERSION,
                         "Content-Type": "application/json"},
             "body_template": {"author": "urn:li:organization:{LINKEDIN_COMPANY_ID}",
                               "commentary": "{post.copy}",
@@ -682,29 +770,29 @@ def _manifest_launch_ads(connector_name, brand, kwargs):
     endpoints = {
         "google-ads": {
             "method": "POST",
-            "url": "https://googleads.googleapis.com/v24/customers/{customer_id}/campaigns:mutate",
-            "headers": {"Authorization": "Bearer {GOOGLE_ADS_OAUTH_TOKEN}",
-                        "developer-token": "{GOOGLE_ADS_DEVELOPER_TOKEN}"},
+            "url": GOOGLE_ADS_BASE + "/customers/{customer_id}/campaigns:mutate",
+            "headers": {"Authorization": "Bearer {GOOGLE_ADS_OAUTH_TOKEN}"},
             "body_template": {"operations": [{"update": {"resourceName": "{campaign_resource}",
                                                           "status": "ENABLED"},
                                               "updateMask": "status"}]},
         },
         "meta-marketing": {
             "method": "POST",
-            "url": "https://graph.facebook.com/v24.0/{campaign_id}",
+            "url": META_GRAPH_BASE + "/{campaign_id}",
             "params": {"access_token": "{META_ACCESS_TOKEN}", "status": "ACTIVE"},
         },
         "linkedin-marketing": {
             "method": "POST",
-            "url": "https://api.linkedin.com/rest/adCampaignsV2/{campaign_id}",
+            "url": "https://api.linkedin.com/rest/adAccounts/{LINKEDIN_AD_ACCOUNT_ID}/adCampaigns/{campaign_id}",
             "headers": {"Authorization": "Bearer {LINKEDIN_ACCESS_TOKEN}",
+                        "X-Restli-Protocol-Version": "2.0.0",
                         "X-RestLi-Method": "PARTIAL_UPDATE",
-                        "LinkedIn-Version": "202606"},
+                        "LinkedIn-Version": LINKEDIN_VERSION},
             "body_template": {"patch": {"$set": {"status": "ACTIVE"}}},
         },
         "tiktok-ads": {
             "method": "POST",
-            "url": "https://business-api.tiktok.com/open_api/v1.3/campaign/status/update/",
+            "url": TIKTOK_BASE + "/campaign/status/update/",
             "headers": {"Access-Token": "{TIKTOK_ACCESS_TOKEN}",
                         "Content-Type": "application/json"},
             "body_template": {"advertiser_id": "{TIKTOK_ADVERTISER_ID}",

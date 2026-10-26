@@ -317,6 +317,10 @@ class TestPythonMinimum(unittest.TestCase):
     FLOOR_MINOR = 10
     OPTIONAL_EXTRA_MINOR = None
     OPTIONAL_EXTRA_LINE = None
+    # The announced next minimum (Python 3.10 reached end of life in October 2026):
+    # allowed only on a line that names the release that will require it.
+    NEXT_MINOR = 11
+    NEXT_LINE = re.compile(r"\b3\.37\.0\b")
     STATEMENT = re.compile(r"Python\s+3\.(\d{1,2})\s*(?:\+|or newer)|\b3\.(\d{1,2})\+")
 
     def statements(self):
@@ -329,6 +333,8 @@ class TestPythonMinimum(unittest.TestCase):
 
     def allowed(self, minor, line):
         if minor == self.FLOOR_MINOR:
+            return True
+        if minor == self.NEXT_MINOR and self.NEXT_LINE.search(line):
             return True
         return bool(self.OPTIONAL_EXTRA_MINOR and minor == self.OPTIONAL_EXTRA_MINOR
                     and self.OPTIONAL_EXTRA_LINE.search(line))
