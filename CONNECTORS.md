@@ -30,7 +30,7 @@ Some services are connected at the **Claude platform level** rather than through
 
 | Service | Platform integration | MCP alternative |
 |---------|---------------------|-----------------|
-| Google Drive | Yes — connect in Settings → Integrations | Also available via npx (`mcp-google-drive`) |
+| Google Drive | Yes — connect in Settings → Integrations | Or the Pipedream entry in `.mcp.json.connectors-reference` (no vendor-published npm package) |
 | Google Docs | Yes — connect in Settings → Integrations | — (no standalone npx server; covered by the Google Drive integration) |
 
 Platform-level integrations work even if they don't appear in the `/digital-marketing-pro:integrations` connector dashboard.
@@ -97,10 +97,4 @@ Use these skills to discover and manage your integrations:
 
 ## Advanced configuration (Claude Code)
 
-For Claude Code CLI users who want the full 68-server configuration with npx/stdio transports, rename the example file:
-
-```bash
-cp .mcp.json.example .mcp.json
-```
-
-This replaces the HTTP-only configuration with the full set of local MCP servers. Requires Node.js, npx, and the appropriate API keys configured as environment variables.
+Connector setup offers only vendor-verified, version-pinned packages. `.mcp.json.example` has runnable `npx` entries only for packages the vendor itself publishes on npm (Pinecone, DataForSEO, DeepL), each pinned to an exact version; copy the ones you want into your own `.mcp.json` and set their environment variables (Claude Code only; requires Node.js). The list lives in `scripts/_connector_registry.py` (`VERIFIED_NPX_PACKAGES`), a test keeps the example in step with it, and a weekly job checks every entry against the npm registry. Services with no vendor-hosted HTTP server and no vendor-published package are listed in the example's `_no_verified_connector`: set them up from the vendor's own docs. DMP prints no `npx` command for them, because a package name the vendor does not publish could be registered by anyone, who would then receive the API keys.

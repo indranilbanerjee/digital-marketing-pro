@@ -27,9 +27,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _connector_registry import (  # type: ignore  # noqa: E402
     CONNECTOR_REGISTRY,
+    NO_VERIFIED_CONNECTOR_NOTE,
     _load_mcp_json,
     is_connector_configured as _is_configured_impl,
     redact_secrets as _redact_secrets,
+    verified_npx_args,
 )
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -42,6 +44,13 @@ MCP_JSON = PLUGIN_ROOT / ".mcp.json"
 # a bool. The new shared helper returns (bool, evidence_dict). Strip evidence
 # to preserve the existing call sites in status_dashboard / list_available /
 # check_connector / setup_guide.
+def _transport(conn):
+    """The transport to report: an npx connector with no vendor-verified package is "unavailable"."""
+    if conn["transport"] == "npx" and verified_npx_args(conn.get("package")) is None:
+        return "unavailable"
+    return conn["transport"]
+
+
 def _is_configured(name, connector_info, active_servers):
     configured, _ = _is_configured_impl(name, connector_info, active_servers)
     return configured
@@ -63,7 +72,7 @@ def status_dashboard():
             entry = {
                 "name": name,
                 "description": conn["description"],
-                "transport": conn["transport"],
+                "transport": _transport(conn),
                 "skills_unlocked": conn["skills_unlocked"],
             }
             if conn.get("access"):
@@ -75,12 +84,14 @@ def status_dashboard():
                 total_connected += 1
             else:
                 entry["status"] = "available"
-                if conn["transport"] == "npx":
+                if conn["transport"] == "npx" and verified_npx_args(conn.get("package")):
                     entry["env_vars_needed"] = conn["env_vars"]
                     entry["note"] = "Claude Code only (requires npx)"
+                elif conn["transport"] == "npx":
+                    entry["note"] = NO_VERIFIED_CONNECTOR_NOTE
                 else:
                     entry["note"] = "HTTP connector — works in Cowork + Claude Code"
-                if "note" in conn:
+                if "note" in conn and conn["note"] != entry["note"]:
                     entry["platform_note"] = conn["note"]
                 available.append(entry)
 
@@ -117,13 +128,15 @@ def list_available():
                     "name": name,
                     "category": cat_key,
                     "description": conn["description"],
-                    "transport": conn["transport"],
+                    "transport": _transport(conn),
                     "skills_unlocked": conn["skills_unlocked"],
                 }
                 if conn.get("access"):
                     entry["access"] = conn["access"]
-                if conn["transport"] == "npx":
+                if conn["transport"] == "npx" and verified_npx_args(conn.get("package")):
                     entry["env_vars_needed"] = conn["env_vars"]
+                elif conn["transport"] == "npx":
+                    entry["setup"] = NO_VERIFIED_CONNECTOR_NOTE
                 available.append(entry)
 
     return {"available_connectors": available, "count": len(available)}
@@ -142,7 +155,7 @@ def check_connector(name):
                 "name": name,
                 "category": cat_key,
                 "description": conn["description"],
-                "transport": conn["transport"],
+                "transport": _transport(conn),
                 "status": "connected" if configured else "not_connected",
                 "skills_unlocked": conn["skills_unlocked"],
             }
@@ -153,12 +166,12 @@ def check_connector(name):
                     "setup_note", "HTTP connector — auto-connects via OAuth when you first use it")
                 if conn.get("access"):
                     result["access"] = conn["access"]
-            elif conn.get("package_status") == "no-known-npm-package":
+            elif verified_npx_args(conn.get("package")) is None:
                 result["package"] = None
-                result["package_status"] = conn["package_status"]
-                result["setup"] = conn.get("note", "No verified MCP package — use /digital-marketing-pro:add-integration.")
+                result["package_status"] = "no-verified-package"
+                result["setup"] = NO_VERIFIED_CONNECTOR_NOTE
             else:
-                result["package"] = conn.get("package", "")
+                result["package"] = verified_npx_args(conn["package"])[1]
                 result["env_vars"] = conn.get("env_vars", [])
                 if not configured:
                     env_status = {}
@@ -232,18 +245,17 @@ def setup_guide(name):
                         f"{name} is configured. Use any of these skills to activate it: "
                         + ", ".join(f"/dm:{s}" for s in conn["skills_unlocked"])
                     )
-            elif conn.get("package_status") == "no-known-npm-package":
+            elif verified_npx_args(conn.get("package")) is None:
                 guide["transport"] = "unavailable"
                 guide["package"] = None
-                guide["package_status"] = conn["package_status"]
+                guide["package_status"] = "no-verified-package"
                 guide["steps"] = [
-                    conn.get("note", "No verified MCP package on npm for this connector."),
-                    f"Use /digital-marketing-pro:add-integration {name} to wire a custom MCP server you trust.",
-                    "npx runs remote code — verify any package on npm before adding it to .mcp.json.",
+                    NO_VERIFIED_CONNECTOR_NOTE,
+                    f"Use /digital-marketing-pro:add-integration {name} to wire a server you have vetted.",
                 ]
             else:
                 guide["transport"] = "npx"
-                guide["package"] = conn.get("package", "")
+                guide["package"] = verified_npx_args(conn["package"])[1]
                 guide["env_vars"] = conn.get("env_vars", [])
                 guide["steps"] = [
                     f"1. Obtain API credentials from the {name} platform.",
@@ -254,7 +266,7 @@ def setup_guide(name):
                 guide["mcp_json_entry"] = {
                     name: {
                         "command": "npx",
-                        "args": ["-y", conn["package"]],
+                        "args": verified_npx_args(conn["package"]),
                         "env": {v: f"${{{v}}}" for v in conn["env_vars"]},
                     }
                 }

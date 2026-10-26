@@ -1,715 +1,22 @@
 {
-  "_readme": "OPTIONAL MCP Integrations — Digital Marketing Pro. These connect to YOUR OWN marketing accounts. The plugin works fully without any of these. This file is ILLUSTRATIVE and is never auto-loaded — the shipped .mcp.json is empty ({\"mcpServers\":{}}). To enable an integration, verify the package first (see _warning), then copy its block into your own .mcp.json (or use /digital-marketing-pro:add-integration) and set the required environment variables.",
-  "_warning": "PACKAGE VERIFICATION REQUIRED. The npx package names below are a conceptual catalog of the integrations DMP supports — they are NOT all confirmed-working npm packages, and several are known NOT to exist. `npx` executes remote code, so VERIFY every package on npmjs.com before running it; prefer /digital-marketing-pro:add-integration for a custom MCP path. VERIFIED-REAL as of this release: @pinecone-database/mcp, mcp-google-drive, sarvam-mcp-server, deepl-mcp-server, dataforseo-mcp-server. KNOWN-FICTIONAL — no such npm package, do NOT run: @anthropic/mcp-google-analytics, @anthropic/mcp-google-search-console, @anthropic/mcp-hubspot, @anthropic/mcp-slack, @anthropic/mcp-google-sheets, @anthropic/mcp-stripe, @anthropic/mcp-google-cloud-translation, mcp-meta-marketing, mcp-semrush, mcp-klaviyo, mcp-intercom, mcp-salesforce, mcp-google-looker-studio, mcp-brandwatch, graphiti-mcp, @supermemoryai/supermemory-mcp, @notionhq/mcp-server, lara-mcp. mcp-server-qdrant is a likely name-squat (the official Qdrant server ships as Python/uvx, not npm). NOTE: many of these vendors now ship HOSTED HTTP MCP servers (Slack, Notion, HubSpot, Stripe, Canva, Figma, Asana, Webflow, Gmail, Google Calendar, Google Drive) — see .mcp.json.connectors-reference for the HTTP catalog and prefer those over npx where available.",
+  "_readme": "OPTIONAL MCP integrations for Digital Marketing Pro. These connect to YOUR OWN accounts; the plugin works fully without any of them. This file is illustrative and never auto-loaded (the plugin ships no .mcp.json). Only packages the vendor itself publishes on npm, pinned to an exact version, get a runnable entry here; the list is scripts/_connector_registry.py VERIFIED_NPX_PACKAGES, and a test keeps this file in step with it. For most services, use the vendor's hosted HTTP server from .mcp.json.connectors-reference instead (no npx, works in Cowork). _vendor_hosted_http_instead maps services to the vendor's hosted entry there. Services in _no_verified_connector have neither: set them up from the vendor's own documentation, or wire a server you have vetted with /digital-marketing-pro:add-integration. To enable an entry, copy its block into your own .mcp.json and set its environment variables.",
   "mcpServers": {
-    "google-analytics": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@anthropic/mcp-google-analytics"
-      ],
-      "env": {
-        "GA_PROPERTY_ID": "${GA_PROPERTY_ID}",
-        "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}"
-      },
-      "description": "Google Analytics 4 — traffic, conversions, audience data for performance reports"
-    },
-    "google-search-console": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@anthropic/mcp-google-search-console"
-      ],
-      "env": {
-        "GSC_SITE_URL": "${GSC_SITE_URL}",
-        "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}"
-      },
-      "description": "Google Search Console — ranking data, queries, CTR for SEO audits"
-    },
-    "google-ads": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-google-ads"
-      ],
-      "env": {
-        "GOOGLE_ADS_CUSTOMER_ID": "${GOOGLE_ADS_CUSTOMER_ID}",
-        "GOOGLE_ADS_DEVELOPER_TOKEN": "${GOOGLE_ADS_DEVELOPER_TOKEN}",
-        "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}"
-      },
-      "description": "Google Ads — campaign performance, keyword data, bid optimization"
-    },
-    "meta-marketing": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-meta-marketing"
-      ],
-      "env": {
-        "META_ACCESS_TOKEN": "${META_ACCESS_TOKEN}",
-        "META_AD_ACCOUNT_ID": "${META_AD_ACCOUNT_ID}"
-      },
-      "description": "Meta Business Suite — Facebook/Instagram ads, audience insights, performance"
-    },
-    "hubspot": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@anthropic/mcp-hubspot"
-      ],
-      "env": {
-        "HUBSPOT_ACCESS_TOKEN": "${HUBSPOT_ACCESS_TOKEN}"
-      },
-      "description": "HubSpot CRM — contacts, deals, email performance, pipeline data"
-    },
-    "slack": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@anthropic/mcp-slack"
-      ],
-      "env": {
-        "SLACK_BOT_TOKEN": "${SLACK_BOT_TOKEN}"
-      },
-      "description": "Slack — send marketing reports, campaign alerts, team notifications"
-    },
-    "google-sheets": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@anthropic/mcp-google-sheets"
-      ],
-      "env": {
-        "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}"
-      },
-      "description": "Google Sheets — export reports, campaign data, content calendars to spreadsheets"
-    },
-    "mailchimp": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-mailchimp"
-      ],
-      "env": {
-        "MAILCHIMP_API_KEY": "${MAILCHIMP_API_KEY}"
-      },
-      "description": "Mailchimp — email campaign analytics, list management, automation data"
-    },
-    "stripe": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@anthropic/mcp-stripe"
-      ],
-      "env": {
-        "STRIPE_API_KEY": "${STRIPE_API_KEY}"
-      },
-      "description": "Stripe — revenue data, conversion tracking, LTV calculations"
-    },
-    "linkedin-marketing": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-linkedin-marketing"
-      ],
-      "env": {
-        "LINKEDIN_ACCESS_TOKEN": "${LINKEDIN_ACCESS_TOKEN}",
-        "LINKEDIN_AD_ACCOUNT_ID": "${LINKEDIN_AD_ACCOUNT_ID}"
-      },
-      "description": "LinkedIn Marketing — ad performance, audience targeting, company page analytics"
-    },
-    "semrush": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-semrush"
-      ],
-      "env": {
-        "SEMRUSH_API_KEY": "${SEMRUSH_API_KEY}"
-      },
-      "description": "SEMrush — keyword research, competitor analysis, backlink data, site audit"
-    },
-    "ahrefs": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-ahrefs"
-      ],
-      "env": {
-        "AHREFS_API_KEY": "${AHREFS_API_KEY}"
-      },
-      "description": "Ahrefs — backlink profiles, keyword explorer, content gap analysis"
-    },
-    "tiktok-ads": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-tiktok-ads"
-      ],
-      "env": {
-        "TIKTOK_ACCESS_TOKEN": "${TIKTOK_ACCESS_TOKEN}",
-        "TIKTOK_ADVERTISER_ID": "${TIKTOK_ADVERTISER_ID}"
-      },
-      "description": "TikTok Ads — campaign performance, creative insights, audience analytics, Spark Ads data"
-    },
-    "shopify": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-shopify"
-      ],
-      "env": {
-        "SHOPIFY_STORE_URL": "${SHOPIFY_STORE_URL}",
-        "SHOPIFY_ACCESS_TOKEN": "${SHOPIFY_ACCESS_TOKEN}"
-      },
-      "description": "Shopify — eCommerce orders, products, customers, inventory, sales analytics"
-    },
-    "wordpress": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-wordpress"
-      ],
-      "env": {
-        "WORDPRESS_SITE_URL": "${WORDPRESS_SITE_URL}",
-        "WORDPRESS_AUTH_TOKEN": "${WORDPRESS_AUTH_TOKEN}"
-      },
-      "description": "WordPress — content publishing, post management, SEO metadata, plugin data"
-    },
-    "salesforce": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-salesforce"
-      ],
-      "env": {
-        "SALESFORCE_INSTANCE_URL": "${SALESFORCE_INSTANCE_URL}",
-        "SALESFORCE_ACCESS_TOKEN": "${SALESFORCE_ACCESS_TOKEN}"
-      },
-      "description": "Salesforce — CRM pipeline, opportunity data, lead management, account insights"
-    },
-    "google-looker-studio": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-google-looker-studio"
-      ],
-      "env": {
-        "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}"
-      },
-      "description": "Google Looker Studio — dashboard data, report embedding, cross-platform visualization"
-    },
-    "activecampaign": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-activecampaign"
-      ],
-      "env": {
-        "ACTIVECAMPAIGN_API_URL": "${ACTIVECAMPAIGN_API_URL}",
-        "ACTIVECAMPAIGN_API_KEY": "${ACTIVECAMPAIGN_API_KEY}"
-      },
-      "description": "ActiveCampaign — email automation, lead scoring, CRM contacts, automation workflows"
-    },
-    "twitter-x": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-twitter"
-      ],
-      "env": {
-        "TWITTER_API_KEY": "${TWITTER_API_KEY}",
-        "TWITTER_API_SECRET": "${TWITTER_API_SECRET}",
-        "TWITTER_ACCESS_TOKEN": "${TWITTER_ACCESS_TOKEN}",
-        "TWITTER_ACCESS_SECRET": "${TWITTER_ACCESS_SECRET}"
-      },
-      "description": "Twitter/X — post tweets, search content, manage threads, media uploads"
-    },
-    "instagram": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-instagram"
-      ],
-      "env": {
-        "INSTAGRAM_ACCESS_TOKEN": "${INSTAGRAM_ACCESS_TOKEN}",
-        "INSTAGRAM_BUSINESS_ACCOUNT_ID": "${INSTAGRAM_BUSINESS_ACCOUNT_ID}"
-      },
-      "description": "Instagram — publish images/videos, get insights, manage DMs via Graph API"
-    },
-    "linkedin-publishing": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-linkedin-publishing"
-      ],
-      "env": {
-        "LINKEDIN_ACCESS_TOKEN": "${LINKEDIN_ACCESS_TOKEN}"
-      },
-      "description": "LinkedIn — post articles, share updates, company page management"
-    },
-    "tiktok-content": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-tiktok-content"
-      ],
-      "env": {
-        "TIKTOK_ACCESS_TOKEN": "${TIKTOK_ACCESS_TOKEN}"
-      },
-      "description": "TikTok — publish videos/photos, content discovery, creator tools"
-    },
-    "youtube": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-youtube"
-      ],
-      "env": {
-        "YOUTUBE_OAUTH_TOKEN": "${YOUTUBE_OAUTH_TOKEN}"
-      },
-      "description": "YouTube — upload videos, manage playlists, Shorts creation, analytics"
-    },
-    "pinterest": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-pinterest"
-      ],
-      "env": {
-        "PINTEREST_ACCESS_TOKEN": "${PINTEREST_ACCESS_TOKEN}"
-      },
-      "description": "Pinterest — create pins, manage boards, search visual content, analytics"
-    },
-    "sendgrid": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-sendgrid"
-      ],
-      "env": {
-        "SENDGRID_API_KEY": "${SENDGRID_API_KEY}"
-      },
-      "description": "SendGrid — send email campaigns, manage contacts/lists, templates, delivery tracking"
-    },
-    "klaviyo": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-klaviyo"
-      ],
-      "env": {
-        "KLAVIYO_API_KEY": "${KLAVIYO_API_KEY}"
-      },
-      "description": "Klaviyo — email/SMS campaigns, flow performance, audience segmentation, personalization"
-    },
-    "customer-io": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-customer-io"
-      ],
-      "env": {
-        "CUSTOMERIO_API_KEY": "${CUSTOMERIO_API_KEY}"
-      },
-      "description": "Customer.io — behavioral email/SMS, segment generation, campaign creation, customer profiles"
-    },
-    "brevo": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-brevo"
-      ],
-      "env": {
-        "BREVO_API_KEY": "${BREVO_API_KEY}"
-      },
-      "description": "Brevo — email/SMS/WhatsApp marketing, automation workflows, CRM contacts, 26 services"
-    },
-    "mailgun": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-mailgun"
-      ],
-      "env": {
-        "MAILGUN_API_KEY": "${MAILGUN_API_KEY}",
-        "MAILGUN_DOMAIN": "${MAILGUN_DOMAIN}"
-      },
-      "description": "Mailgun — transactional email sending, delivery analytics, domain management"
-    },
-    "zoho-crm": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-zoho-crm"
-      ],
-      "env": {
-        "ZOHO_CLIENT_ID": "${ZOHO_CLIENT_ID}",
-        "ZOHO_CLIENT_SECRET": "${ZOHO_CLIENT_SECRET}",
-        "ZOHO_REFRESH_TOKEN": "${ZOHO_REFRESH_TOKEN}"
-      },
-      "description": "Zoho CRM — full CRUD for leads, contacts, deals, campaigns, workflow automation"
-    },
-    "pipedrive": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-pipedrive"
-      ],
-      "env": {
-        "PIPEDRIVE_API_TOKEN": "${PIPEDRIVE_API_TOKEN}"
-      },
-      "description": "Pipedrive — deal pipeline management, contact CRUD, activity logging, 45+ API operations"
-    },
-    "mixpanel": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-mixpanel"
-      ],
-      "env": {
-        "MIXPANEL_API_TOKEN": "${MIXPANEL_API_TOKEN}"
-      },
-      "description": "Mixpanel — event analytics, funnel analysis, user behavior, A/B test results"
-    },
-    "amplitude": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-amplitude"
-      ],
-      "env": {
-        "AMPLITUDE_API_KEY": "${AMPLITUDE_API_KEY}"
-      },
-      "description": "Amplitude — behavioral analytics, experiment results, cohort analysis, session replay"
-    },
-    "bigquery": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-bigquery"
-      ],
-      "env": {
-        "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}",
-        "BIGQUERY_PROJECT_ID": "${BIGQUERY_PROJECT_ID}"
-      },
-      "description": "BigQuery — SQL queries on marketing data warehouse, forecasting, cross-platform analytics"
-    },
     "pinecone": {
       "command": "npx",
       "args": [
         "-y",
-        "@pinecone-database/mcp"
+        "@pinecone-database/mcp@0.3.0"
       ],
       "env": {
         "PINECONE_API_KEY": "${PINECONE_API_KEY}"
       },
       "description": "Pinecone — vector database for brand RAG: store/search brand content, campaign archives, competitive data"
     },
-    "qdrant": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-server-qdrant"
-      ],
-      "env": {
-        "QDRANT_URL": "${QDRANT_URL}",
-        "QDRANT_API_KEY": "${QDRANT_API_KEY}"
-      },
-      "description": "Qdrant — self-hosted vector search for marketing knowledge, campaign performance embeddings"
-    },
-    "supermemory": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@supermemoryai/supermemory-mcp"
-      ],
-      "env": {
-        "SUPERMEMORY_API_KEY": "${SUPERMEMORY_API_KEY}"
-      },
-      "description": "Supermemory — universal agent memory across sessions, semantic search, auto-deduplication"
-    },
-    "graphiti": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "graphiti-mcp"
-      ],
-      "env": {
-        "GRAPHITI_API_KEY": "${GRAPHITI_API_KEY}"
-      },
-      "description": "Zep Graphiti — temporal knowledge graph for campaign timelines, audience evolution, market shifts"
-    },
-    "notion": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@notionhq/mcp-server"
-      ],
-      "env": {
-        "NOTION_API_KEY": "${NOTION_API_KEY}"
-      },
-      "description": "Notion — brand guidelines, campaign docs, team wikis, planning databases, dashboards"
-    },
-    "google-drive": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-google-drive"
-      ],
-      "env": {
-        "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}"
-      },
-      "description": "Google Drive — read/write Docs, manage asset folders, template library, collaborative editing"
-    },
-    "webflow": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-webflow"
-      ],
-      "env": {
-        "WEBFLOW_API_TOKEN": "${WEBFLOW_API_TOKEN}"
-      },
-      "description": "Webflow — design updates, CMS management, landing page publishing, style editing"
-    },
-    "twilio": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-twilio"
-      ],
-      "env": {
-        "TWILIO_ACCOUNT_SID": "${TWILIO_ACCOUNT_SID}",
-        "TWILIO_AUTH_TOKEN": "${TWILIO_AUTH_TOKEN}"
-      },
-      "description": "Twilio — send SMS/MMS, WhatsApp messages, phone management for marketing campaigns"
-    },
-    "intercom": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-intercom"
-      ],
-      "env": {
-        "INTERCOM_ACCESS_TOKEN": "${INTERCOM_ACCESS_TOKEN}"
-      },
-      "description": "Intercom — customer messaging, conversation search, churn detection, support automation"
-    },
-    "linear": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-linear"
-      ],
-      "env": {
-        "LINEAR_API_KEY": "${LINEAR_API_KEY}"
-      },
-      "description": "Linear — marketing project tracking, task management, sprint planning, team workflows"
-    },
-    "optimizely": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-optimizely"
-      ],
-      "env": {
-        "OPTIMIZELY_API_KEY": "${OPTIMIZELY_API_KEY}"
-      },
-      "description": "Optimizely — A/B test management, feature flags, experiment lifecycle, result analysis"
-    },
-    "supabase": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-supabase"
-      ],
-      "env": {
-        "SUPABASE_URL": "${SUPABASE_URL}",
-        "SUPABASE_KEY": "${SUPABASE_KEY}"
-      },
-      "description": "Supabase — PostgreSQL database for custom marketing data, customer tables, analytics storage"
-    },
-    "odoo": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-odoo"
-      ],
-      "env": {
-        "ODOO_URL": "${ODOO_URL}",
-        "ODOO_DB": "${ODOO_DB}",
-        "ODOO_API_KEY": "${ODOO_API_KEY}"
-      },
-      "description": "Odoo — open-source ERP+CRM, leads, contacts, deals, invoicing, marketing campaigns"
-    },
-    "freshsales": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-freshsales"
-      ],
-      "env": {
-        "FRESHSALES_DOMAIN": "${FRESHSALES_DOMAIN}",
-        "FRESHSALES_API_KEY": "${FRESHSALES_API_KEY}"
-      },
-      "description": "Freshsales — Freshworks CRM, contacts, deals, accounts, sequences, lead scoring"
-    },
-    "monday-crm": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-monday"
-      ],
-      "env": {
-        "MONDAY_API_TOKEN": "${MONDAY_API_TOKEN}"
-      },
-      "description": "Monday.com — CRM boards, deal tracking, automations, project management, dashboards"
-    },
-    "dynamics-365": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-dynamics-365"
-      ],
-      "env": {
-        "DYNAMICS_INSTANCE_URL": "${DYNAMICS_INSTANCE_URL}",
-        "DYNAMICS_CLIENT_ID": "${DYNAMICS_CLIENT_ID}",
-        "DYNAMICS_CLIENT_SECRET": "${DYNAMICS_CLIENT_SECRET}",
-        "DYNAMICS_TENANT_ID": "${DYNAMICS_TENANT_ID}"
-      },
-      "description": "Microsoft Dynamics 365 — enterprise CRM, leads, opportunities, accounts, marketing campaigns"
-    },
-    "copper": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-copper"
-      ],
-      "env": {
-        "COPPER_API_KEY": "${COPPER_API_KEY}",
-        "COPPER_EMAIL": "${COPPER_EMAIL}"
-      },
-      "description": "Copper — Gmail-native CRM, contacts, deals, activities, relationship intelligence"
-    },
-    "close-crm": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-close"
-      ],
-      "env": {
-        "CLOSE_API_KEY": "${CLOSE_API_KEY}"
-      },
-      "description": "Close — SMB sales CRM, calling, emailing, pipeline management, custom activities"
-    },
-    "keap": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-keap"
-      ],
-      "env": {
-        "KEAP_ACCESS_TOKEN": "${KEAP_ACCESS_TOKEN}"
-      },
-      "description": "Keap — small business CRM + marketing automation, contacts, deals, invoices, campaigns"
-    },
-    "jira": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-jira"
-      ],
-      "env": {
-        "JIRA_URL": "${JIRA_URL}",
-        "JIRA_EMAIL": "${JIRA_EMAIL}",
-        "JIRA_API_TOKEN": "${JIRA_API_TOKEN}"
-      },
-      "description": "Jira — project tracking, sprint management, issue CRUD, workflow automation"
-    },
-    "asana": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-asana"
-      ],
-      "env": {
-        "ASANA_ACCESS_TOKEN": "${ASANA_ACCESS_TOKEN}"
-      },
-      "description": "Asana — task management, project timelines, team workload, campaign tracking"
-    },
-    "clickup": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-clickup"
-      ],
-      "env": {
-        "CLICKUP_API_TOKEN": "${CLICKUP_API_TOKEN}"
-      },
-      "description": "ClickUp — project management, docs, goals, time tracking, marketing workflows"
-    },
-    "canva": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-canva"
-      ],
-      "env": {
-        "CANVA_API_KEY": "${CANVA_API_KEY}"
-      },
-      "description": "Canva — design creation, brand kit management, template library, asset export"
-    },
-    "figma": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-figma"
-      ],
-      "env": {
-        "FIGMA_ACCESS_TOKEN": "${FIGMA_ACCESS_TOKEN}"
-      },
-      "description": "Figma — design files, component libraries, prototypes, design system management"
-    },
-    "moz": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-moz"
-      ],
-      "env": {
-        "MOZ_ACCESS_ID": "${MOZ_ACCESS_ID}",
-        "MOZ_SECRET_KEY": "${MOZ_SECRET_KEY}"
-      },
-      "description": "Moz — domain authority, keyword difficulty, rank tracking, link analysis, SERP features"
-    },
-    "pagespeed": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-pagespeed"
-      ],
-      "env": {
-        "GOOGLE_API_KEY": "${GOOGLE_API_KEY}"
-      },
-      "description": "Google PageSpeed Insights — Core Web Vitals, performance scores, Lighthouse audits"
-    },
-    "brandwatch": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-brandwatch"
-      ],
-      "env": {
-        "BRANDWATCH_API_KEY": "${BRANDWATCH_API_KEY}"
-      },
-      "description": "Brandwatch — social listening, competitor mentions, sentiment analysis, share of voice"
-    },
     "dataforseo": {
       "command": "npx",
       "args": [
         "-y",
-        "dataforseo-mcp-server"
+        "dataforseo-mcp-server@3.1.3"
       ],
       "env": {
         "DATAFORSEO_USERNAME": "${DATAFORSEO_USERNAME}",
@@ -717,74 +24,85 @@
       },
       "description": "DataForSEO — live SERP data, keyword research, backlinks, on-page analysis, content analysis, competitor domains, AI visibility checking, LLM mention tracking. 9 API modules: SERP, Keywords Data, DataForSEO Labs, Backlinks, On-Page, Domain Analytics, Content Analytics, Business Data, App Data"
     },
-    "marketo": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-marketo"
-      ],
-      "env": {
-        "MARKETO_CLIENT_ID": "${MARKETO_CLIENT_ID}",
-        "MARKETO_CLIENT_SECRET": "${MARKETO_CLIENT_SECRET}",
-        "MARKETO_BASE_URL": "${MARKETO_BASE_URL}"
-      },
-      "description": "Marketo — enterprise marketing automation, lead management, nurture programs, scoring"
-    },
-    "pardot": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-pardot"
-      ],
-      "env": {
-        "PARDOT_BUSINESS_UNIT_ID": "${PARDOT_BUSINESS_UNIT_ID}",
-        "SALESFORCE_ACCESS_TOKEN": "${SALESFORCE_ACCESS_TOKEN}"
-      },
-      "description": "Pardot — B2B marketing automation, prospect tracking, engagement scoring, Salesforce sync"
-    },
     "deepl": {
       "command": "npx",
       "args": [
         "-y",
-        "deepl-mcp-server"
+        "deepl-mcp-server@1.3.14"
       ],
       "env": {
         "DEEPL_API_KEY": "${DEEPL_API_KEY}"
       },
       "description": "DeepL — professional translation for 30+ languages, formality control, document translation, glossary support"
-    },
-    "sarvam-ai": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "sarvam-mcp-server"
-      ],
-      "env": {
-        "SARVAM_API_KEY": "${SARVAM_API_KEY}"
-      },
-      "description": "Sarvam AI — Indian language specialist: 22 Indic languages (Hindi, Tamil, Telugu, Bengali, etc.), translation, language detection, transliteration"
-    },
-    "google-cloud-translation": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@anthropic/mcp-google-cloud-translation"
-      ],
-      "env": {
-        "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}"
-      },
-      "description": "Google Cloud Translation — 100+ languages, batch translation, language detection, adaptive translation"
-    },
-    "lara-translate": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "lara-mcp"
-      ],
-      "env": {
-        "LARA_API_KEY": "${LARA_API_KEY}"
-      },
-      "description": "Lara Translate — 100+ languages, translation memories, context-aware marketing content translation"
     }
-  }
+  },
+  "_vendor_hosted_http_instead": {
+    "Ahrefs": "ahrefs",
+    "Amplitude": "amplitude",
+    "Asana": "asana",
+    "Canva": "canva",
+    "Figma": "figma",
+    "Google Ads": "google-ads-mcp (read-only)",
+    "HubSpot CRM": "hubspot",
+    "Klaviyo": "klaviyo",
+    "Meta Business Suite": "meta-ads",
+    "Notion": "notion",
+    "Slack": "slack",
+    "Stripe": "stripe",
+    "Webflow": "webflow"
+  },
+  "_no_verified_connector": [
+    "ActiveCampaign",
+    "BigQuery",
+    "Brandwatch",
+    "Brevo",
+    "ClickUp",
+    "Close",
+    "Copper",
+    "Customer.io",
+    "Freshsales",
+    "Google Analytics 4",
+    "Google Cloud Translation",
+    "Google Drive",
+    "Google Looker Studio",
+    "Google PageSpeed Insights",
+    "Google Search Console",
+    "Google Sheets",
+    "Instagram",
+    "Intercom",
+    "Jira",
+    "Keap",
+    "Lara Translate",
+    "Linear",
+    "LinkedIn",
+    "LinkedIn Marketing",
+    "Mailchimp",
+    "Mailgun",
+    "Marketo",
+    "Microsoft Dynamics 365",
+    "Mixpanel",
+    "Monday.com",
+    "Moz",
+    "Odoo",
+    "Optimizely",
+    "Pardot",
+    "Pinterest",
+    "Pipedrive",
+    "Qdrant",
+    "Salesforce",
+    "Sarvam AI",
+    "SEMrush",
+    "SendGrid",
+    "Shopify",
+    "Supabase",
+    "Supermemory",
+    "TikTok",
+    "TikTok Ads",
+    "Twilio",
+    "Twitter/X",
+    "WordPress",
+    "YouTube",
+    "Zep Graphiti",
+    "Zoho CRM"
+  ]
 }

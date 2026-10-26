@@ -15,7 +15,7 @@ digital-marketing-pro/
 ├── .claude-plugin/
 │   └── plugin.json                    # Plugin manifest (2026 spec: homepage, repository as a STRING url, license, keywords — NO $schema key, and repository is a string not a {type,url} object, per the plugin spec)
 ├── .mcp.json                          # NOT shipped (gitignored) — zero auto-connecting MCPs
-├── .mcp.json.example                  # illustrative npx catalog (opt-in; verify packages before use — see its _warning)
+├── .mcp.json.example                  # opt-in entries for vendor-published npm packages only, pinned
 ├── hooks/
 │   └── hooks.json                     # ships EMPTY {"hooks":{}} — zero global hooks
 ├── commands/                          # 5 top-level commands
@@ -44,7 +44,7 @@ digital-marketing-pro/
 │   ├── journey-orchestrator.md        # NEW in v2.1.0
 │   ├── quality-assurance.md           # NEW in v2.2.0
 │   └── localization-specialist.md     # NEW in v2.2.0
-├── scripts/                           # 95 Python scripts + requirements
+├── scripts/                           # 96 Python scripts + requirements
 │   ├── setup.py                       # Brand management, initialization
 │   ├── campaign-tracker.py            # Campaign persistence + violation tracking
 │   ├── adaptive-scorer.py             # Context-aware scoring weights
@@ -423,7 +423,7 @@ When enabled, these three reference lifecycle hooks wrap a Claude Code session w
 
 ## 8. Script Architecture
 
-All 95 scripts in `scripts/` follow consistent conventions.
+All 96 scripts in `scripts/` follow consistent conventions.
 
 ### Conventions
 
@@ -452,176 +452,175 @@ Brand profiles follow schema version `1.0.0` (defined in `setup.py` as `SCHEMA_V
 
 ## 9. MCP Configuration
 
-No `.mcp.json` ships (it is gitignored) — nothing auto-connects. The tables below are the *conceptual* connector catalog. The HTTP catalog lives in `.mcp.json.connectors-reference`; the npx catalog in `.mcp.json.example`.
+No `.mcp.json` ships (it is gitignored) — nothing auto-connects. The tables below are the connector catalog by service. Vendor-hosted HTTP servers live in `.mcp.json.connectors-reference`; `.mcp.json.example` holds runnable entries only for packages the vendor itself publishes on npm, pinned to an exact version (`scripts/_connector_registry.py` VERIFIED_NPX_PACKAGES, enforced by `tests/test_npx_allowlist.py`).
 
-> **Package verification required.** The `Package` column below is illustrative and **not all names are verified on npm** — several are known-fictional (e.g. `@anthropic/mcp-google-analytics`, `mcp-salesforce`, `mcp-supermemory`/`graphiti-mcp`, `@notionhq/mcp-server`). See the `_warning` field in `.mcp.json.example` for the verified-vs-fictional breakdown. `npx` runs remote code, so verify any package on npm before use, or prefer `/digital-marketing-pro:add-integration` for a custom MCP path.
 
 ### Server List
 
 **Analytics & Measurement**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| google-analytics | @anthropic/mcp-google-analytics | GA4 traffic, conversions, audience data |
-| google-search-console | @anthropic/mcp-google-search-console | Rankings, queries, CTR for SEO |
-| mixpanel | mcp-mixpanel | Product analytics, event tracking, funnels (v2.0.0) |
-| amplitude | mcp-amplitude | Behavioral analytics, cohort analysis, experiments (v2.0.0) |
-| bigquery | mcp-bigquery | Data warehouse queries, marketing data exports (v2.0.0) |
+| google-analytics | no verified connector: set up from the vendor's docs | GA4 traffic, conversions, audience data |
+| google-search-console | no verified connector: set up from the vendor's docs | Rankings, queries, CTR for SEO |
+| mixpanel | no verified connector: set up from the vendor's docs | Product analytics, event tracking, funnels (v2.0.0) |
+| amplitude | vendor-hosted HTTP (see `.mcp.json.connectors-reference`) | Behavioral analytics, cohort analysis, experiments (v2.0.0) |
+| bigquery | no verified connector: set up from the vendor's docs | Data warehouse queries, marketing data exports (v2.0.0) |
 
 **Advertising Platforms**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| google-ads | mcp-google-ads | Campaign performance, keyword data, bids |
-| meta-marketing | mcp-meta-marketing | Facebook/Instagram ads, audience insights |
-| linkedin-marketing | mcp-linkedin-marketing | Ad performance, company page analytics |
-| tiktok-ads | mcp-tiktok-ads | TikTok campaign performance, creative insights |
+| google-ads | vendor-hosted HTTP (see `.mcp.json.connectors-reference`) | Campaign performance, keyword data, bids |
+| meta-marketing | vendor-hosted HTTP (see `.mcp.json.connectors-reference`) | Facebook/Instagram ads, audience insights |
+| linkedin-marketing | no verified connector: set up from the vendor's docs | Ad performance, company page analytics |
+| tiktok-ads | no verified connector: set up from the vendor's docs | TikTok campaign performance, creative insights |
 
 **CRM & Customer Data**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| hubspot | @anthropic/mcp-hubspot | CRM contacts, deals, email performance |
-| salesforce | mcp-salesforce | CRM pipeline, opportunity data, leads |
-| zoho-crm | mcp-zoho-crm | Zoho CRM contacts, deals, campaigns (v2.0.0) |
-| pipedrive | mcp-pipedrive | Pipedrive pipeline, activities, contacts (v2.0.0) |
+| hubspot | vendor-hosted HTTP (see `.mcp.json.connectors-reference`) | CRM contacts, deals, email performance |
+| salesforce | no verified connector: set up from the vendor's docs | CRM pipeline, opportunity data, leads |
+| zoho-crm | no verified connector: set up from the vendor's docs | Zoho CRM contacts, deals, campaigns (v2.0.0) |
+| pipedrive | no verified connector: set up from the vendor's docs | Pipedrive pipeline, activities, contacts (v2.0.0) |
 
 **Email & Marketing Automation**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| mailchimp | mcp-mailchimp | Email campaign analytics, list management |
-| activecampaign | mcp-activecampaign | Email automation, lead scoring, workflows |
-| sendgrid | mcp-sendgrid | Transactional and marketing email delivery (v2.0.0) |
-| klaviyo | mcp-klaviyo | eCommerce email/SMS, flows, segmentation (v2.0.0) |
-| customer-io | mcp-customer-io | Behavioral messaging, campaign orchestration (v2.0.0) |
-| brevo | mcp-brevo | Email, SMS, WhatsApp marketing campaigns (v2.0.0) |
-| mailgun | mcp-mailgun | Email delivery, validation, analytics (v2.0.0) |
+| mailchimp | no verified connector: set up from the vendor's docs | Email campaign analytics, list management |
+| activecampaign | no verified connector: set up from the vendor's docs | Email automation, lead scoring, workflows |
+| sendgrid | no verified connector: set up from the vendor's docs | Transactional and marketing email delivery (v2.0.0) |
+| klaviyo | vendor-hosted HTTP (see `.mcp.json.connectors-reference`) | eCommerce email/SMS, flows, segmentation (v2.0.0) |
+| customer-io | no verified connector: set up from the vendor's docs | Behavioral messaging, campaign orchestration (v2.0.0) |
+| brevo | no verified connector: set up from the vendor's docs | Email, SMS, WhatsApp marketing campaigns (v2.0.0) |
+| mailgun | no verified connector: set up from the vendor's docs | Email delivery, validation, analytics (v2.0.0) |
 
 **Social Media Publishing (v2.0.0)**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| twitter | mcp-twitter | Tweet posting, thread management, media upload |
-| instagram | mcp-instagram | Post scheduling, story publishing, Reels |
-| linkedin-publishing | mcp-linkedin-publishing | Company page posts, article publishing |
-| tiktok-content | mcp-tiktok-content | Video publishing, caption management |
-| youtube | mcp-youtube | Video uploads, metadata management, playlists |
-| pinterest | mcp-pinterest | Pin creation, board management, rich pins |
+| twitter | no verified connector: set up from the vendor's docs | Tweet posting, thread management, media upload |
+| instagram | no verified connector: set up from the vendor's docs | Post scheduling, story publishing, Reels |
+| linkedin-publishing | no verified connector: set up from the vendor's docs | Company page posts, article publishing |
+| tiktok-content | no verified connector: set up from the vendor's docs | Video publishing, caption management |
+| youtube | no verified connector: set up from the vendor's docs | Video uploads, metadata management, playlists |
+| pinterest | no verified connector: set up from the vendor's docs | Pin creation, board management, rich pins |
 
 **Commerce**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| stripe | @anthropic/mcp-stripe | Revenue data, conversion tracking, LTV |
-| shopify | mcp-shopify | eCommerce orders, products, customers, sales |
+| stripe | vendor-hosted HTTP (see `.mcp.json.connectors-reference`) | Revenue data, conversion tracking, LTV |
+| shopify | no verified connector: set up from the vendor's docs | eCommerce orders, products, customers, sales |
 
 **SEO & Competitive Intelligence**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| semrush | mcp-semrush | Keyword research, competitor analysis |
-| ahrefs | mcp-ahrefs | Backlink profiles, content gap analysis |
+| semrush | no verified connector: set up from the vendor's docs | Keyword research, competitor analysis |
+| ahrefs | vendor-hosted HTTP (see `.mcp.json.connectors-reference`) | Backlink profiles, content gap analysis |
 
 **Productivity & Reporting**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| google-sheets | @anthropic/mcp-google-sheets | Report exports, content calendars |
-| slack | @anthropic/mcp-slack | Marketing reports, campaign alerts |
+| google-sheets | no verified connector: set up from the vendor's docs | Report exports, content calendars |
+| slack | vendor-hosted HTTP (see `.mcp.json.connectors-reference`) | Marketing reports, campaign alerts |
 
 **CMS & Website (v2.0.0)**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| wordpress | mcp-wordpress | Content publishing, post management, SEO |
-| webflow | mcp-webflow | Webflow CMS publishing, collection management |
+| wordpress | no verified connector: set up from the vendor's docs | Content publishing, post management, SEO |
+| webflow | vendor-hosted HTTP (see `.mcp.json.connectors-reference`) | Webflow CMS publishing, collection management |
 
 **Memory & RAG (v2.0.0)**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| pinecone | mcp-pinecone | Vector storage for brand knowledge RAG |
-| qdrant | mcp-qdrant | Vector search for semantic knowledge retrieval |
-| supermemory | mcp-supermemory | Cross-session agent memory and learning |
-| graphiti | mcp-graphiti | Temporal knowledge graph for campaign relationships |
+| pinecone | no verified connector: set up from the vendor's docs | Vector storage for brand knowledge RAG |
+| qdrant | no verified connector: set up from the vendor's docs | Vector search for semantic knowledge retrieval |
+| supermemory | no verified connector: set up from the vendor's docs | Cross-session agent memory and learning |
+| graphiti | no verified connector: set up from the vendor's docs | Temporal knowledge graph for campaign relationships |
 
 **Knowledge Management (v2.0.0)**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| notion | mcp-notion | Team documentation, knowledge base, wikis |
-| google-drive | mcp-google-drive | Document storage, brand asset access |
+| notion | vendor-hosted HTTP (see `.mcp.json.connectors-reference`) | Team documentation, knowledge base, wikis |
+| google-drive | no verified connector: set up from the vendor's docs | Document storage, brand asset access |
 
 **Communication (v2.0.0)**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| twilio | mcp-twilio | SMS and WhatsApp message delivery |
-| intercom | mcp-intercom | Customer messaging, support inbox, articles |
+| twilio | no verified connector: set up from the vendor's docs | SMS and WhatsApp message delivery |
+| intercom | no verified connector: set up from the vendor's docs | Customer messaging, support inbox, articles |
 
 **Project Management & Testing (v2.0.0)**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| linear | mcp-linear | Task management, sprint tracking, issue boards |
-| optimizely | mcp-optimizely | A/B testing, feature flags, experimentation |
+| linear | no verified connector: set up from the vendor's docs | Task management, sprint tracking, issue boards |
+| optimizely | no verified connector: set up from the vendor's docs | A/B testing, feature flags, experimentation |
 
 **Database (v2.0.0)**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| supabase | mcp-supabase | PostgreSQL database, real-time data, auth |
+| supabase | no verified connector: set up from the vendor's docs | PostgreSQL database, real-time data, auth |
 
 **CRM (v2.1.0)**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| odoo | mcp-odoo | Odoo CRM contacts, deals, invoicing, inventory |
-| freshsales | mcp-freshsales | Freshsales CRM leads, deals, accounts, activities |
-| monday-crm | mcp-monday-crm | Monday CRM boards, deals, contacts, automations |
-| dynamics-365 | mcp-dynamics-365 | Microsoft Dynamics 365 CRM leads, opportunities, accounts |
-| copper | mcp-copper | Copper CRM contacts, deals, activities (Google Workspace native) |
-| close | mcp-close | Close CRM leads, activities, call tracking, sequences |
-| keap | mcp-keap | Keap (Infusionsoft) contacts, deals, automation, invoicing |
+| odoo | no verified connector: set up from the vendor's docs | Odoo CRM contacts, deals, invoicing, inventory |
+| freshsales | no verified connector: set up from the vendor's docs | Freshsales CRM leads, deals, accounts, activities |
+| monday-crm | no verified connector: set up from the vendor's docs | Monday CRM boards, deals, contacts, automations |
+| dynamics-365 | no verified connector: set up from the vendor's docs | Microsoft Dynamics 365 CRM leads, opportunities, accounts |
+| copper | no verified connector: set up from the vendor's docs | Copper CRM contacts, deals, activities (Google Workspace native) |
+| close | no verified connector: set up from the vendor's docs | Close CRM leads, activities, call tracking, sequences |
+| keap | no verified connector: set up from the vendor's docs | Keap (Infusionsoft) contacts, deals, automation, invoicing |
 
 **Project Management (v2.1.0)**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| jira | mcp-jira | Jira issues, sprints, boards, project tracking |
-| asana | mcp-asana | Asana tasks, projects, portfolios, timelines |
-| clickup | mcp-clickup | ClickUp tasks, spaces, goals, time tracking |
+| jira | no verified connector: set up from the vendor's docs | Jira issues, sprints, boards, project tracking |
+| asana | vendor-hosted HTTP (see `.mcp.json.connectors-reference`) | Asana tasks, projects, portfolios, timelines |
+| clickup | no verified connector: set up from the vendor's docs | ClickUp tasks, spaces, goals, time tracking |
 
 **Design Tools (v2.1.0)**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| canva | mcp-canva | Canva design creation, templates, brand kit access |
-| figma | mcp-figma | Figma design files, components, comments, exports |
+| canva | vendor-hosted HTTP (see `.mcp.json.connectors-reference`) | Canva design creation, templates, brand kit access |
+| figma | vendor-hosted HTTP (see `.mcp.json.connectors-reference`) | Figma design files, components, comments, exports |
 
 **SEO & Monitoring (v2.1.0)**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| moz | mcp-moz | Moz domain authority, keyword research, link analysis |
-| google-pagespeed | mcp-google-pagespeed | PageSpeed Insights, Core Web Vitals, performance scores |
+| moz | no verified connector: set up from the vendor's docs | Moz domain authority, keyword research, link analysis |
+| google-pagespeed | no verified connector: set up from the vendor's docs | PageSpeed Insights, Core Web Vitals, performance scores |
 
 **Marketing Automation (v2.1.0)**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| marketo | mcp-marketo | Marketo leads, campaigns, smart lists, email programs |
-| pardot | mcp-pardot | Pardot prospects, campaigns, engagement scoring, forms |
+| marketo | no verified connector: set up from the vendor's docs | Marketo leads, campaigns, smart lists, email programs |
+| pardot | no verified connector: set up from the vendor's docs | Pardot prospects, campaigns, engagement scoring, forms |
 
 **Translation Services (v2.2.0)**
 
-| Server | Package | Purpose |
+| Server | Setup | Purpose |
 |--------|---------|---------|
-| deepl | mcp-deepl | European and CJK translation, formality control, glossaries |
-| sarvam-ai | mcp-sarvam-ai | 22 Indic language translation, transliteration, language detection |
-| google-cloud-translation | mcp-google-cloud-translation | 100+ language translation, batch processing, adaptive translation |
-| lara-translate | mcp-lara-translate | Marketing-context translation, translation memories, brand consistency |
+| deepl | no verified connector: set up from the vendor's docs | European and CJK translation, formality control, glossaries |
+| sarvam-ai | no verified connector: set up from the vendor's docs | 22 Indic language translation, transliteration, language detection |
+| google-cloud-translation | no verified connector: set up from the vendor's docs | 100+ language translation, batch processing, adaptive translation |
+| lara-translate | no verified connector: set up from the vendor's docs | Marketing-context translation, translation memories, brand consistency |
 
 ### Configuration Pattern
 
@@ -630,7 +629,7 @@ No `.mcp.json` ships (it is gitignored) — nothing auto-connects. The tables be
   "mcpServers": {
     "server-name": {
       "command": "npx",
-      "args": ["-y", "@scope/mcp-package-name"],
+      "args": ["-y", "<vendor-package>@<exact-version>"],
       "env": {
         "API_KEY": "${ENV_VAR_NAME}"
       },
@@ -640,7 +639,7 @@ No `.mcp.json` ships (it is gitignored) — nothing auto-connects. The tables be
 }
 ```
 
-All 68 server credentials are referenced via `${ENV_VAR}` placeholders. Servers only activate when the corresponding environment variables are set. No credentials are stored in plugin code. The plugin works fully without any MCP servers enabled -- they add live data capabilities but are not required.
+Every runnable entry references its credentials via `${ENV_VAR}` placeholders, and a server only activates once you copy it into your own `.mcp.json`. A service marked "no verified connector" gets no command and no environment block: a package name the vendor does not publish could be registered by anyone, who would then receive the keys. No credentials are stored in plugin code. The plugin works fully without any MCP servers enabled -- they add live data capabilities but are not required.
 
 ---
 

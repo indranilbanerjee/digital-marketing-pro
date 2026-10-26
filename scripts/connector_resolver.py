@@ -41,10 +41,12 @@ from pathlib import Path
 from typing import Any
 
 from _connector_registry import (
+    NO_VERIFIED_CONNECTOR_NOTE,
     _load_mcp_json,
     find_connector,
     is_connector_configured,
     is_read_only,
+    verified_npx_args,
 )
 
 import os
@@ -1121,15 +1123,14 @@ def _build_setup_hint(candidates: list[str]) -> dict:
                 hint["url_placeholder"] = ("Replace the <...> part of the URL with your own "
                                            "endpoint before adding it.")
             hints.append(hint)
-        elif info.get("package_status") == "no-known-npm-package" or not info.get("package"):
+        elif verified_npx_args(info.get("package")) is None:
+            # No npx line and no env block: a name the vendor doesn't publish
+            # could be registered by anyone, who would receive these keys.
             hints.append({
                 "connector": c_name,
                 "transport": "unavailable",
-                "package_status": "no-known-npm-package",
-                "note": info.get(
-                    "note",
-                    "No verified MCP package on npm — use /digital-marketing-pro:add-integration "
-                    "to wire a custom server. npx runs remote code; verify any package before use."),
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
             })
         else:
             hints.append({
@@ -1139,7 +1140,7 @@ def _build_setup_hint(candidates: list[str]) -> dict:
                 "step_2_mcp_json_snippet": {
                     c_name: {
                         "command": "npx",
-                        "args": ["-y", info.get("package", "")],
+                        "args": verified_npx_args(info["package"]),
                         "env": {v: f"${{{v}}}" for v in info.get("env_vars", [])},
                     }
                 },

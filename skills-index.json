@@ -55,7 +55,7 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 6737
+      "bytes": 7138
     },
     {
       "name": "aeo-audit",
@@ -613,7 +613,7 @@
         "send-notification"
       ],
       "doc_files": 1,
-      "bytes": 7891
+      "bytes": 8563
     },
     {
       "name": "content-brief",
@@ -774,7 +774,7 @@
         "validate-profile"
       ],
       "doc_files": 56,
-      "bytes": 884461
+      "bytes": 885116
     },
     {
       "name": "continuous-improvement-loop",
@@ -2083,7 +2083,7 @@
         "serp-tracker"
       ],
       "doc_files": 2,
-      "bytes": 15766
+      "bytes": 15698
     },
     {
       "name": "recall",

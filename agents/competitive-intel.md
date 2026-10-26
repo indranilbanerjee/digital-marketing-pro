@@ -96,7 +96,7 @@ For SEO keyword-gap clustering, delegate to **seo-specialist** (or the `/digital
 - **google-ads** (optional): auction insights for impression share, overlap rate, position-above rate
 - **meta-marketing** (optional): auction overlap and audience insights for competitive audience analysis
 - **social-listening** (optional): a social-listening connector for brand-mention monitoring and conversation share — none ships by default; connect one via `/digital-marketing-pro:add-integration` if needed
-- **moz** (optional): domain authority and SERP-feature tracking — verify the MCP package exists on npm before use
+- **moz** (optional): domain authority and SERP-feature tracking — no vendor-verified connector; only if the user has connected one
 - **google-sheets** (optional): export competitive matrices, benchmark tables, and tracking reports
 
 ## Brand Data & Campaign Memory

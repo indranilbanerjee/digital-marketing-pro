@@ -6,6 +6,31 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.35.9] - 2026-10-27
+
+### Connector setup offers only vendor-verified, version-pinned packages
+
+`npx -y <package>` downloads and runs whatever is published under that name, with the API keys from the connector's environment block. DMP's connector catalog named many npm packages that the vendor does not publish. Checked against registry.npmjs.org on 2026-10-27, 51 of the 73 names did not exist, 3 had been unpublished, and most of the rest came from third parties. A name nobody has published can be registered by anyone, who would then receive the keys. Each fix below has a test that fails on the 3.35.8 code.
+
+**Changed — a runnable command only for the vendor's own package**
+
+- `scripts/_connector_registry.py` gains `VERIFIED_NPX_PACKAGES`: the only npm packages DMP offers to run. Each entry names the vendor's npm account, the vendor's repository and an exact version (the newest release at least 14 days old): `@pinecone-database/mcp@0.3.0`, `dataforseo-mcp-server@3.1.3` and `deepl-mcp-server@1.3.14`.
+- Every other connector that used to name a package now has none. `connector_resolver.py` (the setup hints in action stubs) and `connector-status.py` (status, list, check and setup guide) say "No vendor-verified connector: set it up from the vendor's own documentation" and print no `npx` line and no environment block. They report the transport as `unavailable`.
+- `.mcp.json.example` keeps only the three pinned vendor entries. It maps 13 services to the vendor's hosted HTTP server in `.mcp.json.connectors-reference` and lists the other 52 by service name under `_no_verified_connector`, with no package names.
+- `/digital-marketing-pro:connect` and `/digital-marketing-pro:add-integration` accept only the vendor's own server: a hosted endpoint, or an npm package whose maintainer and repository belong to the vendor, pinned to an exact version. Download counts and stars no longer count as evidence. The custom-MCP guide, the CRM, memory and rank-monitor references and the competitive-intel agent follow the same rule.
+- The docs no longer tell you to verify each npm package before use, because the code now enforces it: README, CONNECTORS, the integrations guide, architecture, getting started, SUBMISSION, TESTING-GUIDE and the connectors reference.
+
+**Added — checks that keep it that way**
+
+- `tests/test_npx_allowlist.py`: every allowlist entry is pinned and was verified within 120 days, every runnable entry in `.mcp.json.example` is allowlisted and pinned, no registry connector names an unverified package, no shipped doc shows `npx -y` for an unlisted name, and neither the resolver nor connector-status prints `npx` or an environment variable for one. Each check has a plant.
+- `scripts/npm_allowlist_check.py` asks registry.npmjs.org whether each allowlisted package still exists at its pinned version, maintained by the listed vendor account, from the listed repository. Exit 1 on any failure.
+- `.github/workflows/dated-checks.yml` runs every Monday: the npm check plus `tests/run_all.py --dated` (the tests that go red as time passes). On failure it opens, or comments on, one issue labelled `dated-check`, so a removed or transferred package is noticed even when nobody pushes.
+
+**Tests**
+
+- `tests/test_npx_allowlist.py` (17 tests). On the 3.35.8 code, 7 fail: the example, the registry, the prose, the resolver's hints and connector-status.
+- Suite: 717 tests.
+
 ## [3.35.8] - 2026-10-12
 
 ### The propose-only command works from any folder, and the script guards cover new folders by default

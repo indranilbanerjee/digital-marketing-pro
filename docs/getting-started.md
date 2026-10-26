@@ -37,7 +37,7 @@ That is it. Everything else is optional.
 **Optional but nice to have:**
 
 - **Python 3.10 or newer** --- unlocks advanced scoring features like brand voice analysis and content readability. The plugin works perfectly without Python; you just get bonus capabilities if it is installed.
-- **No API keys required** --- the plugin ships with 177 reference knowledge files that power all 16 marketing modules (including the v3.0 methodology and framework reference docs). The optional MCP integrations (13 registry-backed HTTP connectors (11 work in Cowork as-is; Google Ads MCP and Amazon Ads MCP need your own endpoint first), plus a 68-server opt-in catalog for Claude Code) use your own account credentials and can be configured later. Run `/digital-marketing-pro:integrations` to see which connectors are available and `/digital-marketing-pro:connect <name>` for step-by-step setup.
+- **No API keys required** --- the plugin ships with 177 reference knowledge files that power all 16 marketing modules (including the v3.0 methodology and framework reference docs). The optional MCP integrations (13 registry-backed HTTP connectors (11 work in Cowork as-is; Google Ads MCP and Amazon Ads MCP need your own endpoint first), plus a few vendor-published npm packages pinned to an exact version, for Claude Code) use your own account credentials and can be configured later. Run `/digital-marketing-pro:integrations` to see which connectors are available and `/digital-marketing-pro:connect <name>` for step-by-step setup.
 
 > **Bottom line:** If you can run Claude Code or Claude Cowork, you can use this plugin right now.
 
@@ -94,7 +94,7 @@ Installing plugin: digital-marketing-pro vX.Y.Z
   - 16 marketing modules loaded
   - 164 skills + 5 commands registered (/digital-marketing-pro:*)
   - 24 specialist agents available
-  - 13 HTTP connectors + a 68-server opt-in catalog available
+  - 13 HTTP connectors + pinned vendor packages and setup notes for the rest
   - Hooks ship empty (opt-in SessionStart/PreToolUse/SessionEnd reference config in hooks/hooks-reference.example.json)
   - 12-Part Engagement Methodology available (run /digital-marketing-pro:engagement to start)
 
@@ -669,7 +669,7 @@ Example output:
 
  ...
 
-Connected: 13 HTTP | Available: 68-server catalog
+Connected: 13 HTTP | Available: vendor-verified catalog
 Skills fully unlocked: 87/158 | Skills with enhanced capabilities: **158/158**
 ```
 
@@ -897,7 +897,7 @@ You are set up and ready to go. Here are some resources for when you want to go 
 
 - **Memory & RAG** --- Store and retrieve brand knowledge across sessions using Pinecone, Qdrant, or Supermemory vector databases. See the Memory & Knowledge commands above.
 
-- **Connecting your marketing tools** --- The plugin supports 13 registry-backed HTTP MCP connectors + a 68-server opt-in catalog spanning analytics, advertising, CRM, email, social publishing, memory/RAG, and more. See [docs/integrations-guide.md](integrations-guide.md) to connect your accounts.
+- **Connecting your marketing tools** --- The plugin supports 13 registry-backed HTTP MCP connectors, a few vendor-published npm packages pinned to an exact version, and setup notes for services with no vendor-verified connector, spanning analytics, advertising, CRM, email, social publishing, memory/RAG, and more. See [docs/integrations-guide.md](integrations-guide.md) to connect your accounts.
 
 - **KPI-driven strategy** --- Learn how to set up marketing KPI frameworks, build reporting dashboards, and track campaign performance over time in [docs/strategy-and-kpis.md](strategy-and-kpis.md).
 

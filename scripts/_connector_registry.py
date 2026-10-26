@@ -10,8 +10,9 @@ execution-tracker / seo-executor) import from here. Centralising the
 registry means a connector added in one place is automatically discoverable
 by every action that needs it.
 
-Three responsibilities:
+Four responsibilities:
   1. CONNECTOR_REGISTRY — the full catalog grouped by category
+  1a. VERIFIED_NPX_PACKAGES — the only npm packages DMP ever offers to run
   2. _load_mcp_json + is_connector_configured — probe whether a connector is reachable
   3. redact_secrets — credential-safe response filter
 
@@ -26,6 +27,61 @@ from pathlib import Path
 # Plugin root = parent of scripts/
 PLUGIN_ROOT = Path(__file__).resolve().parent.parent
 MCP_JSON = PLUGIN_ROOT / ".mcp.json"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# VERIFIED_NPX_PACKAGES — the only npm packages DMP ever offers to run
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# `npx -y <pkg>` downloads and runs whatever is published under that name, with
+# the API keys from its env block. A name nobody has published can be
+# registered by anyone, who would then receive those keys. So a runnable
+# command ships only for a package the vendor itself publishes, pinned to an
+# exact version; every other service gets NO_VERIFIED_CONNECTOR_NOTE and no
+# npx line or env block. Prefer the vendor's hosted HTTP server where one
+# exists (.mcp.json.connectors-reference).
+#
+# Per entry: version (exact pin), npm_maintainer (the vendor's npm account),
+# repository (the vendor's own repo), vendor, verified_on. To add one, check
+# registry.npmjs.org and the vendor's docs, pin a release at least 14 days old,
+# and run tests/test_npx_allowlist.py. The weekly dated-checks job re-checks
+# every entry against the npm registry (scripts/npm_allowlist_check.py).
+VERIFIED_NPX_PACKAGES = {
+    "@pinecone-database/mcp": {
+        "version": "0.3.0",
+        "npm_maintainer": "pinecone-ops",
+        "repository": "https://github.com/pinecone-io/pinecone-mcp",
+        "vendor": "Pinecone",
+        "verified_on": "2026-10-27",
+    },
+    "dataforseo-mcp-server": {
+        "version": "3.1.3",
+        "npm_maintainer": "dataforseo",
+        "repository": "https://github.com/dataforseo/mcp-server-typescript",
+        "vendor": "DataForSEO",
+        "verified_on": "2026-10-27",
+    },
+    "deepl-mcp-server": {
+        "version": "1.3.14",
+        "npm_maintainer": "deepl-com",
+        "repository": "https://github.com/DeepL/deepl-mcp-server",
+        "vendor": "DeepL",
+        "verified_on": "2026-10-27",
+    },
+}
+
+NO_VERIFIED_CONNECTOR_NOTE = (
+    "No vendor-verified connector: set it up from the vendor's own documentation, or "
+    "wire a server you have vetted with /digital-marketing-pro:add-integration. DMP "
+    "offers a runnable command only for packages the vendor itself publishes, pinned "
+    "to an exact version.")
+
+
+def verified_npx_args(package):
+    """['-y', 'pkg@x.y.z'] for an allowlisted vendor package; None for anything else."""
+    entry = VERIFIED_NPX_PACKAGES.get(package or "")
+    return ["-y", f"{package}@{entry['version']}"] if entry else None
+
 
 
 CONNECTOR_REGISTRY = {
@@ -44,8 +100,8 @@ CONNECTOR_REGISTRY = {
             "intercom": {
                 "transport": "npx",
                 "package": None,
-                "package_status": "no-known-npm-package",
-                "note": "No verified MCP package on npm — use /digital-marketing-pro:add-integration to wire a custom server. npx runs remote code; verify any package before use.",
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "Intercom — customer messaging, churn detection",
                 "env_vars": ["INTERCOM_ACCESS_TOKEN"],
                 "skills_unlocked": ["send-notification"],
@@ -93,8 +149,8 @@ CONNECTOR_REGISTRY = {
             "salesforce": {
                 "transport": "npx",
                 "package": None,
-                "package_status": "no-known-npm-package",
-                "note": "No verified MCP package on npm — use /digital-marketing-pro:add-integration to wire a custom server. npx runs remote code; verify any package before use.",
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "Salesforce — CRM pipeline, leads, accounts",
                 "env_vars": ["SALESFORCE_INSTANCE_URL", "SALESFORCE_ACCESS_TOKEN"],
                 "skills_unlocked": [
@@ -103,7 +159,9 @@ CONNECTOR_REGISTRY = {
             },
             "pipedrive": {
                 "transport": "npx",
-                "package": "mcp-pipedrive",
+                "package": None,
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "Pipedrive — deal pipeline, contacts, activities",
                 "env_vars": ["PIPEDRIVE_API_TOKEN"],
                 "skills_unlocked": [
@@ -112,7 +170,9 @@ CONNECTOR_REGISTRY = {
             },
             "zoho-crm": {
                 "transport": "npx",
-                "package": "mcp-zoho-crm",
+                "package": None,
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "Zoho CRM — leads, contacts, deals, campaigns",
                 "env_vars": ["ZOHO_CLIENT_ID", "ZOHO_CLIENT_SECRET", "ZOHO_REFRESH_TOKEN"],
                 "skills_unlocked": [
@@ -145,15 +205,17 @@ CONNECTOR_REGISTRY = {
             "semrush": {
                 "transport": "npx",
                 "package": None,
-                "package_status": "no-known-npm-package",
-                "note": "No verified MCP package on npm — use /digital-marketing-pro:add-integration to wire a custom server. npx runs remote code; verify any package before use.",
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "SEMrush — keyword research, site audit, backlinks",
                 "env_vars": ["SEMRUSH_API_KEY"],
                 "skills_unlocked": ["seo-audit", "keyword-research", "competitor-analysis"],
             },
             "moz": {
                 "transport": "npx",
-                "package": "mcp-moz",
+                "package": None,
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "Moz — domain authority, rank tracking, SERP",
                 "env_vars": ["MOZ_ACCESS_ID", "MOZ_SECRET_KEY"],
                 "skills_unlocked": ["seo-audit", "keyword-research"],
@@ -175,28 +237,36 @@ CONNECTOR_REGISTRY = {
             },
             "mailchimp": {
                 "transport": "npx",
-                "package": "mcp-mailchimp",
+                "package": None,
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "Mailchimp — email campaigns, lists, automation",
                 "env_vars": ["MAILCHIMP_API_KEY"],
                 "skills_unlocked": ["send-email-campaign", "email-sequence"],
             },
             "sendgrid": {
                 "transport": "npx",
-                "package": "mcp-sendgrid",
+                "package": None,
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "SendGrid — transactional + marketing email",
                 "env_vars": ["SENDGRID_API_KEY"],
                 "skills_unlocked": ["send-email-campaign"],
             },
             "brevo": {
                 "transport": "npx",
-                "package": "mcp-brevo",
+                "package": None,
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "Brevo — email/SMS/WhatsApp, automation, CRM",
                 "env_vars": ["BREVO_API_KEY"],
                 "skills_unlocked": ["send-email-campaign", "send-sms"],
             },
             "customer-io": {
                 "transport": "npx",
-                "package": "mcp-customer-io",
+                "package": None,
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "Customer.io — behavioral email/SMS, segments",
                 "env_vars": ["CUSTOMERIO_API_KEY"],
                 "skills_unlocked": ["send-email-campaign", "email-sequence"],
@@ -208,7 +278,9 @@ CONNECTOR_REGISTRY = {
         "connectors": {
             "google-ads": {
                 "transport": "npx",
-                "package": "mcp-google-ads",
+                "package": None,
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "Google Ads — campaigns, keywords, bid optimization",
                 "env_vars": [
                     "GOOGLE_ADS_CUSTOMER_ID", "GOOGLE_ADS_DEVELOPER_TOKEN",
@@ -222,8 +294,8 @@ CONNECTOR_REGISTRY = {
             "meta-marketing": {
                 "transport": "npx",
                 "package": None,
-                "package_status": "no-known-npm-package",
-                "note": "No verified MCP package on npm — use /digital-marketing-pro:add-integration to wire a custom server. npx runs remote code; verify any package before use.",
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "Meta — Facebook/Instagram ads, audiences",
                 "env_vars": ["META_ACCESS_TOKEN", "META_AD_ACCOUNT_ID"],
                 "skills_unlocked": [
@@ -233,7 +305,9 @@ CONNECTOR_REGISTRY = {
             },
             "linkedin-marketing": {
                 "transport": "npx",
-                "package": "mcp-linkedin-marketing",
+                "package": None,
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "LinkedIn Ads — B2B targeting, company pages",
                 "env_vars": ["LINKEDIN_ACCESS_TOKEN", "LINKEDIN_AD_ACCOUNT_ID"],
                 "skills_unlocked": [
@@ -242,7 +316,9 @@ CONNECTOR_REGISTRY = {
             },
             "tiktok-ads": {
                 "transport": "npx",
-                "package": "mcp-tiktok-ads",
+                "package": None,
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "TikTok Ads — campaigns, creative insights",
                 "env_vars": ["TIKTOK_ACCESS_TOKEN", "TIKTOK_ADVERTISER_ID"],
                 "skills_unlocked": [
@@ -318,8 +394,8 @@ CONNECTOR_REGISTRY = {
             "google-analytics": {
                 "transport": "npx",
                 "package": None,
-                "package_status": "no-known-npm-package",
-                "note": "No verified MCP package on npm — use /digital-marketing-pro:add-integration to wire a custom server. npx runs remote code; verify any package before use.",
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "Google Analytics 4 — traffic, conversions, audiences",
                 "env_vars": ["GA_PROPERTY_ID", "GOOGLE_APPLICATION_CREDENTIALS"],
                 "skills_unlocked": [
@@ -329,7 +405,9 @@ CONNECTOR_REGISTRY = {
             },
             "google-search-console": {
                 "transport": "npx",
-                "package": "@anthropic/mcp-google-search-console",
+                "package": None,
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "Google Search Console — rankings, queries, CTR",
                 "env_vars": ["GSC_SITE_URL", "GOOGLE_APPLICATION_CREDENTIALS"],
                 "skills_unlocked": [
@@ -343,21 +421,27 @@ CONNECTOR_REGISTRY = {
         "connectors": {
             "meta-graph": {
                 "transport": "npx",
-                "package": "mcp-meta-graph",
+                "package": None,
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "Meta Graph API — Facebook/Instagram organic posting",
                 "env_vars": ["META_PAGE_ACCESS_TOKEN", "META_PAGE_ID"],
                 "skills_unlocked": ["schedule-social", "social-strategy"],
             },
             "linkedin-publishing": {
                 "transport": "npx",
-                "package": "mcp-linkedin-publishing",
+                "package": None,
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "LinkedIn — company page posts, analytics",
                 "env_vars": ["LINKEDIN_ACCESS_TOKEN", "LINKEDIN_COMPANY_ID"],
                 "skills_unlocked": ["schedule-social", "social-strategy"],
             },
             "twitter-x": {
                 "transport": "npx",
-                "package": "mcp-twitter-x",
+                "package": None,
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "Twitter/X — tweet scheduling, analytics",
                 "env_vars": ["TWITTER_API_KEY", "TWITTER_API_SECRET",
                              "TWITTER_ACCESS_TOKEN", "TWITTER_ACCESS_SECRET"],
@@ -365,14 +449,18 @@ CONNECTOR_REGISTRY = {
             },
             "buffer": {
                 "transport": "npx",
-                "package": "mcp-buffer",
+                "package": None,
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "Buffer — cross-platform scheduling, analytics",
                 "env_vars": ["BUFFER_ACCESS_TOKEN"],
                 "skills_unlocked": ["schedule-social", "social-strategy"],
             },
             "hootsuite": {
                 "transport": "npx",
-                "package": "mcp-hootsuite",
+                "package": None,
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "Hootsuite — multi-platform scheduling",
                 "env_vars": ["HOOTSUITE_ACCESS_TOKEN"],
                 "skills_unlocked": ["schedule-social", "social-strategy"],
@@ -409,15 +497,17 @@ CONNECTOR_REGISTRY = {
             "cision": {
                 "transport": "npx",
                 "package": None,
-                "package_status": "no-known-npm-package",
-                "note": "No verified MCP package on npm — use /digital-marketing-pro:add-integration to wire a custom server. npx runs remote code; verify any package before use.",
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "Cision — press release distribution, journalist database",
                 "env_vars": ["CISION_API_KEY"],
                 "skills_unlocked": ["pr-pitch", "digital-pr"],
             },
             "muckrack": {
                 "transport": "npx",
-                "package": "mcp-muckrack",
+                "package": None,
+                "package_status": "no-verified-package",
+                "note": NO_VERIFIED_CONNECTOR_NOTE,
                 "description": "Muck Rack — journalist database, pitch tracking",
                 "env_vars": ["MUCKRACK_API_KEY"],
                 "skills_unlocked": ["pr-pitch", "digital-pr"],

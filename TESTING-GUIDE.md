@@ -102,9 +102,9 @@ mv ~/.claude-marketing ~/.claude-marketing.before-test
 - [ ] `agents/` — 24 agent .md files (all with YAML frontmatter)
 - [ ] `commands/` — 18 command .md files
 - [ ] `skills/` — 158 skill directories, each with SKILL.md
-- [ ] `scripts/` — 95 Python scripts
+- [ ] `scripts/` — 96 Python scripts
 - [ ] `.mcp.json` — not shipped (gitignored); zero auto-connecting MCPs
-- [ ] `.mcp.json.example` — illustrative npx catalog (opt-in; verify packages before use)
+- [ ] `.mcp.json.example` — runnable entries only for vendor-published npm packages, pinned (`tests/test_npx_allowlist.py`)
 - [ ] `hooks/hooks.json` — ships `{"hooks":{}}` (zero global hooks)
 - [ ] `docs/` — 16 documentation guides
 - [ ] `CONNECTORS.md` — Connector reference with `~~category` placeholders
@@ -358,7 +358,7 @@ DM Pro has 24 specialist agents. Verify they register correctly and respond when
 
 ## 6. Script Tests
 
-DM Pro has 95 Python scripts. Test key scripts that are critical to plugin operation.
+DM Pro has 96 Python scripts. Test key scripts that are critical to plugin operation.
 
 ### 6.1 Core Scripts
 

@@ -1,0 +1,70 @@
+# Dated checks — runs the checks that can go red while nobody pushes, every week.
+#
+# A quiet repo never runs push-only tests. This job runs:
+#   * `tests/run_all.py --dated`: provenance stamps and re-verification ages
+#     that fail as time passes;
+#   * `scripts/npm_allowlist_check.py`: every vendor npm package DMP offers to
+#     run with `npx` still exists on registry.npmjs.org at its pinned version,
+#     maintained by the vendor's account. A removed or transferred name could
+#     otherwise be registered by someone else, who would receive the API keys
+#     in that connector's environment block.
+# On failure it opens (or comments on) one issue labelled `dated-check`.
+# Stdlib only; no secrets beyond the built-in GITHUB_TOKEN.
+name: Dated checks
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  dated:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run the dated tests
+        id: dated
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python tests/run_all.py --dated 2>&1 | tee dated-output.txt
+      - name: Check the npm allowlist against the registry
+        id: npm
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python scripts/npm_allowlist_check.py 2>&1 | tee npm-output.txt
+      - name: Open or update the dated-check issue
+        if: steps.dated.outcome == 'failure' || steps.npm.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create dated-check --color B60205 \
+            --description "A weekly dated check (stamp, allowlist, sunset) failed" --force
+          {
+            echo "The weekly dated checks failed on $(date -u +%Y-%m-%d)."
+            echo "Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo
+            echo "Dated tests: ${{ steps.dated.outcome }} · npm allowlist: ${{ steps.npm.outcome }}"
+            echo
+            echo '```'
+            tail -n 40 dated-output.txt
+            echo '---'
+            cat npm-output.txt
+            echo '```'
+          } > body.md
+          existing=$(gh issue list --label dated-check --state open --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body-file body.md
+          else
+            gh issue create --title "Dated checks failed: a stamp, allowlist entry or sunset needs attention" \
+              --label dated-check --body-file body.md
+          fi
+          exit 1
