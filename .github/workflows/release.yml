@@ -1,0 +1,81 @@
+# Release — creates the GitHub release for each new version.
+#
+# Versions shipped without a GitHub release leave the repository page showing an old
+# "Latest" release: on 2026-10-27 it showed v3.17.0 while 3.39.1 was installed.
+# On every push to the default branch that changes the manifest, this reads the
+# version, finds the commit that set it, and, if no release has that tag yet,
+# creates one there with the matching CHANGELOG.md entry as its notes and marks it
+# Latest. A version that already has a release is left alone, so a re-run is safe.
+# Run it by hand (workflow_dispatch) to release the current version.
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths: [".claude-plugin/plugin.json"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Read the version and its CHANGELOG entry
+        id: entry
+        env:
+          MANIFEST: .claude-plugin/plugin.json
+        run: |
+          python - <<'PY'
+          import json, os, re, subprocess, sys
+          manifest = json.load(open(os.environ["MANIFEST"], encoding="utf-8-sig"))
+          version = manifest.get("version") or manifest.get("metadata", {}).get("version")
+          if not version:
+              sys.exit(f"{os.environ['MANIFEST']} states no version")
+          text = open("CHANGELOG.md", encoding="utf-8-sig").read()
+          m = re.search(r"^## \[" + re.escape(version) + r"\][^\n]*\n(.*?)(?=^## \[|\Z)", text, re.M | re.S)
+          if not m:
+              sys.exit(f"CHANGELOG.md has no entry for {version}")
+          body = m.group(1).strip()
+          sha = subprocess.run(["git", "log", "-1", "--format=%H", "-S", f'"version": "{version}"',
+                                "--", os.environ["MANIFEST"]], capture_output=True, text=True).stdout.strip()
+          sha = sha or os.environ["GITHUB_SHA"]
+          head = re.match(r"#{3,4}\s+([^\n]+)\n*", body)
+          if head:
+              summary, body = head.group(1).strip(), body[head.end():].strip()
+          else:
+              subject = subprocess.run(["git", "log", "-1", "--format=%s", sha],
+                                       capture_output=True, text=True).stdout.strip()
+              summary = re.sub(r"^v?" + re.escape(version) + r"\s*[:\-—]\s*", "", subject)
+          title = f"v{version}: {summary}" if summary else f"v{version}"
+          if len(title) > 120:
+              title = title[:117].rstrip() + "..."
+          open("release-notes.md", "w", encoding="utf-8").write(body + "\n")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
+              out.write(f"version={version}\nsha={sha}\ntitle={title}\n")
+          print(f"v{version} at {sha[:10]}: {title}")
+          PY
+      - name: Create the release if it doesn't exist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.entry.outputs.version }}
+          SHA: ${{ steps.entry.outputs.sha }}
+          TITLE: ${{ steps.entry.outputs.title }}
+        run: |
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "v$VERSION already has a release"
+            exit 0
+          fi
+          gh release create "v$VERSION" --target "$SHA" --title "$TITLE" \
+            --notes-file release-notes.md --latest
