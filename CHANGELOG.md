@@ -6,6 +6,50 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.39.1] - 2026-10-27
+
+### The model router's offline check reads the deprecations record too; a cut-off list is refused
+
+**Fixed: offline, a named model is checked against the hint book's deprecations record as well as the registry**
+
+- Found from an installed SocialForge copy. With `MODEL_ROUTER_OFFLINE=1`, asking for `gemini-2.0-flash` sent it (exit 0) with only "not in the shipped registry, so its lifecycle could not be checked". The hint book's Google record, which ships beside the router, marks it shut down since 2026-06-01. Asking for `gemini-3.5-flash` warned that it was deprecated, but not that Google routes its requests to `gemini-3.6-flash`.
+- Every path without a live list now reads the record as well: `MODEL_ROUTER_OFFLINE`, a timeout, provider trouble, or a list without lifecycle fields. The record is local data, not a call. Its fields mean what they mean on the live path:
+  - `shut_down` (Google), or an OpenAI shutdown date already past: refused with exit 2, naming the record's replacement;
+  - `redirects_to`: a warning that the answer comes from the other model;
+  - a future shutdown date: a warning with that date;
+  - a past date on a Google row the page does not grey out: a warning that the model may stop at any time.
+
+  A fine-tuned OpenAI model follows its base model's row.
+- Where the record and the shipped registry disagree, the stricter one wins: retired over redirected over deprecated, then the earlier shutdown date. The message names its source, "according to the shipped registry" or "according to the hint book's google deprecations record (read 2026-10-27)". A model in neither gets a warning that says so.
+- The AI-visibility checker's OpenAI leg gets the same check offline from DMP's `deprecations.openai` record. For example, after 2026-12-11 a run naming `o3` (not in the registry) stops and names `gpt-5.6-sol`.
+- The two sources do disagree in practice. The shipped registry still lists `gpt-5.1` as current, while OpenAI's deprecations page (read 2026-10-27) retires it on 2027-04-01. Offline, the record's warning now shows.
+
+**Added: `record_applies=False` (CLI: `--ignore-deprecations-record`)**
+
+- A caller whose request goes to a different service than the one the record describes can say so. SocialForge forces offline for Vertex AI runs, and Vertex retires Gemini models on its own schedule, so the Gemini API record must not refuse a Vertex pin.
+- The record is then ignored for that call, live and offline, including its staleness warning, and no cache is read or written. The shipped registry still applies.
+
+**Fixed: a model list still going after 20 pages is refused, never used short**
+
+- `_pages` in `scripts/model_router.py` stopped after 20 pages and returned what it had. A short list makes a listed model look unlisted, both to the router and to the drift report. It now raises a schema error.
+- The router falls back to the shipped default, tagged offline, with the reason. `scripts/refresh_models.py` reports the provider as skipped.
+- The Evolink reader in `refresh_models.py` does the same.
+- The cap is 20 pages: 20,000 models at the 1,000-per-page size the router asks for.
+
+**Router copies**
+
+- `scripts/model_router.py` changed, so the copy in [SocialForge](https://github.com/indranilbanerjee/socialforge) is re-copied from this commit's blob and its pinned sha256 is updated.
+
+**Tests**
+
+- 14 new tests, written before the change. All 14 fail on the 3.39.0 router (b71cd44).
+- `tests/test_model_router.py`:
+  - `TestOfflineRecord` (11): Google shut down, redirected and future shutdown; a list timeout; the stricter source winning in both directions; a model in neither source; `record_applies=False`; the CLI reproduction from the installed copy; OpenAI past and future shutdowns and a fine-tune; the checker's OpenAI leg.
+  - `TestPageCap` (2): 20 pages read and a 21st refused, for Anthropic and Google; the route's offline fallback.
+- `tests/test_refresh_models.py` (1): Evolink cut at the cap is reported as skipped.
+- One 3.39.0 test (registry check offline) now uses a model only the registry knows. With both sources agreeing on `gemini-2.0-flash`, the record's message is the one shown.
+- Suite: 882 tests.
+
 ## [3.39.0] - 2026-10-27
 
 ### The model router reaches Google; a replacement taken from a deprecations page is named as the vendor's

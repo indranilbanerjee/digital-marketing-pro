@@ -46,7 +46,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from resolve_model import _find_registry, get_registry  # noqa: E402
-from model_router import FetchError, fetch_anthropic, fetch_google, fetch_openai  # noqa: E402
+from model_router import MAX_PAGES, FetchError, fetch_anthropic, fetch_google, fetch_openai  # noqa: E402
 
 EVOLINK_MODELS_URL = "https://direct.evolink.ai/v1/models"
 TIMEOUT_S = 15
@@ -80,14 +80,15 @@ def list_gemini(urlopen=None) -> set[str] | None:
 def list_evolink(urlopen=None) -> set[str] | None:
     """Evolink's docs (index read 2026-10-27) do not describe this endpoint. It answers in
     OpenAI's shape, so it is read the same way: one page, or more while has_more and
-    last_id say there is another."""
+    last_id say there is another. A list still going after MAX_PAGES is an error, not a
+    short set (a short set would report models STALE)."""
     key = os.environ.get("EVOLINK_API_KEY")
     if not key:
         return None
     opener = urlopen or urllib.request.urlopen
     ids: set[str] = set()
     after = None
-    for _ in range(20):
+    for _ in range(MAX_PAGES):
         url = EVOLINK_MODELS_URL + ("?" + urllib.parse.urlencode({"after": after}) if after else "")
         req = urllib.request.Request(url, headers={"Authorization": f"Bearer {key}"})
         try:
@@ -102,8 +103,8 @@ def list_evolink(urlopen=None) -> set[str] | None:
         ids |= {m["id"] for m in page["data"] if isinstance(m, dict) and isinstance(m.get("id"), str)}
         after = page.get("has_more") and page.get("last_id")
         if not after:
-            break
-    return ids
+            return ids
+    raise FetchError("schema", f"the model list had more than {MAX_PAGES} pages; a partial list is not used")
 
 
 def diff(registry_ids: set[str], live_ids: set[str]) -> dict[str, list[str]]:

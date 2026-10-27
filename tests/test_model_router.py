@@ -634,11 +634,12 @@ class TestGooglePresenceOnly(GoogleCase):
         self.assertEqual((r["basis"], r["offline"], r["model"]), ("offline", True, "gemini-3.6-flash"))
 
     def test_offline_checks_the_shipped_registry(self):
-        registry = {"models": [{"id": "gemini-2.0-flash", "status": "retired", "shutdown_date": "2026-06-01",
+        # A model only the registry knows (the record has no gemini-1.5 rows), so the registry speaks.
+        registry = {"models": [{"id": "gemini-1.5-flash", "status": "retired", "shutdown_date": "2025-09-24",
                                 "replacement_id": "gemini-3.6-flash"}]}
         with self.assertRaises(mr.RouterError) as ctx:
-            self.g(GFetch(), requested="gemini-2.0-flash", env={"MODEL_ROUTER_OFFLINE": "1"}, registry=registry)
-        self.assertTrue(str(ctx.exception).startswith("gemini-2.0-flash is retired"), str(ctx.exception))
+            self.g(GFetch(), requested="gemini-1.5-flash", env={"MODEL_ROUTER_OFFLINE": "1"}, registry=registry)
+        self.assertTrue(str(ctx.exception).startswith("gemini-1.5-flash is retired"), str(ctx.exception))
         self.assertIn("shipped registry", str(ctx.exception))
         self.assertIn("gemini-3.6-flash", str(ctx.exception))
 
@@ -782,6 +783,174 @@ class TestOfflineLifecycle(RouterCase):
                               capture_output=True, text=True, timeout=60, env=env)
         self.assertEqual(proc.returncode, 2, proc.stdout + proc.stderr)
         self.assertIn("claude-haiku-5-5", proc.stdout)
+
+
+class TestOfflineRecord(unittest.TestCase):
+    """Without the live list, a named model is checked against the hint book's deprecations
+    record as well as the shipped registry: the record ships beside the router and is local
+    data, not a call. Found from an installed copy: offline, a requested gemini-2.0-flash
+    (shut_down in the record) was sent with only "not in the shipped registry", and
+    gemini-3.5-flash warned as deprecated without saying its endpoint redirects. The stricter
+    source wins and the message names it. Planted before the change (they fail on b71cd44)."""
+
+    LATER = datetime(2026, 12, 12, tzinfo=timezone.utc)
+
+    def go(self, provider, requested, registry=None, now=NOW, env=None, fetch=None, hints=None, **kw):
+        job, cred, key, default = {"google": (G_JOB, G_CRED, G_KEY, "gemini-3.6-flash"),
+                                   "openai": (OAI_JOB, OAI_CRED, OAI_KEY, "gpt-6.1-sol")}[provider]
+        with redirect_stderr(io.StringIO()):
+            return mr.route(job, hints or GHINTS, provider=provider, credential_name=cred, api_key=key,
+                            default_model=default, requested=requested, fetch=fetch or GFetch(), cache_path=None,
+                            now=now, env={"MODEL_ROUTER_OFFLINE": "1"} if env is None else env,
+                            registry={"models": []} if registry is None else registry, **kw)
+
+    def test_google_shut_down_in_the_record_is_refused(self):
+        with self.assertRaises(mr.RouterError) as ctx:
+            self.go("google", "gemini-2.0-flash")
+        self.assertEqual(ctx.exception.exit_code, 2)
+        text = str(ctx.exception)
+        self.assertTrue(text.startswith("gemini-2.0-flash is retired"), text)
+        self.assertIn("gemini-3.6-flash", text)
+        self.assertIn("google deprecations record", text)
+
+    def test_google_redirect_in_the_record_says_where_the_answer_comes_from(self):
+        registry = {"models": [{"id": "gemini-3.5-flash", "status": "deprecated", "replacement_id": "gemini-3.6-flash"}]}
+        r = self.go("google", "gemini-3.5-flash", registry=registry)
+        joined = " ".join(r["warnings"])
+        self.assertEqual((r["model"], r["basis"], r["replacement"]), ("gemini-3.5-flash", "offline", "gemini-3.6-flash"))
+        self.assertIn("routes requests for it to gemini-3.6-flash", joined)
+        self.assertIn("google deprecations record", joined)
+        self.assertNotIn("shipped registry", joined)  # the stricter source wins; one warning, not two
+
+    def test_google_future_shutdown_warns_with_its_date(self):
+        r = self.go("google", "gemini-3.1-flash-lite")
+        joined = " ".join(r["warnings"])
+        self.assertIn("2027-05-07", joined)
+        self.assertIn("gemini-3.5-flash-lite", joined)
+        self.assertIn("google deprecations record", joined)
+        self.assertNotIn("not in the shipped registry", joined)
+
+    def test_a_list_timeout_takes_the_same_check(self):
+        with self.assertRaises(mr.RouterError):
+            self.go("google", "gemini-2.0-flash", env={}, fetch=GFetch(error=mr.FetchError("timeout", "timed out")))
+
+    def test_the_stricter_source_wins_and_is_named(self):
+        current = {"models": [{"id": "gemini-2.0-flash", "status": "current"}]}
+        with self.assertRaises(mr.RouterError) as ctx:
+            self.go("google", "gemini-2.0-flash", registry=current)
+        self.assertIn("deprecations record", str(ctx.exception))
+        retired = {"models": [{"id": "gemini-3.1-flash-lite", "status": "retired", "shutdown_date": "2026-06-01",
+                               "replacement_id": "gemini-3.5-flash-lite"}]}
+        with self.assertRaises(mr.RouterError) as ctx:
+            self.go("google", "gemini-3.1-flash-lite", registry=retired)
+        self.assertIn("shipped registry", str(ctx.exception))
+
+    def test_a_model_neither_source_knows_is_named(self):
+        r = self.go("google", "gemini-imaginary-9")
+        self.assertTrue(any("not in the shipped registry or the hint book's google deprecations record" in w
+                            for w in r["warnings"]), r["warnings"])
+
+    def test_a_caller_can_say_the_record_does_not_apply(self):
+        """SocialForge's Vertex runs: Vertex retires Gemini models on its own schedule."""
+        r = self.go("google", "gemini-2.0-flash", record_applies=False)
+        self.assertEqual((r["model"], r["basis"]), ("gemini-2.0-flash", "offline"))
+        self.assertFalse(any("deprecations record" in w for w in r["warnings"]), r["warnings"])
+        stale = copy.deepcopy(GHINTS)
+        stale["deprecations"]["google"]["read_on"] = "2026-08-01"
+        r = self.go("google", "gemini-3.6-flash", hints=stale, record_applies=False)
+        self.assertEqual(r["warnings"], [f"gemini-3.6-flash is not in the shipped registry, so its lifecycle could "
+                                         f"not be checked without the live list"])
+
+    def test_cli_repro_from_the_installed_copy(self):
+        """MODEL_ROUTER_OFFLINE=1 --requested gemini-2.0-flash exited 0 from an installed copy."""
+        import subprocess
+        with tempfile.TemporaryDirectory() as tmp:
+            hints, reg = Path(tmp, "hints.json"), Path(tmp, "registry.json")
+            hints.write_text(json.dumps(GHINTS), encoding="utf-8")
+            reg.write_text(json.dumps({"aliases": {"latest-vision-google": "gemini-3.6-flash"}, "models": []}),
+                           encoding="utf-8")
+            base = [sys.executable, str(SCRIPTS / "model_router.py"), "--hints", str(hints), "--registry", str(reg),
+                    "--job", G_JOB, "--provider", "google", "--credential-name", G_CRED,
+                    "--requested", "gemini-2.0-flash"]
+            env = dict(os.environ, MODEL_ROUTER_OFFLINE="1")
+            proc = subprocess.run(base, capture_output=True, text=True, timeout=60, env=env)
+            self.assertEqual(proc.returncode, 2, proc.stdout + proc.stderr)
+            self.assertIn("gemini-3.6-flash", json.loads(proc.stdout)["error"])
+            proc = subprocess.run(base + ["--ignore-deprecations-record"], capture_output=True, text=True,
+                                  timeout=60, env=env)
+            self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+            self.assertEqual(json.loads(proc.stdout)["model"], "gemini-2.0-flash")
+
+    def test_openai_past_shutdown_in_the_record_is_refused(self):
+        with self.assertRaises(mr.RouterError) as ctx:
+            self.go("openai", "o3", now=self.LATER, hints=HINTS)
+        self.assertTrue(str(ctx.exception).startswith("o3 is retired"), str(ctx.exception))
+        self.assertIn("gpt-5.6-sol", str(ctx.exception))
+
+    def test_openai_future_shutdown_warns_and_a_fine_tune_follows_its_base(self):
+        r = self.go("openai", "gpt-5.1", hints=HINTS)
+        self.assertEqual(r["replacement"], "gpt-6-sol")
+        self.assertIn("2027-04-01", " ".join(r["warnings"]))
+        r = self.go("openai", "ft:gpt-4o-2024-08-06:acme-corp::def456", hints=HINTS)
+        self.assertIn("2027-01-14", " ".join(r["warnings"]))
+
+    def test_the_checker_refuses_a_retired_openai_model_offline(self):
+        spec = importlib.util.spec_from_file_location("ai_visibility_checker", SCRIPTS / "ai-visibility-checker.py")
+        checker = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(checker)
+        with tempfile.TemporaryDirectory() as home:
+            old = {k: os.environ.get(k) for k in ("CLAUDE_MARKETING_HOME", "MODEL_ROUTER_OFFLINE")}
+            os.environ.update({"CLAUDE_MARKETING_HOME": home, "MODEL_ROUTER_OFFLINE": "1"})
+            try:
+                with redirect_stderr(io.StringIO()), self.assertRaises(mr.RouterError) as ctx:
+                    checker.route_openai("o3", OAI_KEY, fetch=OAIFetch(), now=self.LATER)
+            finally:
+                for k, v in old.items():
+                    os.environ.pop(k, None) if v is None else os.environ.__setitem__(k, v)
+        self.assertIn("gpt-5.6-sol", str(ctx.exception))
+
+
+class TestPageCap(unittest.TestCase):
+    """A list with pages left at the cap is an error, never a short list (a short list makes a
+    model look unlisted). 20 pages are read; a 21st means the list was cut."""
+
+    @staticmethod
+    def endless(pages: int, style: str):
+        served = []
+
+        def opener(req, timeout=None):
+            served.append(req)
+            n = len(served)
+            more = n < pages
+            if style == "anthropic":
+                body = {"data": [{"id": f"claude-test-{n}", "lifecycle": "active"}], "has_more": more,
+                        "last_id": f"claude-test-{n}"}
+            else:
+                body = {"models": [g_entry(f"gemini-test-{n}")]}
+                if more:
+                    body["nextPageToken"] = f"token-{n}"
+            return Resp(json.dumps(body).encode())
+
+        return opener, served
+
+    def test_twenty_pages_are_read_and_a_twenty_first_is_refused(self):
+        for style, fetch, key in (("anthropic", mr.fetch_anthropic, KEY), ("google", mr.fetch_google, G_KEY)):
+            opener, served = self.endless(mr.MAX_PAGES, style)
+            self.assertEqual(len(fetch(key, "2023-06-01", urlopen=opener)), mr.MAX_PAGES, style)
+            opener, served = self.endless(mr.MAX_PAGES + 1, style)
+            with self.assertRaises(mr.FetchError) as ctx:
+                fetch(key, "2023-06-01", urlopen=opener)
+            self.assertEqual(ctx.exception.kind, "schema", style)
+            self.assertIn(f"more than {mr.MAX_PAGES} pages", ctx.exception.detail)
+
+    def test_the_route_falls_back_offline_and_says_why(self):
+        opener, _ = self.endless(mr.MAX_PAGES + 1, "google")
+        with redirect_stderr(io.StringIO()):
+            r = mr.route(G_JOB, GHINTS, provider="google", credential_name=G_CRED, api_key=G_KEY,
+                         default_model="gemini-3.6-flash", fetch=lambda k, v: mr.fetch_google(k, v, urlopen=opener),
+                         cache_path=None, now=NOW, env={})
+        self.assertEqual((r["basis"], r["offline"]), ("offline", True))
+        self.assertIn("pages", r["reason"])
 
 
 class TestFetchAnthropic(unittest.TestCase):

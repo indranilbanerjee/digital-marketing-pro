@@ -32,9 +32,11 @@ family, the newest (highest version, then newest) model that is:
   * at least MIN_GA_DAYS old (a brand-new release is never promoted on day one);
   * equipped with every capability the job's rule requires.
 The registry stays as the fallback: offline, the caller's shipped default is used and the
-answer is tagged "offline". Offline, the registry also stands in for the list's lifecycle
-data: a model about to be sent that the registry marks deprecated warns, and one past its
-shutdown is refused, as on the live path.
+answer is tagged "offline". Offline, the registry and the hint book's deprecations record
+(both local data) also stand in for the list's lifecycle data: a model about to be sent that
+either marks deprecated warns, one past its shutdown is refused, and one the record says now
+routes to another model warns that the answer comes from that model, as on the live path.
+The stricter source wins and its message names it.
 
 A model asked for by name is kept if it is active; kept with a warning if it is deprecated
 (naming the retirement date and the model the router would pick); and refused, exit 2, if it
@@ -61,7 +63,7 @@ keeps the copies identical. Stdlib only, Python 3.10+.
 CLI (prints one JSON object; exit 0 chosen, 2 refused or bad input):
     python model_router.py --hints FILE --job JOB --provider anthropic|google|openai \\
         --credential-name NAME [--requested ID] [--default-model ID] \\
-        [--cache FILE] [--anthropic-version VERSION]
+        [--cache FILE] [--anthropic-version VERSION] [--ignore-deprecations-record]
 """
 from __future__ import annotations
 
@@ -81,6 +83,7 @@ TTL_DAYS = 7
 MIN_GA_DAYS = 14
 RECORD_RECHECK_DAYS = 30
 TIMEOUT_S = 10.0
+MAX_PAGES = 20  # pages left after this many: an error, never a short list
 OFFLINE_ENV = "MODEL_ROUTER_OFFLINE"
 ANTHROPIC_MODELS_URL = "https://api.anthropic.com/v1/models"
 OPENAI_MODELS_URL = "https://api.openai.com/v1/models"
@@ -177,11 +180,12 @@ def _error_text(exc: urllib.error.HTTPError) -> str:
 def _pages(first_url: str, headers: dict, api_key: str, cursor: str, timeout: float, urlopen,
            retry_without=None, *, items: str = "data", id_field: str = "id", next_token: str | None = None) -> list:
     """Every page of a model list. Anthropic and OpenAI page by has_more/last_id; Google by
-    nextPageToken, leaving an empty list's `models` key out."""
+    nextPageToken, leaving an empty list's `models` key out. A list still going after
+    MAX_PAGES is refused: a short list would make a listed model look unlisted."""
     opener = urlopen or urllib.request.urlopen
     out: list = []
     url, after = first_url, None
-    for _ in range(20):
+    for _ in range(MAX_PAGES):
         full = url + (("&" if "?" in url else "?") + urllib.parse.urlencode({cursor: after}) if after else "")
         req = urllib.request.Request(full, method="GET")
         for name, value in headers.items():
@@ -197,7 +201,7 @@ def _pages(first_url: str, headers: dict, api_key: str, cursor: str, timeout: fl
         after = page.get(next_token) if next_token else (page.get("has_more") and page.get("last_id"))
         if not after:
             return out
-    return out
+    raise FetchError("schema", f"the model list had more than {MAX_PAGES} pages; a partial list is not used")
 
 
 # --- Anthropic adapter -----------------------------------------------------------------------
@@ -533,12 +537,17 @@ def _fresh(entry, now: datetime) -> bool:
 def route(job: str, hints: dict, *, provider: str, credential_name: str, api_key: str,
           default_model: str | None, requested: str | None = None, fetch=None, cache_path=None,
           now: datetime | None = None, anthropic_version: str | None = None, env=None,
-          registry: dict | None = None) -> dict:
+          registry: dict | None = None, record_applies: bool = True) -> dict:
     """The model to send for `job`, with where the answer came from. Raises RouterError.
 
     `registry` is the plugin's shipped model registry (its `models` list). With no live list
-    (offline, a timeout, provider trouble), the model about to be sent is checked against it:
-    deprecated warns, past its shutdown refuses, the same contract as the live path."""
+    (offline, a timeout, provider trouble), the model about to be sent is checked against it
+    and against the hint book's deprecations record for the provider: deprecated warns, past
+    its shutdown refuses, the same contract as the live path; the stricter source wins.
+
+    `record_applies=False` says that record describes another service than the one this call
+    goes to (a Vertex AI run, for example: Vertex retires Gemini models on its own schedule).
+    The record is then ignored for this call, live and offline, and no cache is used."""
     env = os.environ if env is None else env
     now = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
     if not isinstance(credential_name, str) or not CREDENTIAL_NAME.match(credential_name):
@@ -553,6 +562,11 @@ def route(job: str, hints: dict, *, provider: str, credential_name: str, api_key
     if rule["provider"] != provider:
         raise RouterError(f"job {job!r} is for {rule['provider']!r}, not {provider!r}")
     adapter = ADAPTERS[provider]
+    if not record_applies:
+        # The record describes another service: ignore it everywhere, and keep this call's
+        # answers out of a cache that record-based calls read.
+        hints = {**hints, "deprecations": {k: v for k, v in (hints.get("deprecations") or {}).items() if k != provider}}
+        cache_path = None
     base = {"job": job, "provider": provider, "line": rule.get("line"), "family": rule.get("family"),
             "model_requested": requested, "replacement": None, "router": ROUTER, "reason": None, "warnings": []}
     record = (hints.get("deprecations") or {}).get(provider)
@@ -565,7 +579,7 @@ def route(job: str, hints: dict, *, provider: str, credential_name: str, api_key
                  f"deprecations record" if adapter.get("dates_from_record") and record else None)
 
     if str(env.get(OFFLINE_ENV, "")).strip().lower() in ("1", "true", "yes"):
-        return _offline(base, requested, default_model, f"{OFFLINE_ENV} is set", registry, now)
+        return _offline(base, requested, default_model, f"{OFFLINE_ENV} is set", registry, now, record)
 
     cache, cache_warning = _load_cache(cache_path)
     if cache_warning:
@@ -590,12 +604,12 @@ def route(job: str, hints: dict, *, provider: str, credential_name: str, api_key
                               f"check {credential_name}") from None
         return _offline(base, requested, default_model,
                         f"{provider} model list unavailable ({exc.kind}: {_scrub(exc.detail, api_key)})",
-                        registry, now)
+                        registry, now, record)
     if not listed:
         raise RouterError(f"{provider} returned no models for {credential_name}; check the key's access")
     models, problem = adapter["normalize"](listed, hints, now)
     if problem:
-        return _offline(base, requested, default_model, problem, registry, now)
+        return _offline(base, requested, default_model, problem, registry, now, record)
 
     source, stamp = adapter["source"], _iso(now)
     for key in [k for k in entries if k.startswith(f"{provider}|") and k.endswith(f"|{credential_name}")]:
@@ -631,35 +645,82 @@ def registry_entry(registry: dict | None, model_id: str) -> tuple:
     return (dated[0], dated[0]["id"]) if len(dated) == 1 else (None, None)
 
 
+SEVERITY = {"known": 0, "deprecated": 1, "redirected": 2, "retired": 3}
+
+
+def _registry_verdict(registry: dict | None, model: str, today: date) -> dict | None:
+    entry, matched = registry_entry(registry, model)
+    if entry is None:
+        return None
+    shut = _parse(entry.get("shutdown_date"))
+    when = shut.date() if shut else None
+    kind = ("retired" if entry.get("status") == "retired" or (when and when <= today) else
+            "deprecated" if entry.get("status") == "deprecated" or when else "known")
+    return {"kind": kind, "shutdown": when, "replacement": entry.get("replacement_id"),
+            "shown": model if matched == model else f"{model} ({matched})", "source": "the shipped registry"}
+
+
+def _record_verdict(provider: str, record: dict | None, model: str, today: date) -> dict | None:
+    """What the hint book's deprecations record says about a model, read the way the live path
+    reads it: Google's shut_down, redirects_to and earliest shutdown date; OpenAI's shutdown
+    date (a fine-tune follows its base model)."""
+    entry = ((record or {}).get("models") or {}).get(_google_id(model) if provider == "google" else _base_id(model))
+    if not isinstance(entry, dict):
+        return None
+    shut = _parse(entry.get("shutdown"))
+    when = shut.date() if shut else None
+    if provider == "google":
+        kind = {"active": "known"}.get(_google_lifecycle(entry), _google_lifecycle(entry))
+    else:
+        kind = "retired" if when and when <= today else "deprecated" if when else "known"
+    return {"kind": kind, "shutdown": when, "replacement": entry.get("redirects_to") or entry.get("replacement"),
+            "shown": model, "source": f"the hint book's {provider} deprecations record (read {record['read_on']})",
+            "earliest": provider == "google"}
+
+
 def _offline(base: dict, requested: str | None, default_model: str | None, reason: str,
-             registry: dict | None = None, now: datetime | None = None) -> dict:
+             registry: dict | None = None, now: datetime | None = None, record: dict | None = None) -> dict:
+    """The shipped default or the named model, tagged offline. With no live list, the model is
+    checked against the shipped registry AND the hint book's deprecations record (local data,
+    shipped beside this file). The stricter of the two wins, and its message names its source."""
     model = requested or default_model
     if not model:
         raise RouterError(f"no model for job {base['job']!r}: {reason}, and there is no shipped default")
     out = {**base, "model": model, "basis": "offline", "offline": True, "reason": reason,
            "source": "shipped-default", "discovered_at": None, "counts": None,
            "warnings": list(base["warnings"])}
-    if registry is None:
-        return out
-    entry, matched = registry_entry(registry, model)
-    if entry is None:
-        out["warnings"].append(f"{model} is not in the shipped registry, so its lifecycle could not be checked "
-                               f"without the live list")
-        return out
-    shown = model if matched == model else f"{model} ({matched})"
-    replacement = entry.get("replacement_id") or "a current model"
-    shut = _parse(entry.get("shutdown_date"))
-    when = shut.date().isoformat() if shut else None
     today = (now or datetime.now(timezone.utc)).astimezone(timezone.utc).date()
-    if entry.get("status") == "retired" or (shut and shut.date() <= today):
-        raise RouterError(f"{shown} is retired{' (shut down ' + when + ')' if when else ''} according to the "
-                          f"shipped registry: requests naming it fail. Use {replacement}.")
-    if entry.get("status") == "deprecated" or shut:
-        if requested:
-            out["replacement"] = entry.get("replacement_id")
-        why = "Keeping it because it was asked for by name." if requested else "It is the shipped default."
+    found = [v for v in (_record_verdict(base["provider"], record, model, today),
+                         _registry_verdict(registry, model, today)) if v]
+    if not found:
+        if registry is not None:
+            where = f" or the hint book's {base['provider']} deprecations record" if record else ""
+            out["warnings"].append(f"{model} is not in the shipped registry{where}, so its lifecycle could not be "
+                                   f"checked without the live list")
+        return out
+    # Stricter first: the more severe verdict, then the earlier shutdown; the record wins a tie.
+    v = max(found, key=lambda x: (SEVERITY[x["kind"]], -(x["shutdown"] or date.max).toordinal()))
+    shown, source, when = v["shown"], v["source"], v["shutdown"].isoformat() if v["shutdown"] else None
+    instead = v["replacement"] or "a current model"
+    if v["kind"] == "retired":
+        raise RouterError(f"{shown} is retired{' (shut down ' + when + ')' if when else ''} according to "
+                          f"{source}: requests naming it fail. Use {instead}.")
+    if v["kind"] == "known":
+        return out
+    if requested:
+        out["replacement"] = v["replacement"]
+    if v["kind"] == "redirected":
+        why = ("Sending it because it was asked for by name" if requested else "It is the shipped default")
+        out["warnings"].append(f"{shown} is no longer served as itself according to {source}: {base['provider']} "
+                               f"routes requests for it to {instead}. {why}; the answer will come from {instead}.")
+        return out
+    why = "Keeping it because it was asked for by name." if requested else "It is the shipped default."
+    if v.get("earliest") and when and v["shutdown"] <= today:
+        out["warnings"].append(f"{shown} is past its announced shutdown date ({when}) according to {source} and "
+                               f"may stop working at any time; its replacement is {instead}. {why}")
+    else:
         out["warnings"].append(f"{shown} is deprecated and retires {when or 'on a date not yet announced'} "
-                               f"according to the shipped registry; its replacement is {replacement}. {why}")
+                               f"according to {source}; its replacement is {instead}. {why}")
     return out
 
 
@@ -725,6 +786,9 @@ def main(argv=None) -> int:
                    help="the plugin's model registry (default: model_registry.json next to this file)")
     p.add_argument("--cache", type=Path, help="cache file (omit for no cache)")
     p.add_argument("--anthropic-version", default="2023-06-01")
+    p.add_argument("--ignore-deprecations-record", action="store_true",
+                   help="the hint book's deprecations record describes another service than this call's "
+                        "(for example Vertex AI, which retires Gemini models on its own schedule)")
     args = p.parse_args(argv)
     if not CREDENTIAL_NAME.match(args.credential_name):
         # Never echo it: a key pasted here by mistake must not reach the output.
@@ -748,7 +812,8 @@ def main(argv=None) -> int:
             raise RouterError(f"{args.credential_name} is not set")
         result = route(args.job, hints, provider=args.provider, credential_name=args.credential_name,
                        api_key=key, default_model=default_model, requested=args.requested,
-                       cache_path=args.cache, anthropic_version=args.anthropic_version, registry=registry)
+                       cache_path=args.cache, anthropic_version=args.anthropic_version, registry=registry,
+                       record_applies=not args.ignore_deprecations_record)
     except RouterError as exc:
         print(json.dumps({"error": exc.reason}))
         return 2

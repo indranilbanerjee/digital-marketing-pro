@@ -166,6 +166,18 @@ class TestEveryPage(unittest.TestCase):
         query = urllib.parse.parse_qs(urllib.parse.urlsplit(paged.requests[1].full_url).query)
         self.assertEqual(query["after"], ["evo-image-one"])
 
+    def test_a_list_cut_at_the_page_cap_is_skipped_not_short(self):
+        """21 pages, each saying there is another: a short list would report models STALE."""
+        endless = Recorder()
+        endless.PAGES = dict(Recorder.PAGES, **{"direct.evolink.ai": [
+            {"object": "list", "data": [{"id": f"evo-model-{n}"}], "has_more": True, "last_id": f"evo-model-{n}"}
+            for n in range(1, 30)]})
+        code, out, _ = run_main(endless, env={"EVOLINK_API_KEY": KEYS["EVOLINK_API_KEY"]})
+        status = json.loads(out)["evolink"]["status"]
+        self.assertTrue(status.startswith("skipped (fetch failed: schema:"), status)
+        self.assertIn("pages", status)
+        self.assertEqual(len(endless.to("direct.evolink.ai")), 20)
+
     def test_page_two_counts_in_the_drift_report(self):
         code, out, _ = run_main(Recorder(), env={k: KEYS[k] for k in ("ANTHROPIC_API_KEY", "GEMINI_API_KEY")})
         report = json.loads(out)

@@ -56,8 +56,13 @@ python scripts/resolve_model.py --list --vendor anthropic --status current
     - A listed model missing from the record has no known release date, so the 14-day rule can't clear it. A newer one held back this way is named in a warning until the record is re-read.
 - One list call per provider per 7 days per key name serves every job; the cache (`model-router-cache.json`) is keyed by the environment variable's name and holds chosen ids, lifecycle dates and counts, never the key, the list or a fine-tune's name. `MODEL_ROUTER_OFFLINE=1` makes no call.
 - A model asked for by name (`--anthropic-model`, `--openai-model`) is kept if current, kept with a warning if deprecated, and refused with exit 2 if retired, naming the replacement. Nothing is swapped silently.
-- A rejected key or an empty list stops the run before any probe is sent (exit 2). A timeout, provider trouble, or an Anthropic list without lifecycle fields falls back to the registry alias and tags the output `offline`.
-- Offline, a model asked for by name is checked against the shipped registry instead of the live list: deprecated warns with its retirement date and replacement, and past its shutdown it is refused (exit 2). An undated id such as `claude-sonnet-4-5` matches its one dated snapshot. The router's CLI resolves the job's `default_alias` in the registry when `--default-model` is omitted.
+- A rejected key or an empty list stops the run before any probe is sent (exit 2). A timeout, provider trouble, an Anthropic list without lifecycle fields, or a list still going after 20 pages falls back to the registry alias and tags the output `offline`. A partial list is never used: it would make a listed model look unlisted.
+- Offline, a model asked for by name is checked against two local sources instead of the live list: the shipped registry and the hint book's deprecations record for that provider.
+  - Each is read as the live path reads it. Deprecated warns with its retirement date and replacement. Past its shutdown (OpenAI), or `shut_down` on Google's page, it is refused (exit 2). A Google `redirects_to` warns that the answer comes from the other model.
+  - Where the two disagree, the stricter one wins, and the message names its source: "according to the shipped registry", or "according to the hint book's google deprecations record (read 2026-10-27)".
+  - An undated id such as `claude-sonnet-4-5` matches its one dated snapshot in the registry.
+  - The router's CLI resolves the job's `default_alias` in the registry when `--default-model` is omitted.
+- When the record describes a different service than the call goes to, the caller passes `record_applies=False` (CLI: `--ignore-deprecations-record`). [SocialForge](https://github.com/indranilbanerjee/socialforge)'s Vertex AI runs do this, because Vertex retires Gemini models on its own schedule. The record is then ignored for that call, live and offline, and no cache is read or written.
 - The run's output carries `model_routing.anthropic` and `model_routing.openai`: the model asked for, the model sent, where the answer came from (`live`, `cache`, `requested` or `offline`) and when.
 
 ```bash
@@ -169,7 +174,7 @@ ANTHROPIC_API_KEY=... OPENAI_API_KEY=... GEMINI_API_KEY=... EVOLINK_API_KEY=... 
 python scripts/refresh_models.py --bump-timestamp
 ```
 
-The drift report reads every page of each list (Anthropic's default page is 20 models, Google's 50) with the model router's own readers. Each key goes only in its provider's header, never in a URL, and a refused call is reported by its HTTP status alone, never with the provider's error message, which can echo part of the key. Before 3.39.0 the Gemini call put the key in the URL, and a model on page two of a list was reported STALE.
+The drift report reads every page of each list (Anthropic's default page is 20 models, Google's 50) with the model router's own readers. A list still going after 20 pages is reported as skipped, never as a short list. Each key goes only in its provider's header, never in a URL, and a refused call is reported by its HTTP status alone, never with the provider's error message, which can echo part of the key. Before 3.39.0 the Gemini call put the key in the URL, and a model on page two of a list was reported STALE.
 
 The drift report shows:
 - **NEW** — model ids the provider lists that are not in your registry (triage and add).

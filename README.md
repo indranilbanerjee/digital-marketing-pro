@@ -6,16 +6,16 @@ Run `/digital-marketing-pro:engagement` against each brand. Same 12-Part Strateg
 
 Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Act Article 50 ready, Cowork team-persistent**. Built for marketing agencies, in-house teams running 50–200 brands, and consultancies. Installs on **Claude Code** (CLI + IDE), **Anthropic Cowork**, **OpenAI Codex**, **Cursor 2.5+**, **GitHub Copilot CLI**, **Google Antigravity 2.0**, **Hermes Agent**, **OpenClaw**, and **Grok** + 35+ Agent Skills platforms. Created by [Indranil Banerjee](https://indranil.in) · [LinkedIn](https://www.linkedin.com/in/askneelnow/) · [X](https://x.com/askneelnow).
 
-[![Version](https://img.shields.io/badge/version-3.39.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.39.1-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=yellow)](https://github.com/indranilbanerjee/digital-marketing-pro/stargazers)
-[![Tests](https://img.shields.io/badge/tests-868%2F868%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-882%2F882%20passing-brightgreen.svg)](tests/)
 [![Platforms](https://img.shields.io/badge/platforms-9%20native%20%2B%2035%20Agent%20Skills-success.svg)](#works-on-40-agent-harnesses-via-the-agent-skills-open-standard)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Article%2050%20ready-darkred.svg)](skills/context-engine/compliance-rules.md)
 
 [![Built by Indranil "Neel" Banerjee — Neelverse Marketing Suite — Sponsor this project](docs/assets/author-banner.svg)](https://github.com/sponsors/indranilbanerjee)
 
-> 🆕 **Just shipped — v3.39.0 (October 27, 2026):** the model router can now choose Google models from Google's own list, and its warnings say when a replacement is the vendor's recommendation rather than the router's pick. [What's new](#whats-new) · [Changelog](CHANGELOG.md)
+> 🆕 **Just shipped — v3.39.1 (October 27, 2026):** without a live model list, the model router now also checks the vendor deprecations record that ships with it, so a shut-down model is refused offline too, and a model list cut off at the page limit is never used short. [What's new](#whats-new) · [Changelog](CHANGELOG.md)
 
 ```bash
 # Install — one command (Claude Code 2.1.292 or newer)
@@ -204,7 +204,7 @@ Other marketing plugins exist, including Anthropic's own marketing plugin and co
 | AEO / GEO | **A 6-platform audit, including Google AI Mode** |
 | Where it runs | **9 native hosts**: Claude Code, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes, OpenClaw, Grok |
 | Live-write safety | **Single-use approval record for writes it sends itself; MCP writes: typed yes + host prompt** |
-| Tests | **868 stdlib unittest** tests |
+| Tests | **882 stdlib unittest** tests |
 | License | **MIT: no telemetry, no seats** |
 
 ---
@@ -301,7 +301,7 @@ Output: HTTP calls for the 8 executable connectors (Slack, HubSpot, Klaviyo, Sen
 
 ---
 
-## Supported surfaces (v3.39.0)
+## Supported surfaces (v3.39.1)
 
 | Platform | Install command | Manifest path | Status |
 |---|---|---|---|
@@ -413,6 +413,10 @@ If you run into a platform-specific install snag, file a [GitHub issue](https://
 
 ## What's new
 
+### v3.39.1 — offline checks read the deprecations record too (October 27, 2026)
+
+When the model router can't reach a provider's live list, it checks a model you name against what ships with the plugin. Until now that meant only the model registry, not the deprecations page record that sits right beside it. So, offline, a model the vendor's page retires could slip through: OpenAI's o3, which isn't in the registry, or a Google model switched off in June. A model whose requests Google now hands to a newer one got no word about it either. The router now checks both and acts on the stricter, saying which one it followed. A plugin calling Google through Vertex AI, which retires models on its own timetable, can say the record doesn't apply. A provider list cut off at the page limit is now refused rather than used short, since a short list would make a model look withdrawn. 882 tests.
+
 ### v3.39.0 — the model router reaches Google (October 27, 2026)
 
 The model router can now pick Google models the same way it picks Anthropic and OpenAI ones: from the list of models your key can use, by job, never by name. Google's list gives no retirement or release dates, so the router reads them from Google's deprecations page, recorded with the date it was read. That page gives the earliest possible shutdown dates and marks the models already switched off, and the router follows both. It never picks a model whose requests Google now sends to a different model. Your Google key goes only in a request header, never in a web address where logs would keep it. No DMP feature uses Google yet; the router ships here as the master copy that [SocialForge](https://github.com/indranilbanerjee/socialforge) uses for its photo indexing. One fix for all providers: when a retiring model's replacement comes from a vendor's deprecations page, the warning now says so instead of calling it the router's choice. The two can differ. The registry's drift report now also keeps the Google key out of web addresses and reads every page of each provider's list; it used to stop at the first page and wrongly flag models listed further on. 868 tests.
@@ -420,10 +424,6 @@ The model router can now pick Google models the same way it picks Anthropic and 
 ### v3.38.2 — deprecation checks offline too; public files point only at what a reader can open (October 27, 2026)
 
 When the model router couldn't reach a provider's live model list (offline mode, a timeout, provider trouble), it sent a model asked for by name without any lifecycle check, even one the shipped registry knows is retiring, such as Claude Sonnet 4.5 on 30 November. It now checks that registry instead: a deprecated model gets a warning with its date and replacement, and one past its shutdown is refused before anything is sent, just as with the live list. Separately, a few shipped files named the internal work sessions behind this plugin and pointed at private notes, including the model registry's "last updated by" field. They now link only to vendor pages and documents in this repository, and a test keeps it that way. 841 tests.
-
-### v3.38.1 — SEO descriptions in the words people use (October 27, 2026)
-
-A blind test, with requests written by someone who had never seen the plugin's wording, found six SEO requests where no skill fired at all. The jobs exist; the descriptions didn't use the requests' words. Keyword clustering now mentions queries, topic hubs and spoke pages. The drift report mentions two Search Console exports from two dates. The SEO plan says organic and a phased year roadmap. The technical SEO guide names JavaScript rendering (server-side rendering, prerendering) and the LCP and INP page-speed metrics. Every description still fits the short-listing rule. 829 tests.
 
 Older releases are in [CHANGELOG.md](CHANGELOG.md).
 
@@ -727,7 +727,7 @@ Yes. Each brand has its own `~/.claude-marketing/brands/<brand-slug>/` directory
 Skip to `/digital-marketing-pro:campaign-plan`. Every individual surface (campaign / SEO / content / competitor / email / report) is independently runnable. The full engagement is the canonical path, not the only path.
 
 **Q: Will this work on Codex / Cursor / Copilot CLI / Antigravity?**
-Yes — verified-real native manifests ship for all 9 surfaces (CC, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok). See [Supported surfaces](#supported-surfaces-v3390) above for per-platform install commands.
+Yes — verified-real native manifests ship for all 9 surfaces (CC, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok). See [Supported surfaces](#supported-surfaces-v3391) above for per-platform install commands.
 
 **Q: I run my team on Anthropic Cowork. Does brand state persist between sessions?**
 Yes — but you need to run `/digital-marketing-pro:cowork-setup` once per team first (v3.12.0). Cowork's per-session filesystem is ephemeral, and `${CLAUDE_PLUGIN_DATA}` is too ([open issue #51398](https://github.com/anthropics/claude-code/issues/51398)). The setup wizard routes brand profiles + plans + reports through a Google Drive MCP so everything survives across sessions and is shared across the team. Multi-team isolation via per-team folder names.
@@ -800,7 +800,7 @@ Use the direct repo form: `grok plugin install indranilbanerjee/digital-marketin
 ### General (any platform)
 
 **"Tests in `tests/` fail when I `git clone` locally"**
-Run `python tests/run_all.py` from the repo root. All 868 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+; `scripts/setup.py` recommends 3.11 or newer, and the floor moves to 3.11 once Claude's Cowork environment does) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
+Run `python tests/run_all.py` from the repo root. All 882 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+; `scripts/setup.py` recommends 3.11 or newer, and the floor moves to 3.11 once Claude's Cowork environment does) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
 
 **"`/digital-marketing-pro:doctor` shows my action as stub_unconfigured"**
 That action needs an MCP connector configured. Run `python scripts/connector-status.py --action setup-guide --name <connector-name>` for the exact setup snippet. Add it to your `.mcp.json` under `mcpServers`, restart your agent, and the action becomes `manifest_ready`. See [Connector-aware action resolver](#connector-aware-action-resolver) for the full readiness model.
