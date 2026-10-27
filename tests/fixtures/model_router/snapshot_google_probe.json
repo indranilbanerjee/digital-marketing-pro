@@ -1,0 +1,21 @@
+{
+  "basis": "live",
+  "counts": {
+    "eligible": 3,
+    "in_line": 5,
+    "listed": 14
+  },
+  "discovered_at": "2026-10-27T12:00:00Z",
+  "family": "^gemini-(?P<version>\\d+(?:\\.\\d+)*)-flash$",
+  "job": "test.vision.google",
+  "line": null,
+  "model": "gemini-3.8-flash",
+  "model_requested": null,
+  "offline": false,
+  "provider": "google",
+  "reason": null,
+  "replacement": null,
+  "router": "model_router/1",
+  "source": "https://generativelanguage.googleapis.com/v1beta/models",
+  "warnings": []
+}

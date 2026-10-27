@@ -1,0 +1,132 @@
+{
+  "_fixture": "Shape of GET https://generativelanguage.googleapis.com/v1beta/models as documented at ai.google.dev/api/models (read 2026-10-27): models[] of Model (name 'models/{id}', baseModelId, version, displayName, description, inputTokenLimit, outputTokenLimit, supportedGenerationMethods, thinking, temperature, maxTemperature, topP, topK), plus nextPageToken while more pages follow. Ids follow ai.google.dev/gemini-api/docs/deprecations as read 2026-10-27; versions, token limits and parameters are test data for tests/test_model_router.py, not claims.",
+  "models": [
+    {
+      "name": "models/gemini-3.8-flash-tts",
+      "baseModelId": "gemini-3.8-flash-tts",
+      "version": "001",
+      "displayName": "Gemini 3.8 Flash TTS",
+      "description": "Gemini 3.8 Flash TTS (test data)",
+      "inputTokenLimit": 1048576,
+      "outputTokenLimit": 65536,
+      "supportedGenerationMethods": [
+        "generateContent",
+        "countTokens"
+      ],
+      "temperature": 1,
+      "maxTemperature": 2,
+      "topP": 0.95,
+      "topK": 64,
+      "thinking": false
+    },
+    {
+      "name": "models/gemini-flash-latest",
+      "baseModelId": "gemini-flash-latest",
+      "version": "001",
+      "displayName": "Gemini Flash Latest",
+      "description": "Gemini Flash Latest (test data)",
+      "inputTokenLimit": 1048576,
+      "outputTokenLimit": 65536,
+      "supportedGenerationMethods": [
+        "generateContent",
+        "countTokens",
+        "createCachedContent",
+        "batchGenerateContent"
+      ],
+      "temperature": 1,
+      "maxTemperature": 2,
+      "topP": 0.95,
+      "topK": 64,
+      "thinking": true
+    },
+    {
+      "name": "models/gemini-3-flash-preview",
+      "baseModelId": "gemini-3-flash-preview",
+      "version": "3-flash-preview",
+      "displayName": "Gemini 3 Flash Preview",
+      "description": "Gemini 3 Flash Preview (test data)",
+      "inputTokenLimit": 1048576,
+      "outputTokenLimit": 65536,
+      "supportedGenerationMethods": [
+        "generateContent",
+        "countTokens",
+        "createCachedContent",
+        "batchGenerateContent"
+      ],
+      "temperature": 1,
+      "maxTemperature": 2,
+      "topP": 0.95,
+      "topK": 64,
+      "thinking": true
+    },
+    {
+      "name": "models/gemini-3.1-flash-tts-preview",
+      "baseModelId": "gemini-3.1-flash-tts-preview",
+      "version": "3.1-flash-tts-preview",
+      "displayName": "Gemini 3.1 Flash TTS Preview",
+      "description": "Gemini 3.1 Flash TTS Preview (test data)",
+      "inputTokenLimit": 1048576,
+      "outputTokenLimit": 65536,
+      "supportedGenerationMethods": [
+        "generateContent",
+        "countTokens"
+      ],
+      "temperature": 1,
+      "maxTemperature": 2,
+      "topP": 0.95,
+      "topK": 64,
+      "thinking": false
+    },
+    {
+      "name": "models/gemini-embedding-2",
+      "baseModelId": "gemini-embedding-2",
+      "version": "001",
+      "displayName": "Gemini Embedding 2",
+      "description": "Gemini Embedding 2 (test data)",
+      "inputTokenLimit": 1048576,
+      "outputTokenLimit": 65536,
+      "supportedGenerationMethods": [
+        "embedContent",
+        "countTextTokens"
+      ],
+      "temperature": 1,
+      "maxTemperature": 2,
+      "topP": 0.95,
+      "topK": 64
+    },
+    {
+      "name": "models/gemini-3.8-live",
+      "baseModelId": "gemini-3.8-live",
+      "version": "001",
+      "displayName": "Gemini 3.8 Live",
+      "description": "Gemini 3.8 Live (test data)",
+      "inputTokenLimit": 1048576,
+      "outputTokenLimit": 65536,
+      "supportedGenerationMethods": [
+        "bidiGenerateContent"
+      ],
+      "temperature": 1,
+      "maxTemperature": 2,
+      "topP": 0.95,
+      "topK": 64,
+      "thinking": false
+    },
+    {
+      "name": "models/gemini-2.5-flash-native-audio-preview-12-2025",
+      "baseModelId": "gemini-2.5-flash-native-audio-preview-12-2025",
+      "version": "2.5-preview-12-2025",
+      "displayName": "Gemini 2.5 Flash Native Audio Preview",
+      "description": "Gemini 2.5 Flash Native Audio Preview (test data)",
+      "inputTokenLimit": 1048576,
+      "outputTokenLimit": 65536,
+      "supportedGenerationMethods": [
+        "bidiGenerateContent"
+      ],
+      "temperature": 1,
+      "maxTemperature": 2,
+      "topP": 0.95,
+      "topK": 64,
+      "thinking": false
+    }
+  ]
+}

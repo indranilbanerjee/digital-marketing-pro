@@ -1,0 +1,18 @@
+{
+  "_fixture": "Error shape of the Gemini API (google.rpc.Status, google.aip.dev/193; ai.google.dev/gemini-api/docs/troubleshooting: invalid keys are client errors such as 400 or 403), read 2026-10-27. Test data.",
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      }
+    ]
+  }
+}

@@ -240,7 +240,9 @@ class TestCuratorDocMatchesRegistry(unittest.TestCase):
         record = json.loads((REPO / "scripts" / "model_hints.json").read_text(encoding="utf-8"))
         record = record["deprecations"]["openai"]["models"]
         kept = re.findall(r"WARNING \((anthropic|openai)\): (\S+) is deprecated and retires (\d{4}-\d{2}-\d{2}); "
-                          r"the router would choose (\S+)\.", text)
+                          r"(?:the router would choose (\S+)|\w+'s deprecations page names (\S+) as its replacement)\.",
+                          text)
+        kept = [(provider, old, when, chosen or recorded) for provider, old, when, chosen, recorded in kept]
         self.assertEqual({k[0] for k in kept}, {"anthropic", "openai"})
         for provider, old, when, new in kept:
             if provider == "anthropic":

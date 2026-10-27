@@ -368,6 +368,8 @@ class TestOpenAIPresenceOnly(OpenAICase):
         r = self.oai(OAIFetch(), requested="gpt-5.1")
         self.assertEqual((r["model"], r["replacement"]), ("gpt-5.1", "gpt-6-sol"))
         self.assertIn("2027-04-01", " ".join(r["warnings"]))
+        # Before 3.39.0 this said "the router would choose gpt-6-sol"; the router's own pick is gpt-6.1-sol.
+        self.assertIn("deprecations page names gpt-6-sol", " ".join(r["warnings"]))
 
     def test_past_its_shutdown_it_is_refused_naming_the_replacement(self):
         with self.assertRaises(mr.RouterError) as ctx:
@@ -440,6 +442,266 @@ class TestOpenAIPresenceOnly(OpenAICase):
         self.assertEqual((url.scheme, url.netloc, url.path), ("https", "api.openai.com", "/v1/models"))
         self.assertEqual(seen[0].get_header("Authorization"), f"Bearer {OAI_KEY}")
         self.assertIsNone(seen[0].get_header("X-api-key"))
+
+
+G_KEY = "g-test-0000-not-a-real-google-key"
+G_CRED = "GEMINI_API_KEY"
+G_JOB = "test.vision.google"
+FLASH = r"^gemini-(?P<version>\d+(?:\.\d+)*)-flash$"
+G_DEPRECATIONS = "https://ai.google.dev/gemini-api/docs/deprecations"
+GHINTS = copy.deepcopy(HINTS)
+GHINTS["jobs"][G_JOB] = {"provider": "google", "family": FLASH, "capabilities": ["generateContent"],
+                         "default_alias": "latest-vision-google",
+                         "source": "https://ai.google.dev/gemini-api/docs/models", "read_on": "2026-10-27"}
+# Rows copied from the deprecations page as read 2026-10-27 (shutdown dates there are the EARLIEST
+# possible; the page greys out the models already shut down, recorded here as shut_down).
+GHINTS["deprecations"]["google"] = {
+    "source": G_DEPRECATIONS, "read_on": "2026-10-27",
+    "models": {
+        "gemini-3.8-flash": {"released": "2026-09-02"},
+        "gemini-3.8-flash-tts": {"released": "2026-09-22"},
+        "gemini-3.7-flash": {"released": "2026-08-13", "redirects_to": "gemini-3.8-flash"},
+        "gemini-3.6-flash": {"released": "2026-07-21"},
+        "gemini-3.5-flash": {"released": "2026-05-19", "redirects_to": "gemini-3.6-flash"},
+        "gemini-3.5-flash-lite": {"released": "2026-07-21"},
+        "gemini-3.5-transcribe": {"released": "2026-08"},
+        "gemini-3.1-flash-lite": {"released": "2026-05-07", "shutdown": "2027-05-07",
+                                  "replacement": "gemini-3.5-flash-lite"},
+        "gemini-3-flash-preview": {"released": "2025-12-17", "replacement": "gemini-3.6-flash"},
+        "gemini-3.1-flash-tts-preview": {"released": "2026-02-26", "shutdown": "2026-11-17",
+                                         "replacement": "gemini-3.8-flash-tts or gemini-3.8-flash-lite-tts"},
+        "gemini-2.5-flash": {"released": "2025-06-17"},
+        "gemini-2.0-flash": {"released": "2025-02-05", "shutdown": "2026-06-01", "shut_down": True,
+                             "replacement": "gemini-3.6-flash"},
+    },
+}
+
+
+def g_models() -> list:
+    return copy.deepcopy(fixture("google_models.json")["models"])
+
+
+def g_entry(mid: str, methods=("generateContent", "countTokens")) -> dict:
+    return {"name": f"models/{mid}", "baseModelId": mid, "version": "001", "displayName": mid,
+            "supportedGenerationMethods": list(methods)}
+
+
+class GFetch(Fetch):
+    def __call__(self, api_key, anthropic_version):
+        self.calls += 1
+        assert api_key == G_KEY
+        if self.error:
+            raise self.error
+        return copy.deepcopy(self.data if self.data is not None else g_models())
+
+
+class GoogleCase(RouterCase):
+    def g(self, fetch, requested=None, now=NOW, hints=None, default="gemini-3.6-flash", env=None, registry=None):
+        err = io.StringIO()
+        with redirect_stderr(err):
+            return mr.route(G_JOB, hints or GHINTS, provider="google", credential_name=G_CRED, api_key=G_KEY,
+                            default_model=default, requested=requested, fetch=fetch, cache_path=self.cache,
+                            now=now, env=env if env is not None else {}, registry=registry)
+
+
+class Resp(io.BytesIO):
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *a):
+        return False
+
+
+class TestGooglePresenceOnly(GoogleCase):
+    """Google's models.list gives names ("models/<id>"), versions, token limits and the generation
+    methods each model supports, but no lifecycle and no release date, and previews, experimental
+    ids and moving "latest" aliases are mixed in. Selection is by family rule over ids with the
+    job's methods required; lifecycle AND release dates come from the deprecations record an
+    agent read from Google's page. Planted before the adapter existed."""
+
+    def test_float_picks_the_highest_version_with_the_required_method(self):
+        r = self.g(GFetch())
+        self.assertEqual((r["model"], r["basis"], r["family"], r["provider"]),
+                         ("gemini-3.8-flash", "live", FLASH, "google"))
+
+    def test_generate_content_is_required_from_the_list(self):
+        data = g_models()
+        for m in data:
+            if m["baseModelId"] == "gemini-3.8-flash":
+                m["supportedGenerationMethods"] = ["bidiGenerateContent", "countTokens"]
+        self.assertEqual(self.g(GFetch(data))["model"], "gemini-3.6-flash")
+
+    def test_a_redirected_endpoint_is_never_picked_and_warns_when_asked_for(self):
+        data = [m for m in g_models() if m["baseModelId"] != "gemini-3.8-flash"]
+        self.assertEqual(self.g(GFetch(data))["model"], "gemini-3.6-flash")
+        self.cache.unlink()
+        r = self.g(GFetch(), requested="gemini-3.5-flash")
+        self.assertEqual((r["model"], r["basis"], r["replacement"]), ("gemini-3.5-flash", "requested", "gemini-3.6-flash"))
+        joined = " ".join(r["warnings"])
+        self.assertIn("routes", joined)
+        self.assertIn("gemini-3.6-flash", joined)
+
+    def test_previews_exp_latest_and_dated_ids_are_never_picked(self):
+        loose = copy.deepcopy(GHINTS)
+        loose["jobs"][G_JOB]["family"] = r"^gemini-(?P<version>\d+(?:\.\d+)*)-flash(?:-.+)?$"
+        names = ("gemini-3.9-flash-preview", "gemini-3.9-flash-exp", "gemini-3.9-flash-latest",
+                 "gemini-3.9-flash-preview-11-2026", "gemini-3.9-flash-11-2026", "gemini-3.9-flash-11-05")
+        for name in names:
+            loose["deprecations"]["google"]["models"][name] = {"released": "2026-09-01"}
+        data = [m for m in g_models() if not m["baseModelId"].endswith(("-tts", "-lite"))]
+        data += [g_entry(n) for n in names]
+        self.assertEqual(self.g(GFetch(data), hints=loose)["model"], "gemini-3.8-flash")
+
+    def test_too_new_by_the_records_release_date_is_skipped(self):
+        newer = copy.deepcopy(GHINTS)
+        newer["deprecations"]["google"]["models"]["gemini-3.9-flash"] = {"released": "2026-10-20"}
+        r = self.g(GFetch(g_models() + [g_entry("gemini-3.9-flash")]), hints=newer)
+        self.assertEqual(r["model"], "gemini-3.8-flash")
+        self.assertEqual(r["warnings"], [])
+
+    def test_a_listed_model_missing_from_the_record_is_held_back_and_named(self):
+        r = self.g(GFetch(g_models() + [g_entry("gemini-3.9-flash")]))
+        self.assertEqual(r["model"], "gemini-3.8-flash")
+        held = [w for w in r["warnings"] if "release date" in w]
+        self.assertEqual(len(held), 1, r["warnings"])
+        self.assertIn(G_DEPRECATIONS, held[0])
+        cached = self.g(GFetch(error=AssertionError("a fresh cache must not call out")))
+        self.assertEqual(cached["warnings"], r["warnings"])
+
+    def test_a_month_only_release_date_counts_from_the_months_last_day(self):
+        loose = copy.deepcopy(GHINTS)
+        loose["jobs"][G_JOB]["family"] = r"^gemini-(?P<version>\d+(?:\.\d+)*)-transcribe$"
+        loose["deprecations"]["google"]["models"]["gemini-3.5-transcribe"] = {"released": "2026-10"}
+        data = [g_entry("gemini-3.5-transcribe")]
+        with self.assertRaises(mr.RouterError):
+            self.g(GFetch(data), hints=loose, now=datetime(2026, 11, 10, tzinfo=timezone.utc))
+        self.cache.unlink()
+        r = self.g(GFetch(data), hints=loose, now=datetime(2026, 11, 15, tzinfo=timezone.utc))
+        self.assertEqual(r["model"], "gemini-3.5-transcribe")
+
+    def test_deprecated_by_the_record_warns_and_keeps(self):
+        r = self.g(GFetch(), requested="gemini-3.1-flash-lite")
+        self.assertEqual((r["model"], r["basis"], r["replacement"]),
+                         ("gemini-3.1-flash-lite", "requested", "gemini-3.5-flash-lite"))
+        joined = " ".join(r["warnings"])
+        self.assertIn("2027-05-07", joined)
+        # The replacement is the page's recommendation, not the router's pick (that would be 3.8 Flash).
+        self.assertIn("deprecations page names gemini-3.5-flash-lite", joined)
+        self.assertNotIn("the router would choose", joined)
+
+    def test_shut_down_on_the_page_is_refused_naming_the_replacement(self):
+        with self.assertRaises(mr.RouterError) as ctx:
+            self.g(GFetch(), requested="gemini-2.0-flash")
+        self.assertEqual(ctx.exception.exit_code, 2)
+        self.assertTrue(str(ctx.exception).startswith("gemini-2.0-flash is retired"), str(ctx.exception))
+        self.assertIn("Use gemini-3.6-flash, the replacement google's deprecations page names", str(ctx.exception))
+        self.assertNotIn("newest", str(ctx.exception))
+
+    def test_past_the_earliest_shutdown_date_but_still_served_warns_not_refuses(self):
+        """Google's dates are the earliest possible shutdown; the page greys out what is really off."""
+        later = datetime(2026, 11, 20, tzinfo=timezone.utc)
+        r = self.g(GFetch(), requested="gemini-3.1-flash-tts-preview", now=later)
+        self.assertEqual(r["model"], "gemini-3.1-flash-tts-preview")
+        joined = " ".join(r["warnings"])
+        self.assertIn("2026-11-17", joined)
+        self.assertIn("any time", joined)
+
+    def test_a_models_prefix_on_a_requested_id_is_understood(self):
+        r = self.g(GFetch(), requested="models/gemini-3.1-flash-lite")
+        self.assertIn("2027-05-07", " ".join(r["warnings"]))
+
+    def test_rejected_key_empty_list_and_timeout(self):
+        body = json.dumps(fixture("google_400.json")).encode()
+
+        def refuse(req, timeout=None):
+            raise urllib.error.HTTPError(req.full_url, 400, "Bad Request", {}, io.BytesIO(body))
+
+        with self.assertRaises(mr.RouterError) as ctx:
+            self.g(lambda k, v: mr.fetch_google(k, v, urlopen=refuse))
+        self.assertEqual(ctx.exception.exit_code, 2)
+        self.assertIn("400", str(ctx.exception))
+        self.assertIn("INVALID_ARGUMENT", str(ctx.exception))
+        self.assertNotIn(G_KEY, str(ctx.exception))
+        with self.assertRaises(mr.RouterError) as ctx:
+            self.g(lambda k, v: mr.fetch_google(k, v, urlopen=lambda req, timeout=None: Resp(
+                json.dumps(fixture("google_empty.json")).encode())))
+        self.assertIn("no models", str(ctx.exception))
+
+        def slow(req, timeout=None):
+            raise TimeoutError("timed out")
+
+        r = self.g(lambda k, v: mr.fetch_google(k, v, urlopen=slow))
+        self.assertEqual((r["basis"], r["offline"], r["model"]), ("offline", True, "gemini-3.6-flash"))
+
+    def test_offline_checks_the_shipped_registry(self):
+        registry = {"models": [{"id": "gemini-2.0-flash", "status": "retired", "shutdown_date": "2026-06-01",
+                                "replacement_id": "gemini-3.6-flash"}]}
+        with self.assertRaises(mr.RouterError) as ctx:
+            self.g(GFetch(), requested="gemini-2.0-flash", env={"MODEL_ROUTER_OFFLINE": "1"}, registry=registry)
+        self.assertTrue(str(ctx.exception).startswith("gemini-2.0-flash is retired"), str(ctx.exception))
+        self.assertIn("shipped registry", str(ctx.exception))
+        self.assertIn("gemini-3.6-flash", str(ctx.exception))
+
+    def test_cache_holds_the_credential_name_and_chosen_ids_only(self):
+        self.g(GFetch())
+        text = self.cache.read_text(encoding="utf-8")
+        self.assertIn(G_CRED, text)
+        self.assertNotIn(G_KEY, text)
+        self.assertNotIn("gemini-embedding-2", text)
+
+    def test_determinism_snapshot(self):
+        want = fixture("snapshot_google_probe.json")
+        self.assertEqual(self.g(GFetch()), want)
+        shuffled = g_models()
+        random.Random(5).shuffle(shuffled)
+        self.cache.unlink()
+        self.assertEqual(self.g(GFetch(shuffled)), want)
+
+    def test_the_key_goes_in_a_header_never_the_url(self):
+        seen = []
+        pages = [fixture("google_models_page1.json"), fixture("google_models_page2.json")]
+
+        def opener(req, timeout=None):
+            seen.append(req)
+            return Resp(json.dumps(pages[len(seen) - 1]).encode())
+
+        got = mr.fetch_google(G_KEY, None, urlopen=opener)
+        self.assertEqual([m["name"] for m in got], [m["name"] for m in g_models()])
+        self.assertEqual(len(seen), 2)
+        for req in seen:
+            url = urllib.parse.urlsplit(req.full_url)
+            self.assertEqual((url.scheme, url.netloc, url.path),
+                             ("https", "generativelanguage.googleapis.com", "/v1beta/models"))
+            self.assertNotIn("key", urllib.parse.parse_qs(url.query))
+            self.assertNotIn(G_KEY, req.full_url)
+            self.assertEqual(req.get_header("X-goog-api-key"), G_KEY)
+            self.assertIsNone(req.get_header("Authorization"))
+        self.assertEqual(urllib.parse.parse_qs(urllib.parse.urlsplit(seen[0].full_url).query)["pageSize"], ["1000"])
+        self.assertEqual(urllib.parse.parse_qs(urllib.parse.urlsplit(seen[1].full_url).query)["pageToken"],
+                         ["Cg10ZXN0LXBhZ2UtdHdv"])
+
+    def test_the_hint_book_and_record_rules_for_google(self):
+        self.assertEqual(mr.validate_hints(GHINTS), [])
+        bad = copy.deepcopy(GHINTS)
+        bad["jobs"][G_JOB]["capabilities"] = []
+        bad["jobs"]["test.google.line"] = {"provider": "google", "line": "flash", "capabilities": ["generateContent"],
+                                           "source": "https://ai.google.dev/gemini-api/docs/models",
+                                           "read_on": "2026-10-27"}
+        record = bad["deprecations"]["google"]["models"]
+        record["gemini-3.8-flash"] = {"released": "September 2, 2026"}
+        record["gemini-3.6-flash"] = {"released": "2026-07-21", "shutdown_on": "2027-01-01"}
+        record["gemini-3.7-flash"] = {"released": "2026-08-13", "redirects_to": ""}
+        record["gemini-2.0-flash"] = {"shut_down": True, "replacement": "gemini-3.6-flash"}
+        record["gemini-9-flash"] = {}
+        problems = "\n".join(mr.validate_hints(bad))
+        for expected in (f"{G_JOB}: google jobs must name the generation methods",
+                         "test.google.line: google lists no model lines",
+                         "deprecations.google.gemini-3.8-flash: released must be YYYY-MM-DD or YYYY-MM",
+                         "deprecations.google.gemini-3.6-flash: unknown field shutdown_on",
+                         "deprecations.google.gemini-3.7-flash: redirects_to",
+                         "deprecations.google.gemini-2.0-flash: shut_down needs its shutdown date",
+                         "deprecations.google.gemini-9-flash: empty"):
+            self.assertIn(expected, problems)
 
 
 REGISTRY = {
@@ -655,8 +917,24 @@ class TestPrivacyDocsTruth(unittest.TestCase):
     def test_privacy_names_the_list_call_and_its_limits(self):
         text = (REPO / "PRIVACY.md").read_text(encoding="utf-8")
         for needed in ("/v1/models", "MODEL_ROUTER_OFFLINE", f"once every {mr.TTL_DAYS} days",
-                       "never the key", "model-router-cache.json"):
+                       "never the key", "model-router-cache.json", "generativelanguage.googleapis.com",
+                       "x-goog-api-key"):
             self.assertIn(needed, text)
+
+    def test_curator_examples_quote_the_routers_own_words(self):
+        """docs/MODEL-CURATOR.md's warnings, regenerated from the real hint book and the fixtures.
+        3.38.0's OpenAI example said "the router would choose gpt-6-luna": Luna is the page's
+        recommendation, while the router's family pick is GPT-6.1 Sol."""
+        doc = (REPO / "docs" / "MODEL-CURATOR.md").read_text(encoding="utf-8")
+        hints = json.loads((SCRIPTS / "model_hints.json").read_text(encoding="utf-8"))
+        cases = (("anthropic", JOB, CRED, KEY, Fetch(), "claude-sonnet-4-5-20250929"),
+                 ("openai", OAI_JOB, OAI_CRED, OAI_KEY, OAIFetch(), "gpt-4o-2024-08-06"))
+        for provider, job, cred, key, fetch, requested in cases:
+            with redirect_stderr(io.StringIO()):
+                r = mr.route(job, hints, provider=provider, credential_name=cred, api_key=key, default_model=None,
+                             requested=requested, fetch=fetch, now=NOW, env={})
+            self.assertEqual(len(r["warnings"]), 1, r["warnings"])
+            self.assertIn(f"WARNING ({provider}): {r['warnings'][0]}", doc)
 
 
 class TestParity(unittest.TestCase):

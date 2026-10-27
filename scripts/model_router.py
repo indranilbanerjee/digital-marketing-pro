@@ -14,10 +14,21 @@ or a model FAMILY, never an id:
     comes from that shutdown_date plus the deprecations record an agent read from OpenAI's
     deprecations page into the hint book (with its source and date). Fine-tuned models
     follow their base model's schedule.
+  * Google: models.list gives each model's name ("models/<id>"), version, token limits and
+    the generation methods it supports, with no lifecycle and no release date. A job names a
+    FAMILY pattern and the methods it calls (its `capabilities`, such as generateContent),
+    which the list must report. Lifecycle AND release dates come from the deprecations
+    record an agent read from Google's deprecations page. That page's shutdown dates are the
+    earliest possible ones and it marks the models already shut down, so a model past its
+    date that the page does not mark is kept with a warning, not refused. A model whose
+    endpoint the page says now routes to another is never picked. A listed model missing
+    from the record has no known release date, so it waits (with a warning) until the record
+    is re-read.
 At run time the router lists the models this key can use and picks, in the job's line or
 family, the newest (highest version, then newest) model that is:
-  * `active` (no shutdown announced, not retired);
-  * generally available: no preview/exp/beta/alpha/rc id, no dated snapshot, no fine-tune;
+  * `active` (no shutdown announced, not retired, not routed to another model);
+  * generally available: no preview/exp/beta/alpha/rc id, no moving "latest" alias, no dated
+    snapshot, no fine-tune;
   * at least MIN_GA_DAYS old (a brand-new release is never promoted on day one);
   * equipped with every capability the job's rule requires.
 The registry stays as the fallback: offline, the caller's shipped default is used and the
@@ -38,7 +49,8 @@ LIMITS (the plan's rules 5, 8 and 10)
   never the key. It stores the chosen ids, their lifecycle dates and counts; never the list,
   and never a fine-tuned model's name (at an agency those name clients).
 * Each key goes only to its own vendor, the Anthropic one with the same anthropic-version
-  header as the caller's generation call.
+  header as the caller's generation call, the Google one in the x-goog-api-key header and
+  never in the URL (where proxies and server logs keep it).
 * MODEL_ROUTER_OFFLINE=1 makes no call at all.
 * Deterministic: the same list on the same day gives the same answer. Learning from
   approvals belongs to a server, not to this file.
@@ -47,7 +59,7 @@ This file is copied byte for byte into each plugin that uses it; a parity test i
 keeps the copies identical. Stdlib only, Python 3.10+.
 
 CLI (prints one JSON object; exit 0 chosen, 2 refused or bad input):
-    python model_router.py --hints FILE --job JOB --provider anthropic|openai \\
+    python model_router.py --hints FILE --job JOB --provider anthropic|google|openai \\
         --credential-name NAME [--requested ID] [--default-model ID] \\
         [--cache FILE] [--anthropic-version VERSION]
 """
@@ -72,11 +84,14 @@ TIMEOUT_S = 10.0
 OFFLINE_ENV = "MODEL_ROUTER_OFFLINE"
 ANTHROPIC_MODELS_URL = "https://api.anthropic.com/v1/models"
 OPENAI_MODELS_URL = "https://api.openai.com/v1/models"
+GOOGLE_MODELS_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 LIFECYCLES = ("active", "deprecated", "retired")
 NON_GA = re.compile(r"(?:^|[-_.])(?:preview|exp|experimental|beta|alpha|rc\d*)(?:$|[-_.])", re.I)
-DATED_SNAPSHOT = re.compile(r"-\d{4}-\d{2}-\d{2}$")
+MOVING_ALIAS = re.compile(r"(?:^|[-_.])latest$", re.I)  # hot-swapped with each release
+DATED_SNAPSHOT = re.compile(r"-(?:\d{4}-\d{2}-\d{2}|\d{2}-\d{4}|\d{2}-\d{2})$")  # 2024-08-06, 09-2025, 05-20
+GOOGLE_RECORD_FIELDS = ("released", "shutdown", "shut_down", "replacement", "redirects_to")
 CREDENTIAL_NAME = re.compile(r"^[A-Z][A-Z0-9_]{1,63}$")
-CACHE_FIELDS = frozenset({"model", "lifecycle", "retires_at", "line", "replacement",
+CACHE_FIELDS = frozenset({"model", "lifecycle", "retires_at", "line", "replacement", "replacement_from",
                           "discovered_at", "source", "counts"})
 RULE_REQUIRED = ("provider", "source", "read_on")
 EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
@@ -127,7 +142,7 @@ def _base_id(model_id: str) -> str:
 
 # --- HTTP ------------------------------------------------------------------------------------
 
-def _get_json(req, opener, timeout: float, api_key: str) -> dict:
+def _get_json(req, opener, timeout: float, api_key: str, items: str = "data", omit_empty: bool = False) -> dict:
     try:
         with opener(req, timeout=timeout) as resp:
             page = json.loads(resp.read().decode("utf-8-sig"))
@@ -142,22 +157,27 @@ def _get_json(req, opener, timeout: float, api_key: str) -> dict:
         raise FetchError(kind, _scrub(str(reason), api_key)) from None
     except ValueError:
         raise FetchError("schema", "the model list was not JSON") from None
-    if not isinstance(page, dict) or not isinstance(page.get("data"), list):
-        raise FetchError("schema", "the model list had no data array")
+    if isinstance(page, dict) and omit_empty and items not in page:
+        page[items] = []  # proto3 JSON leaves an empty repeated field out
+    if not isinstance(page, dict) or not isinstance(page.get(items), list):
+        raise FetchError("schema", f"the model list had no {items} array")
     return page
 
 
 def _error_text(exc: urllib.error.HTTPError) -> str:
-    """The error's type and code only: providers echo part of a rejected key in the message."""
+    """The error's type, status and code only: providers echo part of a rejected key in the message."""
     try:
         err = json.loads(exc.read().decode("utf-8-sig")).get("error", {})
-        return " ".join(str(err[k]) for k in ("type", "code") if err.get(k))
+        return " ".join(str(err[k]) for k in ("type", "status", "code")
+                        if err.get(k) and str(err[k]) != str(exc.code))
     except Exception:
         return ""
 
 
 def _pages(first_url: str, headers: dict, api_key: str, cursor: str, timeout: float, urlopen,
-           retry_without=None) -> list:
+           retry_without=None, *, items: str = "data", id_field: str = "id", next_token: str | None = None) -> list:
+    """Every page of a model list. Anthropic and OpenAI page by has_more/last_id; Google by
+    nextPageToken, leaving an empty list's `models` key out."""
     opener = urlopen or urllib.request.urlopen
     out: list = []
     url, after = first_url, None
@@ -167,16 +187,16 @@ def _pages(first_url: str, headers: dict, api_key: str, cursor: str, timeout: fl
         for name, value in headers.items():
             req.add_header(name, value)
         try:
-            page = _get_json(req, opener, timeout, api_key)
+            page = _get_json(req, opener, timeout, api_key, items, omit_empty=bool(next_token))
         except FetchError as exc:
             if exc.code == 400 and retry_without and not out and url != retry_without:
                 url = retry_without  # an API version without the filter: list without it
                 continue
             raise
-        out.extend(m for m in page["data"] if isinstance(m, dict) and isinstance(m.get("id"), str))
-        if not page.get("has_more") or not page.get("last_id"):
+        out.extend(m for m in page[items] if isinstance(m, dict) and isinstance(m.get(id_field), str))
+        after = page.get(next_token) if next_token else (page.get("has_more") and page.get("last_id"))
+        if not after:
             return out
-        after = page["last_id"]
     return out
 
 
@@ -217,8 +237,8 @@ def fetch_openai(api_key: str, _api_version: str | None = None, *, timeout: floa
     return _pages(OPENAI_MODELS_URL, {"Authorization": f"Bearer {api_key}"}, api_key, "after", timeout, urlopen)
 
 
-def _openai_record(hints: dict) -> dict:
-    return ((hints.get("deprecations") or {}).get("openai") or {}).get("models") or {}
+def _record(hints: dict, provider: str) -> dict:
+    return ((hints.get("deprecations") or {}).get(provider) or {}).get("models") or {}
 
 
 def _shutdown_lifecycle(shutdown, now: datetime) -> str:
@@ -229,7 +249,7 @@ def _shutdown_lifecycle(shutdown, now: datetime) -> str:
 
 
 def _norm_openai(raw: list, hints: dict, now: datetime) -> tuple:
-    record, out = _openai_record(hints), []
+    record, out = _record(hints, "openai"), []
     for m in raw:
         shutdown = m.get("shutdown_date") or record.get(_base_id(m["id"]), {}).get("shutdown")
         created = m.get("created")
@@ -242,23 +262,98 @@ def _norm_openai(raw: list, hints: dict, now: datetime) -> tuple:
 
 def _requested_openai(requested: str, models: list, rule: dict, hints: dict, now: datetime) -> dict:
     found = next((m for m in models if m["id"] == requested), None)
-    noted = _openai_record(hints).get(_base_id(requested), {})
+    noted = _record(hints, "openai").get(_base_id(requested), {})
     if found:
         lifecycle, retires = found["lifecycle"], found["retires_at"]
     elif noted.get("shutdown"):
         lifecycle, retires = _shutdown_lifecycle(noted["shutdown"], now), noted["shutdown"]
     else:
         lifecycle, retires = "unlisted", None
-    replacement = noted.get("replacement")
-    if not replacement:
-        best, _ = choose(models, rule, now)
-        replacement = best["id"] if best else None
-    return {"lifecycle": lifecycle, "retires_at": retires, "line": None, "replacement": replacement}
+    return {"lifecycle": lifecycle, "retires_at": retires, "line": None,
+            **_replacement(noted.get("replacement"), models, rule, now)}
+
+
+def _replacement(recorded: str | None, models: list, rule: dict, now: datetime) -> dict:
+    """The vendor's recommended replacement from the record, else the router's own pick; the
+    messages say which, because the two can differ."""
+    if recorded:
+        return {"replacement": recorded, "replacement_from": "record"}
+    best, _ = choose(models, rule, now)
+    return {"replacement": best["id"] if best else None, "replacement_from": "router"}
+
+
+# --- Google adapter (presence plus recorded lifecycle and release dates) ----------------------
+
+def fetch_google(api_key: str, _api_version: str | None = None, *, timeout: float = TIMEOUT_S,
+                 urlopen=None) -> list:
+    """Every model this key can see. The key travels in the x-goog-api-key header, never in the
+    URL: Google's own curl examples put it there as ?key=, where proxies and server logs keep it."""
+    return _pages(GOOGLE_MODELS_URL + "?" + urllib.parse.urlencode({"pageSize": 1000}),
+                  {"x-goog-api-key": api_key}, api_key, "pageToken", timeout, urlopen,
+                  items="models", id_field="name", next_token="nextPageToken")
+
+
+def _google_id(name: str) -> str:
+    return name[len("models/"):] if name.startswith("models/") else name
+
+
+def _month_or_day(value) -> date | None:
+    """YYYY-MM-DD as given; YYYY-MM (the page gives only a month for some models) as the month's
+    LAST day, so the age rule never clears a model earlier than it could have been released."""
+    if not isinstance(value, str):
+        return None
+    try:
+        if re.fullmatch(r"\d{4}-\d{2}", value):
+            year, month = int(value[:4]), int(value[5:])
+            if not 1 <= month <= 12:
+                return None
+            return date(year + month // 12, month % 12 + 1, 1) - timedelta(days=1)
+        return date.fromisoformat(value) if re.fullmatch(r"\d{4}-\d{2}-\d{2}", value) else None
+    except ValueError:
+        return None
+
+
+def _google_lifecycle(noted: dict) -> str:
+    if noted.get("shut_down"):
+        return "retired"
+    if noted.get("redirects_to"):
+        return "redirected"
+    return "deprecated" if noted.get("shutdown") else "active"
+
+
+def _norm_google(raw: list, hints: dict, now: datetime) -> tuple:
+    record, out = _record(hints, "google"), []
+    for m in raw:
+        mid = _google_id(m["name"])
+        noted = record.get(mid, {})
+        released = _month_or_day(noted.get("released"))
+        methods = [x for x in m.get("supportedGenerationMethods") or [] if isinstance(x, str)]
+        out.append({"id": mid, "line": None, "lifecycle": _google_lifecycle(noted),
+                    "retires_at": noted.get("shutdown"),
+                    "created_at": released.isoformat() + "T00:00:00Z" if released else NEVER,
+                    "capabilities": {x: {"supported": True} for x in methods}})
+    return out, None
+
+
+def _requested_google(requested: str, models: list, rule: dict, hints: dict, now: datetime) -> dict:
+    mid = _google_id(requested)
+    found = next((m for m in models if m["id"] == mid), None)
+    noted = _record(hints, "google").get(mid, {})
+    if found:
+        lifecycle, retires = found["lifecycle"], found["retires_at"]
+    elif noted and _google_lifecycle(noted) != "active":
+        lifecycle, retires = _google_lifecycle(noted), noted.get("shutdown")
+    else:
+        lifecycle, retires = "unlisted", None
+    return {"lifecycle": lifecycle, "retires_at": retires, "line": None,
+            **_replacement(noted.get("redirects_to") or noted.get("replacement"), models, rule, now)}
 
 
 ADAPTERS = {
     "anthropic": {"fetch": fetch_anthropic, "source": ANTHROPIC_MODELS_URL,
                   "normalize": _norm_anthropic, "requested": _requested_anthropic},
+    "google": {"fetch": fetch_google, "source": GOOGLE_MODELS_URL, "dates_from_record": True,
+               "normalize": _norm_google, "requested": _requested_google},
     "openai": {"fetch": fetch_openai, "source": OPENAI_MODELS_URL,
                "normalize": _norm_openai, "requested": _requested_openai},
 }
@@ -267,7 +362,8 @@ ADAPTERS = {
 # --- selection -------------------------------------------------------------------------------
 
 def _not_promotable(model_id: str) -> bool:
-    return bool(":" in model_id or NON_GA.search(model_id) or DATED_SNAPSHOT.search(model_id))
+    return bool(":" in model_id or NON_GA.search(model_id) or MOVING_ALIAS.search(model_id)
+                or DATED_SNAPSHOT.search(model_id))
 
 
 def _has_capabilities(model: dict, required) -> bool:
@@ -296,12 +392,16 @@ def choose(models: list, rule: dict, now: datetime) -> tuple:
     else:
         in_line = [(m, ()) for m in models if m.get("line") == rule.get("line")]
     floor = now - timedelta(days=MIN_GA_DAYS)
-    eligible = [(m, v) for m, v in in_line
-                if m.get("lifecycle") == "active" and not _not_promotable(m["id"])
-                and (_parse(m.get("created_at")) or EPOCH) <= floor
-                and _has_capabilities(m, rule.get("capabilities"))]
+    ready = [(m, v) for m, v in in_line
+             if m.get("lifecycle") == "active" and not _not_promotable(m["id"])
+             and _has_capabilities(m, rule.get("capabilities"))]
+    eligible = [(m, v) for m, v in ready if (_parse(m.get("created_at")) or EPOCH) <= floor]
     eligible.sort(key=lambda mv: (mv[1], _parse(mv[0].get("created_at")) or EPOCH, mv[0]["id"]), reverse=True)
     counts = {"listed": len(models), "in_line": len(in_line), "eligible": len(eligible)}
+    top = eligible[0][1] if eligible else None
+    held = sum(1 for m, v in ready if m.get("created_at") == NEVER and (top is None or v > top))
+    if held:
+        counts["held_undated"] = held  # newer than the pick, but no release date to clear the age rule
     return (eligible[0][0] if eligible else None), counts
 
 
@@ -335,6 +435,8 @@ def validate_hints(hints) -> list:
         has_line, has_family = bool(rule.get("line")), bool(rule.get("family"))
         if has_line == has_family:
             out.append(f"{job}: give line or family, not both" if has_line else f"{job}: give line or family")
+        elif has_line and rule.get("provider") in ("openai", "google"):
+            out.append(f"{job}: {rule['provider']} lists no model lines, so give a family")
         if has_family:
             try:
                 if "version" not in re.compile(rule["family"]).groupindex:
@@ -346,6 +448,9 @@ def validate_hints(hints) -> list:
             out.append(f"{job}: capabilities must be a list of names")
         elif caps and rule.get("provider") == "openai":
             out.append(f"{job}: openai lists no capabilities, so none can be required")
+        elif not caps and rule.get("provider") == "google":
+            out.append(f"{job}: google jobs must name the generation methods they call in capabilities "
+                       f"(for example generateContent), since the list mixes text, image, speech and embedding models")
     for provider, record in sorted((hints.get("deprecations") or {}).items()):
         where = f"deprecations.{provider}"
         if not isinstance(record, dict) or not isinstance(record.get("models"), dict):
@@ -358,9 +463,33 @@ def validate_hints(hints) -> list:
             if not isinstance(entry, dict):
                 out.append(f"{where}.{mid}: must be an object")
                 continue
+            if provider == "google":
+                out += _google_entry_problems(f"{where}.{mid}", entry)
+                continue
             out += _date_problem(entry.get("shutdown"), f"{where}.{mid}", "shutdown")
             if not isinstance(entry.get("replacement"), str) or not entry["replacement"]:
                 out.append(f"{where}.{mid}: replacement missing")
+    return out
+
+
+def _google_entry_problems(where: str, entry: dict) -> list:
+    """One row of Google's deprecations page: the release date, the earliest shutdown date, whether
+    the page marks it as already shut down, its recommended replacement, or the model its
+    endpoint now routes to. Every field is optional; an empty row says nothing."""
+    if not entry:
+        return [f"{where}: empty; give at least its release date"]
+    out = [f"{where}: unknown field {k}" for k in sorted(entry) if k not in GOOGLE_RECORD_FIELDS]
+    if "released" in entry and _month_or_day(entry["released"]) is None:
+        out.append(f"{where}: released must be YYYY-MM-DD or YYYY-MM")
+    if "shutdown" in entry:
+        out += _date_problem(entry["shutdown"], where, "shutdown")
+    if "shut_down" in entry and not isinstance(entry["shut_down"], bool):
+        out.append(f"{where}: shut_down must be true or false")
+    if entry.get("shut_down") and "shutdown" not in entry:
+        out.append(f"{where}: shut_down needs its shutdown date")
+    for field in ("replacement", "redirects_to"):
+        if field in entry and (not isinstance(entry[field], str) or not entry[field].strip()):
+            out.append(f"{where}: {field} must name a model")
     return out
 
 
@@ -432,6 +561,8 @@ def route(job: str, hints: dict, *, provider: str, credential_name: str, api_key
         if age > RECORD_RECHECK_DAYS:
             base["warnings"].append(f"the {provider} deprecations record was read {age} days ago; "
                                     f"re-read {record['source']} and update the hint book")
+    held_hint = (f"re-read {record['source']} and add the missing release dates to the hint book's {provider} "
+                 f"deprecations record" if adapter.get("dates_from_record") and record else None)
 
     if str(env.get(OFFLINE_ENV, "")).strip().lower() in ("1", "true", "yes"):
         return _offline(base, requested, default_model, f"{OFFLINE_ENV} is set", registry, now)
@@ -446,7 +577,8 @@ def route(job: str, hints: dict, *, provider: str, credential_name: str, api_key
     model_key = f"{provider}|model:{requested}|{credential_name}" if requested and not private else None
     if (_fresh(entries.get(listed_key), now) and job_key in entries
             and (not requested or (model_key and model_key in entries))):
-        return _answer(base, entries[job_key], entries.get(model_key) if model_key else None, "cache")
+        return _answer(base, entries[job_key], entries.get(model_key) if model_key else None, "cache",
+                       now, held_hint)
 
     why = "cache unreadable" if cache_warning else ("cache stale" if listed_key in entries else "no cache")
     print(f"model-router: listing {provider} models for {credential_name} ({why})", file=sys.stderr)
@@ -484,7 +616,7 @@ def route(job: str, hints: dict, *, provider: str, credential_name: str, api_key
         if model_key:
             entries[model_key] = asked
     _save_cache(cache_path, cache)
-    return _answer(base, entries[job_key], asked, "live")
+    return _answer(base, entries[job_key], asked, "live", now, held_hint)
 
 
 def registry_entry(registry: dict | None, model_id: str) -> tuple:
@@ -531,7 +663,8 @@ def _offline(base: dict, requested: str | None, default_model: str | None, reaso
     return out
 
 
-def _answer(base: dict, chosen: dict, asked: dict | None, basis: str) -> dict:
+def _answer(base: dict, chosen: dict, asked: dict | None, basis: str, now: datetime | None = None,
+            held_hint: str | None = None) -> dict:
     out = {**base, "model": chosen.get("model"), "basis": basis, "offline": False,
            "source": chosen.get("source"), "discovered_at": chosen.get("discovered_at"),
            "counts": chosen.get("counts"), "warnings": list(base["warnings"])}
@@ -540,22 +673,42 @@ def _answer(base: dict, chosen: dict, asked: dict | None, basis: str) -> dict:
         out["replacement"] = replacement
         instead = replacement or "a current model"
         where = f"active {asked['line']} model" if asked.get("line") else "current model in the job's family"
+        recorded = asked.get("replacement_from") == "record"
         if asked.get("lifecycle") == "retired":
-            raise RouterError(f"{requested} is retired: requests naming it fail. Use {instead}, the newest "
-                              f"{where} this key can use.")
+            why = (f"the replacement {base['provider']}'s deprecations page names" if recorded
+                   else f"the newest {where} this key can use")
+            raise RouterError(f"{requested} is retired: requests naming it fail. Use {instead}, {why}.")
         if asked.get("lifecycle") == "deprecated":
-            when = (asked.get("retires_at") or "")[:10] or "on a date not yet announced"
-            out["warnings"].append(f"{requested} is deprecated and retires {when}; the router would choose "
-                                   f"{instead}. Keeping {requested} because it was asked for by name.")
+            when = (asked.get("retires_at") or "")[:10]
+            pick = (f"{base['provider']}'s deprecations page names {instead} as its replacement" if recorded
+                    else f"the router would choose {instead}")
+            if when and now and when <= now.date().isoformat():
+                # Google's dates are the earliest possible shutdown; the page marks what is really off.
+                out["warnings"].append(f"{requested} is past its announced shutdown date ({when}) and may stop "
+                                       f"working at any time; {pick}. Keeping {requested} because it was asked "
+                                       f"for by name.")
+            else:
+                out["warnings"].append(f"{requested} is deprecated and retires {when or 'on a date not yet announced'}; "
+                                       f"{pick}. Keeping {requested} because it was asked for by name.")
+        elif asked.get("lifecycle") == "redirected":
+            out["warnings"].append(f"{requested} is no longer served as itself: {base['provider']} routes requests "
+                                   f"for it to {instead}. Sending {requested} because it was asked for by name; "
+                                   f"the answer will come from {instead}.")
         elif asked.get("lifecycle") == "unlisted":
             out["warnings"].append(f"{requested} is not in {base['provider']}'s model list for this key; "
                                    f"sending it anyway, without a lifecycle check.")
         out["model"], out["basis"] = requested, "requested"
         return out
+    kind = f"{base['line']} model" if base.get("line") else "model in the job's family"
+    held = (out.get("counts") or {}).get("held_undated")
+    note = (f"{held} newer {kind}{'s' if held > 1 else ''} {'have' if held > 1 else 'has'} no known release "
+            f"date, so the {MIN_GA_DAYS}-day rule cannot clear {'them' if held > 1 else 'it'} yet"
+            + (f"; {held_hint}" if held_hint else "")) if held else None
     if not out["model"]:
-        kind = f"{base['line']} model" if base.get("line") else "model in the job's family"
         raise RouterError(f"no active, generally available {kind} at least {MIN_GA_DAYS} days old with the "
-                          f"required capabilities is visible to this key")
+                          f"required capabilities is visible to this key" + (f" ({note})" if note else ""))
+    if note:
+        out["warnings"].append(note)
     return out
 
 

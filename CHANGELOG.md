@@ -6,6 +6,49 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.39.0] - 2026-10-27
+
+### The model router reaches Google; a replacement taken from a deprecations page is named as the vendor's
+
+**Added: a Google adapter in `scripts/model_router.py`**
+
+- No DMP job uses it yet. This file is the canonical copy of the router, and [SocialForge](https://github.com/indranilbanerjee/socialforge) copies it byte for byte so its asset indexing picks its vision model by job.
+- Presence comes from `GET https://generativelanguage.googleapis.com/v1beta/models` (up to 1,000 per page, following `nextPageToken`). The key goes only in the `x-goog-api-key` header. Google's own curl examples put it in the URL as `?key=`, where proxies and server logs keep it.
+- A Google job names a family pattern over ids and the generation methods it calls as its `capabilities` (for example `generateContent`). The model's `supportedGenerationMethods` in the list must include them. The hint book rejects a Google job that names no methods, or that names a line.
+- The list has no lifecycle and no release date. Both come from a `deprecations.google` record read from [Google's deprecations page](https://ai.google.dev/gemini-api/docs/deprecations), with its source and date. Each entry may carry `released`, `shutdown`, `shut_down`, `replacement` and `redirects_to`.
+  - The page defines its shutdown dates as the earliest possible ones and greys out the models already shut down. So `shut_down` is refused (exit 2), while a past date on a row the page does not grey out gets a warning that the model may stop at any time. On 2026-10-27 one row was past its date and still live.
+  - The page says two endpoints, Gemini 3.5 Flash and 3.7 Flash, now route their requests to newer models. The router never picks such a model. Asked for one by name, it sends it with a warning that the answer comes from the other model.
+  - A listed model missing from the record has no known release date, so the 14-day rule cannot clear it. A newer model held back this way is named in a warning until the record is re-read.
+  - A release date the page gives only as a month counts from the month's last day.
+- For every provider, a moving `latest` alias (swapped with each new release) is never picked. Google's date suffixes (`-09-2025`, `-05-20`) count as dated snapshots.
+- A rejected key: Google answers 400 or 403 with a `status`, and the refusal names it (`HTTP 400 INVALID_ARGUMENT`), never the key. An empty list arrives with its `models` key left out and stops the run (exit 2).
+- `PRIVACY.md` and `docs/MODEL-CURATOR.md` describe the Google list call and the record's fields.
+
+**Fixed: a replacement taken from a deprecations record is named as the vendor's recommendation**
+
+- For a deprecated OpenAI model, the warning said "the router would choose X" when X was the replacement recommended on OpenAI's deprecations page. The two can differ: for `gpt-4o-2024-08-06` OpenAI recommends GPT-6 Luna, while the job's family pick is GPT-6.1 Sol.
+- The warning now says "openai's deprecations page names X as its replacement", and a retired model's refusal says the same. Anthropic's warnings name the router's own pick, so they are unchanged.
+- The worked example in `docs/MODEL-CURATOR.md` used the old wording. A new test regenerates both examples from the real hint book and requires the doc to quote them word for word.
+
+**Tests**
+
+- 17 new Google tests in `tests/test_model_router.py`, written before the adapter. All 17 fail on the 3.38.2 router. They cover:
+  - the family pick, with the required method;
+  - redirected endpoints;
+  - preview, experimental, `latest` and dated ids;
+  - the record's release dates: too new, missing, month-only;
+  - deprecated, shut down, and past the earliest date;
+  - a `models/` prefix on a requested id;
+  - a rejected key, an empty list and a timeout;
+  - the offline registry check;
+  - the cache;
+  - a determinism snapshot;
+  - the header, never the URL;
+  - the hint-book rules.
+- The fixtures in `tests/fixtures/model_router/google_*.json` follow the documented `models.list` shape, with ids from the deprecations page.
+- `tests/test_no_internal_references.py` now also catches a session label preceded by up to two descriptive words. "A/B tester" and "testers" in prose still pass.
+- Suite: 859 tests.
+
 ## [3.38.2] - 2026-10-27
 
 ### The model router checks deprecations offline too; public files point only at what a reader can open

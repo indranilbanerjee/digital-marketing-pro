@@ -31,12 +31,29 @@ python scripts/resolve_model.py --list --vendor anthropic --status current
 
 ---
 
-## The model router (both legs of the AI-visibility checker)
+## The model router (both legs of the AI-visibility checker, plus a Google adapter)
 
-`scripts/model_router.py` stops depending on model names for the decision. A job in `scripts/model_hints.json` names a provider and a model **line** or **family**, plus the capabilities it needs, never an id; every rule carries the page it was read from and the date. At run time the router lists the models the key can use (GET `/v1/models`) and picks the newest model in the line or family that is current, generally available (no preview, exp, beta, alpha or rc id, no dated snapshot, no fine-tune) and at least 14 days old. The registry alias (`default_alias`) is the fallback, used only offline.
+`scripts/model_router.py` stops depending on model names for the decision. A job in `scripts/model_hints.json` names a provider and a model **line** or **family**, plus the capabilities it needs, never an id; every rule carries the page it was read from and the date. At run time the router lists the models the key can use (GET `/v1/models` at Anthropic and OpenAI, GET `/v1beta/models` at Google) and picks the newest model in the line or family that is current, generally available (no preview, exp, beta, alpha or rc id, no moving `latest` alias, no dated snapshot, no fine-tune) and at least 14 days old. The registry alias (`default_alias`) is the fallback, used only offline.
 
 - **Anthropic** (`ai-visibility.probe.anthropic`, line `sonnet`): the list reports each model's `lifecycle`, `line`, `created_at`, `retires_at` and capabilities, so lifecycle is fully automatic.
 - **OpenAI** (`ai-visibility.probe.openai`, family `gpt-<version>-sol`): the list gives only `id`, `created`, `owned_by` and, when announced, `shutdown_date`. Selection is by family pattern over ids, highest version first. Lifecycle comes from that `shutdown_date` plus the `deprecations.openai` record an agent read from OpenAI's deprecations page into the hint book, with its source and date. The router names the record in its warnings once it is more than 30 days old. Fine-tuned models (`ft:BASE:org::id`) follow their base model's schedule, as OpenAI states, and are never picked or cached.
+- **Google** (no DMP job; this file is the canonical copy that [SocialForge](https://github.com/indranilbanerjee/socialforge) copies byte for byte for `index-assets`): `models.list` gives each model's `name` (`models/<id>`), `version`, token limits and `supportedGenerationMethods`, with no lifecycle and no release date. Previews, experimental ids and moving `latest` aliases are mixed in. A Google job names a family pattern and must list the generation methods it calls as its `capabilities` (for example `generateContent`), which the list must report for the model. The key goes only in the `x-goog-api-key` header. Google's own curl examples put it in the URL as `?key=`, where proxies and server logs keep it.
+  - Lifecycle **and** release dates come from the `deprecations.google` record, read from [Google's deprecations page](https://ai.google.dev/gemini-api/docs/deprecations), with its source and date. One entry per model row, every field optional:
+
+    | Field | From the page |
+    |---|---|
+    | `released` | Release date, `YYYY-MM-DD`; `YYYY-MM` when the page gives only a month (counted from the month's last day) |
+    | `shutdown` | The page's shutdown date, which it defines as the **earliest possible** one |
+    | `shut_down` | `true` for the rows the page greys out as already shut down |
+    | `replacement` | Recommended replacement |
+    | `redirects_to` | The model an endpoint now routes its requests to ("the endpoint is not shutting down and automatically routes API requests to …") |
+
+  - The router reads those fields like this:
+    - `shut_down`: retired, and refused if asked for by name.
+    - `redirects_to`: never picked. Asked for by name, it is sent with a warning that the answer comes from the other model.
+    - A `shutdown` date still in the future: deprecated. Asked for by name, it is kept with a warning.
+    - A `shutdown` date already past on a row the page doesn't grey out: kept with a warning that it may stop at any time, not refused.
+    - A listed model missing from the record has no known release date, so the 14-day rule can't clear it. A newer one held back this way is named in a warning until the record is re-read.
 - One list call per provider per 7 days per key name serves every job; the cache (`model-router-cache.json`) is keyed by the environment variable's name and holds chosen ids, lifecycle dates and counts, never the key, the list or a fine-tune's name. `MODEL_ROUTER_OFFLINE=1` makes no call.
 - A model asked for by name (`--anthropic-model`, `--openai-model`) is kept if current, kept with a warning if deprecated, and refused with exit 2 if retired, naming the replacement. Nothing is swapped silently.
 - A rejected key or an empty list stops the run before any probe is sent (exit 2). A timeout, provider trouble, or an Anthropic list without lifecycle fields falls back to the registry alias and tags the output `offline`.
@@ -44,12 +61,14 @@ python scripts/resolve_model.py --list --vendor anthropic --status current
 - The run's output carries `model_routing.anthropic` and `model_routing.openai`: the model asked for, the model sent, where the answer came from (`live`, `cache`, `requested` or `offline`) and when.
 
 ```bash
-# Ask for deprecated models by name: kept, with a warning naming the router's choice
+# Ask for deprecated models by name: kept, with a warning naming the replacement
 python scripts/ai-visibility-checker.py --brand acme --mode api --anthropic-model claude-sonnet-4-5-20250929
 # WARNING (anthropic): claude-sonnet-4-5-20250929 is deprecated and retires 2026-11-30; the router would choose claude-sonnet-5-5. Keeping claude-sonnet-4-5-20250929 because it was asked for by name.
 python scripts/ai-visibility-checker.py --brand acme --mode api --openai-model gpt-4o-2024-08-06
-# WARNING (openai): gpt-4o-2024-08-06 is deprecated and retires 2027-01-14; the router would choose gpt-6-luna. Keeping gpt-4o-2024-08-06 because it was asked for by name.
+# WARNING (openai): gpt-4o-2024-08-06 is deprecated and retires 2027-01-14; openai's deprecations page names gpt-6-luna as its replacement. Keeping gpt-4o-2024-08-06 because it was asked for by name.
 ```
+
+A replacement taken from a deprecations record is the vendor's recommendation and is named as such. It can differ from the router's own pick: for `gpt-4o-2024-08-06` OpenAI recommends GPT-6 Luna, while the job's family pick is GPT-6.1 Sol. Before 3.39.0 both cases read "the router would choose".
 
 When Sonnet 4.5 retires on 2026-11-30, a job with no model named keeps working without a registry edit, and a run that names Sonnet 4.5 stops with the replacement in the message.
 

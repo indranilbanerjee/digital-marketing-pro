@@ -27,7 +27,7 @@ LABELS = re.compile("|".join([
     r"\bBrain" + r" A\b",
     r"\bWorker" + r" [AB]\b",
     r"\b[Tt]he" + r" Orchestrator\b",  # "the Campaign Orchestrator" is a product name; it passes
-    r"\b[Tt]he" + r" Tester\b",
+    r"\b[Tt]he(?:\s+[\w-]+){0,2}\s+" + r"Tester\b",  # "the fresh-install Tester" too; "A/B tester" passes
     r"\bTester" + r"'s\b",
 ]))
 SKIP_PARTS = {".git", "__pycache__", "results", "node_modules"}
@@ -92,10 +92,14 @@ class TestNoInternalReferences(unittest.TestCase):
         self.assertTrue(problems("scripts/x.py", "so after 3.36.2 Worker" + " B finished the sync by hand"))
         self.assertTrue(problems("tests/x.py", "The four cases Brain" + " A asked for first."))
         self.assertTrue(problems("tests/x.py", "The Tester" + "'s probe used to run the suite"))
+        # A role word after up to two words: found in sibling CHANGELOG lines dated 2026-10-27.
+        self.assertTrue(problems("CHANGELOG.md", "- Found by the fresh-install " + "Tester from the installed copy."))
+        self.assertTrue(problems("CHANGELOG.md", "as the installed-copy fresh " + "Tester saw it"))
         for fine in ("Campaign Orchestrator activates", "Journey Orchestrator Agent",
                      "The Campaign Orchestrator's budget-allocation framework",
                      "12-Part Engagement Orchestrator", "the session's model", "a tester who never saw it",
-                     "significance-tester.py", "A/B testers"):
+                     "significance-tester.py", "A/B testers", "the A/B tester picks a winner",
+                     "the A/B Tester tab", "testers in prose", "the fresh-install testers"):
             self.assertEqual(problems("docs/x.md", fine), [], fine)
 
     def test_old_changelog_entries_are_history(self):
