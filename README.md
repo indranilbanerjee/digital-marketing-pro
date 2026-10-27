@@ -6,16 +6,16 @@ Run `/digital-marketing-pro:engagement` against each brand. Same 12-Part Strateg
 
 Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Act Article 50 ready, Cowork team-persistent**. Built for marketing agencies, in-house teams running 50–200 brands, and consultancies. Installs on **Claude Code** (CLI + IDE), **Anthropic Cowork**, **OpenAI Codex**, **Cursor 2.5+**, **GitHub Copilot CLI**, **Google Antigravity 2.0**, **Hermes Agent**, **OpenClaw**, and **Grok** + 35+ Agent Skills platforms. Created by [Indranil Banerjee](https://indranil.in) · [LinkedIn](https://www.linkedin.com/in/askneelnow/) · [X](https://x.com/askneelnow).
 
-[![Version](https://img.shields.io/badge/version-3.36.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.36.1-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=yellow)](https://github.com/indranilbanerjee/digital-marketing-pro/stargazers)
-[![Tests](https://img.shields.io/badge/tests-740%2F740%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-747%2F747%20passing-brightgreen.svg)](tests/)
 [![Platforms](https://img.shields.io/badge/platforms-9%20native%20%2B%2035%20Agent%20Skills-success.svg)](#works-on-40-agent-harnesses-via-the-agent-skills-open-standard)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Article%2050%20ready-darkred.svg)](skills/context-engine/compliance-rules.md)
 
 [![Built by Indranil "Neel" Banerjee — Neelverse Marketing Suite — Sponsor this project](docs/assets/author-banner.svg)](https://github.com/sponsors/indranilbanerjee)
 
-> 🆕 **Just shipped — v3.36.0 (October 27, 2026):** every ad-platform API version lives in one dated table with sunset tests, Meta moves to v26.0 before v24.0 stops working on 10 Nov, and agent descriptions are a third of their old length. [What's new](#whats-new) · [Changelog](CHANGELOG.md)
+> 🆕 **Just shipped — v3.36.1 (October 27, 2026):** the compliance rules are current for India's DPDP Rules, the new TCPA revocation rule, the EU AI Act's 2 December deadline, UK cookies and California, and a test now watches every compliance date. [What's new](#whats-new) · [Changelog](CHANGELOG.md)
 
 ```bash
 # Install — one command (Claude Code 2.1.292 or newer)
@@ -204,7 +204,7 @@ Other marketing plugins exist, including Anthropic's own marketing plugin and co
 | AEO / GEO | **A 6-platform audit, including Google AI Mode** |
 | Where it runs | **9 native hosts**: Claude Code, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes, OpenClaw, Grok |
 | Live-write safety | **Single-use approval record for writes it sends itself; MCP writes: typed yes + host prompt** |
-| Tests | **740 stdlib unittest** tests |
+| Tests | **747 stdlib unittest** tests |
 | License | **MIT: no telemetry, no seats** |
 
 ---
@@ -301,7 +301,7 @@ Output: HTTP calls for the 8 executable connectors (Slack, HubSpot, Klaviyo, Sen
 
 ---
 
-## Supported surfaces (v3.36.0)
+## Supported surfaces (v3.36.1)
 
 | Platform | Install command | Manifest path | Status |
 |---|---|---|---|
@@ -413,6 +413,10 @@ If you run into a platform-specific install snag, file a [GitHub issue](https://
 
 ## What's new
 
+### v3.36.1 — compliance rules up to date, with a dated table (October 27, 2026)
+
+The compliance rules every skill checks against had fallen behind. India's DPDP Rules were dated to the January 2025 draft, and their Consent Manager registration was described as live (it opens 13 November 2026); the core duties, including verifiable parental consent, apply from 13 May 2027. The US text-message rules now cover the FCC's revocation rule effective 25 November 2026. The EU AI Act notes add the 2 December 2026 marking deadline for AI systems already on the market and the rule that old AI text republished now must be labelled. UK cookie exceptions and PECR fines changed on 5 February 2026, and California's penalties and new AI, browser-signal and data-broker laws are in. Every date now sits in one table at the top of the rules, each jurisdiction carries a "verified on" stamp, and a weekly test fails when a date passes or a stamp goes stale. 747 tests.
+
 ### v3.36.0 — API versions in one dated table; Meta v26.0; shorter agents (October 27, 2026)
 
 Meta's Marketing API v24.0, which DMP's ad templates used, stops working on 10 November 2026, and nothing in the repo knew. Every pinned platform API version now lives in one table with its sunset date and source page: Meta v26.0, LinkedIn 202610 on the documented campaign path, Google Ads v26 without the developer token Google retired in September, plus TikTok, X Ads and Klaviyo. Tests fail 30 days before a sunset and whenever the docs name a different version from the code, and the weekly GitHub job runs them. The 24 agent descriptions, which Claude Code lists in full in every session, are now 112 to 140 characters with each agent's routing words kept, cutting the plugin's always-on cost by about 1,300 tokens. Claude Code 2.1.292+ installs in one command, and setup warns on Python 3.10, which reached end of life on 2026-10-01 (DMP still runs on it while Claude's Cowork environment does). 740 tests.
@@ -420,10 +424,6 @@ Meta's Marketing API v24.0, which DMP's ad templates used, stops working on 10 N
 ### v3.35.9 — connector setup offers only vendor-verified packages (October 27, 2026)
 
 `npx -y <package>` runs whatever is published under that name, with your API keys in its environment. DMP's connector catalog named many npm packages the vendor doesn't publish; most didn't exist at all, and anyone could register such a name and receive the keys. Now a runnable command ships only for a package the vendor itself publishes, pinned to an exact version (Pinecone, DataForSEO, DeepL). Every other service points to the vendor's hosted HTTP server or says plainly that there is no verified connector, and DMP prints no `npx` line or environment block for it. A test enforces the rule, and a weekly GitHub job checks each package against the npm registry and opens an issue if one disappears. 717 tests.
-
-### v3.35.8 — the propose-only command works from any folder (October 12, 2026)
-
-From the fresh-install smoke test's recheck. PRIVACY.md's command for returning autopilot to propose-only used a relative `scripts/` path that fails from your own project; it now uses the plugin's folder. The check that every script-running file says where the scripts are now covers every document by default instead of a list of folders. Printed commands carry no text after them, so a PowerShell note never swallows it, and a test confirms no script waits for input on Claude Code's open stdin pipe. 700 tests.
 
 Older releases are in [CHANGELOG.md](CHANGELOG.md).
 
@@ -647,7 +647,7 @@ DM Pro carries jurisdiction-specific compliance rules that auto-apply when a bra
 - NY synthetic-performer disclosure law (live June 2026, $1K–$5K per violation, $10K repeat) — applies to synthetic influencers + AI endorsements
 - FTC May 2026 endorsement guidance — synthetic influencers, AI testimonials, AI-edited creator content
 - CJEU March 2026 ruling — pseudonymized cookie IDs are personal data when re-identification is feasible
-- CCPA Jan 2026 ADMT amendments + AI-derived sensitive data classification
+- CCPA ADMT regulations (in effect 1 Jan 2026; ADMT compliance from 1 Jan 2027) + AI-derived sensitive data classification
 - DPDP Phase II preparation — consent manager registration opens Nov 2026
 
 ---
@@ -724,7 +724,7 @@ Yes. Each brand has its own `~/.claude-marketing/brands/<brand-slug>/` directory
 Skip to `/digital-marketing-pro:campaign-plan`. Every individual surface (campaign / SEO / content / competitor / email / report) is independently runnable. The full engagement is the canonical path, not the only path.
 
 **Q: Will this work on Codex / Cursor / Copilot CLI / Antigravity?**
-Yes — verified-real native manifests ship for all 9 surfaces (CC, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok). See [Supported surfaces](#supported-surfaces-v3360) above for per-platform install commands.
+Yes — verified-real native manifests ship for all 9 surfaces (CC, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok). See [Supported surfaces](#supported-surfaces-v3361) above for per-platform install commands.
 
 **Q: I run my team on Anthropic Cowork. Does brand state persist between sessions?**
 Yes — but you need to run `/digital-marketing-pro:cowork-setup` once per team first (v3.12.0). Cowork's per-session filesystem is ephemeral, and `${CLAUDE_PLUGIN_DATA}` is too ([open issue #51398](https://github.com/anthropics/claude-code/issues/51398)). The setup wizard routes brand profiles + plans + reports through a Google Drive MCP so everything survives across sessions and is shared across the team. Multi-team isolation via per-team folder names.
@@ -797,7 +797,7 @@ Use the direct repo form: `grok plugin install indranilbanerjee/digital-marketin
 ### General (any platform)
 
 **"Tests in `tests/` fail when I `git clone` locally"**
-Run `python tests/run_all.py` from the repo root. All 740 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+; `scripts/setup.py` recommends 3.11 or newer, and the floor moves to 3.11 once Claude's Cowork environment does) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
+Run `python tests/run_all.py` from the repo root. All 747 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+; `scripts/setup.py` recommends 3.11 or newer, and the floor moves to 3.11 once Claude's Cowork environment does) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
 
 **"`/digital-marketing-pro:doctor` shows my action as stub_unconfigured"**
 That action needs an MCP connector configured. Run `python scripts/connector-status.py --action setup-guide --name <connector-name>` for the exact setup snippet. Add it to your `.mcp.json` under `mcpServers`, restart your agent, and the action becomes `manifest_ready`. See [Connector-aware action resolver](#connector-aware-action-resolver) for the full readiness model.

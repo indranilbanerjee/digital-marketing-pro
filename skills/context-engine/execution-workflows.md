@@ -217,7 +217,7 @@ Use for: promotional SMS, transactional SMS with marketing elements, WhatsApp ma
 ### Compliance (Mandatory First Step)
 
 1. **Consent verification** — Verify opt-in consent for every recipient:
-   - US (TCPA): Express written consent for marketing SMS. Prior express consent for informational.
+   - US (TCPA): Express written consent for marketing SMS. Prior express consent for informational. Honour a revocation made by any reasonable means within 10 business days; from 25 Nov 2026 a revocation may be scoped to the category of informational messages it answered, and you may designate one exclusive way to revoke (91 FR 67214). A STOP to marketing ends marketing. See `compliance-rules.md` section 1.2.
    - EU (GDPR): Explicit opt-in consent.
    - Canada (CASL): Express consent with documented proof.
    - All: Consent must be specific to SMS/WhatsApp channel (email consent does not transfer).

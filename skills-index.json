@@ -774,7 +774,7 @@
         "validate-profile"
       ],
       "doc_files": 56,
-      "bytes": 885231
+      "bytes": 896457
     },
     {
       "name": "continuous-improvement-loop",
@@ -2321,7 +2321,7 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 12734
+      "bytes": 13034
     },
     {
       "name": "seo-audit",

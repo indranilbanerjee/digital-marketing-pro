@@ -6,6 +6,69 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.36.1] - 2026-10-27
+
+### Compliance rules brought up to date, with the dates in one table that a test watches
+
+From the 2026-10-27 freshness review. `skills/context-engine/compliance-rules.md` stated India's DPDP Rules as notified on 3 Jan 2025 (that was the consultation draft) and their Consent Manager framework as "now live" (registration opens 13 Nov 2026). It also listed UK PECR fines as GBP 500,000 eight months after they rose, and California's 2023 penalty amounts. Every fact below was read at a primary source on 2026-10-27 unless marked "reported". Each fix has a test that fails on the 3.36.0 text.
+
+**Fixed — India (DPDP), before 13 Nov 2026**
+
+- The Rules are G.S.R. 846(E), dated 13 Nov 2025, and phase in under rule 1:
+  - rules 1, 2 and 17–21 (the Data Protection Board) applied from publication;
+  - rule 4 (Consent Manager registration) applies from 13 Nov 2026;
+  - rules 3, 5–16, 22 and 23 (notice, security, breach notification, children's verifiable consent under rule 10, rights, retention) apply from 13 May 2027.
+- Penalties are now listed by type: up to INR 250 crore (security safeguards), 200 crore (breach notification or children's data) and 50 crore (anything else). Consent Managers must be Indian companies, and requests must be answered within 90 days. Sources: the Rules on meity.gov.in and PIB (17 Nov 2025). `india-market-context.md` follows.
+
+**Fixed — US texts and calls (TCPA), before 25 Nov 2026**
+
+- New section 1.2 row, plus `/digital-marketing-pro:send-sms` and the execution workflow:
+  - consumers revoke by any reasonable means, and revocations are honoured within 10 business days;
+  - from 25 Nov 2026 (91 FR 67214), a revocation may be scoped to the category of informational calls or texts it answered, and callers may designate an exclusive means to revoke;
+  - a STOP to marketing still ends marketing.
+- The CAN-SPAM maximum is stated as $53,088, the 2025 level, which the FTC kept for 2026.
+
+**Fixed — EU AI Act, before 2 Dec 2026**
+
+- Generative AI systems on the market before 2 Aug 2026 have until 2 Dec 2026 to add the Article 50(2) marking.
+- Output generated before 2 Aug 2026 needs no retroactive label, but AI text on a matter of public interest published on or after that date must be labelled, including text generated earlier (Commission guidelines C(2026) 5054, para 154).
+- High-risk dates moved by the Digital Omnibus on AI: Annex III from 2 Dec 2027, Annex I from 2 Aug 2028.
+- From 2 Dec 2026, AI that generates non-consensual sexual deepfakes or child sexual abuse material is prohibited.
+- The EU icons page date is now 13 Oct 2026.
+
+**Fixed — UK, California and the other US states**
+
+- **UK (since 5 Feb 2026):**
+  - cookies used solely for statistics that improve your own service, and appearance cookies, no longer need consent if users get clear information and a free way to object;
+  - charities may use the soft opt-in;
+  - PECR fines follow the UK GDPR higher maximum.
+  Sources: the Data (Use and Access) Act 2025, Schedules 12 and 13, and SI 2026/82.
+- **California:**
+  - penalties are $2,663 / $7,988 and breach damages $107–$799;
+  - the AI Transparency Act is operative from 2 Aug 2026 (large platforms from 1 Jan 2027, capture devices from 1 Jan 2028; $5,000 per violation per day);
+  - AB 566 requires a browser opt-out signal from 1 Jan 2027;
+  - ADMT compliance starts 1 Jan 2027;
+  - data brokers process DROP deletions at least every 45 days from 1 Aug 2026.
+- **Other US states:**
+  - new: Oklahoma (SB 546, effective 1 Jan 2027) and Alabama (HB 351, effective 1 May 2027), from the enrolled texts;
+  - reported, not read at source: Vermont (effective 1 Jan 2028), Connecticut's amendments (1 Jul 2026) and Colorado's replacement AI law SB 26-189 (1 Jan 2027).
+
+**Added — a dated table with a staleness guard**
+
+- `compliance-rules.md` opens with "Dated obligations": 14 dated changes, each with its section, source and status.
+- Every Section 1 jurisdiction has a **Verified** row. Six were checked on 2026-10-27; the other eleven say "pending re-check", due by 2027-01-31.
+- `tests/test_compliance_dates.py` fails when:
+  - a date passes while its row still says `upcoming`;
+  - a future row says `in force`;
+  - a stamp is more than 365 days old (warning at 180), or still pending after 2027-01-31;
+  - one of the retired wrong claims returns.
+- The weekly dated-checks job runs it (`tests/run_all.py --dated`).
+
+**Tests**
+
+- `tests/test_compliance_dates.py` (7). On the 3.36.0 text it fails 2 checks and errors on 2.
+- Suite: 747 tests.
+
 ## [3.36.0] - 2026-10-27
 
 ### Ad platform APIs in one dated table, Meta v26.0 before v24.0 stops working, shorter agent descriptions
