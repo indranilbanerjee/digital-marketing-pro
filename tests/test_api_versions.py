@@ -311,6 +311,13 @@ class TestScheduledJob(unittest.TestCase):
         for name in run_all.DATED_TESTS:
             self.assertTrue((REPO / "tests" / f"{name}.py").is_file(), name)
 
+    def test_every_module_that_freezes_today_is_in_the_dated_list(self):
+        # A test that reads DMP_TODAY goes red as time passes; the weekly job must run it.
+        import run_all
+        freezes = sorted(p.stem for p in (REPO / "tests").glob("test_*.py")
+                         if "DMP_TODAY" in p.read_text(encoding="utf-8-sig"))
+        self.assertEqual([n for n in freezes if n not in run_all.DATED_TESTS], [])
+
 
 if __name__ == "__main__":
     unittest.main()

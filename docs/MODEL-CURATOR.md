@@ -60,6 +60,8 @@ python scripts/resolve_model.py --list --vendor anthropic --status current
 - Offline, a model asked for by name is checked against two local sources instead of the live list: the shipped registry and the hint book's deprecations record for that provider.
   - Each is read as the live path reads it. Deprecated warns with its retirement date and replacement. Past its shutdown (OpenAI), or `shut_down` on Google's page, it is refused (exit 2). A Google `redirects_to` warns that the answer comes from the other model.
   - Where the two disagree, the stricter one wins, and the message names its source: "according to the shipped registry", or "according to the hint book's google deprecations record (read 2026-10-27)".
+  - They shouldn't disagree, and `tests/test_registry_record_agreement.py` checks it. For a model in both files that the record says is deprecated, redirected or shut down, the registry must give the same status (retired for shut down, deprecated otherwise), shutdown date, replacement and, for OpenAI, deprecation date. It runs weekly with the dated checks, so once an OpenAI shutdown date passes it fails until the registry says retired. Before 3.40.0 the registry listed `gpt-5.1` as current while the openai record shut it down on 2027-04-01.
+  - An id only in the record stays out of the registry. On 2026-10-27 that was 14 openai ids: nine dated snapshots of registry entries (such as `gpt-5-2025-08-07`), the undated `o3` and `o3-pro`, and three models DMP never calls (`gpt-4.1-2025-04-14`, `gpt-4.1-mini-2025-04-14`, `gpt-5.3-codex`). The record has covered them offline since 3.39.1. The registry holds what DMP calls, or falls forward to.
   - An undated id such as `claude-sonnet-4-5` matches its one dated snapshot in the registry.
   - The router's CLI resolves the job's `default_alias` in the registry when `--default-model` is omitted.
 - When the record describes a different service than the call goes to, the caller passes `record_applies=False` (CLI: `--ignore-deprecations-record`). [SocialForge](https://github.com/indranilbanerjee/socialforge)'s Vertex AI runs do this, because Vertex retires Gemini models on its own schedule. The record is then ignored for that call, live and offline, and no cache is read or written.
@@ -207,6 +209,8 @@ Then either point the relevant alias at the new id, or leave the alias alone and
 ## Deprecating a model
 
 Change `status` to `"deprecated"` and add `replacement_id`. The resolver will auto-fall-forward for any script that resolves through an alias OR through `--model` validation.
+
+If the hint book's deprecations record lists the model, copy its shutdown date, replacement and announced date (as `deprecation_date`) exactly; `tests/test_registry_record_agreement.py` fails on any difference. The replacement needs its own entry, current or supported, so the resolver has somewhere to fall forward to. That is why `gpt-6-sol` has one: it isn't on OpenAI's models overview, but it has its own model page and is the replacement OpenAI names for `gpt-5.1`.
 
 ```json
 {

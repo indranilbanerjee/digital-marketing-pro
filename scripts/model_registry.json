@@ -2,7 +2,7 @@
   "$comment": "Canonical model registry for the Neelverse Marketing Suite (DMP / ContentForge / SocialForge). Update this file then run scripts/sync_model_registry.sh to distribute: each sibling copy is this file minus the DMP-only families listed in scripts/registry_mirror.py. The resolver consults this registry to map human-readable aliases to concrete model IDs and to warn when a deprecated model is being used. See refresh_models.py to poll provider APIs for drift.",
   "schema_version": "1.0",
   "last_updated": "2026-10-27",
-  "last_updated_by": "manual refresh from vendor pages read 2026-10-27 (each entry's docs_url and notes name its source; see docs/MODEL-CURATOR.md); speech kinds (text-to-speech, speech-to-text) added in DMP 3.37.2 as pins with an expiry",
+  "last_updated_by": "manual refresh from vendor pages read 2026-10-27 (each entry's docs_url and notes name its source; see docs/MODEL-CURATOR.md); speech kinds (text-to-speech, speech-to-text) added in DMP 3.37.2 as pins with an expiry; gpt-5.1 marked deprecated and gpt-6-sol added from OpenAI's deprecations and model pages read 2026-10-27 (DMP 3.40.0)",
   "next_review_due": "2026-11-16",
   "stewardship_policy": "Re-validate at least quarterly OR whenever a script call returns a 404 / deprecation warning. Frontier model landscape shifts every ~6 weeks; treat any entry older than 3 months as suspect. Verify the next time `refresh_models.py` reports drift, or before any new feature ship.",
   "param_compatibility_notes": {
@@ -697,14 +697,18 @@
         "text",
         "vision"
       ],
-      "status": "current",
+      "status": "deprecated",
       "released": "2026-03",
+      "deprecation_date": "2026-10-01",
+      "shutdown_date": "2027-04-01",
+      "replacement_id": "gpt-6-sol",
       "best_for": [
         "general production workloads",
         "cost-sensitive reasoning"
       ],
       "api_endpoint": "https://direct.evolink.ai/v1/chat/completions",
-      "docs_url": "https://docs.evolink.ai/en/api-manual/language-series/gpt-5-1/gpt-5-1-api"
+      "docs_url": "https://docs.evolink.ai/en/api-manual/language-series/gpt-5-1/gpt-5-1-api",
+      "notes": "Deprecated 2026-10-01, shutdown 2027-04-01 (snapshot gpt-5.1-2025-11-13); replacement gpt-6-sol. Source: https://developers.openai.com/api/docs/deprecations (read 2026-10-27). DMP calls it through Evolink, whose GPT model list still offered gpt-5.1 and gpt-6-sol on 2026-10-27 with no notice of its own; OpenAI's shutdown is taken as Evolink's too, since Evolink resells OpenAI's model (inferred)."
     },
     {
       "id": "deepseek-v4-pro",
@@ -1120,8 +1124,29 @@
         "production workloads"
       ],
       "api_endpoint": "https://api.openai.com/v1/chat/completions",
-      "notes": "Featured balanced model on the OpenAI models page (read 2026-10-27): 1.05M context, knowledge cutoff 2026-04-30. The deprecations page still names 'gpt-6-sol' (not on the models page) as a replacement for gpt-5.3-codex and gpt-5.1; if a call 404s, resolve via refresh_models.py.",
+      "notes": "Featured balanced model on the OpenAI models page (read 2026-10-27): 1.05M context, knowledge cutoff 2026-04-30. gpt-6-sol, which the deprecations page names as the replacement for gpt-5.1 and gpt-5.3-codex, is the older Sol model; it has its own model page (read 2026-10-27) and its own entry here.",
       "docs_url": "https://developers.openai.com/api/docs/models"
+    },
+    {
+      "id": "gpt-6-sol",
+      "vendor": "openai",
+      "family": "gpt",
+      "display_name": "GPT-6 Sol",
+      "tier": "balanced",
+      "modality": [
+        "text",
+        "vision"
+      ],
+      "status": "supported",
+      "context_window": 1050000,
+      "best_for": [
+        "complex coding",
+        "agentic workflows"
+      ],
+      "replacement_id": "gpt-6.1-sol",
+      "api_endpoint": "https://api.openai.com/v1/chat/completions",
+      "docs_url": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+      "notes": "Own model page (read 2026-10-27): 'See GPT-6.1 Sol for the newer Sol model'; not on the models overview. 1.05M context, 128K max output, knowledge cutoff 2026-04-20. Not deprecated on the deprecations page (read 2026-10-27), which names it as the replacement for gpt-5.1 and gpt-5.3-codex. Function calling on Chat Completions needs reasoning_effort none; the Responses API has the full tool set. Release month not stated, so left out. For new work use gpt-6.1-sol."
     },
     {
       "id": "gpt-6-luna",
