@@ -6,6 +6,65 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.37.1] - 2026-10-27
+
+### Every jurisdiction re-read at its source, TikTok's Smart+ cutoff, and no agent pins a model
+
+3.36.1 stamped eleven jurisdictions "pending re-check". This release re-reads them, plus the three US state items marked "reported", against the law itself and the regulator's own pages on 2026-10-27. Each guard below has a test that fails on the 3.37.0 code or text.
+
+**Fixed: compliance rules re-read at the source** (`skills/context-engine/compliance-rules.md`)
+
+- Every Section 1 jurisdiction now carries a dated "Verified" stamp that names its sources. Re-read: GDPR (1.1), CASL (1.5), LGPD (1.6), Australia (1.8), Singapore (1.9), PIPL (1.10), APPI (1.12), PIPA (1.13), Saudi PDPL (1.14), UAE (1.15) and Thai PDPA (1.16). No section is pending any more.
+- **UAE.**
+  - "Up to AED 20 million" had no basis. Decree-Law 45/2021 sets no fine amounts; a Cabinet decision is to set them (Art 26), and none is listed on uaelegislation.gov.ae.
+  - No Executive Regulation has been issued (the row said 2023–2024). Firms get six months from its issue (Art 29).
+  - The law has no legitimate-interest basis; the row said it had one.
+- **Saudi Arabia.**
+  - There is no data-localisation rule in force. Transfers follow the Transfer Regulation (v2.0, Aug 2024), and an October 2026 draft, still in consultation, would add one.
+  - "NCC" does not appear in the law: SDAIA is the competent authority (Art 30).
+  - Financial and location data are not "sensitive" under PDPL Art 1.
+  - The row now has the criminal fine (SAR 3M, Art 35), repeat-violation doubling (Art 36) and the email-marketing articles (PDPL Arts 25–26, Implementing Regulation Arts 28–29).
+- **Thailand.**
+  - "Sender identification" and "Thai-language notices" are not in the PDPA.
+  - The fine tiers (THB 1M/3M/5M, ss.82–90) and the PDPC's enforcement record to 1 Aug 2025 are added.
+  - The cookie-guidance claim and the 1 June 2022 enforcement date could not be confirmed and are marked UNVERIFIED.
+- **Earlier sections.**
+  - CASL has no private right of action: ss.47–51 were "Repealed before coming into force".
+  - Australia's inferred consent does not cover messages after a single purchase (ACMA). The Spam Act penalties are ACMA's dated figures, and the Privacy Act 2024 amendments and their dates are added.
+  - Singapore: deemed consent by notification, legitimate interests and business improvement cannot be used to send marketing (PDPC guidelines, rev. 29 Apr 2026); the row had listed them as marketing exceptions. The fine cap is 10% of Singapore turnover above S$10m (s.48J).
+  - China's in-country storage rule applies only to critical-infrastructure operators and handlers above the CAC's volume thresholds (PIPL Art 40), with the 2024 transfer exemptions.
+  - Korea's fine cap now follows PIPA Art 64-2 as in force on 11 Sep 2026, and the criminal maximum is 10 years.
+  - Japan's 2026 amendment (Act No. 56, in force on a date not yet set) is recorded.
+  - The GDPR rows separate law from good practice: double opt-in is practice, and the Digital Omnibus is still a proposal. The LGPD rows quote the ANPD's cookie guide and Resolutions 2/2022, 4/2023, 19/2024 and 32/2026.
+- **US states (1.4).**
+  - Colorado SB 26-189 was read in its signed text. It repeals and re-enacts the AI Act as an automated decision-making law from 1 Jan 2027: notice, explanation of adverse outcomes within 30 days, correction and human review; AG-only enforcement; a 60-day cure notice until 1 Jan 2030.
+  - Vermont S.71's signing on 16 Jun 2026 is confirmed by the Governor's bill-action page.
+  - Connecticut's 35,000-consumer threshold and its outright ban on processing a minor's data for targeted advertising or sale are confirmed by the Attorney General's CTDPA page, which also gives the penalty as up to $5,000 per violation. The row had said "nearly banning", and "typically $7,500–$10,000".
+  - Still reported: Vermont's act number and effective date, and Connecticut's act number and date. The legislature sites refused connections from here.
+
+**Changed: TikTok's Upgraded Smart+ cutoff**
+
+- From **1 Jan 2027**, TikTok's Marketing API stops creating or copying non-Search **Legacy Manual Flow** campaigns (Sales, App Promotion, Lead Generation) through `/campaign/create/`, `/campaign/copy/task/create/`, `/adgroup/create/`, `/ad/create/` and `/ad/aco/create/`. New campaigns go through the Upgraded Smart+ APIs (`/smart_plus/...`), which still offer a fully manual option.
+- Sources: TikTok's Marketing API docs, read through the search index because TikTok's sites are blocked in India, and TikTok's official SDK (`github.com/tiktok/tiktok-business-api-sdk`). No TikTok API was called.
+- `scripts/connector_resolver.py`: the TikTok row in `API_VERSIONS` is now verified (2026-10-27) and carries the cutoff as a dated `deadlines` entry listing the affected paths. The launch template enables campaigns built in the upgraded flow through `/smart_plus/campaign/status/update/`, and keeps `/campaign/status/update/` as `legacy_flow_url` for Legacy Manual Flow and Search campaigns.
+- `/digital-marketing-pro:paid-advertising` (`tiktok-ads.md` and the "Since August 2026" list) and `/digital-marketing-pro:launch-ad-campaign` step 4 explain the change.
+
+**Fixed: no agent pins a model**
+
+- `agents/quality-assurance.md` had `model: sonnet`, so it ran on whatever that name meant on each host instead of the session's model. The line is removed. Agents inherit the session's model, in line with the rule that models are chosen by job at run time, never by name.
+
+**Fixed: `tests/run_all.py` runs only on flags it knows**
+
+- `python tests/run_all.py --help` used to run the whole suite, because unknown arguments were ignored. Now `--help` and `-h` print the usage and exit 0. Any other unknown argument prints the usage to stderr and exits 2 without loading a test. Accepted flags: `-v`, `--dated`.
+
+**Tests**
+
+- `tests/test_compliance_dates.py`: no Section 1 jurisdiction may stay "pending re-check", and six new retired claims, each from the 3.37.0 text: the AED 20 million fine, the issued UAE regulations, Saudi localisation, NCC, "nearly banning" and Colorado's "reported" note. On 3.37.0 text: 2 failures.
+- `tests/test_api_versions.py`, new `TestVendorDeadlines`: a template that still calls an endpoint listed in a vendor deadline fails 30 days before the date. It also checks that the TikTok cutoff is recorded and that the launch template targets Smart+. On 3.37.0 code: 1 failure and 1 error.
+- `tests/test_agent_descriptions.py`, new `TestNoAgentPinsAModel`: any `model:` in an agent's frontmatter other than `inherit` fails. On 3.37.0: 1 failure.
+- New: `tests/test_run_all_args.py`. An unknown flag exits 2 without running, `--help` exits 0 without running, and the known flags are fixed. On the 3.37.0 runner: 3 errors (its `--help` ran the suite until the test's 60-second timeout).
+- Suite: 769 tests.
+
 ## [3.37.0] - 2026-10-27
 
 ### Google's new crawler tokens, Cloudflare's block modes, Bing's citation gaps, Google's AI-feature control and Preferred Sources

@@ -191,6 +191,45 @@ class TestApiVersionTable(unittest.TestCase):
         self.assertTrue(verification_problems(unexplained, date(2026, 10, 27)))
 
 
+def deadline_problems(table: dict, resolver_source: str, on: date) -> list[str]:
+    """A vendor deadline that retires endpoints: fail 30 days ahead while a template
+    still calls an affected path. Once no template does, the row is informational."""
+    out = []
+    body = resolver_source.split("META_GRAPH_BASE =", 1)[-1]
+    for name, row in table.items():
+        for d in row.get("deadlines", []):
+            when = date.fromisoformat(d["date"])
+            used = [p for p in d.get("affected_paths", []) if f'+ "{p}"' in body]
+            if used and on >= when - timedelta(days=SUNSET_WARN_DAYS):
+                out.append(f"{name}: {', '.join(used)} still used; {d['what']} on {d['date']}")
+    return out
+
+
+class TestVendorDeadlines(unittest.TestCase):
+
+    def test_no_template_uses_an_endpoint_near_its_cutoff(self):
+        source = (SCRIPTS / "connector_resolver.py").read_text(encoding="utf-8")
+        problems = deadline_problems(cr.API_VERSIONS, source, today())
+        self.assertEqual(problems, [], "\n  " + "\n  ".join(problems))
+
+    def test_tiktok_cutoff_is_recorded(self):
+        tiktok = cr.API_VERSIONS["tiktok"]
+        self.assertEqual(tiktok["deadlines"][0]["date"], "2027-01-01")
+        self.assertIn("/campaign/create/", tiktok["deadlines"][0]["affected_paths"])
+
+    def test_plant_a_legacy_create_template(self):
+        table = {"tiktok": {"deadlines": [{"date": "2027-01-01", "what": "legacy create ends",
+                                           "affected_paths": ["/campaign/create/"]}]}}
+        source = 'META_GRAPH_BASE = "x"\n"url": TIKTOK_BASE + "/campaign/create/",\n'
+        self.assertTrue(deadline_problems(table, source, date(2026, 12, 5)))
+        self.assertEqual(deadline_problems(table, source, date(2026, 11, 1)), [])
+
+    def test_launch_template_targets_upgraded_smart_plus(self):
+        launch = cr._manifest_launch_ads("tiktok-ads", "b", {})["http_request"]
+        self.assertTrue(launch["url"].endswith("/smart_plus/campaign/status/update/"))
+        self.assertTrue(launch["legacy_flow_url"].endswith("/campaign/status/update/"))
+
+
 class TestManifestsUseTheTable(unittest.TestCase):
 
     def test_no_hardcoded_versions_in_resolver(self):

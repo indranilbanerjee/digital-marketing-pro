@@ -104,12 +104,21 @@ API_VERSIONS = {
     "tiktok": {
         "version": "v1.3",
         "sunset": None,
-        "sunset_basis": "no sunset known",
-        "source": "https://business-api.tiktok.com/portal/docs",
-        "verified_on": None,
-        "verify_note": "TikTok's developer site timed out on 2026-10-27; the owner checks "
-                       "by hand (reported: legacy manual Sales, App and Lead Gen campaigns "
-                       "move to the Smart+ APIs from 1 Jan 2027)",
+        "sunset_basis": "no sunset announced for v1.3 itself",
+        "source": "https://business-api.tiktok.com/portal/docs/marketing-api/v1.3",
+        # TikTok's sites are blocked from India, where this was written: read through the
+        # search index (the notice repeats on the Marketing API overview and endpoint pages)
+        # and TikTok's official SDK, github.com/tiktok/tiktok-business-api-sdk.
+        "verified_on": "2026-10-27",
+        "deadlines": [{
+            "date": "2027-01-01",
+            "what": ("/campaign/create/, /campaign/copy/task/create/, /adgroup/create/, "
+                     "/ad/create/ and /ad/aco/create/ stop creating or copying non-Search "
+                     "Legacy Manual Flow campaigns (Sales, App Promotion, Lead Generation) "
+                     "and their ad groups and ads; migrate to the Upgraded Smart+ APIs"),
+            "affected_paths": ["/campaign/create/", "/campaign/copy/task/create/",
+                               "/adgroup/create/", "/ad/create/", "/ad/aco/create/"],
+        }],
     },
     "x_ads": {
         "version": "12",
@@ -791,8 +800,12 @@ def _manifest_launch_ads(connector_name, brand, kwargs):
             "body_template": {"patch": {"$set": {"status": "ACTIVE"}}},
         },
         "tiktok-ads": {
+            # Campaigns built in the Upgraded Smart+ flow (the only API path for new Sales,
+            # App Promotion and Lead Generation campaigns from 2027-01-01) take their own
+            # status endpoint; Legacy Manual Flow and Search campaigns keep the old one.
             "method": "POST",
-            "url": TIKTOK_BASE + "/campaign/status/update/",
+            "url": TIKTOK_BASE + "/smart_plus/campaign/status/update/",
+            "legacy_flow_url": TIKTOK_BASE + "/campaign/status/update/",
             "headers": {"Access-Token": "{TIKTOK_ACCESS_TOKEN}",
                         "Content-Type": "application/json"},
             "body_template": {"advertiser_id": "{TIKTOK_ADVERTISER_ID}",

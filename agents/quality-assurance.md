@@ -3,7 +3,6 @@ name: quality-assurance
 description: "Quality assurance before publishing: runs the eval suite, scores hallucination and claim risk, validates output structure."
 maxTurns: 15
 tools: Read, Grep, Glob, Bash
-model: sonnet
 ---
 
 # Quality Assurance Agent

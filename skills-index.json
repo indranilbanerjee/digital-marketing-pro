@@ -774,7 +774,7 @@
         "validate-profile"
       ],
       "doc_files": 56,
-      "bytes": 896457
+      "bytes": 904016
     },
     {
       "name": "continuous-improvement-loop",
@@ -1571,7 +1571,7 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 16033
+      "bytes": 16269
     },
     {
       "name": "launch-campaign",
@@ -1889,7 +1889,7 @@
         "launch-ad-campaign"
       ],
       "doc_files": 14,
-      "bytes": 213456
+      "bytes": 215858
     },
     {
       "name": "pdf-report",

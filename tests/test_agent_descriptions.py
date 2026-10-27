@@ -152,6 +152,27 @@ class TestAgentDescriptions(unittest.TestCase):
         self.assertTrue(pointer_problems(descs))
 
 
+class TestNoAgentPinsAModel(unittest.TestCase):
+    """Agents run on whatever model the user's session runs. quality-assurance pinned
+    `model: sonnet` in its frontmatter until 3.37.1: that ties the plugin to one vendor's
+    model tier (the suite's rule is capability kinds resolved at run time, never model ids),
+    and on a host without that model the agent could not start."""
+
+    def pinned(self, text: str) -> str | None:
+        m = re.search(r"^model:\s*(\S+)", frontmatter(text), re.M)
+        return m.group(1) if m and m.group(1).strip("\"'") != "inherit" else None
+
+    def test_no_agent_frontmatter_names_a_model(self):
+        pins = {p.stem: v for p in sorted(AGENTS.glob("*.md"))
+                if (v := self.pinned(p.read_text(encoding="utf-8")))}
+        self.assertEqual(pins, {})
+
+    def test_plant(self):
+        self.assertEqual(self.pinned("---\nname: qa\nmodel: sonnet\n---\n"), "sonnet")
+        self.assertIsNone(self.pinned("---\nname: qa\nmodel: inherit\n---\n"))
+        self.assertIsNone(self.pinned("---\nname: qa\n---\nThe model: tiers explained\n"))
+
+
 class TestDelegationTargetsExist(unittest.TestCase):
 
     def test_agents_used_sections_name_real_agents(self):

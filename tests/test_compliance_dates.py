@@ -49,6 +49,13 @@ RETIRED_CLAIMS = (
     ("$2,500 per unintentional violation", "CCPA amounts are CPI-adjusted ($2,663 / $7,988) since 1 Jan 2025"),
     ("high-risk system obligations 2 Aug 2027", "the Digital Omnibus on AI moved high-risk dates to 2 Dec 2027 / 2 Aug 2028"),
     ("Vermont (VDPA, 2025)", "Vermont's law (S.71) is reported effective 1 Jan 2028"),
+    # 3.37.1 re-check (each was in the 3.37.0 text)
+    ("Up to AED 20 million", "UAE Decree-Law 45/2021 sets no fine amounts; a Cabinet decision is to set them (Art 26)"),
+    ("implementing regulations issued 2023", "no UAE Executive Regulation is listed on uaelegislation.gov.ae"),
+    ("must be stored and processed in Saudi Arabia", "the Saudi PDPL has no localisation rule in force (Transfer Regulation v2.0)"),
+    ("and NCC enforce", "NCC is not in the Saudi PDPL; SDAIA is the competent authority (Art 30)"),
+    ("nearly banning targeted ads", "Connecticut bars processing a minor's data for targeted advertising outright"),
+    ("(reported; read the enacted text before relying on it)", "Colorado SB 26-189 was read in its signed text on 2026-10-27"),
 )
 
 
@@ -128,6 +135,11 @@ class TestComplianceDates(unittest.TestCase):
         for w in warns:
             print(f"[compliance-dates] re-check soon: {w}")
         self.assertEqual(fails, [], "\n  " + "\n  ".join(fails))
+
+    def test_no_jurisdiction_is_still_pending(self):
+        # 3.37.1 re-read every pending section; a new jurisdiction is read before it is added.
+        body = self.text[self.text.index("## Section 1"):self.text.index("## Section 2")]
+        self.assertNotIn("| **Verified** | pending re-check", body)
 
     def test_retired_claims_stay_gone(self):
         found = [f"{claim!r}: {why}" for claim, why in RETIRED_CLAIMS if claim in self.text]
