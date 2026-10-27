@@ -1479,7 +1479,7 @@
     {
       "name": "keyword-cluster",
       "tier": "E",
-      "description": "Cluster keywords into pillar and spoke pages by SERP overlap via script. \\\"cluster these keywords\\\"",
+      "description": "Cluster keywords or queries into topic hubs and spoke pages by SERP overlap. \\\"cluster these keywords\\\"",
       "scripts": [
         "keyword_cluster.py"
       ],
@@ -1497,7 +1497,7 @@
         "seo-implement"
       ],
       "doc_files": 1,
-      "bytes": 10268
+      "bytes": 10272
     },
     {
       "name": "keyword-research",
@@ -2351,7 +2351,7 @@
     {
       "name": "seo-drift",
       "tier": "E",
-      "description": "Compare two SEO snapshots by script: gainers, losers, drift classes. \\\"what moved after the core update\\\"",
+      "description": "Compare two SEO exports (Search Console, two dates): gainers, losers, drift classes. \\\"what moved after the core update\\\"",
       "scripts": [
         "seo_drift.py"
       ],
@@ -2367,7 +2367,7 @@
         "seo-audit"
       ],
       "doc_files": 1,
-      "bytes": 10973
+      "bytes": 10989
     },
     {
       "name": "seo-implement",
@@ -2387,7 +2387,7 @@
     {
       "name": "seo-plan",
       "tier": "G",
-      "description": "Build a 12-month SEO plan that scores four pillars and phases the roadmap. \\\"build an SEO strategy\\\"",
+      "description": "Build a 12-month organic SEO plan: four scored pillars, phased year roadmap. \\\"build an SEO strategy\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -2404,12 +2404,12 @@
         "tech-seo-audit"
       ],
       "doc_files": 1,
-      "bytes": 15124
+      "bytes": 15126
     },
     {
       "name": "serp-tracker",
       "tier": "G",
-      "description": "Deprecated; use rank-monitor --features for SERP features. \\\"track SERP features\\\"",
+      "description": "Deprecated; use rank-monitor --features. \\\"track SERP features\\\"",
       "scripts": [],
       "missing_scripts": [],
       "gates": [],
@@ -2420,7 +2420,7 @@
         "rank-monitor"
       ],
       "doc_files": 1,
-      "bytes": 1757
+      "bytes": 1739
     },
     {
       "name": "share-of-voice",
@@ -2606,7 +2606,7 @@
     {
       "name": "technical-seo",
       "tier": "E",
-      "description": "Technical SEO reference for deep fixes: Web Vitals, JS SEO, migrations, schema. \\\"plan a site migration\\\"",
+      "description": "Technical SEO fixes for devs: JS rendering (SSR, prerender), Web Vitals (LCP, INP), schema. \\\"plan a site migration\\\"",
       "scripts": [
         "campaign-tracker.py"
       ],
@@ -2616,7 +2616,7 @@
         "brand-setup"
       ],
       "doc_files": 6,
-      "bytes": 111143
+      "bytes": 111155
     },
     {
       "name": "translate-content",

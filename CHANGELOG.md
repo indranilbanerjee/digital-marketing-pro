@@ -6,6 +6,30 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.38.1] - 2026-10-27
+
+### Four SEO descriptions fix vocabulary gaps seen in a blind eval
+
+A blind evaluation on 2026-10-27 exposed six SEO requests where none of the plugin's SEO skills fired at all. The requests were written by a tester who never saw the plugin's wording. All six missing jobs exist in the plugin; their descriptions just didn't use the words people asked with.
+
+**Changed: descriptions** (Stage-2 rule kept: 60–150 characters, median ≤110, one owner per quoted phrase, listing ≤26,000 characters)
+
+| Skill | Now also says | The request it missed |
+|---|---|---|
+| `keyword-cluster` | queries, topic hubs, spoke pages | sorting a list of queries into themes, a hub page per theme |
+| `seo-drift` | two exports, Search Console, two dates | two Search Console exports, explaining what moved between them |
+| `seo-plan` | organic, a phased year roadmap | a long-term organic plan for the year |
+| `technical-seo` | JS rendering (SSR, prerender), Web Vitals (LCP, INP), for developers | client-side JavaScript rendering, and LCP/INP fixes for a developer |
+
+- `technical-seo` and `tech-seo-audit` were checked against each other. Their misses were not confusion between the two: neither skill fired on the two missed requests, and `tech-seo-audit` routed all three of its own. They stay separate. `technical-seo` gives fix guidance for developers; `tech-seo-audit` runs a scripted site-wide crawl.
+- `serp-tracker` (deprecated) is shortened to "Deprecated; use rank-monitor --features." so the whole listing stays under its ceiling (25,999 of 26,000 characters).
+- No routing score is quoted. The blind set these misses came from is spent, so measuring these changes needs a fresh one.
+
+**Tests**
+
+- New: `tests/test_routing_vocabulary.py`. The four descriptions must keep the words the misses showed were needed. On the 3.38.0 wording: 1 failure, as planted. It measures nothing about routing.
+- Suite: 829 tests.
+
 ## [3.38.0] - 2026-10-27
 
 ### The model router: the AI-visibility checker picks its models from each provider's own live list
