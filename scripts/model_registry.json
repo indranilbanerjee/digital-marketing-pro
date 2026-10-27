@@ -590,8 +590,12 @@
         "text-to-video",
         "image-to-video"
       ],
-      "notes": "Shut down 2026-10-22 on the Gemini API. Gemini-API replacement: gemini-omni-1.1-flash; Vertex replacement: veo-3.1-generate-001.",
+      "notes": "Shut down 2026-10-22 on the Gemini API (Gemini API deprecations, read 2026-10-27). The replacement depends on the backend: gemini-omni-1.1-flash on the Gemini API, veo-3.1-generate-001 on Vertex AI (which the Gemini API does not serve). replacement_id keeps the Vertex id for readers of one id.",
       "replacement_id": "veo-3.1-generate-001",
+      "replacement_by_backend": {
+        "gemini-api": "gemini-omni-1.1-flash",
+        "vertex": "veo-3.1-generate-001"
+      },
       "shutdown_date": "2026-10-22"
     },
     {

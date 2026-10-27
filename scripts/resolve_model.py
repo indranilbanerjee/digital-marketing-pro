@@ -9,6 +9,7 @@ and deprecated IDs surface as warnings instead of silent 404s.
 
 Usage (CLI):
     python resolve_model.py --alias latest-fast-anthropic
+    python resolve_model.py --alias veo-3.1-generate-preview --backend gemini-api
     python resolve_model.py --check gpt-4o
     python resolve_model.py --list
     python resolve_model.py --list --vendor anthropic
@@ -26,7 +27,12 @@ Usage (Python):
 Exit codes (CLI):
     0  resolved / current / list returned
     1  alias unknown OR model deprecated (with --check)
-    2  registry file missing / malformed
+    2  registry file missing / malformed, OR a retired or deprecated id whose replacement depends on
+       the backend (the entry has replacement_by_backend) and no listed --backend was given
+
+A replacement can depend on the service a request goes to: veo-3.1-generate-preview's is
+gemini-omni-1.1-flash on the Gemini API and veo-3.1-generate-001 on Vertex AI. An entry with
+replacement_by_backend is never forwarded to one backend's id without --backend (backend= in Python).
 """
 
 from __future__ import annotations
@@ -87,12 +93,29 @@ def get_registry(force_reload: bool = False) -> dict[str, Any]:
     return _REGISTRY_CACHE
 
 
+class BackendRequired(ValueError):
+    """The replacement depends on the backend, and no backend the entry lists was named."""
+
+
+def _replacement(model_id: str, m: dict[str, Any], backend: str | None) -> str | None:
+    by_backend = m.get("replacement_by_backend") or {}
+    if not by_backend:
+        return m.get("replacement_id")
+    if backend in by_backend:
+        return by_backend[backend]
+    options = ", ".join(f"{rep} ({name})" for name, rep in sorted(by_backend.items()))
+    lead = (f"{model_id} has no replacement for {backend}" if backend
+            else f"{model_id}'s replacement depends on the backend")
+    raise BackendRequired(f"{lead}: {options}; pass --backend {' or '.join(sorted(by_backend))} "
+                          f"for the service the request goes to.")
+
+
 def _model_index() -> dict[str, dict[str, Any]]:
     reg = get_registry()
     return {m["id"]: m for m in reg.get("models", [])}
 
 
-def resolve(alias_or_id: str, *, allow_deprecated: bool = False) -> str:
+def resolve(alias_or_id: str, *, allow_deprecated: bool = False, backend: str | None = None) -> str:
     """Resolve an alias (e.g. "latest-fast-anthropic") OR an exact model ID
     to a concrete model ID. If the input is itself a current model ID, returns
     it unchanged. If it's a deprecated OR retired model ID, returns the
@@ -102,6 +125,10 @@ def resolve(alias_or_id: str, *, allow_deprecated: bool = False) -> str:
     layer, so passing them through unchanged would guarantee a 404. The
     `allow_deprecated=True` flag only affects `deprecated` (not-yet-retired)
     models.
+
+    `backend` names the service the request goes to (for example gemini-api or vertex). An entry
+    with replacement_by_backend forwards only to that backend's id, and raises BackendRequired
+    when no listed backend is named.
     """
     reg = get_registry()
     aliases = reg.get("aliases", {})
@@ -112,20 +139,19 @@ def resolve(alias_or_id: str, *, allow_deprecated: bool = False) -> str:
         m = idx[alias_or_id]
         status = m.get("status", "current")
         if status == "retired":
-            replacement = m.get("replacement_id")
+            replacement = _replacement(alias_or_id, m, backend)
             if not replacement:
                 raise ValueError(
                     f"Model {alias_or_id} is retired with no replacement_id in registry."
                 )
             return replacement
         if status == "deprecated":
-            replacement = m.get("replacement_id")
-            if replacement and not allow_deprecated:
-                return replacement
-            if not replacement:
+            if not (m.get("replacement_id") or m.get("replacement_by_backend")):
                 raise ValueError(
                     f"Model {alias_or_id} is deprecated with no replacement_id in registry."
                 )
+            if not allow_deprecated:
+                return _replacement(alias_or_id, m, backend)
         return alias_or_id
     raise KeyError(
         f"{alias_or_id!r} is neither a known alias nor a known model id. "
@@ -133,14 +159,16 @@ def resolve(alias_or_id: str, *, allow_deprecated: bool = False) -> str:
     )
 
 
-def check(model_id: str) -> tuple[str, str | None]:
-    """Return (status, replacement_id) for a model ID.
-    status is one of: current, supported, preview, deprecated, retired, unknown."""
+def check(model_id: str, backend: str | None = None) -> tuple[str, str | None]:
+    """Return (status, replacement) for a model ID.
+    status is one of: current, supported, preview, deprecated, retired, unknown. The replacement is
+    the entry's replacement_by_backend[backend] when it lists that backend, else its replacement_id."""
     idx = _model_index()
     if model_id not in idx:
         return ("unknown", None)
     m = idx[model_id]
-    return (m.get("status", "current"), m.get("replacement_id"))
+    return (m.get("status", "current"),
+            (m.get("replacement_by_backend") or {}).get(backend) or m.get("replacement_id"))
 
 
 def list_models(
@@ -179,7 +207,7 @@ def registry_age_days() -> int | None:
 EXECUTION_AGE_WARN_DAYS = 7
 
 
-def resolve_for_execution(alias_or_id: str) -> tuple[dict[str, Any], int]:
+def resolve_for_execution(alias_or_id: str, backend: str | None = None) -> tuple[dict[str, Any], int]:
     """Resolution that carries its own provenance — the execution ladder.
 
     A bare model id looks identical whether the registry was reviewed yesterday
@@ -203,7 +231,7 @@ def resolve_for_execution(alias_or_id: str) -> tuple[dict[str, Any], int]:
         "cannot be verified, refuse and say what was tried."
     )
     try:
-        model_id = resolve(alias_or_id)
+        model_id = resolve(alias_or_id, backend=backend)
     except (KeyError, ValueError) as exc:
         return ({"input": alias_or_id, "status": "unresolved",
                  "error": str(exc), "action_required": ladder}, 3)
@@ -216,7 +244,7 @@ def resolve_for_execution(alias_or_id: str) -> tuple[dict[str, Any], int]:
         "registry_last_updated": reg.get("last_updated"),
         "registry_age_days": age,
     }
-    status, replacement = check(model_id)
+    status, replacement = check(model_id, backend)
     payload["model_status"] = status
     if replacement:
         payload["replacement_id"] = replacement
@@ -339,23 +367,29 @@ def main() -> int:
     parser.add_argument("--json", action="store_true", help="JSON output")
     parser.add_argument("--allow-deprecated", action="store_true",
                         help="With --alias, return the deprecated id instead of its replacement")
+    parser.add_argument("--backend",
+                        help="The service the request goes to (for example gemini-api or vertex), for "
+                             "entries whose replacement depends on it")
     args = parser.parse_args()
 
     try:
         if args.alias:
             try:
-                resolved = resolve(args.alias, allow_deprecated=args.allow_deprecated)
+                resolved = resolve(args.alias, allow_deprecated=args.allow_deprecated, backend=args.backend)
                 if args.json:
                     print(json.dumps({"input": args.alias, "resolved": resolved}))
                 else:
                     print(resolved)
                 return 0
+            except BackendRequired as exc:
+                print(f"ERROR: {exc}", file=sys.stderr)
+                return 2
             except (KeyError, ValueError) as exc:
                 print(f"ERROR: {exc}", file=sys.stderr)
                 return 1
 
         if args.check:
-            status, replacement = check(args.check)
+            status, replacement = check(args.check, args.backend)
             payload = {"model": args.check, "status": status, "replacement_id": replacement}
             if args.json:
                 print(json.dumps(payload))
@@ -400,7 +434,7 @@ def main() -> int:
             return 0
 
         if args.for_execution:
-            payload, code = resolve_for_execution(args.for_execution)
+            payload, code = resolve_for_execution(args.for_execution, args.backend)
             print(json.dumps(payload, indent=2))
             return code
 

@@ -197,5 +197,75 @@ class TestExecutionLadder(unittest.TestCase):
         self.assertIn("undated", payload["warning"])
 
 
+class TestReplacementByBackend(unittest.TestCase):
+    """A replacement can depend on the service the call goes to. veo-3.1-generate-preview shut down
+    on the Gemini API on 2026-10-22; Google names gemini-omni-1.1-flash there, while Vertex AI's
+    GA model is veo-3.1-generate-001, which the Gemini API does not serve. Before 3.40.0 the
+    registry held one replacement_id (the Vertex one) and resolve() forwarded every caller to it."""
+
+    PREVIEW = "veo-3.1-generate-preview"
+
+    def test_the_registry_names_a_replacement_per_backend(self):
+        entry = next(m for m in resolve_model.get_registry()["models"] if m["id"] == self.PREVIEW)
+        self.assertEqual(entry["replacement_by_backend"],
+                         {"gemini-api": "gemini-omni-1.1-flash", "vertex": "veo-3.1-generate-001"})
+        self.assertEqual(entry["replacement_id"], "veo-3.1-generate-001")  # still the default for readers of one id
+
+    def test_a_named_backend_gets_its_own_replacement(self):
+        self.assertEqual(resolve_model.resolve(self.PREVIEW, backend="gemini-api"), "gemini-omni-1.1-flash")
+        self.assertEqual(resolve_model.resolve(self.PREVIEW, backend="vertex"), "veo-3.1-generate-001")
+        self.assertEqual(resolve_model.check(self.PREVIEW, backend="gemini-api"), ("retired", "gemini-omni-1.1-flash"))
+
+    def test_no_backend_is_refused_naming_both(self):
+        with self.assertRaises(resolve_model.BackendRequired) as ctx:
+            resolve_model.resolve(self.PREVIEW)
+        text = str(ctx.exception)
+        for part in ("gemini-omni-1.1-flash (gemini-api)", "veo-3.1-generate-001 (vertex)", "pass --backend"):
+            self.assertIn(part, text)
+
+    def test_a_backend_the_entry_does_not_list_is_refused(self):
+        with self.assertRaises(resolve_model.BackendRequired) as ctx:
+            resolve_model.resolve(self.PREVIEW, backend="openai")
+        self.assertIn("has no replacement for openai", str(ctx.exception))
+
+    def test_an_entry_without_a_map_ignores_the_backend(self):
+        retired = next(m for m in resolve_model.get_registry()["models"]
+                       if m.get("status") == "retired" and m.get("replacement_id") and "replacement_by_backend" not in m)
+        self.assertEqual(resolve_model.resolve(retired["id"], backend="vertex"), retired["replacement_id"])
+
+    def test_a_deprecated_entry_with_a_map(self):
+        from unittest import mock
+        reg = {"aliases": {}, "models": [
+            {"id": "old", "status": "deprecated", "replacement_id": "new-b",
+             "replacement_by_backend": {"a": "new-a", "b": "new-b"}},
+            {"id": "new-a", "status": "current"}, {"id": "new-b", "status": "current"}]}
+        with mock.patch.object(resolve_model, "_REGISTRY_CACHE", reg):
+            with self.assertRaises(resolve_model.BackendRequired):
+                resolve_model.resolve("old")
+            self.assertEqual(resolve_model.resolve("old", allow_deprecated=True), "old")
+            self.assertEqual(resolve_model.resolve("old", backend="a"), "new-a")
+
+    def test_for_execution_takes_the_backend(self):
+        payload, code = resolve_model.resolve_for_execution(self.PREVIEW, backend="gemini-api")
+        self.assertEqual((code, payload["model_id"]), (0, "gemini-omni-1.1-flash"))
+        payload, code = resolve_model.resolve_for_execution(self.PREVIEW)
+        self.assertEqual(code, 3)
+        self.assertIn("pass --backend", payload["error"])
+
+    def test_cli(self):
+        import subprocess
+        script = str(Path(__file__).resolve().parent.parent / "scripts" / "resolve_model.py")
+        proc = subprocess.run([sys.executable, script, "--alias", self.PREVIEW],
+                              capture_output=True, text=True, timeout=60)
+        self.assertEqual(proc.returncode, 2, proc.stdout + proc.stderr)
+        self.assertIn("pass --backend", proc.stderr)
+        proc = subprocess.run([sys.executable, script, "--alias", self.PREVIEW, "--backend", "gemini-api"],
+                              capture_output=True, text=True, timeout=60)
+        self.assertEqual((proc.returncode, proc.stdout.strip()), (0, "gemini-omni-1.1-flash"), proc.stderr)
+        proc = subprocess.run([sys.executable, script, "--check", self.PREVIEW, "--backend", "vertex"],
+                              capture_output=True, text=True, timeout=60)
+        self.assertIn("(use veo-3.1-generate-001)", proc.stdout)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -953,6 +953,57 @@ class TestPageCap(unittest.TestCase):
         self.assertIn("pages", r["reason"])
 
 
+class TestBackendReplacement(unittest.TestCase):
+    """A registry entry can name a replacement per backend (replacement_by_backend). The router's
+    google adapter calls the Gemini API, so offline it names the Gemini API's replacement unless the
+    caller says the request goes elsewhere (backend="vertex"). Before 3.40.0 it named the single
+    replacement_id, Vertex AI's veo-3.1-generate-001, which the Gemini API doesn't serve."""
+
+    REGISTRY = {"models": [{"id": "veo-3.1-generate-preview", "status": "retired", "shutdown_date": "2026-10-22",
+                            "replacement_id": "veo-3.1-generate-001",
+                            "replacement_by_backend": {"gemini-api": "gemini-omni-1.1-flash",
+                                                       "vertex": "veo-3.1-generate-001"}}]}
+
+    def go(self, **kw):
+        with redirect_stderr(io.StringIO()), self.assertRaises(mr.RouterError) as ctx:
+            mr.route(G_JOB, GHINTS, provider="google", credential_name=G_CRED, api_key=G_KEY,
+                     default_model="gemini-3.6-flash", requested="veo-3.1-generate-preview", fetch=GFetch(),
+                     cache_path=None, now=NOW, env={"MODEL_ROUTER_OFFLINE": "1"}, registry=self.REGISTRY, **kw)
+        return str(ctx.exception)
+
+    def test_each_adapter_names_its_backend(self):
+        self.assertEqual(mr.PROVIDER_BACKEND, {"anthropic": "anthropic", "openai": "openai", "google": "gemini-api"})
+
+    def test_google_names_the_gemini_api_replacement(self):
+        self.assertIn("Use gemini-omni-1.1-flash.", self.go())
+
+    def test_a_vertex_run_names_the_vertex_replacement(self):
+        self.assertIn("Use veo-3.1-generate-001.", self.go(record_applies=False, backend="vertex"))
+
+    def test_the_helper(self):
+        entry = self.REGISTRY["models"][0]
+        self.assertEqual(mr.registry_replacement(entry, "vertex"), "veo-3.1-generate-001")
+        self.assertEqual(mr.registry_replacement(entry, "gemini-api"), "gemini-omni-1.1-flash")
+        self.assertEqual(mr.registry_replacement(entry, "openai"), "veo-3.1-generate-001")  # not listed: the default
+        self.assertEqual(mr.registry_replacement({"replacement_id": "x"}, "vertex"), "x")
+
+    def test_cli_backend(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as tmp:
+            hints, reg = Path(tmp, "hints.json"), Path(tmp, "registry.json")
+            hints.write_text(json.dumps(GHINTS), encoding="utf-8")
+            reg.write_text(json.dumps({"aliases": {}, **self.REGISTRY}), encoding="utf-8")
+            base = [sys.executable, str(SCRIPTS / "model_router.py"), "--hints", str(hints), "--registry", str(reg),
+                    "--job", G_JOB, "--provider", "google", "--credential-name", G_CRED,
+                    "--default-model", "gemini-3.6-flash", "--requested", "veo-3.1-generate-preview",
+                    "--ignore-deprecations-record"]
+            env = dict(os.environ, MODEL_ROUTER_OFFLINE="1")
+            for extra, want in (([], "gemini-omni-1.1-flash"), (["--backend", "vertex"], "veo-3.1-generate-001")):
+                proc = subprocess.run(base + extra, capture_output=True, text=True, timeout=60, env=env)
+                self.assertEqual(proc.returncode, 2, proc.stdout + proc.stderr)
+                self.assertIn(f"Use {want}.", json.loads(proc.stdout)["error"])
+
+
 class TestFetchAnthropic(unittest.TestCase):
 
     def test_pages_headers_and_query(self):

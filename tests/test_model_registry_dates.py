@@ -16,7 +16,8 @@ Rules (dates are ISO strings; DMP_TODAY=YYYY-MM-DD freezes "today" for planting)
      must carry `retirement_checked` on or after that date and at most RECHECK_DAYS old.
   3. No alias may point at a deprecated or retired id, or at one whose `shutdown_date`
      is within SHUTDOWN_WARN_DAYS.
-  4. Every deprecated/retired entry's `replacement_id` exists and is current or supported.
+  4. Every deprecated/retired entry's `replacement_id`, and each id in its
+     `replacement_by_backend`, exists and is current or supported.
   5. A retired entry is dropped DROP_AFTER_DAYS after its shutdown date.
   6. `next_review_due` is not in the past.
   7. Kinds no vendor list endpoint can discover (text-to-speech, speech-to-text) are PINS:
@@ -71,6 +72,11 @@ def registry_problems(reg: dict, on: date) -> list[str]:
                 out.append(f"{mid}: {status} with replacement {rep!r} missing from the registry")
             elif models[rep].get("status", "current") not in LIVE:
                 out.append(f"{mid}: falls forward to {rep}, which is {models[rep].get('status')}")
+            for backend, rep in sorted((m.get("replacement_by_backend") or {}).items()):
+                if rep not in models:
+                    out.append(f"{mid}: replacement on {backend} {rep!r} missing from the registry")
+                elif models[rep].get("status", "current") not in LIVE:
+                    out.append(f"{mid}: on {backend} falls forward to {rep}, which is {models[rep].get('status')}")
         if status == "retired" and shut and (on - shut).days > DROP_AFTER_DAYS:
             out.append(f"{mid}: retired {shut}, over {DROP_AFTER_DAYS} days ago; drop it")
         pinned, expires = _d(m.get("pinned_on")), _d(m.get("pin_expires"))
@@ -144,6 +150,17 @@ class TestRegistryDates(unittest.TestCase):
         late = "\n".join(registry_problems(reg, date(2026, 11, 30)))
         self.assertIn("alias a: x shuts down", late)
         self.assertIn("y: retirement floor 2026-10-15 passed; last checked 2026-10-27", late)
+
+    def test_per_backend_replacements_must_exist_and_be_live(self):
+        reg = {"next_review_due": "2027-01-01", "aliases": {},
+               "models": [{"id": "old", "status": "retired", "shutdown_date": "2026-10-22", "replacement_id": "b-new",
+                           "replacement_by_backend": {"a": "a-new", "b": "b-new", "c": "gone"}},
+                          {"id": "a-new", "status": "deprecated", "replacement_id": "b-new"},
+                          {"id": "b-new", "status": "current"}]}
+        got = "\n".join(registry_problems(reg, date(2026, 10, 27)))
+        self.assertIn("old: on a falls forward to a-new, which is deprecated", got)
+        self.assertIn("old: replacement on c 'gone' missing from the registry", got)
+        self.assertNotIn("on b", got)
 
 
 RECORD_FAIL_DAYS = 45

@@ -76,6 +76,8 @@ class TestDmpRegistryShape(unittest.TestCase):
     def test_every_replacement_id_exists(self):
         bad = [m["id"] for m in self.dmp["models"]
                if m.get("replacement_id") and m["replacement_id"] not in self.dmp_models]
+        bad += [f"{m['id']} on {b}" for m in self.dmp["models"]
+                for b, rep in (m.get("replacement_by_backend") or {}).items() if rep not in self.dmp_models]
         self.assertEqual(bad, [], f"fall-forward targets missing from registry: {bad}")
 
 
@@ -245,6 +247,13 @@ class TestRegistryMirror(unittest.TestCase):
         code, out = self.run_mirror("--check")
         self.assertEqual(code, 0, out)
         self.assertIn("OK    socialforge", out)
+
+    def test_a_per_backend_replacement_to_a_missing_model_cannot_be_mirrored(self):
+        canon = dict(self.canon, models=[dict(m, replacement_by_backend={"vertex": "gpt-5.2"})
+                                         if m["id"] == "veo-3.1-generate-preview" else m
+                                         for m in self.canon["models"]])
+        with self.assertRaisesRegex(ValueError, r"veo-3\.1-generate-preview replacement on vertex -> gpt-5\.2"):
+            registry_mirror.mirror(canon)
 
     def test_an_alias_to_a_dmp_only_model_cannot_be_mirrored(self):
         canon = dict(self.canon, aliases=dict(self.canon["aliases"], **{"latest-x": "gpt-5.2"}))

@@ -64,7 +64,7 @@ python scripts/resolve_model.py --list --vendor anthropic --status current
   - An id only in the record stays out of the registry. On 2026-10-27 that was 14 openai ids: nine dated snapshots of registry entries (such as `gpt-5-2025-08-07`), the undated `o3` and `o3-pro`, and three models DMP never calls (`gpt-4.1-2025-04-14`, `gpt-4.1-mini-2025-04-14`, `gpt-5.3-codex`). The record has covered them offline since 3.39.1. The registry holds what DMP calls, or falls forward to.
   - An undated id such as `claude-sonnet-4-5` matches its one dated snapshot in the registry.
   - The router's CLI resolves the job's `default_alias` in the registry when `--default-model` is omitted.
-- When the record describes a different service than the call goes to, the caller passes `record_applies=False` (CLI: `--ignore-deprecations-record`). [SocialForge](https://github.com/indranilbanerjee/socialforge)'s Vertex AI runs do this, because Vertex retires Gemini models on its own schedule. The record is then ignored for that call, live and offline, and no cache is read or written.
+- When the record describes a different service than the call goes to, the caller passes `record_applies=False` (CLI: `--ignore-deprecations-record`). [SocialForge](https://github.com/indranilbanerjee/socialforge)'s Vertex AI runs do this, because Vertex retires Gemini models on its own schedule. The record is then ignored for that call, live and offline, and no cache is read or written. Such a caller also passes `backend="vertex"` (CLI: `--backend vertex`), so a registry entry's replacement is the one for Vertex. Without it, the google adapter names the Gemini API's, since that is where its list call goes.
 - The run's output carries `model_routing.anthropic` and `model_routing.openai`: the model asked for, the model sent, where the answer came from (`live`, `cache`, `requested` or `offline`) and when.
 
 ```bash
@@ -210,7 +210,20 @@ Then either point the relevant alias at the new id, or leave the alias alone and
 
 Change `status` to `"deprecated"` and add `replacement_id`. The resolver will auto-fall-forward for any script that resolves through an alias OR through `--model` validation.
 
-If the hint book's deprecations record lists the model, copy its shutdown date, replacement and announced date (as `deprecation_date`) exactly; `tests/test_registry_record_agreement.py` fails on any difference. The replacement needs its own entry, current or supported, so the resolver has somewhere to fall forward to. That is why `gpt-6-sol` has one: it isn't on OpenAI's models overview, but it has its own model page and is the replacement OpenAI names for `gpt-5.1`.
+When the replacement depends on where the request goes, add `replacement_by_backend` beside `replacement_id`. `veo-3.1-generate-preview` shut down on the Gemini API, where Google names `gemini-omni-1.1-flash`; on Vertex AI the GA model is `veo-3.1-generate-001`, which the Gemini API does not serve:
+
+```json
+{
+  "id": "veo-3.1-generate-preview",
+  "status": "retired",
+  "replacement_id": "veo-3.1-generate-001",
+  "replacement_by_backend": {"gemini-api": "gemini-omni-1.1-flash", "vertex": "veo-3.1-generate-001"}
+}
+```
+
+`replacement_id` stays the default for readers of one id. The resolver never forwards an entry with a map to one backend's id unless told which backend: `resolve_model.py --alias veo-3.1-generate-preview` stops with exit 2, naming both replacements, and `--backend gemini-api` (or `vertex`) returns that backend's id. In Python, pass `backend=` to `resolve`, `check` or `resolve_for_execution`. Every id in the map must exist and be current or supported; the dates test and the sibling mirror both check.
+
+If the hint book's deprecations record lists the model, copy its shutdown date, replacement and announced date (as `deprecation_date`) exactly; `tests/test_registry_record_agreement.py` fails on any difference. The replacement it compares is the one for the record's backend (`replacement_by_backend["gemini-api"]` for Google's page), or `replacement_id` when the entry has no map. The replacement needs its own entry, current or supported, so the resolver has somewhere to fall forward to. That is why `gpt-6-sol` has one: it isn't on OpenAI's models overview, but it has its own model page and is the replacement OpenAI names for `gpt-5.1`.
 
 ```json
 {
