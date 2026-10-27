@@ -41,6 +41,8 @@ Sources (all checked 2026-10-04):
   Anthropic crawlers            https://support.claude.com/en/articles/8896518
   Perplexity crawlers           https://docs.perplexity.ai/guides/bots
   Google-Extended               https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers
+  Google user-triggered fetchers https://developers.google.com/crawling/docs/crawlers-fetchers/google-user-triggered-fetchers
+                                (Google-Agent, Google-GeminiNotebook; checked 2026-10-27)
   Applebot-Extended             https://support.apple.com/en-us/119829
   RFC 9309 (robots.txt)         https://www.rfc-editor.org/rfc/rfc9309
   Merchant listing markup       https://developers.google.com/search/docs/appearance/structured-data/merchant-listing
@@ -127,6 +129,16 @@ AI_CRAWLERS = [
      "purpose": "visits pages to answer a Perplexity user's question",
      "robots_note": "Perplexity: this fetcher generally ignores robots.txt rules because a user requested the fetch",
      "source": "https://docs.perplexity.ai/guides/bots"},
+    {"token": "Google-Agent", "vendor": "Google", "role": "user",
+     "purpose": "agents on Google infrastructure that browse the web and act on a user's request",
+     "robots_note": ("Google: user-triggered fetchers generally ignore robots.txt rules; Google is "
+                     "testing Web Bot Auth with the https://agent.bot.goog identity"),
+     "source": "https://developers.google.com/crawling/docs/crawlers-fetchers/google-user-triggered-fetchers"},
+    {"token": "Google-GeminiNotebook", "vendor": "Google", "role": "user",
+     "purpose": "fetches URLs a user adds as sources in a Gemini Notebook project",
+     "robots_note": ("Google: user-triggered fetchers generally ignore robots.txt rules. Replaces "
+                     "Google-NotebookLM (supported until August 2026)"),
+     "source": "https://developers.google.com/crawling/docs/crawlers-fetchers/google-user-triggered-fetchers"},
     {"token": "Google-Extended", "vendor": "Google", "role": "training",
      "purpose": "control token for Gemini model training and grounding; no separate HTTP user agent",
      "robots_note": "Google: Google-Extended does not impact inclusion in Google Search nor is it a Search ranking signal",
@@ -137,6 +149,11 @@ AI_CRAWLERS = [
      "source": "https://support.apple.com/en-us/119829"},
 ]
 REQUIRED_ROLES = ("search", "user", "ads")
+# Tokens a vendor has retired: a robots.txt group that still names one controls nothing.
+RETIRED_TOKENS = {
+    "google-notebooklm": ("Google-NotebookLM", "Google-GeminiNotebook",
+                          "Google lists it as a former agent, supported until August 2026"),
+}
 
 LLMS_TXT_NOTE = ("llms.txt is NOT recommended for Google: Google's AI optimization guide "
                  "lists \"LLMS.txt files and other 'special' markup\" under \"Mythbusting "
@@ -263,6 +280,13 @@ def check_robots(text: str | None, paths: list[str], training_policy: str,
             elif training_policy == "allow" and blocked_paths:
                 status = "fail"
                 findings.append(f"{bot['token']} is {verdict.replace('_', ' ')} but --training-policy is 'allow'")
+    named = {a for g in groups for a in g["agents"]}
+    for token, (name, successor, why) in RETIRED_TOKENS.items():
+        if token in named:
+            if status == "pass":
+                status = "warn"
+            findings.append(f"robots.txt still names {name}, a retired token ({why}): its rules "
+                            f"no longer reach the fetcher, which is now {successor}")
     if not text.strip():
         findings.append("robots.txt is empty — every crawler is allowed")
     return {"id": "robots_ai_crawlers", "status": status, "source": source_label,

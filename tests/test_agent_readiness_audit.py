@@ -182,8 +182,9 @@ class TestRobotsMatching(unittest.TestCase):
         tokens = {b["token"] for b in ara.AI_CRAWLERS}
         for t in ("GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-SearchBot",
                   "Claude-User", "PerplexityBot", "Perplexity-User", "Google-Extended",
-                  "Applebot-Extended", "OAI-AdsBot"):
+                  "Applebot-Extended", "OAI-AdsBot", "Google-Agent", "Google-GeminiNotebook"):
             self.assertIn(t, tokens)
+        self.assertNotIn("Google-NotebookLM", tokens, "retired 2026-08; Google-GeminiNotebook replaced it")
         for b in ara.AI_CRAWLERS:
             self.assertTrue(b["source"].startswith("https://"), b["token"])
 
@@ -223,9 +224,26 @@ class TestRobotsVerdicts(_Tmp):
     def test_user_fetchers_carry_the_vendor_robots_caveat(self):
         rep, _ = self.audit("--robots", self.write("r.txt", ROBOTS_OPEN))
         c = self.check(rep, "robots_ai_crawlers")
-        for token in ("ChatGPT-User", "Perplexity-User"):
+        for token in ("ChatGPT-User", "Perplexity-User", "Google-Agent", "Google-GeminiNotebook"):
             bot = next(b for b in c["crawlers"] if b["token"] == token)
             self.assertIn("robots", bot["note"].lower())
+
+    def test_blocking_google_agent_fails(self):
+        # Google-Agent is a user-triggered fetcher (role "user"): blocking it fails like
+        # blocking ChatGPT-User does, even though Google says such fetchers generally
+        # ignore robots.txt, because the brand's intent is what the audit reports.
+        rep, code = self.audit("--robots", self.write("r.txt", "User-agent: Google-Agent\nDisallow: /\n"))
+        c = self.check(rep, "robots_ai_crawlers")
+        self.assertEqual(c["status"], "fail")
+        self.assertIn("Google-Agent", " ".join(c["findings"]))
+
+    def test_retired_google_notebooklm_token_warns(self):
+        rep, code = self.audit("--robots", self.write(
+            "r.txt", "User-agent: Google-NotebookLM\nDisallow: /\n\nUser-agent: *\nAllow: /\n"))
+        c = self.check(rep, "robots_ai_crawlers")
+        self.assertEqual(c["status"], "warn")
+        self.assertEqual(code, 0)
+        self.assertTrue(any("Google-NotebookLM" in f and "Google-GeminiNotebook" in f for f in c["findings"]))
 
 
 class TestStructuredData(_Tmp):

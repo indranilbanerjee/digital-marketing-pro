@@ -6,6 +6,34 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.37.0] - 2026-10-27
+
+### Google's new crawler tokens, Cloudflare's block modes, Bing's citation gaps, Google's AI-feature control and Preferred Sources
+
+From the 2026-10-27 freshness review. Every fact below was read at its primary source that day. Each guard has a test that fails on the 3.36.2 code or text.
+
+**Changed — the agent-readiness audit knows Google's user-triggered fetchers**
+
+- `scripts/agent-readiness-audit.py` now audits two more Google tokens:
+  - `Google-Agent`: agents on Google infrastructure that browse and act on a user's request;
+  - `Google-GeminiNotebook`: URLs a user adds as sources in a Gemini Notebook project.
+- Both are user fetches, so blocking them fails like blocking ChatGPT-User. Google says such fetchers "generally ignore robots.txt rules", and it is testing Web Bot Auth with the `https://agent.bot.goog` identity.
+- A robots.txt group that still names `Google-NotebookLM` now warns: Google lists it as a former agent, "supported until August 2026". Source: [Google user-triggered fetchers](https://developers.google.com/crawling/docs/crawlers-fetchers/google-user-triggered-fetchers) (updated 2026-08-19).
+- The public `digital-marketing-pro-agent-readiness` hero is re-synced, and its 125 tests, parity included, pass against this release.
+
+**Added — guidance**
+
+- **Cloudflare's block modes**, in `/digital-marketing-pro:agent-readiness-audit` and `/digital-marketing-pro:tech-seo-audit`. Since 15 Sep 2026, Cloudflare's **Block** and **Block on pages with ads** settings also apply to Googlebot, Bingbot and Applebot, so **Block** takes a site out of search; **Disallow AI Training** keeps search crawlers and publishes a no-training preference. A clean robots.txt no longer proves crawlers can reach the site. Source: [Cloudflare](https://blog.cloudflare.com/accountable-mixed-use-ai-crawlers/).
+- **Bing Topics Portfolio (beta, 13 Oct 2026)**, in `/digital-marketing-pro:geo-monitor` and `/digital-marketing-pro:aeo-audit`. Per topic it shows approximate citations across all sites, how many sites are cited, and Top Opportunity Queries, where others are cited and you aren't. It is the first first-party citation-gap list; use it to seed probe sets, and label its figures approximate. Source: [Bing Webmaster blog](https://blogs.bing.com/webmaster/2026/10/introducing-topics-portfolio-beta-in-ai-performance/).
+- **Google's Search generative AI control**, in `/digital-marketing-pro:aeo-geo` and `/digital-marketing-pro:gsc-ai-performance`. Search Console → Settings → Search generative AI excludes a site from AI Overviews, AI Mode and Discover's AI features. Google says it "isn't used as a ranking or inclusion signal affecting other parts of Search" and "doesn't affect AI training". The guidance names the cost too: every AI-feature impression, and the Preferred Sources badge in AI features. Source: [Search Console help](https://support.google.com/webmasters/answer/16908024).
+- **Preferred Sources playbook item**, in `/digital-marketing-pro:aeo-geo`. Use is up more than 7x in 2026 (Google, 15 Oct). Add Google's button or the deep link `https://www.google.com/preferences/source?q=<domain>`; only domains and subdomains qualify, and the AI Mode badge needs the site included in Search generative AI features. Source: [Search Central](https://developers.google.com/search/docs/appearance/preferred-sources).
+
+**Tests**
+
+- `tests/test_agent_readiness_audit.py`: the two tokens, a blocked Google-Agent fails, and the retired token warns. On 3.36.2: 3 failures and 1 error.
+- New: `tests/test_search_guidance.py`. It checks that the skill's crawler table equals the script's tokens, that the guidance stays present, and that no skill names Google-NotebookLM as current. On 3.36.2 text: 2 failures.
+- Suite: 759 tests.
+
 ## [3.36.2] - 2026-10-27
 
 ### The model registry refreshed from the vendors' pages, with checks that its dates and statuses stay true

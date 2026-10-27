@@ -77,7 +77,7 @@
         "seo-drift"
       ],
       "doc_files": 1,
-      "bytes": 10005
+      "bytes": 10675
     },
     {
       "name": "aeo-geo",
@@ -94,7 +94,7 @@
         "gsc-ai-performance"
       ],
       "doc_files": 5,
-      "bytes": 44347
+      "bytes": 46000
     },
     {
       "name": "agency-dashboard",
@@ -134,7 +134,7 @@
         "tech-seo-audit"
       ],
       "doc_files": 1,
-      "bytes": 15035
+      "bytes": 16777
     },
     {
       "name": "analytics-insights",
@@ -1233,7 +1233,7 @@
         "gsc-ai-performance"
       ],
       "doc_files": 1,
-      "bytes": 12481
+      "bytes": 13054
     },
     {
       "name": "goal-filter",
@@ -1295,7 +1295,7 @@
         "seo-drift"
       ],
       "doc_files": 1,
-      "bytes": 15492
+      "bytes": 16183
     },
     {
       "name": "help",
@@ -2601,7 +2601,7 @@
         "seo-audit"
       ],
       "doc_files": 1,
-      "bytes": 8481
+      "bytes": 9043
     },
     {
       "name": "technical-seo",

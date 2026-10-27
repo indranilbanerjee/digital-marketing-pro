@@ -6,16 +6,16 @@ Run `/digital-marketing-pro:engagement` against each brand. Same 12-Part Strateg
 
 Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Act Article 50 ready, Cowork team-persistent**. Built for marketing agencies, in-house teams running 50–200 brands, and consultancies. Installs on **Claude Code** (CLI + IDE), **Anthropic Cowork**, **OpenAI Codex**, **Cursor 2.5+**, **GitHub Copilot CLI**, **Google Antigravity 2.0**, **Hermes Agent**, **OpenClaw**, and **Grok** + 35+ Agent Skills platforms. Created by [Indranil Banerjee](https://indranil.in) · [LinkedIn](https://www.linkedin.com/in/askneelnow/) · [X](https://x.com/askneelnow).
 
-[![Version](https://img.shields.io/badge/version-3.36.2-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.37.0-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=yellow)](https://github.com/indranilbanerjee/digital-marketing-pro/stargazers)
-[![Tests](https://img.shields.io/badge/tests-753%2F753%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-759%2F759%20passing-brightgreen.svg)](tests/)
 [![Platforms](https://img.shields.io/badge/platforms-9%20native%20%2B%2035%20Agent%20Skills-success.svg)](#works-on-40-agent-harnesses-via-the-agent-skills-open-standard)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Article%2050%20ready-darkred.svg)](skills/context-engine/compliance-rules.md)
 
 [![Built by Indranil "Neel" Banerjee — Neelverse Marketing Suite — Sponsor this project](docs/assets/author-banner.svg)](https://github.com/sponsors/indranilbanerjee)
 
-> 🆕 **Just shipped — v3.36.2 (October 27, 2026):** the model registry is refreshed from the vendors' pages (Claude Haiku 5.5, Gemini 4 Argon, Nano Banana 2.1, OpenAI's gpt-4o shutdown), with a weekly check that its dates and aliases stay true. [What's new](#whats-new) · [Changelog](CHANGELOG.md)
+> 🆕 **Just shipped — v3.37.0 (October 27, 2026):** the agent-readiness audit knows Google's new crawler tokens, and the SEO and AI-visibility skills cover Cloudflare's block modes, Bing's citation-gap report, Google's AI-feature opt-out and Preferred Sources. [What's new](#whats-new) · [Changelog](CHANGELOG.md)
 
 ```bash
 # Install — one command (Claude Code 2.1.292 or newer)
@@ -204,7 +204,7 @@ Other marketing plugins exist, including Anthropic's own marketing plugin and co
 | AEO / GEO | **A 6-platform audit, including Google AI Mode** |
 | Where it runs | **9 native hosts**: Claude Code, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes, OpenClaw, Grok |
 | Live-write safety | **Single-use approval record for writes it sends itself; MCP writes: typed yes + host prompt** |
-| Tests | **753 stdlib unittest** tests |
+| Tests | **759 stdlib unittest** tests |
 | License | **MIT: no telemetry, no seats** |
 
 ---
@@ -301,7 +301,7 @@ Output: HTTP calls for the 8 executable connectors (Slack, HubSpot, Klaviyo, Sen
 
 ---
 
-## Supported surfaces (v3.36.2)
+## Supported surfaces (v3.37.0)
 
 | Platform | Install command | Manifest path | Status |
 |---|---|---|---|
@@ -413,6 +413,10 @@ If you run into a platform-specific install snag, file a [GitHub issue](https://
 
 ## What's new
 
+### v3.37.0 — Google's crawler tokens, Cloudflare, Bing citation gaps, Preferred Sources (October 27, 2026)
+
+The agent-readiness audit now checks Google's user-triggered fetchers, Google-Agent and Google-GeminiNotebook, and warns when robots.txt still names the retired Google-NotebookLM token; the public standalone version of the audit carries the same change. Since 15 September, Cloudflare's "Block" setting also stops Googlebot, Bingbot and Applebot, so the readiness and technical-SEO audits now check the CDN, not just robots.txt. The AI-visibility skills use Bing's new Topics Portfolio, the first first-party list of queries where competitors get cited and you don't. They explain Google's Search Console opt-out for AI features (not a ranking signal, but it costs every AI impression) and add a Preferred Sources step. 759 tests.
+
 ### v3.36.2 — model registry refreshed, with date checks (October 27, 2026)
 
 The registry that maps aliases like `latest-fast-anthropic` to real model ids, shared by all three plugins, was refreshed from Anthropic's, OpenAI's and Google's own pages. The fast Claude alias now points to Haiku 5.5, Google's text alias to Gemini 4 Argon and its balanced image alias to Nano Banana 2.1; gpt-4o and gpt-4o-mini are marked for their 14 January 2027 shutdown. Gemini 2.5 turned out not to be deprecated, and one entry had mistaken a release date for a shutdown. A new test fails whenever an alias points at a deprecated model, a live model passes its retirement date unchecked, or the docs' alias table drifts, and the parameter scan now covers every Claude model, since Anthropic's newest API version rejects `temperature` everywhere. 753 tests.
@@ -420,10 +424,6 @@ The registry that maps aliases like `latest-fast-anthropic` to real model ids, s
 ### v3.36.1 — compliance rules up to date, with a dated table (October 27, 2026)
 
 The compliance rules every skill checks against had fallen behind. India's DPDP Rules were dated to the January 2025 draft, and their Consent Manager registration was described as live (it opens 13 November 2026); the core duties, including verifiable parental consent, apply from 13 May 2027. The US text-message rules now cover the FCC's revocation rule effective 25 November 2026. The EU AI Act notes add the 2 December 2026 marking deadline for AI systems already on the market and the rule that old AI text republished now must be labelled. UK cookie exceptions and PECR fines changed on 5 February 2026, and California's penalties and new AI, browser-signal and data-broker laws are in. Every date now sits in one table at the top of the rules, each jurisdiction carries a "verified on" stamp, and a weekly test fails when a date passes or a stamp goes stale. 747 tests.
-
-### v3.36.0 — API versions in one dated table; Meta v26.0; shorter agents (October 27, 2026)
-
-Meta's Marketing API v24.0, which DMP's ad templates used, stops working on 10 November 2026, and nothing in the repo knew. Every pinned platform API version now lives in one table with its sunset date and source page: Meta v26.0, LinkedIn 202610 on the documented campaign path, Google Ads v26 without the developer token Google retired in September, plus TikTok, X Ads and Klaviyo. Tests fail 30 days before a sunset and whenever the docs name a different version from the code, and the weekly GitHub job runs them. The 24 agent descriptions, which Claude Code lists in full in every session, are now 112 to 140 characters with each agent's routing words kept, cutting the plugin's always-on cost by about 1,300 tokens. Claude Code 2.1.292+ installs in one command, and setup warns on Python 3.10, which reached end of life on 2026-10-01 (DMP still runs on it while Claude's Cowork environment does). 740 tests.
 
 Older releases are in [CHANGELOG.md](CHANGELOG.md).
 
@@ -724,7 +724,7 @@ Yes. Each brand has its own `~/.claude-marketing/brands/<brand-slug>/` directory
 Skip to `/digital-marketing-pro:campaign-plan`. Every individual surface (campaign / SEO / content / competitor / email / report) is independently runnable. The full engagement is the canonical path, not the only path.
 
 **Q: Will this work on Codex / Cursor / Copilot CLI / Antigravity?**
-Yes — verified-real native manifests ship for all 9 surfaces (CC, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok). See [Supported surfaces](#supported-surfaces-v3362) above for per-platform install commands.
+Yes — verified-real native manifests ship for all 9 surfaces (CC, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok). See [Supported surfaces](#supported-surfaces-v3370) above for per-platform install commands.
 
 **Q: I run my team on Anthropic Cowork. Does brand state persist between sessions?**
 Yes — but you need to run `/digital-marketing-pro:cowork-setup` once per team first (v3.12.0). Cowork's per-session filesystem is ephemeral, and `${CLAUDE_PLUGIN_DATA}` is too ([open issue #51398](https://github.com/anthropics/claude-code/issues/51398)). The setup wizard routes brand profiles + plans + reports through a Google Drive MCP so everything survives across sessions and is shared across the team. Multi-team isolation via per-team folder names.
@@ -797,7 +797,7 @@ Use the direct repo form: `grok plugin install indranilbanerjee/digital-marketin
 ### General (any platform)
 
 **"Tests in `tests/` fail when I `git clone` locally"**
-Run `python tests/run_all.py` from the repo root. All 753 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+; `scripts/setup.py` recommends 3.11 or newer, and the floor moves to 3.11 once Claude's Cowork environment does) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
+Run `python tests/run_all.py` from the repo root. All 759 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+; `scripts/setup.py` recommends 3.11 or newer, and the floor moves to 3.11 once Claude's Cowork environment does) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
 
 **"`/digital-marketing-pro:doctor` shows my action as stub_unconfigured"**
 That action needs an MCP connector configured. Run `python scripts/connector-status.py --action setup-guide --name <connector-name>` for the exact setup snippet. Add it to your `.mcp.json` under `mcpServers`, restart your agent, and the action becomes `manifest_ready`. See [Connector-aware action resolver](#connector-aware-action-resolver) for the full readiness model.
