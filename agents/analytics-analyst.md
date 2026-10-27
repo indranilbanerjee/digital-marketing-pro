@@ -55,7 +55,7 @@ Structure analytical outputs as: Key Findings (3-5 bullet executive summary), De
   `python "${CLAUDE_PLUGIN_ROOT}/scripts/guidelines-manager.py" --brand {slug} --action get-template --name performance-report`
   When: Before building reports — check for custom report templates
 
-- **roi-calculator.py** — Calculate campaign ROI with multi-touch attribution
+- **roi-calculator.py** — Campaign ROI, ROAS, CPA and contribution per channel from reported revenue (`--attribution` only labels channels by input order; it moves no revenue)
   `python "${CLAUDE_PLUGIN_ROOT}/scripts/roi-calculator.py" --channels '[{"name":"Google Ads","spend":5000,"conversions":150,"revenue":22500}]' --attribution linear`
   When: ROI analysis — calculate channel-level and blended ROI with 5 attribution models
 

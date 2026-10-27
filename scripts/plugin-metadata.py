@@ -325,7 +325,7 @@ def main() -> int:
             print(format_text(data))
         else:
             for k, v in data.items():
-                print(f"{k}: {v}")
+                print(f"{k}: {'not set' if v is None else v}")  # never a bare Python None
     else:
         print(json.dumps(data, indent=2, ensure_ascii=False))
 

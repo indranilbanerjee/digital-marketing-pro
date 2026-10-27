@@ -106,7 +106,7 @@ SCORING_TEMPLATE = {
 }
 
 AI_PLATFORMS = [
-    {"name": "ChatGPT", "url": "https://chat.openai.com", "note": "Test with the current default ChatGPT model (GPT-5.6 family as of July 2026)"},
+    {"name": "ChatGPT", "url": "https://chat.openai.com", "note": "Test with the default model chatgpt.com shows when you sign in (it changes; read the model picker)"},
     {"name": "Claude", "url": "https://claude.ai", "note": "Anthropic's AI assistant"},
     {"name": "Perplexity", "url": "https://perplexity.ai", "note": "AI search engine with citations"},
     {"name": "Google AI Overview", "url": "https://google.com", "note": "Look for AI-generated summaries in search results"},

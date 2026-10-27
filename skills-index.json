@@ -42,7 +42,7 @@
         "video-script"
       ],
       "doc_files": 1,
-      "bytes": 6064
+      "bytes": 6220
     },
     {
       "name": "add-integration",
@@ -283,7 +283,7 @@
         "switch-brand"
       ],
       "doc_files": 1,
-      "bytes": 8134
+      "bytes": 8351
     },
     {
       "name": "budget-optimizer",
@@ -298,7 +298,7 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 6433
+      "bytes": 6456
     },
     {
       "name": "budget-tracker",
@@ -315,7 +315,7 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7280
+      "bytes": 7441
     },
     {
       "name": "c2pa-metadata",
@@ -510,7 +510,7 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 9404
+      "bytes": 9755
     },
     {
       "name": "client-validation-document",
@@ -724,6 +724,7 @@
         "execution-tracker.py",
         "geo-tracker.py",
         "memory-manager.py",
+        "model_router.py",
         "revenue-forecaster.py",
         "revenue-simulator.py",
         "roi-calculator.py",
@@ -776,7 +777,7 @@
         "validate-profile"
       ],
       "doc_files": 56,
-      "bytes": 904454
+      "bytes": 904554
     },
     {
       "name": "continuous-improvement-loop",
@@ -860,7 +861,7 @@
         "check"
       ],
       "doc_files": 1,
-      "bytes": 10635
+      "bytes": 10761
     },
     {
       "name": "credential-switch",
@@ -1023,7 +1024,7 @@
         "brand-setup"
       ],
       "doc_files": 10,
-      "bytes": 148245
+      "bytes": 148229
     },
     {
       "name": "engagement-workflow",
@@ -1142,7 +1143,7 @@
         "competitor-analysis"
       ],
       "doc_files": 1,
-      "bytes": 14121
+      "bytes": 14162
     },
     {
       "name": "executive-dashboard",
@@ -2195,7 +2196,7 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 5788
+      "bytes": 5884
     },
     {
       "name": "save-knowledge",

@@ -103,7 +103,7 @@ Use Path B when:
 - The brand requires depth and rigour, not speed
 - You will be presenting client-facing deliverables (Growth Plan, Yearly Planner)
 
-**Both paths share the same 24 specialist agents, 164 atomic skills, 14 HTTP MCP connectors, brand profile system, and compliance enforcement.** The methodology layer just orchestrates them into a known sequence.
+**Both paths share the same 24 specialist agents, 164 atomic skills, 35 HTTP MCP connectors, brand profile system, and compliance enforcement.** The methodology layer just orchestrates them into a known sequence.
 
 ---
 

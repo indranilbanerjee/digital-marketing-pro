@@ -71,7 +71,7 @@ Structure every analysis as: **Methodology** (approach used, assumptions stated,
   `python "${CLAUDE_PLUGIN_ROOT}/scripts/revenue-forecaster.py" --historical '[{"month":"2026-01","revenue":50000,"spend":15000}]' --forecast-months 6`
   When: Revenue projection — build baseline forecasts for scenario modeling and incrementality baselines
 
-- **roi-calculator.py** — Calculate campaign ROI with multi-touch attribution across 5 models
+- **roi-calculator.py** — Campaign ROI, ROAS, CPA and contribution per channel from reported revenue (`--attribution` only labels channels by input order; for credit that moves between channels, use touchpoint paths)
   `python "${CLAUDE_PLUGIN_ROOT}/scripts/roi-calculator.py" --channels '[{"name":"Google Ads","spend":5000,"conversions":150,"revenue":22500}]' --attribution linear`
   When: Channel ROI analysis — compare attribution models to assess measurement sensitivity
 

@@ -110,7 +110,7 @@ After collecting all information:
 When user says "switch to [brand name]":
 1. Run: `python "${CLAUDE_PLUGIN_ROOT}/scripts/setup.py" --list-brands`
 2. Find matching brand
-3. Update `~/.claude-marketing/brands/_active-brand.json`
+3. Run: `python "${CLAUDE_PLUGIN_ROOT}/scripts/setup.py" --switch-brand BRAND_SLUG`. Never edit `_active-brand.json` by hand: the script writes the keys every other script reads (`active_slug`, `previous_slug`), and a hand-written file makes them all report no active brand.
 4. Confirm: "Switched to [brand_name]."
 
 ## Updating a Brand

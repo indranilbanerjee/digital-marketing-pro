@@ -94,7 +94,7 @@ Installing plugin: digital-marketing-pro vX.Y.Z
   - 16 marketing modules loaded
   - 164 skills + 5 commands registered (/digital-marketing-pro:*)
   - 24 specialist agents available
-  - 13 HTTP connectors + pinned vendor packages and setup notes for the rest
+  - 35 HTTP connectors + pinned vendor packages and setup notes for the rest
   - Hooks ship empty (opt-in SessionStart/PreToolUse/SessionEnd reference config in hooks/hooks-reference.example.json)
   - 12-Part Engagement Methodology available (run /digital-marketing-pro:engagement to start)
 

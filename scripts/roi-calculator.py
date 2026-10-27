@@ -260,7 +260,7 @@ def load_channels(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Campaign ROI calculator with multi-touch attribution models"
+        description="Campaign ROI, ROAS, CPA and contribution per channel from reported revenue"
     )
     parser.add_argument(
         "--channels", default=None,
@@ -273,7 +273,8 @@ def main():
     parser.add_argument(
         "--attribution", default="last_touch",
         choices=sorted(VALID_MODELS),
-        help="Attribution model (default: last_touch)",
+        help="Label each channel with a nominal weight under this model, taking input order as touch "
+             "order (default: last_touch). It does not move revenue between channels.",
     )
     parser.add_argument(
         "--period", default=None,
@@ -320,6 +321,8 @@ def main():
     if args.period:
         output["period"] = args.period
     output["attribution_model"] = args.attribution
+    output["attribution_note"] = (
+        "attribution_weight is a nominal label from the order of the channels in the input (taken as touch order); revenue, ROI, ROAS, CPA and contribution use each channel's reported revenue unchanged. For credit that moves between channels, use touchpoint paths (attribution-report).")
     output["channels"] = channel_metrics
     output["summary"] = summary
     output["recommendations"] = recommendations
