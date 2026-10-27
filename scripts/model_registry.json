@@ -2,7 +2,7 @@
   "$comment": "Canonical model registry for the Neelverse Marketing Suite (DMP / ContentForge / SocialForge). Update this file then run scripts/sync_model_registry.sh to distribute: each sibling copy is this file minus the DMP-only families listed in scripts/registry_mirror.py. The resolver consults this registry to map human-readable aliases to concrete model IDs and to warn when a deprecated model is being used. See refresh_models.py to poll provider APIs for drift.",
   "schema_version": "1.0",
   "last_updated": "2026-10-27",
-  "last_updated_by": "manual refresh from vendor pages read 2026-10-27; see _shared/REGISTRY-PATCH-2026-10-27.md; speech kinds (text-to-speech, speech-to-text) added in DMP 3.37.2 as pins with an expiry",
+  "last_updated_by": "manual refresh from vendor pages read 2026-10-27 (each entry's docs_url and notes name its source; see docs/MODEL-CURATOR.md); speech kinds (text-to-speech, speech-to-text) added in DMP 3.37.2 as pins with an expiry",
   "next_review_due": "2026-11-16",
   "stewardship_policy": "Re-validate at least quarterly OR whenever a script call returns a 404 / deprecation warning. Frontier model landscape shifts every ~6 weeks; treat any entry older than 3 months as suspect. Verify the next time `refresh_models.py` reports drift, or before any new feature ship.",
   "param_compatibility_notes": {

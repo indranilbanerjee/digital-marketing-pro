@@ -1,8 +1,7 @@
 """scripts/model_router.py: pick a model by job from the provider's live list, never by name.
 
-Brain A's build order for the router proof (_shared/PLAN-2026-10-27-model-router.md) was
-FIXTURES FIRST: the deprecated-with-retires_at, retired, preview-only and 401 cases were
-planted as failing tests before any selection code existed. The fixtures in
+The router proof was built FIXTURES FIRST: the deprecated-with-retires_at, retired,
+preview-only and 401 cases were planted as failing tests before any selection code existed. The fixtures in
 tests/fixtures/model_router/ are the documented shape of GET /v1/models; their ids and
 dates are test data.
 
@@ -123,7 +122,7 @@ class RouterCase(unittest.TestCase):
 
 
 class TestPlantedCases(RouterCase):
-    """The four cases Brain A asked for first."""
+    """The four cases planted first."""
 
     def test_deprecated_retiring_next_week_warns_and_keeps_running(self):
         r = self.route(Fetch(), requested="claude-sonnet-4-5-20250929", now=datetime(2026, 11, 23, tzinfo=timezone.utc))

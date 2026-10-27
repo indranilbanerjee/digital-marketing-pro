@@ -6,7 +6,7 @@ exactly the canonical file minus the DMP-only model families (DMP_ONLY_MODELS) a
 aliases (DMP_ONLY_ALIASES), keeping only the sibling's own `$comment`. That is the whole rule:
 an entry DMP drops is dropped from the siblings, and a new canonical entry or alias key
 reaches them even when nothing points at it yet. (The old surgical by-id update did neither,
-so after 3.36.2 Worker B finished the sync by hand with this same mirror.)
+so the 3.36.2 sync had to be finished by hand with this same mirror.)
 
 Usage (sync_model_registry.sh calls this):
     python registry_mirror.py              write each checked-out sibling's mirror

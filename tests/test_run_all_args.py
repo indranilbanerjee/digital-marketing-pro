@@ -1,6 +1,6 @@
 """tests/run_all.py runs only on the flags it knows.
 
-The Tester's `python tests/run_all.py --help` probe used to run the whole suite
+A fresh-install test's `python tests/run_all.py --help` probe used to run the whole suite
 (747 tests, with the real HOME), because run_all ignored every argument it did
 not recognise. Now --help prints the usage and exits 0, and any unknown argument
 prints the usage to stderr and exits 2 without loading a single test.

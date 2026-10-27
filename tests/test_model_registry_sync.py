@@ -13,7 +13,7 @@ documented set of marketing-suite-specific model families. This test enforces:
   3. Each sibling IS the mirror (canonical minus DMP_ONLY, its own $comment kept),
      and `sync_model_registry.sh --check` reports drift in both directions: entries
      a sibling lacks and entries upstream dropped. The surgical by-id sync it
-     replaced (3.37.2) reported neither, so Worker B finished the 3.36.2 sync by hand.
+     replaced (3.37.2) reported neither, so the 3.36.2 sync was finished by hand.
 
 If the ContentForge sibling repo is not checked out next to this repo, the
 cross-repo assertions are skipped (the deviation allowlist is still checked).

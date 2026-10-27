@@ -6,6 +6,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.38.2] - 2026-10-27
+
+### Public files point only at what a reader can open
+
+Some files shipped in the last round named the internal work sessions that build this plugin, and pointed at private planning notes that are not in the repository. The worst case was the model registry's `last_updated_by` field: it is shipped as data and copied into the sibling plugins, and it cited a patch file no reader can open. Public text should say what was done, not who did it, and link only to files a reader can open.
+
+**Fixed**
+
+- `scripts/model_registry.json` `last_updated_by` now says the vendor pages were read on 2026-10-27, that each entry's `docs_url` and notes name its source, and points to `docs/MODEL-CURATOR.md`. Sibling copies pick this up at their next mirror.
+- CHANGELOG 3.38.0 and 3.36.2 describe the plan and the registry refresh without naming internal sessions or private notes.
+- Test and script docstrings in `scripts/registry_mirror.py`, `tests/test_model_router.py`, `tests/test_model_registry_sync.py` and `tests/test_run_all_args.py` say what happened ("the 3.36.2 sync was finished by hand", "built fixtures first") instead of who did it.
+
+**Tests**
+
+- New: `tests/test_no_internal_references.py`. No shipped file may name an internal session or point into the private notes folder. CHANGELOG entries dated before 2026-10-27 are kept as history, because they name test harnesses that really lived there.
+- It works from an installed copy (no git) by walking the folder.
+- "Campaign Orchestrator" and the other product names pass.
+- Planted on the 3.38.1 files: 11 findings.
+- Suite: 833 tests.
+
 ## [3.38.1] - 2026-10-27
 
 ### Four SEO descriptions fix vocabulary gaps seen in a blind eval
@@ -34,7 +54,7 @@ A blind evaluation on 2026-10-27 exposed six SEO requests where none of the plug
 
 ### The model router: the AI-visibility checker picks its models from each provider's own live list
 
-The owner's ask was to stop depending on model names. Brain A's plan (`_shared/PLAN-2026-10-27-model-router.md`) split it in two: automate lifecycle fully, and automate selection conservatively. This release is its proof: one job with two providers.
+The goal is to stop depending on model names. The plan splits it in two: automate lifecycle fully, and automate selection conservatively. This release is its proof: one job with two providers.
 
 Both adapters were built fixtures first: the planted cases were written as failing tests before any selection code existed.
 - Anthropic: 25 tests failed against an interface-only stub.
@@ -280,7 +300,7 @@ From the 2026-10-27 freshness review. Every fact below was read at its primary s
 
 ### The model registry refreshed from the vendors' pages, with checks that its dates and statuses stay true
 
-The canonical registry (`scripts/model_registry.json`, which ContentForge and SocialForge copy) had last been reviewed on 2026-10-04 and was wrong in places by 2026-10-27. Every vendor page was re-read that day (Anthropic, OpenAI, the Gemini API and Vertex AI), and the reviewed patch is in `_shared/REGISTRY-PATCH-2026-10-27.md`. Each guard below has a test that fails on the 3.36.1 registry, doc or scanner.
+The canonical registry (`scripts/model_registry.json`, which ContentForge and SocialForge copy) had last been reviewed on 2026-10-04 and was wrong in places by 2026-10-27. Every vendor page was re-read that day (Anthropic, OpenAI, the Gemini API and Vertex AI); each entry's `docs_url` and notes name its source. Each guard below has a test that fails on the 3.36.1 registry, doc or scanner.
 
 **Fixed — aliases**
 
