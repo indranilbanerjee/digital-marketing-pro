@@ -1,0 +1,5 @@
+{
+  "_fixture": "Shape of GET https://api.openai.com/v1/models as documented at developers.openai.com/api/reference/resources/models/methods/list (read 2026-10-27): id, object, created (Unix seconds), owned_by, optional shutdown_date. Ids, dates and owners here are test data for tests/test_model_router.py, not claims.",
+  "object": "list",
+  "data": []
+}

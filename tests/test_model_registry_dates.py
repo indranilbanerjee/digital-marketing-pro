@@ -146,6 +146,33 @@ class TestRegistryDates(unittest.TestCase):
         self.assertIn("y: retirement floor 2026-10-15 passed; last checked 2026-10-27", late)
 
 
+RECORD_FAIL_DAYS = 45
+
+
+def record_problems(hints: dict, on: date) -> list[str]:
+    """The router's hand-read lifecycle records (scripts/model_hints.json 'deprecations') go
+    stale like any pin: the router warns after 30 days, this weekly check fails after 45."""
+    out = []
+    for provider, record in (hints.get("deprecations") or {}).items():
+        age = (on - date.fromisoformat(record["read_on"])).days
+        if age > RECORD_FAIL_DAYS:
+            out.append(f"deprecations.{provider} read {record['read_on']}, {age} days ago; re-read {record['source']}")
+    return out
+
+
+class TestRouterRecords(unittest.TestCase):
+
+    def test_deprecation_records_are_fresh(self):
+        hints = json.loads((REPO / "scripts" / "model_hints.json").read_text(encoding="utf-8"))
+        problems = record_problems(hints, today())
+        self.assertEqual(problems, [], "\n  " + "\n  ".join(problems))
+
+    def test_plant(self):
+        hints = {"deprecations": {"openai": {"read_on": "2026-10-27", "source": "https://x"}}}
+        self.assertEqual(record_problems(hints, date(2026, 12, 11)), [])
+        self.assertIn("46 days ago", "\n".join(record_problems(hints, date(2026, 12, 12))))
+
+
 class TestSpeechPins(unittest.TestCase):
     """Speech kinds were hardcoded in CutForge (gpt-4o-mini-tts, whisper-1, saarika:v2.5), and all
     three were deprecated by 2026-10-27 with nothing in the suite to say so. No list endpoint
@@ -203,19 +230,24 @@ class TestCuratorDocMatchesRegistry(unittest.TestCase):
         reg = json.loads(REGISTRY.read_text(encoding="utf-8"))
         models = {m["id"]: m for m in reg["models"]}
         text = (REPO / "docs" / "MODEL-CURATOR.md").read_text(encoding="utf-8")
-        default = re.search(r"latest-balanced-openai alias \(([a-z0-9.-]+)", text)
-        self.assertEqual(default.group(1), reg["aliases"]["latest-balanced-openai"])
         substitutes = re.findall(r"WARNING \((?:openai|anthropic)\): (\S+) is deprecated, using (\S+) instead", text)
         substitutes += re.findall(r'check\("([^"]+)"\)` returns `\("deprecated", "([^"]+)"\)', text)
-        self.assertGreaterEqual(len(substitutes), 2)
+        self.assertTrue(substitutes)
         for old, new in substitutes:
             self.assertEqual(models[old].get("replacement_id"), new, old)
-        kept = re.findall(r"WARNING \(anthropic\): (\S+) is deprecated and retires (\d{4}-\d{2}-\d{2}); "
+        # A router warning names a deprecated model's retirement date and the replacement: from
+        # the registry for Anthropic, from the hint book's deprecations record for OpenAI.
+        record = json.loads((REPO / "scripts" / "model_hints.json").read_text(encoding="utf-8"))
+        record = record["deprecations"]["openai"]["models"]
+        kept = re.findall(r"WARNING \((anthropic|openai)\): (\S+) is deprecated and retires (\d{4}-\d{2}-\d{2}); "
                           r"the router would choose (\S+)\.", text)
-        self.assertTrue(kept)
-        for old, when, new in kept:
-            self.assertEqual((models[old]["status"], models[old].get("shutdown_date"), models[old].get("replacement_id")),
-                             ("deprecated", when, new), old)
+        self.assertEqual({k[0] for k in kept}, {"anthropic", "openai"})
+        for provider, old, when, new in kept:
+            if provider == "anthropic":
+                got = (models[old]["status"], models[old].get("shutdown_date"), models[old].get("replacement_id"))
+                self.assertEqual(got, ("deprecated", when, new), old)
+            else:
+                self.assertEqual((record[old]["shutdown"], record[old]["replacement"]), (when, new), old)
 
     def test_drift_is_caught(self):
         stale = "| `latest-fast-anthropic` | `claude-haiku-4-5-20251001` (Claude Haiku 4.5) |\n"

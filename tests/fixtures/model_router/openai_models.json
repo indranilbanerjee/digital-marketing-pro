@@ -1,0 +1,95 @@
+{
+  "_fixture": "Shape of GET https://api.openai.com/v1/models as documented at developers.openai.com/api/reference/resources/models/methods/list (read 2026-10-27): id, object, created (Unix seconds), owned_by, optional shutdown_date. Ids, dates and owners here are test data for tests/test_model_router.py, not claims.",
+  "object": "list",
+  "data": [
+    {
+      "id": "gpt-6.1-sol",
+      "object": "model",
+      "created": 1789430400,
+      "owned_by": "openai",
+      "shutdown_date": null
+    },
+    {
+      "id": "gpt-6-sol",
+      "object": "model",
+      "created": 1787184000,
+      "owned_by": "openai",
+      "shutdown_date": null
+    },
+    {
+      "id": "gpt-5.6-sol",
+      "object": "model",
+      "created": 1783555200,
+      "owned_by": "openai",
+      "shutdown_date": null
+    },
+    {
+      "id": "gpt-6.1-sol-2026-09-15",
+      "object": "model",
+      "created": 1789430400,
+      "owned_by": "openai",
+      "shutdown_date": null
+    },
+    {
+      "id": "gpt-6-astra",
+      "object": "model",
+      "created": 1788998400,
+      "owned_by": "openai",
+      "shutdown_date": null
+    },
+    {
+      "id": "gpt-6.1-terra",
+      "object": "model",
+      "created": 1789430400,
+      "owned_by": "openai",
+      "shutdown_date": null
+    },
+    {
+      "id": "gpt-6-luna",
+      "object": "model",
+      "created": 1788998400,
+      "owned_by": "openai",
+      "shutdown_date": null
+    },
+    {
+      "id": "gpt-4o-2024-08-06",
+      "object": "model",
+      "created": 1722902400,
+      "owned_by": "system",
+      "shutdown_date": "2027-01-14"
+    },
+    {
+      "id": "gpt-5.1",
+      "object": "model",
+      "created": 1762992000,
+      "owned_by": "openai"
+    },
+    {
+      "id": "o3",
+      "object": "model",
+      "created": 1744761600,
+      "owned_by": "openai"
+    },
+    {
+      "id": "ft:gpt-6.1-sol:acme-corp::abc123",
+      "object": "model",
+      "created": 1792454400,
+      "owned_by": "user-org-acme",
+      "shutdown_date": null
+    },
+    {
+      "id": "ft:gpt-4o-2024-08-06:acme-corp::def456",
+      "object": "model",
+      "created": 1740787200,
+      "owned_by": "user-org-acme",
+      "shutdown_date": null
+    },
+    {
+      "id": "text-embedding-3-large",
+      "object": "model",
+      "created": 1706140800,
+      "owned_by": "system",
+      "shutdown_date": null
+    }
+  ]
+}

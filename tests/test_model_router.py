@@ -44,7 +44,11 @@ import model_router as mr  # noqa: E402
 NOW = datetime(2026, 10, 27, 12, 0, tzinfo=timezone.utc)
 KEY = "sk-ant-test-0000-not-a-real-key"
 CRED = "ANTHROPIC_API_KEY"
-JOB = "ai-visibility.probe"
+JOB = "ai-visibility.probe.anthropic"
+OAI_KEY = "sk-test-0000-not-a-real-openai-key"
+OAI_CRED = "OPENAI_API_KEY"
+OAI_JOB = "ai-visibility.probe.openai"
+SOL = r"^gpt-(?P<version>\d+(?:\.\d+)*)-sol$"
 HINTS = {
     "schema": 1,
     "jobs": {
@@ -54,6 +58,18 @@ HINTS = {
         "test.fast": {"provider": "anthropic", "line": "haiku", "capabilities": [],
                       "default_alias": "latest-fast-anthropic",
                       "source": "https://platform.claude.com/docs/en/api/models/list", "read_on": "2026-10-27"},
+        OAI_JOB: {"provider": "openai", "family": SOL, "default_alias": "latest-balanced-openai",
+                  "source": "https://developers.openai.com/api/docs/models", "read_on": "2026-10-27"},
+    },
+    "deprecations": {
+        "openai": {
+            "source": "https://developers.openai.com/api/docs/deprecations", "read_on": "2026-10-27",
+            "models": {
+                "gpt-4o-2024-08-06": {"announced": "2026-10-14", "shutdown": "2027-01-14", "replacement": "gpt-6-luna"},
+                "gpt-5.1": {"announced": "2026-10-01", "shutdown": "2027-04-01", "replacement": "gpt-6-sol"},
+                "o3": {"announced": "2026-06-11", "shutdown": "2026-12-11", "replacement": "gpt-5.6-sol"},
+            },
+        },
     },
 }
 
@@ -260,7 +276,7 @@ class TestSelection(RouterCase):
         self.assertEqual(r["model"], "claude-sonnet-4-6")
 
     def test_determinism_snapshot(self):
-        want = fixture("snapshot_ai_visibility_probe.json")
+        want = fixture("snapshot_anthropic_probe.json")
         self.assertEqual(self.route(Fetch()), want)
         shuffled = models()
         random.Random(7).shuffle(shuffled)
@@ -282,6 +298,149 @@ class TestNaturalExperiment(RouterCase):
         with self.assertRaises(mr.RouterError):
             self.route(Fetch(retired), requested="claude-sonnet-4-5-20250929", now=after)
         self.assertEqual(self.route(Fetch(retired), now=after)["model"], "claude-sonnet-5-5")
+
+
+def oai_models() -> list:
+    return copy.deepcopy(fixture("openai_models.json")["data"])
+
+
+def oai_with(extra=(), **changes) -> list:
+    out = oai_models()
+    for m in out:
+        m.update(changes.get(m["id"], {}))
+    return out + [dict(e) for e in extra]
+
+
+def created(day: datetime) -> int:
+    return int(day.timestamp())
+
+
+class OAIFetch(Fetch):
+    def __call__(self, api_key, anthropic_version):
+        self.calls += 1
+        assert api_key == OAI_KEY
+        if self.error:
+            raise self.error
+        return copy.deepcopy(self.data if self.data is not None else oai_models())
+
+
+class OpenAICase(RouterCase):
+    def oai(self, fetch, requested=None, now=NOW, hints=None, default="gpt-6.1-sol", env=None):
+        err = io.StringIO()
+        with redirect_stderr(err):
+            return mr.route(OAI_JOB, hints or HINTS, provider="openai", credential_name=OAI_CRED, api_key=OAI_KEY,
+                            default_model=default, requested=requested, fetch=fetch, cache_path=self.cache,
+                            now=now, env=env if env is not None else {})
+
+
+class TestOpenAIPresenceOnly(OpenAICase):
+    """OpenAI's list gives ids, created, owned_by and an optional shutdown_date: selection is by
+    family rule over ids, lifecycle from that date and the agent-read deprecations record."""
+
+    def test_float_picks_the_highest_version_in_the_family(self):
+        r = self.oai(OAIFetch())
+        self.assertEqual((r["model"], r["basis"], r["family"]), ("gpt-6.1-sol", "live", SOL))
+
+    def test_preview_and_too_new_are_skipped(self):
+        data = oai_with([{"id": "gpt-6.2-sol-preview", "object": "model", "created": created(NOW - timedelta(days=30)),
+                          "owned_by": "openai", "shutdown_date": None},
+                         {"id": "gpt-6.2-sol", "object": "model", "created": created(NOW - timedelta(days=3)),
+                          "owned_by": "openai", "shutdown_date": None}])
+        self.assertEqual(self.oai(OAIFetch(data))["model"], "gpt-6.1-sol")
+
+    def test_fine_tunes_and_dated_snapshots_are_never_picked(self):
+        loose = copy.deepcopy(HINTS)
+        loose["jobs"][OAI_JOB]["family"] = r"^(?:ft:)?gpt-(?P<version>\d+(?:\.\d+)*)-sol.*$"
+        data = oai_with([{"id": "ft:gpt-7-sol:acme-corp::zzz", "object": "model",
+                          "created": created(NOW - timedelta(days=60)), "owned_by": "user-org-acme"}])
+        r = self.oai(OAIFetch(data), hints=loose)
+        self.assertEqual(r["model"], "gpt-6.1-sol")
+
+    def test_a_shutdown_date_in_the_list_takes_a_model_out_of_selection(self):
+        data = oai_with(**{"gpt-6.1-sol": {"shutdown_date": "2027-06-01"}})
+        self.assertEqual(self.oai(OAIFetch(data))["model"], "gpt-6-sol")
+
+    def test_deprecated_by_the_list_warns_and_keeps(self):
+        r = self.oai(OAIFetch(), requested="gpt-4o-2024-08-06")
+        self.assertEqual((r["model"], r["basis"], r["replacement"]), ("gpt-4o-2024-08-06", "requested", "gpt-6-luna"))
+        self.assertIn("2027-01-14", " ".join(r["warnings"]))
+
+    def test_deprecated_by_the_record_only_warns_and_keeps(self):
+        r = self.oai(OAIFetch(), requested="gpt-5.1")
+        self.assertEqual((r["model"], r["replacement"]), ("gpt-5.1", "gpt-6-sol"))
+        self.assertIn("2027-04-01", " ".join(r["warnings"]))
+
+    def test_past_its_shutdown_it_is_refused_naming_the_replacement(self):
+        with self.assertRaises(mr.RouterError) as ctx:
+            self.oai(OAIFetch(), requested="gpt-4o-2024-08-06", now=datetime(2027, 1, 15, tzinfo=timezone.utc))
+        self.assertIn("gpt-6-luna", str(ctx.exception))
+        self.cache.unlink()
+        gone = [m for m in oai_models() if m["id"] != "o3"]
+        with self.assertRaises(mr.RouterError) as ctx:
+            self.oai(OAIFetch(gone), requested="o3", now=datetime(2026, 12, 12, tzinfo=timezone.utc))
+        self.assertIn("gpt-5.6-sol", str(ctx.exception))
+
+    def test_a_fine_tune_follows_its_base_model_and_is_never_cached(self):
+        r = self.oai(OAIFetch(), requested="ft:gpt-4o-2024-08-06:acme-corp::def456")
+        self.assertEqual(r["model"], "ft:gpt-4o-2024-08-06:acme-corp::def456")
+        self.assertIn("2027-01-14", " ".join(r["warnings"]))
+        self.oai(OAIFetch(), requested="ft:gpt-6.1-sol:acme-corp::abc123")
+        self.assertNotIn("acme", self.cache.read_text(encoding="utf-8"))
+        self.assertNotIn("ft:", self.cache.read_text(encoding="utf-8"))
+
+    def test_a_stale_deprecations_record_is_named(self):
+        stale = copy.deepcopy(HINTS)
+        stale["deprecations"]["openai"]["read_on"] = "2026-08-01"
+        r = self.oai(OAIFetch(), hints=stale)
+        self.assertTrue(any("deprecations" in w and "developers.openai.com" in w for w in r["warnings"]), r["warnings"])
+
+    def test_rejected_key_empty_and_timeout(self):
+        body = json.dumps(fixture("openai_401.json")).encode()
+
+        def refuse(req, timeout=None):
+            raise urllib.error.HTTPError(req.full_url, 401, "Unauthorized", {}, io.BytesIO(body))
+
+        with self.assertRaises(mr.RouterError) as ctx:
+            self.oai(lambda k, v: mr.fetch_openai(k, v, urlopen=refuse))
+        self.assertIn("401", str(ctx.exception))
+        self.assertNotIn("sk-test", str(ctx.exception))
+        with self.assertRaises(mr.RouterError):
+            self.oai(OAIFetch(fixture("openai_empty.json")["data"]))
+
+        def slow(req, timeout=None):
+            raise TimeoutError("timed out")
+
+        r = self.oai(lambda k, v: mr.fetch_openai(k, v, urlopen=slow))
+        self.assertEqual((r["basis"], r["offline"], r["model"]), ("offline", True, "gpt-6.1-sol"))
+
+    def test_determinism_snapshot(self):
+        want = fixture("snapshot_openai_probe.json")
+        self.assertEqual(self.oai(OAIFetch()), want)
+        shuffled = oai_models()
+        random.Random(3).shuffle(shuffled)
+        self.cache.unlink()
+        self.assertEqual(self.oai(OAIFetch(shuffled)), want)
+
+    def test_fetch_openai_request(self):
+        seen = []
+
+        class Resp(io.BytesIO):
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *a):
+                return False
+
+        def opener(req, timeout=None):
+            seen.append(req)
+            return Resp(json.dumps(fixture("openai_models.json")).encode())
+
+        got = mr.fetch_openai(OAI_KEY, None, urlopen=opener)
+        self.assertEqual(len(got), 13)
+        url = urllib.parse.urlsplit(seen[0].full_url)
+        self.assertEqual((url.scheme, url.netloc, url.path), ("https", "api.openai.com", "/v1/models"))
+        self.assertEqual(seen[0].get_header("Authorization"), f"Bearer {OAI_KEY}")
+        self.assertIsNone(seen[0].get_header("X-api-key"))
 
 
 class TestFetchAnthropic(unittest.TestCase):
@@ -320,6 +479,11 @@ class TestHintBook(unittest.TestCase):
         hints = json.loads((SCRIPTS / "model_hints.json").read_text(encoding="utf-8"))
         self.assertEqual(mr.validate_hints(hints), [])
         self.assertIn(JOB, hints["jobs"])
+        self.assertIn(OAI_JOB, hints["jobs"])
+        self.assertIn("openai", hints["deprecations"])
+
+    def test_the_test_hint_book_is_valid(self):
+        self.assertEqual(mr.validate_hints(HINTS), [])
 
     def test_a_rule_without_its_source_or_date_is_rejected(self):
         bad = copy.deepcopy(HINTS)
@@ -328,6 +492,19 @@ class TestHintBook(unittest.TestCase):
         problems = "\n".join(mr.validate_hints(bad))
         self.assertIn(f"{JOB}: read_on", problems)
         self.assertIn("test.fast: source", problems)
+
+    def test_family_rules_and_the_deprecations_record_are_checked(self):
+        bad = copy.deepcopy(HINTS)
+        bad["jobs"][OAI_JOB]["family"] = r"^gpt-\d+-sol$"
+        bad["jobs"][OAI_JOB]["capabilities"] = ["pdf_input"]
+        bad["jobs"]["test.fast"]["family"] = SOL
+        bad["deprecations"]["openai"]["models"]["gpt-5.1"].pop("replacement")
+        del bad["deprecations"]["openai"]["read_on"]
+        problems = "\n".join(mr.validate_hints(bad))
+        for expected in (f"{OAI_JOB}: family needs a (?P<version>", f"{OAI_JOB}: openai lists no capabilities",
+                         "test.fast: give line or family, not both", "deprecations.openai: read_on missing",
+                         "deprecations.openai.gpt-5.1: replacement missing"):
+            self.assertIn(expected, problems)
 
 
 class TestCheckerUsesTheRouter(unittest.TestCase):
@@ -355,6 +532,28 @@ class TestCheckerUsesTheRouter(unittest.TestCase):
             self.assertEqual((live["model"], live["basis"]), ("claude-sonnet-5-5", "live"))
             self.assertTrue(off["offline"])
             self.assertTrue((Path(home) / "model-router-cache.json").exists())
+
+    def test_route_openai_live(self):
+        checker = self.load_checker()
+        with tempfile.TemporaryDirectory() as home:
+            old = {k: os.environ.get(k) for k in ("CLAUDE_MARKETING_HOME", "MODEL_ROUTER_OFFLINE")}
+            os.environ["CLAUDE_MARKETING_HOME"] = home
+            os.environ.pop("MODEL_ROUTER_OFFLINE", None)
+            try:
+                with redirect_stderr(io.StringIO()):
+                    live = checker.route_openai(None, OAI_KEY, fetch=OAIFetch(), now=NOW)
+                    kept = checker.route_openai("gpt-5.1", OAI_KEY, fetch=OAIFetch(), now=NOW)
+            finally:
+                for k, v in old.items():
+                    os.environ.pop(k, None) if v is None else os.environ.__setitem__(k, v)
+        self.assertEqual((live["model"], live["provider"]), ("gpt-6.1-sol", "openai"))
+        self.assertEqual((kept["model"], kept["basis"]), ("gpt-5.1", "requested"))
+
+    def test_no_leg_resolves_a_model_name_outside_the_router(self):
+        source = (SCRIPTS / "ai-visibility-checker.py").read_text(encoding="utf-8")
+        self.assertNotIn("_negotiate_model(", source)
+        self.assertIn("route_openai(", source)
+        self.assertIn("route_anthropic(", source)
 
 
 class TestPrivacyDocsTruth(unittest.TestCase):

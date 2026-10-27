@@ -9,13 +9,13 @@ Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Ac
 [![Version](https://img.shields.io/badge/version-3.38.0-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=yellow)](https://github.com/indranilbanerjee/digital-marketing-pro/stargazers)
-[![Tests](https://img.shields.io/badge/tests-807%2F807%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-825%2F825%20passing-brightgreen.svg)](tests/)
 [![Platforms](https://img.shields.io/badge/platforms-9%20native%20%2B%2035%20Agent%20Skills-success.svg)](#works-on-40-agent-harnesses-via-the-agent-skills-open-standard)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Article%2050%20ready-darkred.svg)](skills/context-engine/compliance-rules.md)
 
 [![Built by Indranil "Neel" Banerjee — Neelverse Marketing Suite — Sponsor this project](docs/assets/author-banner.svg)](https://github.com/sponsors/indranilbanerjee)
 
-> 🆕 **Just shipped — v3.38.0 (October 27, 2026):** the AI-visibility checker now picks its Anthropic model from Anthropic's own live model list, by job and model line instead of by name; deprecated models get a warning and retired ones are refused before anything is sent. [What's new](#whats-new) · [Changelog](CHANGELOG.md)
+> 🆕 **Just shipped — v3.38.0 (October 27, 2026):** the AI-visibility checker now picks its Anthropic and OpenAI models from each provider's own live model list, by job instead of by name; deprecated models get a warning and retired ones are refused before anything is sent. [What's new](#whats-new) · [Changelog](CHANGELOG.md)
 
 ```bash
 # Install — one command (Claude Code 2.1.292 or newer)
@@ -204,7 +204,7 @@ Other marketing plugins exist, including Anthropic's own marketing plugin and co
 | AEO / GEO | **A 6-platform audit, including Google AI Mode** |
 | Where it runs | **9 native hosts**: Claude Code, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes, OpenClaw, Grok |
 | Live-write safety | **Single-use approval record for writes it sends itself; MCP writes: typed yes + host prompt** |
-| Tests | **807 stdlib unittest** tests |
+| Tests | **825 stdlib unittest** tests |
 | License | **MIT: no telemetry, no seats** |
 
 ---
@@ -413,9 +413,9 @@ If you run into a platform-specific install snag, file a [GitHub issue](https://
 
 ## What's new
 
-### v3.38.0 — the model router: models chosen from the provider's live list (October 27, 2026)
+### v3.38.0 — the model router: models chosen from each provider's live list (October 27, 2026)
 
-The AI-visibility checker no longer asks for an Anthropic model by name. A new router reads the list of models your key can use, straight from Anthropic, and picks the newest generally available model in the line the job needs, at least 14 days old. The model registry is now only the offline fallback. Name a model yourself and it is kept if current. A deprecated model is kept with a warning naming its retirement date and the router's choice; a retired one is refused before any probe is sent. The router asks Anthropic at most once a week per key name, never at install, and remembers only the chosen model, never your key or the list. `MODEL_ROUTER_OFFLINE=1` turns the call off. When Claude Sonnet 4.5 retires on 30 November, runs that name no model carry on without an update. 807 tests.
+The AI-visibility checker no longer asks for models by name. A new router reads the list of models your key can use, straight from Anthropic and OpenAI, and picks the newest generally available one for the job, at least 14 days old: in Claude's Sonnet line, and in OpenAI's Sol family. Anthropic's list says which models are deprecated. OpenAI's says less, so the router also uses OpenAI's deprecations page, recorded with the date it was read and flagged once it is a month old. The model registry is now only the offline fallback. Name a model yourself and it is kept if current. A deprecated model is kept with a warning naming its retirement date and the router's choice; a retired one is refused before any probe is sent. The router asks each provider at most once a week per key name, never at install, and remembers only the chosen models: never your key, the list, or the names of your fine-tuned models. `MODEL_ROUTER_OFFLINE=1` turns the calls off. When Claude Sonnet 4.5 retires on 30 November, runs that name no model carry on without an update. 825 tests.
 
 ### v3.37.2 — speech models as pins with an expiry, two-way registry sync (October 27, 2026)
 
@@ -621,9 +621,9 @@ Frontier models change every ~6 weeks. Hardcoding `claude-sonnet-4-5-20250929` o
 - **`scripts/refresh_models.py`** — polls Anthropic / OpenAI / Google / Evolink list endpoints with your API keys and reports drift versus the registry (NEW models in the provider catalog, STALE models in the registry).
 - **Speech kinds are pins with an expiry.** `latest-tts-*` and `latest-stt-*` (OpenAI, ElevenLabs, Sarvam) can't be discovered, because no list endpoint tells a speech model from a chat model. Each entry carries `pinned_on` and `pin_expires`, and the weekly dated check fails once a pin expires.
 - **`scripts/sync_model_registry.sh`** — copies the registry into the sibling plugins as a mirror: the canonical file minus the marketing-only model families. `--check` reports entries a copy is missing and entries upstream has dropped.
-- **`scripts/model_router.py`** (first job: the Anthropic leg of `scripts/ai-visibility-checker.py`) — picks the model from the provider's own live list instead of the registry: the newest active, generally available model in the job's line (`scripts/model_hints.json`), at least 14 days old. A model asked for by name is kept if active, kept with a warning if deprecated, and refused if retired. One list call per 7 days per key name; `MODEL_ROUTER_OFFLINE=1` uses the registry alias instead.
+- **`scripts/model_router.py`** (first job: both legs of `scripts/ai-visibility-checker.py`) — picks the model from the provider's own live list instead of the registry: the newest current, generally available model in the job's line (Anthropic) or family (OpenAI) from `scripts/model_hints.json`, at least 14 days old. A model asked for by name is kept if current, kept with a warning if deprecated, and refused if retired. One list call per provider per 7 days per key name; `MODEL_ROUTER_OFFLINE=1` uses the registry aliases instead.
 
-Every script that calls a provider model accepts `--model` (or `--openai-model` / `--anthropic-model` for `scripts/ai-visibility-checker.py`); outside the router, the value is validated against the registry. See [`docs/MODEL-CURATOR.md`](docs/MODEL-CURATOR.md) for the full alias map, curation policy, and worked examples.
+The one script that calls a model provider itself, `scripts/ai-visibility-checker.py`, takes `--openai-model` / `--anthropic-model` to ask for a model by name; both are routed as above. See [`docs/MODEL-CURATOR.md`](docs/MODEL-CURATOR.md) for the full alias map, curation policy, and worked examples.
 
 ```bash
 python scripts/resolve_model.py --alias latest-balanced-anthropic    # -> claude-sonnet-5-5
@@ -800,7 +800,7 @@ Use the direct repo form: `grok plugin install indranilbanerjee/digital-marketin
 ### General (any platform)
 
 **"Tests in `tests/` fail when I `git clone` locally"**
-Run `python tests/run_all.py` from the repo root. All 807 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+; `scripts/setup.py` recommends 3.11 or newer, and the floor moves to 3.11 once Claude's Cowork environment does) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
+Run `python tests/run_all.py` from the repo root. All 825 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+; `scripts/setup.py` recommends 3.11 or newer, and the floor moves to 3.11 once Claude's Cowork environment does) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
 
 **"`/digital-marketing-pro:doctor` shows my action as stub_unconfigured"**
 That action needs an MCP connector configured. Run `python scripts/connector-status.py --action setup-guide --name <connector-name>` for the exact setup snippet. Add it to your `.mcp.json` under `mcpServers`, restart your agent, and the action becomes `manifest_ready`. See [Connector-aware action resolver](#connector-aware-action-resolver) for the full readiness model.

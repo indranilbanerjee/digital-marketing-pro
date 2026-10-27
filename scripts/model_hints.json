@@ -1,8 +1,8 @@
 {
-  "$comment": "Hint book for scripts/model_router.py: each job names a provider, a model line and the capabilities it needs, never a model id. The router picks the newest active, generally available model in that line at least 14 days old from the provider's live list. default_alias names the scripts/model_registry.json alias used offline. Every rule carries the page it was read from and the date.",
+  "$comment": "Hint book for scripts/model_router.py: each job names a provider and a model line (Anthropic) or a family pattern over ids (OpenAI) plus the capabilities it needs, never a model id. The router picks the newest active, generally available model in that line or family, at least 14 days old, from the provider's live list. default_alias names the scripts/model_registry.json alias used offline. 'deprecations' records what an agent read from a provider's deprecations page, for providers whose list reports no lifecycle; re-read it within 30 days. Every rule and record carries the page it was read from and the date.",
   "schema": 1,
   "jobs": {
-    "ai-visibility.probe": {
+    "ai-visibility.probe.anthropic": {
       "provider": "anthropic",
       "line": "sonnet",
       "capabilities": [],
@@ -10,6 +10,45 @@
       "why": "Asks the model the brand's buyer questions and checks whether the brand is named; a mid-tier line is what most people meet in Claude, and the job needs no special capability.",
       "source": "https://platform.claude.com/docs/en/api/models/list",
       "read_on": "2026-10-27"
+    },
+    "ai-visibility.probe.openai": {
+      "provider": "openai",
+      "family": "^gpt-(?P<version>\\d+(?:\\.\\d+)*)-sol$",
+      "default_alias": "latest-balanced-openai",
+      "why": "Same probe on OpenAI. Sol is the family the models page features as the balanced default (GPT-6.1 Sol on 2026-10-27, GPT-6 Sol and GPT-5.6 Sol before it); the router takes the highest version this key can call.",
+      "source": "https://developers.openai.com/api/docs/models",
+      "read_on": "2026-10-27"
+    }
+  },
+  "deprecations": {
+    "openai": {
+      "source": "https://developers.openai.com/api/docs/deprecations",
+      "read_on": "2026-10-27",
+      "note": "Upcoming text-model shutdowns as listed on the page (it names dated snapshots, not every alias). Fine-tuned models follow their base model's schedule (same page).",
+      "models": {
+        "gpt-4o-2024-08-06": {"announced": "2026-10-14", "shutdown": "2027-01-14", "replacement": "gpt-6-luna"},
+        "gpt-4o-2024-11-20": {"announced": "2026-10-14", "shutdown": "2027-01-14", "replacement": "gpt-6-luna"},
+        "gpt-4o-mini-2024-07-18": {"announced": "2026-10-14", "shutdown": "2027-01-14", "replacement": "gpt-6-luna"},
+        "gpt-4.1-2025-04-14": {"announced": "2026-10-14", "shutdown": "2027-01-14", "replacement": "gpt-6-luna"},
+        "gpt-4.1-mini-2025-04-14": {"announced": "2026-10-14", "shutdown": "2027-01-14", "replacement": "gpt-6-luna"},
+        "gpt-5.3-codex": {"announced": "2026-10-01", "shutdown": "2027-04-01", "replacement": "gpt-6-sol"},
+        "gpt-5.4-nano": {"announced": "2026-10-01", "shutdown": "2027-04-01", "replacement": "gpt-6-luna"},
+        "gpt-5.4-nano-2026-03-17": {"announced": "2026-10-01", "shutdown": "2027-04-01", "replacement": "gpt-6-luna"},
+        "gpt-5.1": {"announced": "2026-10-01", "shutdown": "2027-04-01", "replacement": "gpt-6-sol"},
+        "gpt-5.1-2025-11-13": {"announced": "2026-10-01", "shutdown": "2027-04-01", "replacement": "gpt-6-sol"},
+        "gpt-5": {"announced": "2026-06-11", "shutdown": "2026-12-11", "replacement": "gpt-5.6-sol"},
+        "gpt-5-2025-08-07": {"announced": "2026-06-11", "shutdown": "2026-12-11", "replacement": "gpt-5.6-sol"},
+        "gpt-5-mini": {"announced": "2026-06-11", "shutdown": "2026-12-11", "replacement": "gpt-5.6-terra"},
+        "gpt-5-mini-2025-08-07": {"announced": "2026-06-11", "shutdown": "2026-12-11", "replacement": "gpt-5.6-terra"},
+        "gpt-5-nano": {"announced": "2026-06-11", "shutdown": "2026-12-11", "replacement": "gpt-5.6-luna"},
+        "gpt-5-nano-2025-08-07": {"announced": "2026-06-11", "shutdown": "2026-12-11", "replacement": "gpt-5.6-luna"},
+        "gpt-5-pro": {"announced": "2026-06-11", "shutdown": "2026-12-11", "replacement": "gpt-5.6-sol"},
+        "gpt-5-pro-2025-10-06": {"announced": "2026-06-11", "shutdown": "2026-12-11", "replacement": "gpt-5.6-sol"},
+        "o3": {"announced": "2026-06-11", "shutdown": "2026-12-11", "replacement": "gpt-5.6-sol"},
+        "o3-2025-04-16": {"announced": "2026-06-11", "shutdown": "2026-12-11", "replacement": "gpt-5.6-sol"},
+        "o3-pro": {"announced": "2026-06-11", "shutdown": "2026-12-11", "replacement": "gpt-5.6-sol"},
+        "o3-pro-2025-06-10": {"announced": "2026-06-11", "shutdown": "2026-12-11", "replacement": "gpt-5.6-sol"}
+      }
     }
   }
 }

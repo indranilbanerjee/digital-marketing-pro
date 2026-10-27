@@ -8,71 +8,87 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ## [3.38.0] - 2026-10-27
 
-### The model router: the AI-visibility checker picks its Anthropic model from Anthropic's own live list
+### The model router: the AI-visibility checker picks its models from each provider's own live list
 
-The owner's ask was to stop depending on model names. Brain A's plan (`_shared/PLAN-2026-10-27-model-router.md`) split it in two: automate lifecycle fully, and automate selection conservatively. This release is its smallest proof: one job, one provider. It was built fixtures first: the deprecated, retired, preview-only and rejected-key cases were planted as failing tests (25 of them, against an interface-only stub) before any selection code existed.
+The owner's ask was to stop depending on model names. Brain A's plan (`_shared/PLAN-2026-10-27-model-router.md`) split it in two: automate lifecycle fully, and automate selection conservatively. This release is its proof: one job with two providers.
+
+Both adapters were built fixtures first: the planted cases were written as failing tests before any selection code existed.
+- Anthropic: 25 tests failed against an interface-only stub.
+- OpenAI: 16 tests failed before the adapter existed.
 
 **Added: `scripts/model_router.py`** (stdlib; one file meant to be copied byte for byte into each plugin, with a parity test)
 
-- A job names a provider, a model **line** and the capabilities it needs, never an id. Rules live in the new hint book `scripts/model_hints.json`, and each one carries the page it was read from and the date.
-- At run time the router lists the models the key can use (Anthropic `GET /v1/models`, which reports `lifecycle`, `line`, `created_at`, `retires_at` and capabilities). It picks the newest model in the line that is:
-  - `active`;
-  - generally available (no preview, exp, beta, alpha or rc id, no dated snapshot);
+- A job names a provider and a model **line** or **family**, plus the capabilities it needs, never an id. Rules live in the new hint book `scripts/model_hints.json`, and each one carries the page it was read from and the date.
+- At run time the router lists the models the key can use (GET `/v1/models`). In the job's line or family it picks the newest (highest version, then newest) model that is:
+  - current;
+  - generally available (no preview, exp, beta, alpha or rc id, no dated snapshot, no fine-tune);
   - at least 14 days old;
   - equipped with the job's capabilities.
 
   The same list on the same day always gives the same answer.
-- A model **asked for by name** is kept if active. If deprecated, it is kept with a warning that names its retirement date and the router's choice. If retired, it is refused with exit 2 before any probe is sent, naming the replacement. Nothing is swapped silently.
+- **Anthropic adapter:** the list reports `lifecycle`, `line`, `created_at`, `retires_at` and capabilities, so lifecycle is fully automatic.
+- **OpenAI adapter (presence plus recorded lifecycle):**
+  - OpenAI's list gives `id`, `created`, `owned_by` and, as its reference now documents, an optional `shutdown_date`.
+  - A job names a family pattern over ids (`gpt-<version>-sol`), ranked by version.
+  - A model counts as deprecated when the list gives a `shutdown_date`, or when the `deprecations.openai` record names it. The record is what an agent read from OpenAI's deprecations page on 2026-10-27: 22 text-model ids with shutdown dates and replacements.
+  - The router names the record in its warnings once it is more than 30 days old.
+  - Fine-tuned models (`ft:BASE:org::id`) follow their base model's schedule, as OpenAI states. They are never picked, and their names (which at an agency name clients) are never cached.
+- A model **asked for by name** is kept if current. If deprecated, it is kept with a warning that names its retirement date and the router's choice. If retired, it is refused with exit 2 before any probe is sent, naming the replacement. Nothing is swapped silently.
 - **Failures:**
   - a rejected key (401/403) or an empty list stops the run with the reason (exit 2);
-  - a timeout, provider trouble, or a list without lifecycle fields falls back to the registry alias and tags the result `offline`;
+  - error messages carry the provider's error type and code, never its message, which can echo part of a key;
+  - a timeout, provider trouble, or an Anthropic list without lifecycle fields falls back to the registry alias and tags the result `offline`;
   - a corrupted cache is rebuilt.
 - **Limits:**
-  - one list call per 7 days per key name serves every job in the hint book;
+  - one list call per provider per 7 days per key name serves every job in the hint book;
   - never at install or import;
-  - the key goes only to `api.anthropic.com`, with the same `anthropic-version` header as the probes;
-  - the cache (`model-router-cache.json` in the plugin's data folder) is keyed by the environment variable's name, holds chosen ids, lifecycle dates and counts, and never holds the key or the list;
+  - each key goes only to its own provider, the Anthropic one with the same `anthropic-version` header as the probes;
+  - the cache (`model-router-cache.json` in the plugin's data folder) is keyed by the environment variable's name, and holds chosen ids, lifecycle dates and counts;
   - a value that looks like a key is refused as a credential name, and the CLI never echoes it;
   - `MODEL_ROUTER_OFFLINE=1` makes no call.
-- A small CLI (`--hints`, `--job`, `--provider`, `--credential-name`, `--requested`, `--default-model`, `--cache`) prints one JSON result.
+- A small CLI (`--hints`, `--job`, `--provider anthropic|openai`, `--credential-name`, `--requested`, `--default-model`, `--cache`) prints one JSON result.
 
-**Changed: `scripts/ai-visibility-checker.py`, Anthropic leg**
+**Changed: `scripts/ai-visibility-checker.py`**
 
-- The model now comes from the router's `ai-visibility.probe` job (line `sonnet`) instead of the registry alias `latest-balanced-anthropic`, which is now only the offline default.
-- The output carries `model_routing.anthropic`: the model asked for, the model sent, the basis (`live`, `cache`, `requested`, `offline`), the source and the time.
-- Behaviour change: `--anthropic-model` with a deprecated id used to be silently replaced by its registry successor. It is now kept with a warning, because Anthropic still serves it. A retired id is refused (exit 2). The OpenAI leg is unchanged.
+- Both legs now take their model from the router: `ai-visibility.probe.anthropic` (line `sonnet`) and `ai-visibility.probe.openai` (family `gpt-<version>-sol`). The registry aliases `latest-balanced-anthropic` and `latest-balanced-openai` are now only the offline defaults.
+- The output carries `model_routing.anthropic` and `model_routing.openai`: the model asked for, the model sent, the basis (`live`, `cache`, `requested`, `offline`), the source and the time.
+- Behaviour change: `--anthropic-model` or `--openai-model` with a deprecated id used to be silently replaced by its registry successor. It is now kept with a warning, because the provider still serves it. A retired id is refused (exit 2).
 - **Natural experiment.** Claude Sonnet 4.5 retires 2026-11-30. With no model named, the checker keeps working with no registry edit. A run that names Sonnet 4.5 warns until that day, then stops with the replacement in the message.
 
 **Fixed**
 
 - `docs/MODEL-CURATOR.md`:
   - `check("claude-sonnet-4-5-20250929")` was shown returning `claude-sonnet-4-6`; the registry says `claude-sonnet-5-5`;
-  - the worked examples are rewritten for the router, and a new section describes it.
+  - the override section described a substitution the checker no longer makes;
+  - both are rewritten, and a section describes the router.
 - `tests/test_content_engine_contract.py`: three tests errored on a machine without NLTK, because `brand-voice-scorer.py` exits at import. The README promises a stdlib-only suite. A stub now stands in, as `tests/test_exit_status.py` already does. Found by running the whole suite on a clean Python 3.10.18.
 
 **Docs**
 
-- `PRIVACY.md` describes the list call: when it happens, what it sends and to whom, what the cache keeps, and how to turn it off.
+- `PRIVACY.md` describes both list calls: when they happen, what they send and to whom, what the cache keeps, and how to turn them off.
 - README, AGENTS.md and the script counts (97 → 98) are updated.
 
 **Tests**
 
-- New: `tests/test_model_router.py` (27) and `tests/fixtures/model_router/`. The fixtures follow the documented `/v1/models` response shape (read 2026-10-27), with test-data values. The tests cover:
+- New: `tests/test_model_router.py` (43) and `tests/fixtures/model_router/`. The fixtures follow the documented `/v1/models` response shape of each provider (read 2026-10-27), with test-data values. The tests cover:
   - the planted cases;
-  - the empty list, timeout and no-lifecycle fallbacks;
-  - the cache: fresh, stale, corrupted, offline, and contents (no key, no list);
+  - the fallbacks;
+  - the cache: fresh, stale, corrupted, offline, and contents (no key, no list, no fine-tune);
   - the version header;
   - capability filtering;
-  - a determinism snapshot written by hand before the code;
+  - OpenAI family ranking, shutdown dates from the list and from the record, fine-tunes following their base, and a stale record;
+  - a determinism snapshot per provider, each written by hand before the code;
   - Sonnet 4.5 before and after its retirement;
-  - paging, headers and the `lifecycle[]` query;
-  - the hint book's rules;
+  - request shapes;
+  - the hint book's rules and records;
   - the checker's use of the router;
   - PRIVACY.md wording;
   - parity with sibling copies (skipped until one exists).
-- `tests/test_model_registry_dates.py`: the curator doc's examples (the OpenAI default, both deprecation messages, `check()`) must match the registry. On the 3.37.2 doc: 1 error.
-- Suite: 807 tests, also run on Python 3.10.18 (no NLTK) with the same result.
-- **Unverified:** whether Anthropic's list returns `lifecycle` and `line` under `anthropic-version: 2023-06-01`, the version the pinned SDK sends. The docs example uses 2026-10-21. If the fields are missing, the router does not guess: it uses the registry default and says so. The first real run will show which happens.
+- `tests/test_model_registry_dates.py` (weekly dated job):
+  - the curator doc's examples must match the registry, or the hint book's record for OpenAI;
+  - the deprecations record fails after 45 days.
+- Suite: 825 tests, also run on Python 3.10.18 (no NLTK).
+- **Unverified:** whether Anthropic's list returns `lifecycle` and `line` under `anthropic-version: 2023-06-01`, the version the pinned SDK sends (the docs example uses 2026-10-21). If not, the router uses the registry default and says so. The first real run with a key will show which.
 
 ## [3.37.2] - 2026-10-27
 

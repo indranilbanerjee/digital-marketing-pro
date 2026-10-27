@@ -1,0 +1,9 @@
+{
+  "_fixture": "Shape of GET https://api.openai.com/v1/models as documented at developers.openai.com/api/reference/resources/models/methods/list (read 2026-10-27): id, object, created (Unix seconds), owned_by, optional shutdown_date. Ids, dates and owners here are test data for tests/test_model_router.py, not claims.",
+  "error": {
+    "message": "Incorrect API key provided: sk-test...0000. You can find your API key at the dashboard.",
+    "type": "invalid_request_error",
+    "param": null,
+    "code": "invalid_api_key"
+  }
+}

@@ -6,7 +6,8 @@
     "listed": 6
   },
   "discovered_at": "2026-10-27T12:00:00Z",
-  "job": "ai-visibility.probe",
+  "family": null,
+  "job": "ai-visibility.probe.anthropic",
   "line": "sonnet",
   "model": "claude-sonnet-5-5",
   "model_requested": null,

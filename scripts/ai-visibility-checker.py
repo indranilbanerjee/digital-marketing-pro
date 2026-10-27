@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 """Framework for checking brand mentions in AI responses (manual or API mode).
 
-Model selection:
-  * Anthropic: scripts/model_router.py picks the model from Anthropic's own live
-    list (GET /v1/models) for the `ai-visibility.probe` job in
-    scripts/model_hints.json: the newest active, generally available model in
-    its line, at least 14 days old. One list call per 7 days per key name,
-    cached in model-router-cache.json; MODEL_ROUTER_OFFLINE=1 makes no call and
-    uses the registry alias `latest-balanced-anthropic`. --anthropic-model asks
-    for a model by name: kept if active, kept with a warning if deprecated,
-    refused (exit 2) if retired, naming the replacement.
-  * OpenAI: the curator's `latest-balanced-openai` alias from
-    scripts/model_registry.json, or --openai-model (deprecated ids fall forward).
+Model selection: scripts/model_router.py picks each leg's model from the
+provider's own live list (GET /v1/models) for a job in scripts/model_hints.json,
+never by name:
+  * Anthropic (`ai-visibility.probe.anthropic`): the newest active, generally
+    available model in the job's line, at least 14 days old.
+  * OpenAI (`ai-visibility.probe.openai`): the highest version in the job's
+    family pattern that is listed for the key, has no shutdown date (from the
+    list or the hint book's deprecations record), is no preview, snapshot or
+    fine-tune, and is at least 14 days old.
+One list call per provider per 7 days per key name, cached in
+model-router-cache.json; MODEL_ROUTER_OFFLINE=1 makes no call and uses the
+registry aliases `latest-balanced-anthropic` / `latest-balanced-openai`.
+--anthropic-model / --openai-model ask for a model by name: kept if current,
+kept with a warning if deprecated, refused (exit 2) if retired, naming the
+replacement.
 """
 
 import argparse
@@ -23,43 +27,45 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 import model_router  # noqa: E402
 
-ROUTER_JOB = "ai-visibility.probe"
+ANTHROPIC_JOB = "ai-visibility.probe.anthropic"
+OPENAI_JOB = "ai-visibility.probe.openai"
 
-# Curator: resolve model aliases / validate user-supplied model ids
+# Curator: the registry alias each job falls back to offline
 try:
-    from resolve_model import resolve as _resolve_model, check as _check_model
+    from resolve_model import resolve as _resolve_model
 except ImportError:  # pragma: no cover — curator should always be present
     _resolve_model = lambda alias_or_id, **_: alias_or_id  # type: ignore
-    _check_model = lambda model_id: ("unknown", None)  # type: ignore
 
 
-def _negotiate_model(user_value: str | None, alias: str) -> tuple[str, str | None]:
-    """Pick the model id to actually pass to the SDK. If the user supplied
-    --xxx-model, validate it; otherwise resolve the alias. Returns
-    (model_id, warning_string_or_None)."""
-    if user_value:
-        status, replacement = _check_model(user_value)
-        if status == "deprecated" and replacement:
-            return replacement, f"{user_value} is deprecated, using {replacement} instead"
-        if status == "unknown":
-            return user_value, f"{user_value} is not in the curated registry — proceeding but no deprecation safety net"
-        return user_value, None
-    return _resolve_model(alias), None
-
-
-def route_anthropic(override, api_key, anthropic_version, fetch=None, now=None):
-    """The Anthropic model for this run, chosen from Anthropic's live list by
+def _route(job, provider, credential_name, override, api_key, anthropic_version=None, fetch=None, now=None):
+    """The model for one leg, chosen from the provider's live list by
     scripts/model_router.py. Raises model_router.RouterError when no request
     should be sent (a rejected key, an empty list, a retired model asked for)."""
     hints_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "model_hints.json")
     with open(hints_path, encoding="utf-8-sig") as f:
         hints = json.load(f)
-    rule = hints["jobs"][ROUTER_JOB]
     return model_router.route(
-        ROUTER_JOB, hints, provider="anthropic", credential_name="ANTHROPIC_API_KEY",
-        api_key=api_key, default_model=_resolve_model(rule["default_alias"]), requested=override,
+        job, hints, provider=provider, credential_name=credential_name, api_key=api_key,
+        default_model=_resolve_model(hints["jobs"][job]["default_alias"]), requested=override,
         fetch=fetch, cache_path=_common.workspace_root() / "model-router-cache.json", now=now,
         anthropic_version=anthropic_version)
+
+
+def route_anthropic(override, api_key, anthropic_version, fetch=None, now=None):
+    return _route(ANTHROPIC_JOB, "anthropic", "ANTHROPIC_API_KEY", override, api_key,
+                  anthropic_version=anthropic_version, fetch=fetch, now=now)
+
+
+def route_openai(override, api_key, fetch=None, now=None):
+    return _route(OPENAI_JOB, "openai", "OPENAI_API_KEY", override, api_key, fetch=fetch, now=now)
+
+
+def _report(provider, routing):
+    for warning in routing["warnings"]:
+        print(f"WARNING ({provider}): {warning}", file=sys.stderr)
+    if routing["offline"]:
+        print(f"NOTE ({provider}): {routing['reason']}; using the shipped default {routing['model']}",
+              file=sys.stderr)
 
 # Query templates organized by category
 QUERY_TEMPLATES = {
@@ -178,10 +184,6 @@ def run_api_mode(brand, queries, competitors=None, openai_model_override=None, a
     missing_sdks = []  # a key is set but its SDK is not installed
 
     model_routing = {}
-    # OpenAI: the curator's alias (auto-falls-forward on deprecation)
-    openai_model, openai_warn = _negotiate_model(openai_model_override, "latest-balanced-openai")
-    if openai_warn:
-        print(f"WARNING (openai): {openai_warn}", file=sys.stderr)
 
     # Check for OpenAI
     openai_key = os.environ.get("OPENAI_API_KEY")
@@ -189,6 +191,10 @@ def run_api_mode(brand, queries, competitors=None, openai_model_override=None, a
         try:
             import openai
             client = openai.OpenAI(api_key=openai_key)
+            routing = route_openai(openai_model_override, openai_key)
+            openai_model = routing["model"]
+            _report("openai", routing)
+            model_routing["openai"] = routing
             api_available = True
             for q in queries:
                 query_text = q["query"] if isinstance(q, dict) else q
@@ -233,11 +239,7 @@ def run_api_mode(brand, queries, competitors=None, openai_model_override=None, a
             version = (getattr(client, "default_headers", None) or {}).get("anthropic-version")
             routing = route_anthropic(anthropic_model_override, anthropic_key, version)
             anthropic_model = routing["model"]
-            for warning in routing["warnings"]:
-                print(f"WARNING (anthropic): {warning}", file=sys.stderr)
-            if routing["offline"]:
-                print(f"NOTE (anthropic): {routing['reason']}; using the shipped default {anthropic_model}",
-                      file=sys.stderr)
+            _report("anthropic", routing)
             model_routing["anthropic"] = routing
             api_available = True
             for q in queries:
@@ -314,8 +316,9 @@ def main():
     parser.add_argument("--use-case", default="", help="Use case for query generation")
     parser.add_argument("--pain-point", default="", help="Customer pain point for query generation")
     parser.add_argument("--openai-model", default=None,
-                        help="Override OpenAI model (default: registry alias `latest-balanced-openai`). "
-                             "Deprecated ids auto-fall-forward to their replacement.")
+                        help="Ask for an OpenAI model by name (default: chosen from OpenAI's live "
+                             "model list by scripts/model_router.py). Deprecated: kept with a warning; "
+                             "retired: refused, naming the replacement.")
     parser.add_argument("--anthropic-model", default=None,
                         help="Ask for an Anthropic model by name (default: chosen from Anthropic's live "
                              "model list by scripts/model_router.py). Deprecated: kept with a warning; "
@@ -368,7 +371,7 @@ def main():
         except model_router.RouterError as exc:
             # Refused before any probe was sent: nothing was spent.
             _common.ensure_utf8_stdout()
-            print(json.dumps({"error": exc.reason, "stage": "anthropic model routing"}, ensure_ascii=False))
+            print(json.dumps({"error": exc.reason, "stage": "model routing"}, ensure_ascii=False))
             sys.exit(2)
 
     _common.finish(result)

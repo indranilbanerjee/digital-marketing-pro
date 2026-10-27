@@ -16,44 +16,38 @@ Hardcoding model strings like `claude-sonnet-4-5-20250929`, `gemini-2.0-flash`, 
 
 ---
 
-## How users override the model
+## How the plugin picks a model
 
-Every script that calls a provider model accepts `--model` (or `--openai-model` / `--anthropic-model` for scripts that hit two providers). Pass any id from the registry — or any id, even one the registry doesn't know about. The resolver will:
-
-- **Current id** → pass it through unchanged.
-- **Deprecated id** → print a `WARNING` to stderr and silently substitute the registered `replacement_id`.
-- **Unknown id** → print a `WARNING` and pass the id through (the call may still work; you just lose the deprecation safety net).
-- **No `--model`** → resolve via the script's default alias (e.g. `latest-balanced-anthropic`).
+The only DMP script that calls a model provider itself is `scripts/ai-visibility-checker.py` (API mode). Both of its legs now take their model from the router below; the registry is their offline fallback. The resolver (`resolve_model.py`) remains the registry's API: `resolve`, `check` and `list_models`, used offline and by the sibling plugins.
 
 ```bash
-# Default — OpenAI uses the registry's latest-balanced-openai alias (gpt-6.1-sol on 2026-10-27);
-# Anthropic is chosen from Anthropic's live model list (see "The model router" below)
+# Default: each leg's model is chosen from the provider's live list
 python scripts/ai-visibility-checker.py --brand acme --mode api
 
-# Pass a deprecated OpenAI id — the curator warns and substitutes its replacement
-python scripts/ai-visibility-checker.py --brand acme --mode api --openai-model gpt-4o
-# WARNING (openai): gpt-4o is deprecated, using gpt-6-luna instead
-
-# See what's curated
+# The registry: what's curated, and what an alias or a deprecated id resolves to offline
 python scripts/ai-visibility-checker.py --list-models
 python scripts/resolve_model.py --list --vendor anthropic --status current
 ```
 
 ---
 
-## The model router (Anthropic leg of the AI-visibility checker)
+## The model router (both legs of the AI-visibility checker)
 
-`scripts/model_router.py` stops depending on the registry for the decision. A job in `scripts/model_hints.json` names a provider, a model **line** and the capabilities it needs, never an id; every rule carries the page it was read from and the date. At run time the router lists the models the key can use (Anthropic's GET `/v1/models`, which reports each model's `lifecycle`, `line`, `created_at`, `retires_at` and capabilities) and picks the newest model in the line that is `active`, generally available (no preview, exp, beta, alpha or rc id) and at least 14 days old. The registry alias (`default_alias`) is the fallback, used only offline.
+`scripts/model_router.py` stops depending on model names for the decision. A job in `scripts/model_hints.json` names a provider and a model **line** or **family**, plus the capabilities it needs, never an id; every rule carries the page it was read from and the date. At run time the router lists the models the key can use (GET `/v1/models`) and picks the newest model in the line or family that is current, generally available (no preview, exp, beta, alpha or rc id, no dated snapshot, no fine-tune) and at least 14 days old. The registry alias (`default_alias`) is the fallback, used only offline.
 
-- One list call per 7 days per key name serves every job; the cache (`model-router-cache.json`) is keyed by the environment variable's name and holds chosen ids, lifecycle dates and counts, never the key or the list. `MODEL_ROUTER_OFFLINE=1` makes no call.
-- A model asked for by name (`--anthropic-model`) is kept if active, kept with a warning if deprecated, and refused with exit 2 if retired, naming the replacement. Nothing is swapped silently.
-- A rejected key or an empty list stops the run before any probe is sent (exit 2). A timeout, or a list without lifecycle fields, falls back to the registry alias and tags the output `offline`.
-- The run's output carries `model_routing.anthropic`: the model asked for, the model sent, where the answer came from (`live`, `cache`, `requested` or `offline`) and when.
+- **Anthropic** (`ai-visibility.probe.anthropic`, line `sonnet`): the list reports each model's `lifecycle`, `line`, `created_at`, `retires_at` and capabilities, so lifecycle is fully automatic.
+- **OpenAI** (`ai-visibility.probe.openai`, family `gpt-<version>-sol`): the list gives only `id`, `created`, `owned_by` and, when announced, `shutdown_date`. Selection is by family pattern over ids, highest version first. Lifecycle comes from that `shutdown_date` plus the `deprecations.openai` record an agent read from OpenAI's deprecations page into the hint book, with its source and date. The router names the record in its warnings once it is more than 30 days old. Fine-tuned models (`ft:BASE:org::id`) follow their base model's schedule, as OpenAI states, and are never picked or cached.
+- One list call per provider per 7 days per key name serves every job; the cache (`model-router-cache.json`) is keyed by the environment variable's name and holds chosen ids, lifecycle dates and counts, never the key, the list or a fine-tune's name. `MODEL_ROUTER_OFFLINE=1` makes no call.
+- A model asked for by name (`--anthropic-model`, `--openai-model`) is kept if current, kept with a warning if deprecated, and refused with exit 2 if retired, naming the replacement. Nothing is swapped silently.
+- A rejected key or an empty list stops the run before any probe is sent (exit 2). A timeout, provider trouble, or an Anthropic list without lifecycle fields falls back to the registry alias and tags the output `offline`.
+- The run's output carries `model_routing.anthropic` and `model_routing.openai`: the model asked for, the model sent, where the answer came from (`live`, `cache`, `requested` or `offline`) and when.
 
 ```bash
-# Ask for a deprecated Anthropic model by name — kept, with a warning naming the router's choice
+# Ask for deprecated models by name: kept, with a warning naming the router's choice
 python scripts/ai-visibility-checker.py --brand acme --mode api --anthropic-model claude-sonnet-4-5-20250929
 # WARNING (anthropic): claude-sonnet-4-5-20250929 is deprecated and retires 2026-11-30; the router would choose claude-sonnet-5-5. Keeping claude-sonnet-4-5-20250929 because it was asked for by name.
+python scripts/ai-visibility-checker.py --brand acme --mode api --openai-model gpt-4o-2024-08-06
+# WARNING (openai): gpt-4o-2024-08-06 is deprecated and retires 2027-01-14; the router would choose gpt-6-luna. Keeping gpt-4o-2024-08-06 because it was asked for by name.
 ```
 
 When Sonnet 4.5 retires on 2026-11-30, a job with no model named keeps working without a registry edit, and a run that names Sonnet 4.5 stops with the replacement in the message.

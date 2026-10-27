@@ -1,0 +1,21 @@
+{
+  "basis": "live",
+  "counts": {
+    "eligible": 3,
+    "in_line": 3,
+    "listed": 13
+  },
+  "discovered_at": "2026-10-27T12:00:00Z",
+  "family": "^gpt-(?P<version>\\d+(?:\\.\\d+)*)-sol$",
+  "job": "ai-visibility.probe.openai",
+  "line": null,
+  "model": "gpt-6.1-sol",
+  "model_requested": null,
+  "offline": false,
+  "provider": "openai",
+  "reason": null,
+  "replacement": null,
+  "router": "model_router/1",
+  "source": "https://api.openai.com/v1/models",
+  "warnings": []
+}
