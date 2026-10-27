@@ -139,7 +139,7 @@ def safe_slug(text: str, fallback: str = "brand") -> str:
     ASCII text gives exactly the old slug. Accents fold ("Café" -> "cafe"). When letters, digits
     or emoji from another script remain (Devanagari, CJK, Arabic, Cyrillic), the ASCII part gets a
     six-character tag from a hash of the name, so two such names never share a slug ("भारत चाय" ->
-    "brand-8c2e41"). A Windows device name gets "-<fallback>" appended."""
+    "brand-d08c85"). A Windows device name gets "-<fallback>" appended."""
     name = unicodedata.normalize("NFKC", text or "").strip()
     folded = "".join(c for c in unicodedata.normalize("NFKD", name) if not unicodedata.combining(c))
     slug = _ascii_slug(folded)
@@ -627,6 +627,12 @@ def load_profile(path) -> dict:
         raise JsonFileError("; ".join(problems) + ". Fix it in profile.json, or run "
                             "/digital-marketing-pro:brand-setup to rewrite it.")
     return profile
+
+
+# The keys eval-config-manager.py writes and eval-runner.py reads: one table, so the two can't drift.
+# Before 3.40.0 the runner read "minimum_dimension_scores" and weights.full/quick/compliance, and it
+# looked for them in the manager's whole {"brand", "config"} reply, so no brand setting ever applied.
+EVAL_CONFIG_KEYS = {"auto_reject": "auto_reject_threshold", "minimums": "minimum_scores", "weights": "weights"}
 
 
 def load_json_safe(path):

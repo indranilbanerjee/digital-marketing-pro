@@ -52,6 +52,19 @@ BRANDS_DIR = _common.brands_root()
 ACTIVE_BRAND_FILE = BRANDS_DIR / "_active-brand.json"
 SCRIPTS_DIR = Path(__file__).resolve().parent
 SUBPROCESS_TIMEOUT = 30  # seconds
+K = _common.EVAL_CONFIG_KEYS  # the key names eval-config-manager.py writes
+
+# Exit codes: 0 PASS or WARN, 1 error (every dimension failed), 2 bad input (a missing --file, an
+# unknown --schema), 3 BLOCKED (a CRITICAL issue, or the composite under the auto-reject line).
+EXIT_BLOCKED = 3
+
+
+class InputError(ValueError):
+    """Bad input: printed as {"error": ...} plus any extra fields, exit 2."""
+
+    def __init__(self, message, **extra):
+        super().__init__(message)
+        self.extra = extra
 
 # ---------------------------------------------------------------------------
 # Default dimension weights for each eval type
@@ -164,12 +177,12 @@ def _resolve_content(args):
 
     if args.file:
         file_path = Path(args.file)
-        if not file_path.exists():
-            return None
+        if not file_path.is_file():
+            raise InputError(f"--file not found: {args.file}")
         try:
-            return file_path.read_text(encoding="utf-8-sig")
-        except Exception:
-            return None
+            return _common.decode_text(file_path.read_bytes(), file_path.name)
+        except (OSError, ValueError) as exc:
+            raise InputError(f"--file can't be read: {exc}") from None
 
     return None
 
@@ -261,7 +274,8 @@ def _run_script(script_name, args_list):
         # JSON error objects and exit(1)
         try:
             data = json.loads(result.stdout)
-            return False, data, f"Non-zero exit ({result.returncode}): {stderr_snippet}"
+            said = data.get("error") if isinstance(data, dict) else None
+            return False, data, f"Non-zero exit ({result.returncode}): {said or stderr_snippet or 'no message'}"
         except (json.JSONDecodeError, TypeError):
             return False, {}, (
                 f"Non-zero exit ({result.returncode}) from {script_name}. "
@@ -364,20 +378,73 @@ def _load_eval_config(brand_slug):
             ["--action", "get-config", "--brand", brand_slug],
         )
         if ok and data:
-            return data
+            return _unwrap_config(data)
     # Also try without brand
     ok, data, err = _run_script(
         "eval-config-manager.py",
         ["--action", "get-config"],
     )
     if ok and data:
-        return data
+        return _unwrap_config(data)
     # Fallback defaults
-    return {
-        "auto_reject_threshold": 40,
-        "minimum_dimension_scores": {},
-        "weights": {},
-    }
+    return {K["auto_reject"]: 40, K["minimums"]: {}, K["weights"]: {}}
+
+
+def _unwrap_config(reply):
+    """get-config answers {"brand": ..., "config": {...}}; the settings are inside "config"."""
+    config = reply.get("config") if isinstance(reply.get("config"), dict) else reply
+    return config if isinstance(config, dict) else {}
+
+
+def _brand_weights(base_weights, config):
+    """Apply the brand's dimension weights to an eval type's base weights.
+
+    The manager stores one flat map per brand (its defaults equal FULL_EVAL_WEIGHTS). Each base
+    weight is scaled by the brand's weight relative to that default, so a full eval takes the
+    brand's weights as they are, and quick and compliance keep their own balance unless the brand
+    moved a dimension (hallucination 0.2 -> 0.9 weighs it 4.5x more in every eval type). The scores
+    are renormalised over the dimensions that ran."""
+    brand = config.get(K["weights"]) or {}
+    out = {}
+    for dim, weight in base_weights.items():
+        chosen, shipped = brand.get(dim), FULL_EVAL_WEIGHTS.get(dim)
+        ok = isinstance(chosen, (int, float)) and not isinstance(chosen, bool) and chosen >= 0 and shipped
+        out[dim] = weight * chosen / shipped if ok else weight
+    return out
+
+
+def _collect_issues(dimension, data):
+    """Flagged items a dimension script reported, each with its severity (critical, high, medium,
+    low). A count of critical flags with no item to show still counts as one critical issue."""
+    found = []
+
+    def visit(obj, depth=0):
+        if depth > 4:
+            return
+        if isinstance(obj, dict):
+            sev = obj.get("severity")
+            if isinstance(sev, str) and any(k in obj for k in ("value", "reason", "message")):
+                found.append({"dimension": dimension, "severity": sev.lower(),
+                              "type": obj.get("type") or obj.get("claim_type") or obj.get("check") or "",
+                              "value": str(obj.get("value", ""))[:200],
+                              "reason": str(obj.get("reason") or obj.get("message") or "")[:300]})
+                return
+            for value in obj.values():
+                visit(value, depth + 1)
+        elif isinstance(obj, list):
+            for value in obj:
+                visit(value, depth + 1)
+
+    visit(data)
+    count = data.get("critical_flags") if isinstance(data, dict) else None
+    if isinstance(count, int) and count > 0 and not any(i["severity"] == "critical" for i in found):
+        found.append({"dimension": dimension, "severity": "critical", "type": "critical_flags", "value": "",
+                      "reason": f"{count} critical flag(s) reported; see the script's own output"})
+    return found
+
+
+def _grade_rank(grade):
+    return [g for _, g in GRADE_SCALE].index(grade)
 
 
 # ---------------------------------------------------------------------------
@@ -535,8 +602,10 @@ def _run_eval(dimensions_to_run, base_weights, content, brand_slug,
         # --- Execute each dimension ---
         results = {}       # dim -> {"score", "weight", "status", ...}
         active_dims = []   # dims that produced a score
-        skipped_dims = []  # dims that were skipped
+        skipped_dims = []  # dims that were skipped (not applicable, or failed)
+        failed_dims = []   # dims that should have run and didn't (a script error, a missing package)
         errors = {}        # dim -> error detail
+        issues = []        # flagged items from every dimension, with severity
 
         for dim, runner in runners.items():
             # Pre-skip if skip_reason is set
@@ -561,6 +630,7 @@ def _run_eval(dimensions_to_run, base_weights, content, brand_slug,
                     "reason": err or f"{runner['script']} failed",
                 }
                 skipped_dims.append(dim)
+                failed_dims.append(dim)
                 errors[dim] = err
                 continue
 
@@ -574,7 +644,9 @@ def _run_eval(dimensions_to_run, base_weights, content, brand_slug,
                     "reason": f"Could not extract score from {runner['script']} output",
                 }
                 skipped_dims.append(dim)
+                failed_dims.append(dim)
                 continue
+            issues.extend(_collect_issues(dim, data))
 
             # Clamp to 0-100
             score = round(max(0, min(100, score)), 2)
@@ -607,15 +679,27 @@ def _run_eval(dimensions_to_run, base_weights, content, brand_slug,
         composite = round(max(0, min(100, composite)), 2)
 
         # --- Grade ---
+        # A composite over dimensions that failed to run is partial: never graded above B, and
+        # "incomplete" when fewer than two dimensions ran. Before 3.40.0 a fresh install (no
+        # textstat) graded A+ from the hallucination dimension alone.
         grade = _get_grade(composite)
-        interpretation = _get_interpretation(grade)
+        capped_from = None
+        if failed_dims:
+            if len(active_dims) < 2:
+                capped_from, grade = grade, "incomplete"
+            elif _grade_rank(grade) < _grade_rank("B"):
+                capped_from, grade = grade, "B"
+        interpretation = (f"Partial: {len(active_dims)} of {len(runners)} dimensions ran "
+                          f"({', '.join(failed_dims)} did not; see script_errors). "
+                          + (_get_interpretation(grade) if grade != "incomplete" else "No grade.")
+                          if failed_dims else _get_interpretation(grade))
 
         # --- Auto-reject check ---
-        auto_reject_threshold = config.get("auto_reject_threshold", 40)
+        auto_reject_threshold = config.get(K["auto_reject"], 40)
         auto_rejected = composite < auto_reject_threshold
 
         # --- Minimum dimension score checks ---
-        min_scores_cfg = config.get("minimum_dimension_scores", {})
+        min_scores_cfg = config.get(K["minimums"], {})
         # Check content-type-specific minimums first, then fallback to default
         ct_minimums = min_scores_cfg.get(content_type, min_scores_cfg.get("default", {}))
         dimension_alerts = []
@@ -662,14 +746,28 @@ def _run_eval(dimensions_to_run, base_weights, content, brand_slug,
             log_ok, _, log_err = _run_script("quality-tracker.py", log_args)
             logged = log_ok
 
+        # --- Decision (the check skill's PASS / WARN / BLOCKED) ---
+        critical = [i for i in issues if i["severity"] == "critical"]
+        warnings = [i for i in issues if i["severity"] in ("high", "medium")]
+        if critical or auto_rejected:
+            decision = "BLOCKED"
+        elif dimension_alerts or warnings or failed_dims:
+            decision = "WARN"
+        else:
+            decision = "PASS"
+
         # --- Assemble output ---
         output = {
             "eval_id": eval_id,
             "eval_type": eval_type,
+            "decision": decision,
             "composite_score": composite,
             "grade": grade,
             "interpretation": interpretation,
             "auto_rejected": auto_rejected,
+            "issues": issues,
+            "partial": bool(failed_dims),
+            "missing_dimensions": failed_dims,
             "dimensions": results,
             "dimension_alerts": dimension_alerts,
             "skipped_dimensions": skipped_dims,
@@ -679,6 +777,8 @@ def _run_eval(dimensions_to_run, base_weights, content, brand_slug,
             "timestamp": timestamp,
         }
 
+        if capped_from:
+            output["grade_capped_from"] = capped_from
         if errors:
             output["script_errors"] = errors
 
@@ -696,17 +796,12 @@ def action_run_full(args):
     """Full eval pipeline -- all 6 scoring dimensions."""
     content = _resolve_content(args)
     if not content or not content.strip():
-        return {"error": "No content provided. Use --text or --file."}
+        raise InputError("No content provided. Use --text, or --file with a non-empty file.")
 
     brand_slug = args.brand or _resolve_active_brand()
     config = _load_eval_config(brand_slug)
 
-    # Override base weights from config if available
-    base_weights = dict(FULL_EVAL_WEIGHTS)
-    cfg_weights = config.get("weights", {}).get("full", {})
-    for dim in base_weights:
-        if dim in cfg_weights:
-            base_weights[dim] = cfg_weights[dim]
+    base_weights = _brand_weights(FULL_EVAL_WEIGHTS, config)
 
     dimensions = list(FULL_EVAL_WEIGHTS.keys())
 
@@ -728,16 +823,12 @@ def action_run_quick(args):
     """Quick eval -- 3 fastest/most critical checks."""
     content = _resolve_content(args)
     if not content or not content.strip():
-        return {"error": "No content provided. Use --text or --file."}
+        raise InputError("No content provided. Use --text, or --file with a non-empty file.")
 
     brand_slug = args.brand or _resolve_active_brand()
     config = _load_eval_config(brand_slug)
 
-    base_weights = dict(QUICK_EVAL_WEIGHTS)
-    cfg_weights = config.get("weights", {}).get("quick", {})
-    for dim in base_weights:
-        if dim in cfg_weights:
-            base_weights[dim] = cfg_weights[dim]
+    base_weights = _brand_weights(QUICK_EVAL_WEIGHTS, config)
 
     dimensions = list(QUICK_EVAL_WEIGHTS.keys())
 
@@ -759,16 +850,12 @@ def action_run_compliance(args):
     """Compliance-focused eval -- regulatory and brand compliance checks."""
     content = _resolve_content(args)
     if not content or not content.strip():
-        return {"error": "No content provided. Use --text or --file."}
+        raise InputError("No content provided. Use --text, or --file with a non-empty file.")
 
     brand_slug = args.brand or _resolve_active_brand()
     config = _load_eval_config(brand_slug)
 
-    base_weights = dict(COMPLIANCE_EVAL_WEIGHTS)
-    cfg_weights = config.get("weights", {}).get("compliance", {})
-    for dim in base_weights:
-        if dim in cfg_weights:
-            base_weights[dim] = cfg_weights[dim]
+    base_weights = _brand_weights(COMPLIANCE_EVAL_WEIGHTS, config)
 
     dimensions = list(COMPLIANCE_EVAL_WEIGHTS.keys())
 
@@ -918,13 +1005,35 @@ def main():
         }, indent=2))
         sys.exit(1)
 
-    result = handler(args)
-    print(json.dumps(result, indent=2))
+    try:
+        if getattr(args, "schema", None):
+            listed = _check_schema(args.schema)
+            if listed is not None:  # --schema list
+                print(json.dumps(listed, indent=2, ensure_ascii=False))
+                sys.exit(0)
+        result = handler(args)
+    except InputError as exc:
+        print(json.dumps({"error": str(exc), **exc.extra}, indent=2, ensure_ascii=False))
+        sys.exit(2)
+    print(json.dumps(result, indent=2, ensure_ascii=False))
 
-    # Exit with non-zero if there was a top-level error
+    # Exit with non-zero if there was a top-level error, and 3 when the content must not ship
     if "error" in result:
         sys.exit(1)
-    sys.exit(0)
+    sys.exit(EXIT_BLOCKED if result.get("decision") == "BLOCKED" else 0)
+
+
+def _check_schema(name):
+    """--schema list returns output-validator's schema list; an unknown name raises InputError."""
+    ok, data, err = _run_script("output-validator.py", ["--action", "list-schemas"])
+    schemas = (data or {}).get("schemas") if ok else None
+    if not isinstance(schemas, dict):
+        raise InputError(f"could not list the output schemas: {err}")
+    if name == "list":
+        return {"schemas": schemas}
+    if name not in schemas:
+        raise InputError(f"unknown --schema {name!r}", valid_schemas=sorted(schemas))
+    return None
 
 
 if __name__ == "__main__":

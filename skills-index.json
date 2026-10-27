@@ -434,6 +434,7 @@
         "hallucination-detector.py",
         "output-validator.py",
         "readability-analyzer.py",
+        "setup.py",
         "structural-tell-scan.py"
       ],
       "missing_scripts": [],
@@ -447,10 +448,11 @@
       "cross_refs": [
         "c2pa-metadata",
         "content-engine",
+        "eval-config",
         "eval-content"
       ],
       "doc_files": 1,
-      "bytes": 17415
+      "bytes": 18933
     },
     {
       "name": "churn-risk",
@@ -774,7 +776,7 @@
         "validate-profile"
       ],
       "doc_files": 56,
-      "bytes": 904016
+      "bytes": 904454
     },
     {
       "name": "continuous-improvement-loop",
@@ -1078,7 +1080,7 @@
         "quality-report"
       ],
       "doc_files": 1,
-      "bytes": 10674
+      "bytes": 10832
     },
     {
       "name": "eval-content",
@@ -1121,7 +1123,7 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 8875
+      "bytes": 8860
     },
     {
       "name": "exec-summary",
@@ -2016,7 +2018,7 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7908
+      "bytes": 7903
     },
     {
       "name": "publish-blog",
@@ -2062,7 +2064,7 @@
         "eval-content"
       ],
       "doc_files": 1,
-      "bytes": 9489
+      "bytes": 9484
     },
     {
       "name": "rank-monitor",

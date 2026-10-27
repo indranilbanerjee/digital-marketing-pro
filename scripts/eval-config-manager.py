@@ -40,6 +40,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 
 BRANDS_DIR = _common.brands_root()
+K = _common.EVAL_CONFIG_KEYS  # the key names eval-runner.py reads
 
 # ---------------------------------------------------------------------------
 # Valid dimensions
@@ -69,8 +70,8 @@ def default_config() -> dict:
     now = _now_iso()
     return {
         "version": "1.0",
-        "auto_reject_threshold": 40,
-        "minimum_scores": {
+        K["auto_reject"]: 40,
+        K["minimums"]: {
             "default": {
                 "content_quality": 50,
                 "brand_voice": 50,
@@ -102,7 +103,7 @@ def default_config() -> dict:
                 "readability": 60,
             },
         },
-        "weights": {
+        K["weights"]: {
             "content_quality": 0.25,
             "brand_voice": 0.20,
             "hallucination": 0.20,
@@ -210,13 +211,13 @@ def action_set_threshold(slug: str, dimension: str, threshold: int,
     config = load_config(slug)
     target_key = content_type if content_type else "default"
 
-    if target_key not in config["minimum_scores"]:
+    if target_key not in config[K["minimums"]]:
         # Create a new content-type entry copied from defaults
-        config["minimum_scores"][target_key] = dict(
-            config["minimum_scores"].get("default", {})
+        config[K["minimums"]][target_key] = dict(
+            config[K["minimums"]].get("default", {})
         )
 
-    config["minimum_scores"][target_key][dimension] = threshold
+    config[K["minimums"]][target_key][dimension] = threshold
     config["updated_at"] = _now_iso()
     save_config(slug, config)
 
@@ -256,7 +257,7 @@ def action_set_weights(slug: str, weights_json: str) -> dict:
             return {"error": f"Weight for '{k}' must be 0.0-1.0, got {v}"}
 
     config = load_config(slug)
-    current_weights = config["weights"]
+    current_weights = config[K["weights"]]
 
     # Apply overrides
     for k, v in overrides.items():
@@ -288,7 +289,7 @@ def action_set_weights(slug: str, weights_json: str) -> dict:
         if total > 0 and abs(total - 1.0) > 0.001:
             current_weights = {k: round(v / total, 4) for k, v in current_weights.items()}
 
-    config["weights"] = current_weights
+    config[K["weights"]] = current_weights
     config["updated_at"] = _now_iso()
     save_config(slug, config)
 
@@ -308,7 +309,7 @@ def action_set_auto_reject(slug: str, threshold: int) -> dict:
         return {"error": f"Threshold must be 0-100, got {threshold}"}
 
     config = load_config(slug)
-    config["auto_reject_threshold"] = threshold
+    config[K["auto_reject"]] = threshold
     config["updated_at"] = _now_iso()
     save_config(slug, config)
 
