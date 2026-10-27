@@ -9,13 +9,13 @@ Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Ac
 [![Version](https://img.shields.io/badge/version-3.38.2-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=yellow)](https://github.com/indranilbanerjee/digital-marketing-pro/stargazers)
-[![Tests](https://img.shields.io/badge/tests-833%2F833%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-841%2F841%20passing-brightgreen.svg)](tests/)
 [![Platforms](https://img.shields.io/badge/platforms-9%20native%20%2B%2035%20Agent%20Skills-success.svg)](#works-on-40-agent-harnesses-via-the-agent-skills-open-standard)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Article%2050%20ready-darkred.svg)](skills/context-engine/compliance-rules.md)
 
 [![Built by Indranil "Neel" Banerjee — Neelverse Marketing Suite — Sponsor this project](docs/assets/author-banner.svg)](https://github.com/sponsors/indranilbanerjee)
 
-> 🆕 **Just shipped — v3.38.2 (October 27, 2026):** shipped files now link only to things a reader can open (vendor pages, the docs in this repository), with a test that keeps internal planning references out. [What's new](#whats-new) · [Changelog](CHANGELOG.md)
+> 🆕 **Just shipped — v3.38.2 (October 27, 2026):** the model router now warns about, or refuses, a retiring model even when it can't reach the provider's live list, and shipped files link only to things a reader can open. [What's new](#whats-new) · [Changelog](CHANGELOG.md)
 
 ```bash
 # Install — one command (Claude Code 2.1.292 or newer)
@@ -204,7 +204,7 @@ Other marketing plugins exist, including Anthropic's own marketing plugin and co
 | AEO / GEO | **A 6-platform audit, including Google AI Mode** |
 | Where it runs | **9 native hosts**: Claude Code, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes, OpenClaw, Grok |
 | Live-write safety | **Single-use approval record for writes it sends itself; MCP writes: typed yes + host prompt** |
-| Tests | **833 stdlib unittest** tests |
+| Tests | **841 stdlib unittest** tests |
 | License | **MIT: no telemetry, no seats** |
 
 ---
@@ -413,9 +413,9 @@ If you run into a platform-specific install snag, file a [GitHub issue](https://
 
 ## What's new
 
-### v3.38.2 — public files point only at what a reader can open (October 27, 2026)
+### v3.38.2 — deprecation checks offline too; public files point only at what a reader can open (October 27, 2026)
 
-A few files shipped in the last round named the internal work sessions that build this plugin and pointed at private planning notes, including the model registry's "last updated by" field, which the sibling plugins copy. They now say what was done and link only to vendor pages and documents in this repository. A new test fails if a shipped file names an internal session or points into the private notes; older changelog entries are kept as history. 833 tests.
+When the model router couldn't reach a provider's live model list (offline mode, a timeout, provider trouble), it sent a model asked for by name without any lifecycle check, even one the shipped registry knows is retiring, such as Claude Sonnet 4.5 on 30 November. It now checks that registry instead: a deprecated model gets a warning with its date and replacement, and one past its shutdown is refused before anything is sent, just as with the live list. Separately, a few shipped files named the internal work sessions behind this plugin and pointed at private notes, including the model registry's "last updated by" field. They now link only to vendor pages and documents in this repository, and a test keeps it that way. 841 tests.
 
 ### v3.38.1 — SEO descriptions in the words people use (October 27, 2026)
 
@@ -800,7 +800,7 @@ Use the direct repo form: `grok plugin install indranilbanerjee/digital-marketin
 ### General (any platform)
 
 **"Tests in `tests/` fail when I `git clone` locally"**
-Run `python tests/run_all.py` from the repo root. All 833 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+; `scripts/setup.py` recommends 3.11 or newer, and the floor moves to 3.11 once Claude's Cowork environment does) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
+Run `python tests/run_all.py` from the repo root. All 841 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+; `scripts/setup.py` recommends 3.11 or newer, and the floor moves to 3.11 once Claude's Cowork environment does) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
 
 **"`/digital-marketing-pro:doctor` shows my action as stub_unconfigured"**
 That action needs an MCP connector configured. Run `python scripts/connector-status.py --action setup-guide --name <connector-name>` for the exact setup snippet. Add it to your `.mcp.json` under `mcpServers`, restart your agent, and the action becomes `manifest_ready`. See [Connector-aware action resolver](#connector-aware-action-resolver) for the full readiness model.

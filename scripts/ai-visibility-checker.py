@@ -32,15 +32,17 @@ OPENAI_JOB = "ai-visibility.probe.openai"
 
 # Curator: the registry alias each job falls back to offline
 try:
-    from resolve_model import resolve as _resolve_model
+    from resolve_model import resolve as _resolve_model, get_registry as _get_registry
 except ImportError:  # pragma: no cover — curator should always be present
     _resolve_model = lambda alias_or_id, **_: alias_or_id  # type: ignore
+    _get_registry = lambda: None  # type: ignore
 
 
 def _route(job, provider, credential_name, override, api_key, anthropic_version=None, fetch=None, now=None):
     """The model for one leg, chosen from the provider's live list by
     scripts/model_router.py. Raises model_router.RouterError when no request
-    should be sent (a rejected key, an empty list, a retired model asked for)."""
+    should be sent (a rejected key, an empty list, a retired model asked for).
+    Offline, the shipped registry stands in for the list's lifecycle data."""
     hints_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "model_hints.json")
     with open(hints_path, encoding="utf-8-sig") as f:
         hints = json.load(f)
@@ -48,7 +50,7 @@ def _route(job, provider, credential_name, override, api_key, anthropic_version=
         job, hints, provider=provider, credential_name=credential_name, api_key=api_key,
         default_model=_resolve_model(hints["jobs"][job]["default_alias"]), requested=override,
         fetch=fetch, cache_path=_common.workspace_root() / "model-router-cache.json", now=now,
-        anthropic_version=anthropic_version)
+        anthropic_version=anthropic_version, registry=_get_registry())
 
 
 def route_anthropic(override, api_key, anthropic_version, fetch=None, now=None):

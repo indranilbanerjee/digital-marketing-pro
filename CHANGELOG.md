@@ -8,11 +8,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ## [3.38.2] - 2026-10-27
 
-### Public files point only at what a reader can open
+### The model router checks deprecations offline too; public files point only at what a reader can open
+
+**Fixed: offline, a model asked for by name is checked against the shipped registry**
+
+- With `MODEL_ROUTER_OFFLINE=1`, a list timeout or provider trouble, the router had no lifecycle data. A requested model came back unchanged with no warning, even one the registry knows is retiring: for example `--requested claude-sonnet-4-5`, retiring 2026-11-30. Timeouts and provider trouble make this path more common than the offline flag.
+- `scripts/model_router.py` now looks the model up in the plugin's shipped registry on every offline path:
+  - deprecated: a warning naming its retirement date and replacement;
+  - past its shutdown date, or marked retired: refused with exit 2 before any probe, naming the replacement.
+
+  That's the same contract as the live path. An undated id (`claude-sonnet-4-5`) matches its one dated snapshot (`claude-sonnet-4-5-20250929`). An id the registry doesn't know gets a warning that its lifecycle couldn't be checked.
+- `scripts/ai-visibility-checker.py` passes the registry. The router's CLI takes `--registry` (default: `model_registry.json` next to it), and when `--default-model` is omitted it resolves the job's `default_alias` there instead of reporting "no shipped default".
+- The 3.38.0 note that "a run that names Sonnet 4.5 warns until that day, then stops with the replacement" held only when the live list was reachable. It now holds offline too.
+- Tests: 8 new in `tests/test_model_router.py`. They cover deprecated, an undated alias, past shutdown, retired, a list timeout, an unknown id, no registry, the CLI and the checker. All 8 fail on the 3.38.1 router.
+
+**Fixed: public files point only at what a reader can open**
 
 Some files shipped in the last round named the internal work sessions that build this plugin, and pointed at private planning notes that are not in the repository. The worst case was the model registry's `last_updated_by` field: it is shipped as data and copied into the sibling plugins, and it cited a patch file no reader can open. Public text should say what was done, not who did it, and link only to files a reader can open.
-
-**Fixed**
 
 - `scripts/model_registry.json` `last_updated_by` now says the vendor pages were read on 2026-10-27, that each entry's `docs_url` and notes name its source, and points to `docs/MODEL-CURATOR.md`. Sibling copies pick this up at their next mirror.
 - CHANGELOG 3.38.0 and 3.36.2 describe the plan and the registry refresh without naming internal sessions or private notes.
@@ -24,7 +36,7 @@ Some files shipped in the last round named the internal work sessions that build
 - It works from an installed copy (no git) by walking the folder.
 - "Campaign Orchestrator" and the other product names pass.
 - Planted on the 3.38.1 files: 11 findings.
-- Suite: 833 tests.
+- Suite: 841 tests.
 
 ## [3.38.1] - 2026-10-27
 

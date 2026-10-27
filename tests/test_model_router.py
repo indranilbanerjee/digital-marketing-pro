@@ -442,6 +442,86 @@ class TestOpenAIPresenceOnly(OpenAICase):
         self.assertIsNone(seen[0].get_header("X-api-key"))
 
 
+REGISTRY = {
+    "aliases": {"latest-balanced-anthropic": "claude-sonnet-5-5"},
+    "models": [
+        {"id": "claude-sonnet-4-5-20250929", "status": "deprecated", "shutdown_date": "2026-11-30",
+         "replacement_id": "claude-sonnet-5-5"},
+        {"id": "claude-sonnet-5-5", "status": "current"},
+        {"id": "claude-3-5-haiku-20241022", "status": "retired", "shutdown_date": "2026-02-19",
+         "replacement_id": "claude-haiku-5-5"},
+    ],
+}
+
+
+class TestOfflineLifecycle(RouterCase):
+    """With no live list (MODEL_ROUTER_OFFLINE, a timeout, provider trouble), a model asked for by
+    name is checked against the shipped registry: the same contract as the live path. Found from
+    an installed copy: offline, a requested Sonnet 4.5 came back with no warning at all."""
+
+    def offline(self, requested, now=NOW, registry=REGISTRY, fetch=None, env=None):
+        err = io.StringIO()
+        with redirect_stderr(err):
+            return mr.route(JOB, HINTS, provider="anthropic", credential_name=CRED, api_key=KEY,
+                            default_model="claude-sonnet-5-5", requested=requested, fetch=fetch or Fetch(),
+                            cache_path=self.cache, now=now, env={"MODEL_ROUTER_OFFLINE": "1"} if env is None else env,
+                            registry=registry)
+
+    def test_deprecated_warns_naming_the_date_and_replacement(self):
+        r = self.offline("claude-sonnet-4-5-20250929")
+        self.assertEqual((r["model"], r["basis"], r["replacement"]),
+                         ("claude-sonnet-4-5-20250929", "offline", "claude-sonnet-5-5"))
+        joined = " ".join(r["warnings"])
+        for needed in ("deprecated", "2026-11-30", "claude-sonnet-5-5"):
+            self.assertIn(needed, joined)
+
+    def test_an_undated_alias_matches_its_one_dated_snapshot(self):
+        r = self.offline("claude-sonnet-4-5")
+        self.assertIn("2026-11-30", " ".join(r["warnings"]))
+        self.assertIn("claude-sonnet-4-5-20250929", " ".join(r["warnings"]))
+
+    def test_past_its_shutdown_it_is_refused(self):
+        with self.assertRaises(mr.RouterError) as ctx:
+            self.offline("claude-sonnet-4-5-20250929", now=datetime(2026, 12, 1, tzinfo=timezone.utc))
+        self.assertEqual(ctx.exception.exit_code, 2)
+        self.assertIn("claude-sonnet-5-5", str(ctx.exception))
+        with self.assertRaises(mr.RouterError):
+            self.offline("claude-3-5-haiku-20241022")
+
+    def test_a_list_timeout_takes_the_same_check(self):
+        r = self.offline("claude-sonnet-4-5-20250929", env={},
+                         fetch=Fetch(error=mr.FetchError("timeout", "timed out")))
+        self.assertEqual(r["basis"], "offline")
+        self.assertIn("2026-11-30", " ".join(r["warnings"]))
+
+    def test_an_id_the_registry_does_not_know_is_named(self):
+        r = self.offline("claude-imaginary-9")
+        self.assertTrue(any("not in the shipped registry" in w for w in r["warnings"]), r["warnings"])
+
+    def test_without_a_registry_nothing_changes(self):
+        self.assertEqual(self.offline("claude-sonnet-4-5-20250929", registry=None)["warnings"], [])
+
+    def test_cli_resolves_default_alias_and_checks_the_requested_id(self):
+        import subprocess
+        env = dict(os.environ, MODEL_ROUTER_OFFLINE="1")
+        base = [sys.executable, str(SCRIPTS / "model_router.py"), "--hints", str(SCRIPTS / "model_hints.json"),
+                "--job", JOB, "--provider", "anthropic", "--credential-name", CRED]
+        live_registry = json.loads((SCRIPTS / "model_registry.json").read_text(encoding="utf-8"))
+        proc = subprocess.run(base, capture_output=True, text=True, timeout=60, env=env)
+        self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+        self.assertEqual(json.loads(proc.stdout)["model"], live_registry["aliases"]["latest-balanced-anthropic"])
+        reg = self.tmp / "registry.json"
+        reg.write_text(json.dumps(REGISTRY), encoding="utf-8")
+        proc = subprocess.run(base + ["--registry", str(reg), "--requested", "claude-sonnet-4-5"],
+                              capture_output=True, text=True, timeout=60, env=env)
+        self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+        self.assertIn("2026-11-30", " ".join(json.loads(proc.stdout)["warnings"]))
+        proc = subprocess.run(base + ["--registry", str(reg), "--requested", "claude-3-5-haiku-20241022"],
+                              capture_output=True, text=True, timeout=60, env=env)
+        self.assertEqual(proc.returncode, 2, proc.stdout + proc.stderr)
+        self.assertIn("claude-haiku-5-5", proc.stdout)
+
+
 class TestFetchAnthropic(unittest.TestCase):
 
     def test_pages_headers_and_query(self):
@@ -547,6 +627,21 @@ class TestCheckerUsesTheRouter(unittest.TestCase):
                     os.environ.pop(k, None) if v is None else os.environ.__setitem__(k, v)
         self.assertEqual((live["model"], live["provider"]), ("gpt-6.1-sol", "openai"))
         self.assertEqual((kept["model"], kept["basis"]), ("gpt-5.1", "requested"))
+
+    def test_offline_the_checker_still_warns_about_a_deprecated_request(self):
+        checker = self.load_checker()
+        with tempfile.TemporaryDirectory() as home:
+            old = {k: os.environ.get(k) for k in ("CLAUDE_MARKETING_HOME", "MODEL_ROUTER_OFFLINE")}
+            os.environ["CLAUDE_MARKETING_HOME"] = home
+            os.environ["MODEL_ROUTER_OFFLINE"] = "1"
+            try:
+                with redirect_stderr(io.StringIO()):
+                    r = checker.route_anthropic("claude-sonnet-4-5-20250929", KEY, "2023-06-01", fetch=Fetch(), now=NOW)
+            finally:
+                for k, v in old.items():
+                    os.environ.pop(k, None) if v is None else os.environ.__setitem__(k, v)
+        self.assertEqual(r["basis"], "offline")
+        self.assertTrue(any("2026-11-30" in w for w in r["warnings"]), r["warnings"])
 
     def test_no_leg_resolves_a_model_name_outside_the_router(self):
         source = (SCRIPTS / "ai-visibility-checker.py").read_text(encoding="utf-8")

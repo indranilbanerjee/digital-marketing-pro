@@ -40,6 +40,7 @@ python scripts/resolve_model.py --list --vendor anthropic --status current
 - One list call per provider per 7 days per key name serves every job; the cache (`model-router-cache.json`) is keyed by the environment variable's name and holds chosen ids, lifecycle dates and counts, never the key, the list or a fine-tune's name. `MODEL_ROUTER_OFFLINE=1` makes no call.
 - A model asked for by name (`--anthropic-model`, `--openai-model`) is kept if current, kept with a warning if deprecated, and refused with exit 2 if retired, naming the replacement. Nothing is swapped silently.
 - A rejected key or an empty list stops the run before any probe is sent (exit 2). A timeout, provider trouble, or an Anthropic list without lifecycle fields falls back to the registry alias and tags the output `offline`.
+- Offline, a model asked for by name is checked against the shipped registry instead of the live list: deprecated warns with its retirement date and replacement, and past its shutdown it is refused (exit 2). An undated id such as `claude-sonnet-4-5` matches its one dated snapshot. The router's CLI resolves the job's `default_alias` in the registry when `--default-model` is omitted.
 - The run's output carries `model_routing.anthropic` and `model_routing.openai`: the model asked for, the model sent, where the answer came from (`live`, `cache`, `requested` or `offline`) and when.
 
 ```bash

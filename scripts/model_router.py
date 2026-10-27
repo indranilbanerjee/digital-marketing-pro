@@ -21,7 +21,9 @@ family, the newest (highest version, then newest) model that is:
   * at least MIN_GA_DAYS old (a brand-new release is never promoted on day one);
   * equipped with every capability the job's rule requires.
 The registry stays as the fallback: offline, the caller's shipped default is used and the
-answer is tagged "offline".
+answer is tagged "offline". Offline, the registry also stands in for the list's lifecycle
+data: a model about to be sent that the registry marks deprecated warns, and one past its
+shutdown is refused, as on the live path.
 
 A model asked for by name is kept if it is active; kept with a warning if it is deprecated
 (naming the retirement date and the model the router would pick); and refused, exit 2, if it
@@ -401,8 +403,13 @@ def _fresh(entry, now: datetime) -> bool:
 
 def route(job: str, hints: dict, *, provider: str, credential_name: str, api_key: str,
           default_model: str | None, requested: str | None = None, fetch=None, cache_path=None,
-          now: datetime | None = None, anthropic_version: str | None = None, env=None) -> dict:
-    """The model to send for `job`, with where the answer came from. Raises RouterError."""
+          now: datetime | None = None, anthropic_version: str | None = None, env=None,
+          registry: dict | None = None) -> dict:
+    """The model to send for `job`, with where the answer came from. Raises RouterError.
+
+    `registry` is the plugin's shipped model registry (its `models` list). With no live list
+    (offline, a timeout, provider trouble), the model about to be sent is checked against it:
+    deprecated warns, past its shutdown refuses, the same contract as the live path."""
     env = os.environ if env is None else env
     now = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
     if not isinstance(credential_name, str) or not CREDENTIAL_NAME.match(credential_name):
@@ -427,7 +434,7 @@ def route(job: str, hints: dict, *, provider: str, credential_name: str, api_key
                                     f"re-read {record['source']} and update the hint book")
 
     if str(env.get(OFFLINE_ENV, "")).strip().lower() in ("1", "true", "yes"):
-        return _offline(base, requested or default_model, f"{OFFLINE_ENV} is set")
+        return _offline(base, requested, default_model, f"{OFFLINE_ENV} is set", registry, now)
 
     cache, cache_warning = _load_cache(cache_path)
     if cache_warning:
@@ -449,13 +456,14 @@ def route(job: str, hints: dict, *, provider: str, credential_name: str, api_key
         if exc.kind in ("auth", "http"):
             raise RouterError(f"{provider} refused the model-list call ({_scrub(exc.detail, api_key)}); "
                               f"check {credential_name}") from None
-        return _offline(base, requested or default_model,
-                        f"{provider} model list unavailable ({exc.kind}: {_scrub(exc.detail, api_key)})")
+        return _offline(base, requested, default_model,
+                        f"{provider} model list unavailable ({exc.kind}: {_scrub(exc.detail, api_key)})",
+                        registry, now)
     if not listed:
         raise RouterError(f"{provider} returned no models for {credential_name}; check the key's access")
     models, problem = adapter["normalize"](listed, hints, now)
     if problem:
-        return _offline(base, requested or default_model, problem)
+        return _offline(base, requested, default_model, problem, registry, now)
 
     source, stamp = adapter["source"], _iso(now)
     for key in [k for k in entries if k.startswith(f"{provider}|") and k.endswith(f"|{credential_name}")]:
@@ -479,11 +487,48 @@ def route(job: str, hints: dict, *, provider: str, credential_name: str, api_key
     return _answer(base, entries[job_key], asked, "live")
 
 
-def _offline(base: dict, model: str | None, reason: str) -> dict:
+def registry_entry(registry: dict | None, model_id: str) -> tuple:
+    """(entry, matched id) for a model in the shipped registry, or (None, None). An undated id
+    matches its dated snapshot when exactly one exists (claude-sonnet-4-5 ->
+    claude-sonnet-4-5-20250929: the vendor's alias convention)."""
+    models = [m for m in (registry or {}).get("models", []) if isinstance(m, dict) and m.get("id")]
+    exact = [m for m in models if m["id"] == model_id]
+    if exact:
+        return exact[0], model_id
+    dated = [m for m in models if re.fullmatch(re.escape(model_id) + r"-\d{8}", m["id"])]
+    return (dated[0], dated[0]["id"]) if len(dated) == 1 else (None, None)
+
+
+def _offline(base: dict, requested: str | None, default_model: str | None, reason: str,
+             registry: dict | None = None, now: datetime | None = None) -> dict:
+    model = requested or default_model
     if not model:
         raise RouterError(f"no model for job {base['job']!r}: {reason}, and there is no shipped default")
-    return {**base, "model": model, "basis": "offline", "offline": True, "reason": reason,
-            "source": "shipped-default", "discovered_at": None, "counts": None}
+    out = {**base, "model": model, "basis": "offline", "offline": True, "reason": reason,
+           "source": "shipped-default", "discovered_at": None, "counts": None,
+           "warnings": list(base["warnings"])}
+    if registry is None:
+        return out
+    entry, matched = registry_entry(registry, model)
+    if entry is None:
+        out["warnings"].append(f"{model} is not in the shipped registry, so its lifecycle could not be checked "
+                               f"without the live list")
+        return out
+    shown = model if matched == model else f"{model} ({matched})"
+    replacement = entry.get("replacement_id") or "a current model"
+    shut = _parse(entry.get("shutdown_date"))
+    when = shut.date().isoformat() if shut else None
+    today = (now or datetime.now(timezone.utc)).astimezone(timezone.utc).date()
+    if entry.get("status") == "retired" or (shut and shut.date() <= today):
+        raise RouterError(f"{shown} is retired{' (shut down ' + when + ')' if when else ''} according to the "
+                          f"shipped registry: requests naming it fail. Use {replacement}.")
+    if entry.get("status") == "deprecated" or shut:
+        if requested:
+            out["replacement"] = entry.get("replacement_id")
+        why = "Keeping it because it was asked for by name." if requested else "It is the shipped default."
+        out["warnings"].append(f"{shown} is deprecated and retires {when or 'on a date not yet announced'} "
+                               f"according to the shipped registry; its replacement is {replacement}. {why}")
+    return out
 
 
 def _answer(base: dict, chosen: dict, asked: dict | None, basis: str) -> dict:
@@ -521,7 +566,10 @@ def main(argv=None) -> int:
     p.add_argument("--provider", required=True, choices=sorted(ADAPTERS))
     p.add_argument("--credential-name", required=True, help="environment variable that holds the key")
     p.add_argument("--requested", help="a model asked for by name")
-    p.add_argument("--default-model", help="the shipped default, used offline")
+    p.add_argument("--default-model", help="the shipped default, used offline (default: the job's "
+                                                "default_alias, resolved in the registry)")
+    p.add_argument("--registry", type=Path, default=Path(__file__).resolve().parent / "model_registry.json",
+                   help="the plugin's model registry (default: model_registry.json next to this file)")
     p.add_argument("--cache", type=Path, help="cache file (omit for no cache)")
     p.add_argument("--anthropic-version", default="2023-06-01")
     args = p.parse_args(argv)
@@ -532,15 +580,22 @@ def main(argv=None) -> int:
         return 2
     try:
         hints = json.loads(args.hints.read_text(encoding="utf-8-sig"))
+        registry = (json.loads(args.registry.read_text(encoding="utf-8-sig"))
+                    if args.registry and args.registry.is_file() else None)
+    except (OSError, ValueError) as exc:
+        print(json.dumps({"error": f"cannot read the hint book or registry: {exc}"}))
+        return 2
+    default_model = args.default_model
+    alias = ((hints.get("jobs") or {}).get(args.job) or {}).get("default_alias")
+    if not default_model and registry and alias:
+        default_model = (registry.get("aliases") or {}).get(alias)
+    try:
         key = os.environ.get(args.credential_name, "")
         if not key and str(os.environ.get(OFFLINE_ENV, "")).strip().lower() not in ("1", "true", "yes"):
             raise RouterError(f"{args.credential_name} is not set")
         result = route(args.job, hints, provider=args.provider, credential_name=args.credential_name,
-                       api_key=key, default_model=args.default_model, requested=args.requested,
-                       cache_path=args.cache, anthropic_version=args.anthropic_version)
-    except (OSError, ValueError) as exc:
-        print(json.dumps({"error": f"cannot read the hint book: {exc}"}))
-        return 2
+                       api_key=key, default_model=default_model, requested=args.requested,
+                       cache_path=args.cache, anthropic_version=args.anthropic_version, registry=registry)
     except RouterError as exc:
         print(json.dumps({"error": exc.reason}))
         return 2
