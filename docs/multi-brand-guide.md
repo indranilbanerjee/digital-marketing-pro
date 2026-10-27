@@ -17,7 +17,7 @@ A guide to managing multiple brands, corporate portfolios, and agency client ros
 
 ## How Brand Profiles Work
 
-Every brand you create gets its own isolated directory at `~/.claude-marketing/brands/{slug}/`. A slug is a lowercase, hyphenated identifier derived from the brand name (for example, "Artisan Bakery" becomes `artisan-bakery`).
+Every brand you create gets its own isolated directory at `~/.claude-marketing/brands/{slug}/`. A slug is a lowercase, hyphenated identifier derived from the brand name (for example, "Artisan Bakery" becomes `artisan-bakery`). Accents fold ("Café Olé" becomes `cafe-ole`). A name in another script, such as Devanagari or Chinese, keeps its ASCII part plus a short tag from the name ("भारत Foods" becomes `foods-bb073d`), so two such brands never share a folder. Creating a brand that already exists changes nothing unless you add `--force`.
 
 ### What Lives Inside a Brand Profile
 

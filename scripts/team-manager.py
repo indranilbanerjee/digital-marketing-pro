@@ -402,7 +402,7 @@ def assign_task(slug, data):
         "updated_at": now,
     }
 
-    filepath = assignments_dir / f"{assignment_id}.json"
+    filepath = assignments_dir / f"{assignment_id}.json"  # path-safe: task-<uuid4 hex>
     filepath.write_text(json.dumps(assignment, indent=2), encoding="utf-8")
 
     return {

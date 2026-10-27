@@ -29,10 +29,13 @@ Path policy (DMP canon):
 """
 from __future__ import annotations
 
+import codecs
+import hashlib
 import json
 import os
 import re
 import sys
+import unicodedata
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -71,6 +74,13 @@ def ensure_utf8_stdout() -> None:
                 pass
 
 
+# Every script that imports this module writes UTF-8. Where stdout is a pipe (Claude Code's Bash
+# tool, Cowork, any capture) Windows gives Python cp1252, and a Devanagari, CJK or emoji brand name
+# raised UnicodeEncodeError mid-run. Reconfiguring a text stream after it has been written to is
+# allowed, so the import order of a script doesn't matter.
+ensure_utf8_stdout()
+
+
 # ── Time ────────────────────────────────────────────────────────────
 
 def now_iso() -> str:
@@ -107,13 +117,50 @@ def brands_root() -> Path:
     return workspace_root() / "brands"
 
 
+# Windows device names: no file or folder can carry one, with or without an extension.
+WINDOWS_RESERVED = frozenset({"con", "prn", "aux", "nul", *(f"com{i}" for i in range(1, 10)),
+                              *(f"lpt{i}" for i in range(1, 10))})
+
+
+def _ascii_slug(text: str) -> str:
+    s = re.sub(r"[^a-z0-9]+", "-", text.lower())
+    return re.sub(r"-+", "-", s).strip("-")[:60].rstrip("-")
+
+
+def legacy_slug(name: str) -> str:
+    """The slug before 3.40.0, which dropped every non-ASCII letter ("Café" -> "caf", any Devanagari
+    or CJK name -> "brand"). Used only to find folders created under it."""
+    return _ascii_slug(name or "") or "brand"
+
+
+def safe_slug(text: str, fallback: str = "brand") -> str:
+    """A file-name-safe ASCII slug that keeps different names apart.
+
+    ASCII text gives exactly the old slug. Accents fold ("Café" -> "cafe"). When letters, digits
+    or emoji from another script remain (Devanagari, CJK, Arabic, Cyrillic), the ASCII part gets a
+    six-character tag from a hash of the name, so two such names never share a slug ("भारत चाय" ->
+    "brand-8c2e41"). A Windows device name gets "-<fallback>" appended."""
+    name = unicodedata.normalize("NFKC", text or "").strip()
+    folded = "".join(c for c in unicodedata.normalize("NFKD", name) if not unicodedata.combining(c))
+    slug = _ascii_slug(folded)
+    if any(not c.isascii() and unicodedata.category(c)[0] in "LNM" or unicodedata.category(c) == "So"
+           for c in folded):
+        tag = hashlib.sha256(name.casefold().encode("utf-8")).hexdigest()[:6]
+        slug = f"{slug[:53].rstrip('-') or fallback}-{tag}"
+    slug = slug or fallback
+    return f"{slug}-{fallback}" if slug in WINDOWS_RESERVED else slug
+
+
 def slugify_brand(name: str) -> str:
-    """Canonical brand slug: lowercase, non-alphanumeric runs → single hyphen,
-    trimmed, max 60 chars. Empty input yields 'brand'. This is the ONE
-    slugifier - all local variants (four of them across the tree) were killed."""
-    s = re.sub(r"[^a-z0-9]+", "-", (name or "").lower())
-    s = re.sub(r"-+", "-", s).strip("-")
-    return s[:60].rstrip("-") or "brand"
+    """Canonical brand slug (safe_slug with the fallback "brand"). This is the ONE brand
+    slugifier: all local variants (four of them across the tree) were killed."""
+    return safe_slug(name, "brand")
+
+
+def same_brand_name(a, b) -> bool:
+    """True when two brand names are the same name (case and Unicode normal form aside)."""
+    norm = lambda s: unicodedata.normalize("NFKC", str(s or "")).strip().casefold()  # noqa: E731
+    return norm(a) == norm(b)
 
 
 # Backwards-friendly alias: several scripts had a local `slugify()`.
@@ -127,13 +174,14 @@ class UnsafePathError(ValueError):
 def is_safe_component(name) -> bool:
     """True if `name` can only ever name an entry directly inside a directory:
     non-empty, no `/` or `\\`, no `..`, not absolute, no drive or stream colon,
-    no NUL."""
+    no NUL, and not a Windows device name (NUL, CON, COM1, ...). A colon is refused because on
+    NTFS "a:b" writes an alternate data stream of "a"."""
     if not isinstance(name, str):
         return False
     n = name.strip()
     return bool(n) and n not in (".", "..") and not any(
         bad in n for bad in ("/", "\\", "..", ":", "\x00")
-    ) and not os.path.isabs(n)
+    ) and not os.path.isabs(n) and n.split(".")[0].lower() not in WINDOWS_RESERVED
 
 
 def safe_child(base, name, suffix: str = "") -> Path:
@@ -148,7 +196,7 @@ def safe_child(base, name, suffix: str = "") -> Path:
     if not is_safe_component(name):
         raise UnsafePathError(f"unsafe name {name!r}: use a plain name without path separators or '..'")
     base_path = Path(base)
-    candidate = base_path / f"{name.strip()}{suffix}"
+    candidate = base_path / f"{name.strip()}{suffix}"  # path-safe: checked by is_safe_component just above
     if candidate.resolve().parent != base_path.resolve():
         raise UnsafePathError(f"unsafe name {name!r}: resolves outside {base_path}")
     return candidate
@@ -204,6 +252,15 @@ def brand_dir(brand: str) -> Path:
             return legacy_flat
     except (OSError, ValueError):
         pass
+    # 3. A folder named by the pre-3.40.0 slug ("Café" -> "caf"), used only when its profile is
+    #    this brand's, so a name never lands in another brand's folder.
+    old = legacy_slug(brand)
+    if raw and old != slug and not (root / slug).exists() and (root / old / "profile.json").is_file():
+        try:
+            if same_brand_name(read_json(root / old / "profile.json").get("brand_name"), raw):
+                return root / old
+        except (OSError, ValueError, AttributeError):
+            pass
     return root / slug
 
 
@@ -369,7 +426,7 @@ def write_approval_record(brand: str, prefix: str, record: dict) -> tuple:
     d.mkdir(parents=True, exist_ok=True)
     stamp = _utcnow().strftime("%Y%m%d-%H%M%S")
     n = 1
-    while (d / f"{prefix}-{stamp}-{n}.json").exists():
+    while (d / f"{prefix}-{stamp}-{n}.json").exists():  # path-safe: prefix is a constant in each caller, stamp a timestamp
         n += 1
     approval_id = f"{prefix}-{stamp}-{n}"
     path = safe_child(d, approval_id, ".json")
@@ -515,6 +572,63 @@ def atomic_write_text(path, text: str) -> None:
     tmp.replace(path)
 
 
+class JsonFileError(ValueError):
+    """A JSON file that can't be used: not UTF-8, not JSON, or the wrong shape. The message says
+    what to change. A ValueError, like json.JSONDecodeError and UnicodeDecodeError."""
+
+
+def decode_text(raw: bytes, name: str = "the file") -> str:
+    """UTF-8 (with or without a BOM) or UTF-16 with a BOM, which is what PowerShell 5.1's Out-File
+    and `>` write. Anything else raises JsonFileError: a Windows "ANSI" save is not guessed at,
+    since the guess would silently garble a non-Western code page."""
+    if raw.startswith(codecs.BOM_UTF8):
+        raw = raw[len(codecs.BOM_UTF8):]
+    elif raw.startswith((codecs.BOM_UTF16_LE, codecs.BOM_UTF16_BE)):
+        try:
+            return raw.decode("utf-16")
+        except UnicodeDecodeError:
+            pass
+    try:
+        return raw.decode("utf-8")
+    except UnicodeDecodeError:
+        raise JsonFileError(f"{name} is not UTF-8 (it looks like a Windows 'ANSI' save, such as "
+                            f"Windows-1252). Open it, save it as UTF-8, and run this again.") from None
+
+
+def read_json(path):
+    """Parse a JSON file through decode_text. Raises JsonFileError or json.JSONDecodeError (both
+    ValueError) or OSError."""
+    path = Path(path)
+    return json.loads(decode_text(path.read_bytes(), path.name))
+
+
+# The top-level sections of profile.json and their types (setup.py --create-brand writes them).
+PROFILE_SHAPE = {"brand_name": str, "identity": dict, "business_model": dict, "industry": dict,
+                 "target_markets": list, "brand_voice": dict, "channels": dict, "competitors": list,
+                 "goals": dict, "language": dict}
+_TYPE_WORD = {dict: "an object", list: "a list", str: "text"}
+
+
+def profile_problems(profile) -> list:
+    """What is wrongly shaped in a parsed profile.json, as sentences naming each field."""
+    if not isinstance(profile, dict):
+        return [f"profile.json must hold an object, not {_TYPE_WORD.get(type(profile), type(profile).__name__)}"]
+    return [f"profile.json field '{key}' must be {_TYPE_WORD[want]}, not "
+            f"{_TYPE_WORD.get(type(profile[key]), type(profile[key]).__name__)} ({json.dumps(profile[key])[:40]})"
+            for key, want in PROFILE_SHAPE.items() if key in profile and not isinstance(profile[key], want)]
+
+
+def load_profile(path) -> dict:
+    """Read and check a brand's profile.json. Raises JsonFileError (or JSONDecodeError, OSError)
+    with a message that names the encoding or the field to fix."""
+    profile = read_json(path)
+    problems = profile_problems(profile)
+    if problems:
+        raise JsonFileError("; ".join(problems) + ". Fix it in profile.json, or run "
+                            "/digital-marketing-pro:brand-setup to rewrite it.")
+    return profile
+
+
 def load_json_safe(path):
     """Load JSON, never raise. On failure returns a dict with 'error' and
     'recovery' keys instead of the payload; callers check `"error" in result`
@@ -527,8 +641,8 @@ def load_json_safe(path):
             "recovery": "Initialise it first (e.g. --action init) or check the brand name.",
         }
     try:
-        return json.loads(path.read_text(encoding="utf-8-sig"))
-    except (json.JSONDecodeError, OSError) as exc:
+        return read_json(path)
+    except (ValueError, OSError) as exc:
         return {
             "error": f"corrupt or unreadable JSON at {path}: {type(exc).__name__}: {exc}",
             "corrupt": True,

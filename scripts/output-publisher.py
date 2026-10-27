@@ -76,7 +76,7 @@ def get_visible_publish_dir(brand: str, workflow: str | None = None,
     else:
         root = Path.home() / "Documents" / "DigitalMarketingPro" / brand
     if workflow:
-        root = root / workflow
+        root = _common.safe_child(root, workflow)
     return root
 
 
@@ -147,8 +147,9 @@ def publish_run(args) -> dict:
 
     results = []
     for step, filename in manifest.get("step_artifacts", {}).items():
-        src = run_dir / filename
-        if not src.exists():
+        # Artifact names come from the run manifest: only files inside the run folder are published.
+        src, err = _common.child_or_error(run_dir, str(filename))
+        if err or not src.exists():
             continue
         r = _publish_file(src, args.brand, workflow,
                            publish_dir_override=args.publish_dir,
@@ -229,7 +230,7 @@ def main() -> int:
 
     common_pub_args = lambda p: (
         p.add_argument("--brand", type=_common.path_component, required=True),
-        p.add_argument("--workflow", default="engagement"),
+        p.add_argument("--workflow", type=_common.path_component, default="engagement"),
         p.add_argument("--publish-dir", default=None,
                        help="Override visible-publish root ($DIGITAL_MARKETING_PRO_PUBLISH_DIR or ~/Documents/DigitalMarketingPro/)"),
         p.add_argument("--skip-publish", action="store_true",

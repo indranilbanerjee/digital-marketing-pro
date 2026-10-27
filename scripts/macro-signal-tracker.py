@@ -103,7 +103,7 @@ def record_signal(slug, args):
 
     sdir = _signals_dir(slug)
     sdir.mkdir(parents=True, exist_ok=True)
-    _save_json(sdir / f"{signal_id}.json", record)
+    _save_json(sdir / f"{signal_id}.json", record)  # path-safe: a sha256 hex digest
     return {"status": "recorded", "signal_id": signal_id, "recorded_at": ts}
 
 
@@ -231,7 +231,9 @@ def acknowledge(slug, signal_id, action_taken):
         return {"error": f"Brand '{slug}' not found. Run /digital-marketing-pro:brand-setup first."}
 
     sdir = _signals_dir(slug)
-    fpath = sdir / f"{signal_id}.json"
+    fpath, err = _common.child_or_error(sdir, signal_id, ".json")
+    if err:
+        return {"error": err}
     if not fpath.exists():
         return {"error": f"Signal '{signal_id}' not found."}
 

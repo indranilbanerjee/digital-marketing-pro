@@ -100,7 +100,7 @@ def check_brand():
         return False
 
     try:
-        active = json.loads(ACTIVE_BRAND_FILE.read_text(encoding="utf-8-sig"))
+        active = _common.read_json(ACTIVE_BRAND_FILE)
         slug = active.get("active_slug", "")
         profile_path = BRANDS_DIR / slug / "profile.json"
 
@@ -108,11 +108,11 @@ def check_brand():
             print(f"BROKEN_BRAND: Active brand '{slug}' profile not found.")
             return False
 
-        profile = json.loads(profile_path.read_text(encoding="utf-8-sig"))
+        profile = _common.load_profile(profile_path)
         brand_name = profile.get("brand_name", slug)
         print(f"BRAND_ACTIVE: {brand_name}")
         return True
-    except (json.JSONDecodeError, KeyError) as e:
+    except (ValueError, KeyError, AttributeError, OSError) as e:
         print(f"BRAND_ERROR: Could not load active brand: {e}")
         return False
 
@@ -129,7 +129,7 @@ def print_brand_summary():
         return False
 
     try:
-        active = json.loads(ACTIVE_BRAND_FILE.read_text(encoding="utf-8-sig"))
+        active = _common.read_json(ACTIVE_BRAND_FILE)
         slug = active.get("active_slug", "")
         profile_path = BRANDS_DIR / slug / "profile.json"
 
@@ -142,7 +142,7 @@ def print_brand_summary():
             print("===")
             return False
 
-        profile = json.loads(profile_path.read_text(encoding="utf-8-sig"))
+        profile = _common.load_profile(profile_path)
         name = profile.get("brand_name", slug)
         biz = profile.get("business_model", {})
         ind = profile.get("industry", {})
@@ -245,7 +245,7 @@ def print_brand_summary():
         print("===")
         return True
 
-    except (json.JSONDecodeError, KeyError) as e:
+    except (ValueError, KeyError, AttributeError, OSError) as e:
         print("=== DIGITAL MARKETING PRO ===")
         print(f"BRAND_ERROR: {e}")
         scripts_dir = Path(__file__).resolve().parent
@@ -310,7 +310,7 @@ def install_deps(mode="lite"):
 
         # Update settings with install mode
         if SETTINGS_FILE.exists():
-            settings = json.loads(SETTINGS_FILE.read_text(encoding="utf-8-sig"))
+            settings = _common.read_json(SETTINGS_FILE)
             settings["install_mode"] = mode
             _common.atomic_write_json(SETTINGS_FILE, settings)
 
@@ -320,12 +320,43 @@ def install_deps(mode="lite"):
         return False
 
 
-def create_brand(name, slug=None):
-    """Create a new brand profile with default schema."""
+def _existing_name(profile_path):
+    """(brand_name, readable) for a profile that already exists."""
+    try:
+        return _common.read_json(profile_path).get("brand_name"), True
+    except (ValueError, OSError, AttributeError):
+        return None, False
+
+
+def create_brand(name, slug=None, force=False):
+    """Create a new brand profile with default schema. Returns the profile path, or None when it
+    refuses: an existing profile is never replaced without force, and a slug that holds another
+    brand is never reused, even with force. Before 3.40.0 both were overwritten silently."""
+    explicit = slug is not None
     if slug is None:
         slug = _common.slugify_brand(name)
+    if slug.lower() in _common.WINDOWS_RESERVED:
+        print(f"BRAND_REFUSED: {slug!r} is a Windows device name and can't be a folder; choose another --slug.")
+        return None
 
     brand_dir = BRANDS_DIR / slug
+    profile_path = brand_dir / "profile.json"
+    if not explicit and not profile_path.exists():
+        found = _common.brand_dir(name)  # the same brand saved under its pre-3.40.0 slug
+        if found != brand_dir and (found / "profile.json").is_file():
+            brand_dir, profile_path, slug = found, found / "profile.json", found.name
+    if profile_path.exists():
+        existing, readable = _existing_name(profile_path)
+        if readable and not _common.same_brand_name(existing, name):
+            print(f"BRAND_EXISTS: the folder {slug!r} already holds the brand {existing!r}; nothing was changed. "
+                  f"Give {name!r} its own folder: --create-brand {name!r} --slug <another-slug>")
+            return None
+        if not force:
+            what = f"{name} ({slug})" if readable else f"the folder {slug!r} (its profile.json can't be read)"
+            print(f"BRAND_EXISTS: {what} already has a profile; nothing was changed. To update it, run "
+                  f"/digital-marketing-pro:brand-setup or edit {profile_path}. To replace it with a blank "
+                  f"profile, add --force.")
+            return None
     brand_dir.mkdir(parents=True, exist_ok=True)
 
     # Create subdirectories
@@ -398,7 +429,6 @@ def create_brand(name, slug=None):
         },
     }
 
-    profile_path = brand_dir / "profile.json"
     _common.atomic_write_json(profile_path, profile)
 
     # Create empty supporting files
@@ -415,9 +445,8 @@ def create_brand(name, slug=None):
     previous = None
     if ACTIVE_BRAND_FILE.exists():
         try:
-            previous = json.loads(
-                ACTIVE_BRAND_FILE.read_text(encoding="utf-8-sig")).get("active_slug")
-        except (json.JSONDecodeError, OSError):
+            previous = _common.read_json(ACTIVE_BRAND_FILE).get("active_slug")
+        except (ValueError, OSError, AttributeError):
             previous = None
 
     _common.atomic_write_json(
@@ -444,9 +473,8 @@ def list_brands():
     active_slug = ""
     if ACTIVE_BRAND_FILE.exists():
         try:
-            active = json.loads(ACTIVE_BRAND_FILE.read_text(encoding="utf-8-sig"))
-            active_slug = active.get("active_slug", "")
-        except json.JSONDecodeError:
+            active_slug = _common.read_json(ACTIVE_BRAND_FILE).get("active_slug", "")
+        except (ValueError, OSError, AttributeError):
             pass
 
     for item in BRANDS_DIR.iterdir():
@@ -454,13 +482,15 @@ def list_brands():
             profile_path = item / "profile.json"
             if profile_path.exists():
                 try:
-                    profile = json.loads(profile_path.read_text(encoding="utf-8-sig"))
+                    profile = _common.read_json(profile_path)
                     is_active = "* " if item.name == active_slug else "  "
                     brands.append(
                         f"{is_active}{profile.get('brand_name', item.name)} [{item.name}]"
                     )
-                except json.JSONDecodeError:
-                    brands.append(f"  {item.name} [corrupted profile]")
+                except (ValueError, OSError, AttributeError) as exc:
+                    # One unreadable profile must not hide the other brands.
+                    reason = str(exc) if isinstance(exc, _common.JsonFileError) else "corrupted profile"
+                    brands.append(f"  {item.name} [{reason}]")
 
     if brands:
         print("BRANDS:")
@@ -491,10 +521,10 @@ def switch_brand(slug):
                         p = item / "profile.json"
                         if p.exists():
                             try:
-                                data = json.loads(p.read_text(encoding="utf-8-sig"))
-                                if slug in data.get("brand_name", "").lower():
+                                data = _common.read_json(p)
+                                if slug in str(data.get("brand_name", "")).lower():
                                     available.append(item.name)
-                            except json.JSONDecodeError:
+                            except (ValueError, OSError, AttributeError):
                                 pass
 
         if available:
@@ -505,10 +535,10 @@ def switch_brand(slug):
 
     # Load and validate profile
     try:
-        profile = json.loads(profile_path.read_text(encoding="utf-8-sig"))
+        profile = _common.load_profile(profile_path)
         brand_name = profile.get("brand_name", slug)
-    except json.JSONDecodeError:
-        print(f"BRAND_ERROR: Profile for '{slug}' is corrupted.")
+    except (ValueError, OSError) as exc:
+        print(f"BRAND_ERROR: Profile for '{slug}' can't be used: {exc}")
         return False
 
     # Update active brand
@@ -534,13 +564,13 @@ def migrate_schema():
             profile_path = item / "profile.json"
             if profile_path.exists():
                 try:
-                    profile = json.loads(profile_path.read_text(encoding="utf-8-sig"))
+                    profile = _common.load_profile(profile_path)
                     current_version = profile.get("schema_version", "0.0.0")
 
                     if current_version != SCHEMA_VERSION:
                         # Backup before migration
                         backup_path = item / "profile.backup.json"
-                        backup_path.write_text(profile_path.read_text(encoding="utf-8-sig"), encoding="utf-8")
+                        backup_path.write_bytes(profile_path.read_bytes())
 
                         # Apply migrations (add new fields with defaults)
                         profile["schema_version"] = SCHEMA_VERSION
@@ -552,7 +582,7 @@ def migrate_schema():
                         migrated += 1
                         print(f"  Migrated: {item.name} ({current_version} → {SCHEMA_VERSION})")
 
-                except (json.JSONDecodeError, KeyError) as e:
+                except (ValueError, KeyError, OSError) as e:
                     print(f"  Error migrating {item.name}: {e}")
 
     print(f"MIGRATION_COMPLETE: {migrated} profiles updated.")
@@ -570,6 +600,8 @@ def main():
     parser.add_argument("--slug", type=_common.path_component, metavar="SLUG",
                         help="Explicit slug for --create-brand (default: slugified name). "
                              "The slug is the directory name under ~/.claude-marketing/brands/.")
+    parser.add_argument("--force", action="store_true",
+                        help="With --create-brand: replace this brand's existing profile with a blank one")
     parser.add_argument("--list-brands", action="store_true", help="List all brands")
     parser.add_argument("--switch-brand", metavar="SLUG", help="Switch active brand")
     parser.add_argument("--migrate", action="store_true", help="Migrate brand schemas")
@@ -604,7 +636,8 @@ def main():
             exit_code = 1
 
     if args.create_brand:
-        create_brand(args.create_brand, slug=args.slug)
+        if create_brand(args.create_brand, slug=args.slug, force=args.force) is None:
+            exit_code = 2
 
     if args.list_brands:
         list_brands()

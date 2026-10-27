@@ -198,10 +198,11 @@ def load_brand_profile(slug: str) -> dict:
             ),
         }
     try:
-        with open(profile_path, "r", encoding="utf-8-sig") as fh:
-            profile = json.load(fh)
+        profile = _common.load_profile(profile_path)
     except json.JSONDecodeError as exc:
         return {"error": f"Invalid JSON in {profile_path}: {exc}"}
+    except (ValueError, OSError) as exc:
+        return {"error": f"{profile_path}: {exc}"}
     return normalize_profile(profile)
 
 

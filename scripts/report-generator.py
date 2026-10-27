@@ -134,7 +134,10 @@ def generate_report(slug, data):
     # Save report
     reports_dir = brand_dir / "reports"
     reports_dir.mkdir(exist_ok=True)
-    report_id = f"{report_type}-{period}"
+    # The period is free text ("2026-W43", "10/2026", "Q3: Jul–Sep"): slug it for the file name.
+    # Before 3.40.0 a slash crashed, a colon wrote an NTFS alternate data stream (an empty file)
+    # and "../../../x" wrote outside reports/. The record keeps the period as given.
+    report_id = f"{report_type}-{_common.safe_slug(str(period), 'period')}"
     report_record = {
         "report_id": report_id,
         "report_type": report_type,
@@ -146,7 +149,7 @@ def generate_report(slug, data):
         "recommendations": recommendations,
         "markdown": markdown,
     }
-    filepath = reports_dir / f"{report_id}.json"
+    filepath = _common.safe_child(reports_dir, report_id, ".json")
     _save_json(filepath, report_record)
 
     return {
@@ -166,7 +169,9 @@ def _load_report_markdown(slug, data=None, report_id=None):
         brand_dir, err = get_brand_dir(slug)
         if err:
             return None, err
-        filepath = brand_dir / "reports" / f"{report_id}.json"
+        filepath, err = _common.child_or_error(brand_dir / "reports", report_id, ".json")
+        if err:
+            return None, err
         report = _load_json(filepath, {})
         if not report:
             return None, f"Report '{report_id}' not found."
@@ -176,7 +181,9 @@ def _load_report_markdown(slug, data=None, report_id=None):
         brand_dir, err = get_brand_dir(slug)
         if err:
             return None, err
-        filepath = brand_dir / "reports" / f"{data['report_id']}.json"
+        filepath, err = _common.child_or_error(brand_dir / "reports", str(data["report_id"]), ".json")
+        if err:
+            return None, err
         report = _load_json(filepath, {})
         if not report:
             return None, f"Report '{data['report_id']}' not found."

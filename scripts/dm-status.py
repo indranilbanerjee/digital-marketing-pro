@@ -81,9 +81,8 @@ def resolve_brand_slug(provided: Optional[str]) -> Optional[str]:
     if not pointer.exists():
         return None
     try:
-        data = json.loads(pointer.read_text(encoding="utf-8-sig"))
-        return data.get("active_slug")
-    except (json.JSONDecodeError, OSError):
+        return _common.read_json(pointer).get("active_slug")
+    except (ValueError, OSError, AttributeError):
         return None
 
 
@@ -103,9 +102,12 @@ def collect_brand_section(brand_slug: str) -> dict[str, Any]:
         return section
 
     try:
-        profile = json.loads(profile_path.read_text(encoding="utf-8-sig"))
+        profile = _common.load_profile(profile_path)
     except json.JSONDecodeError as exc:
         section["error"] = f"profile.json is not valid JSON: {exc}"
+        return section
+    except (ValueError, OSError) as exc:
+        section["error"] = str(exc)
         return section
 
     identity = profile.get("identity", {})
@@ -175,8 +177,8 @@ def collect_engagements_section(brand_slug: str) -> dict[str, Any]:
             })
             continue
         try:
-            state = json.loads(state_path.read_text(encoding="utf-8-sig"))
-        except json.JSONDecodeError:
+            state = _common.read_json(state_path)
+        except (ValueError, OSError):
             section["engagements"].append({
                 "engagement_id": eng_dir.name,
                 "status": "state_unreadable",
@@ -233,8 +235,8 @@ def collect_insights_section(brand_slug: str) -> dict[str, Any]:
         return section
 
     try:
-        data = json.loads(insights_path.read_text(encoding="utf-8-sig"))
-    except json.JSONDecodeError as exc:
+        data = _common.read_json(insights_path)
+    except (ValueError, OSError) as exc:
         section["error"] = f"insights.json is not valid JSON: {exc}"
         return section
 
@@ -286,8 +288,8 @@ def collect_compliance_section(brand_slug: str) -> dict[str, Any]:
         return section
 
     try:
-        data = json.loads(violations_path.read_text(encoding="utf-8-sig"))
-    except json.JSONDecodeError as exc:
+        data = _common.read_json(violations_path)
+    except (ValueError, OSError) as exc:
         section["error"] = f"violations file is not valid JSON: {exc}"
         return section
 

@@ -364,7 +364,7 @@ def _save_to_brand(slug, data, filename):
     growth_dir = brand_dir / "growth"
     growth_dir.mkdir(exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d-%H%M%S")
-    fp = growth_dir / f"{filename}-{ts}.json"
+    fp = growth_dir / f"{filename}-{ts}.json"  # path-safe: filename is the --action argparse choice, ts a timestamp
     fp.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 

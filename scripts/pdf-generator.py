@@ -162,7 +162,7 @@ def generate_report(slug, report_type, title, data):
     markdown, included = _build_markdown(report_type, title, data, theme)
 
     # Save markdown
-    md_path = gen_dir / f"{report_id}.md"
+    md_path = gen_dir / f"{report_id}.md"  # path-safe: report_id is rpt-<--report-type choice>-<timestamp>
     md_path.write_text(markdown, encoding="utf-8")
 
     # Save metadata
@@ -174,7 +174,7 @@ def generate_report(slug, report_type, title, data):
         "generated_at": datetime.now().isoformat(),
         "path": str(md_path),
     }
-    _save_json(gen_dir / f"{report_id}.json", meta)
+    _save_json(gen_dir / f"{report_id}.json", meta)  # path-safe: report_id is rpt-<--report-type choice>-<timestamp>
 
     return meta
 
@@ -275,8 +275,10 @@ def get_report(slug, report_id):
         return {"error": err}
 
     gen_dir = brand_dir / "reports" / "generated"
-    meta_path = gen_dir / f"{report_id}.json"
-    md_path = gen_dir / f"{report_id}.md"
+    meta_path, err = _common.child_or_error(gen_dir, report_id, ".json")
+    if err:
+        return {"error": err}
+    md_path = gen_dir / f"{report_id}.md"  # path-safe: report_id checked by child_or_error just above
 
     if not meta_path.exists():
         return {"error": f"Report '{report_id}' not found."}
@@ -317,7 +319,10 @@ def export_markdown(slug, report_id):
         print(json.dumps({"error": err}))
         return False
 
-    md_path = brand_dir / "reports" / "generated" / f"{report_id}.md"
+    md_path, err = _common.child_or_error(brand_dir / "reports" / "generated", report_id, ".md")
+    if err:
+        print(json.dumps({"error": err}))
+        return False
     if not md_path.exists():
         print(json.dumps({"error": f"Report '{report_id}' not found."}))
         return False

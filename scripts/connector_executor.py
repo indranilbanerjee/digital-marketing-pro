@@ -816,7 +816,7 @@ def _log_execution(action_id: str, brand: str, connector: str,
         "approval_record": deepcopy(approval_record) if approval_record else None,
     }
     try:
-        (executions_dir / f"{exec_id}.json").write_text(json.dumps(entry, indent=2, default=str), encoding="utf-8")
+        (executions_dir / f"{exec_id}.json").write_text(json.dumps(entry, indent=2, default=str), encoding="utf-8")  # path-safe: connector and action ids are registry names (resolve_action), plus a timestamp
     except Exception:
         pass  # logging never breaks the call
 

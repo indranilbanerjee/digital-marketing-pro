@@ -147,7 +147,7 @@ def _archive_copy(brand: str, src: Path) -> str | None:
     # lands in the same workspace the rest of the plugin reads from.
     dest_dir = _common.brand_dir(brand) / "gsc-ai"
     dest_dir.mkdir(parents=True, exist_ok=True)
-    dest = dest_dir / f"{date.today().isoformat()}.csv"
+    dest = dest_dir / f"{date.today().isoformat()}.csv"  # path-safe: today's date
     dest.write_bytes(src.read_bytes())
     return str(dest)
 

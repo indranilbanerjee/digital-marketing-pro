@@ -183,7 +183,9 @@ def save_step(brand: str, run_id: str, step: str, content: str, extension: str =
     label_slug = _slug(label_text, maxlen=25)
     filename = f"part-{step}-{label_slug}.{extension.lstrip('.')}" if preset \
                 else f"step-{step}-{label_slug}.{extension.lstrip('.')}"
-    out = _run_dir(brand, run_id) / filename
+    out, err = _common.child_or_error(_run_dir(brand, run_id), filename)
+    if err:
+        return {"error": f"--extension or step: {err}"}
     out.write_text(content, encoding="utf-8")
 
     if step not in manifest["completed_steps"]:
@@ -243,7 +245,9 @@ def load_step(brand: str, run_id: str, step: str) -> dict:
     fn = manifest.get("step_artifacts", {}).get(step)
     if not fn:
         return {"error": f"step {step} has no checkpoint in run {run_id}"}
-    artifact = _run_dir(brand, run_id) / fn
+    artifact, err = _common.child_or_error(_run_dir(brand, run_id), str(fn))
+    if err:
+        return {"error": f"run manifest: {err}"}
     return {
         "step": step,
         "artifact": str(artifact),

@@ -35,6 +35,12 @@ import io
 import json
 import re
 import sys
+
+for _stream in (sys.stdout, sys.stderr):  # UTF-8 output, even where a Windows pipe defaults to cp1252
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 from pathlib import Path
 
 MAX_BYTES = 10 * 1024 * 1024

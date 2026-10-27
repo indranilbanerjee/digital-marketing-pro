@@ -120,7 +120,7 @@ def audit_visibility(slug, query, platform, result, context, url=None):
         "recorded_at": datetime.now().isoformat(),
     }
 
-    _save_json(audits_dir / f"audit-{ts}.json", audit)
+    _save_json(audits_dir / f"audit-{ts}.json", audit)  # path-safe: a timestamp
     return {"status": "recorded", **audit}
 
 
@@ -254,7 +254,7 @@ def benchmark_competitors(slug, query, your_result, competitors):
         "share_of_voice": sov,
         "recorded_at": datetime.now().isoformat(),
     }
-    _save_json(benchmarks_dir / f"bench-{ts}.json", record)
+    _save_json(benchmarks_dir / f"bench-{ts}.json", record)  # path-safe: a timestamp
 
     return {"status": "recorded", **record}
 
@@ -278,7 +278,7 @@ def track_narrative(slug, platform, query, narrative, alignment):
         "recorded_at": datetime.now().isoformat(),
     }
 
-    _save_json(narratives_dir / f"narr-{ts}.json", record)
+    _save_json(narratives_dir / f"narr-{ts}.json", record)  # path-safe: a timestamp
     return {"status": "recorded", **record}
 
 
@@ -301,7 +301,7 @@ def entity_check(slug, platform, entity_name, status, details):
         "recorded_at": datetime.now().isoformat(),
     }
 
-    _save_json(entities_dir / f"entity-{ts}.json", record)
+    _save_json(entities_dir / f"entity-{ts}.json", record)  # path-safe: a timestamp
     return {"status": "recorded", **record}
 
 

@@ -162,7 +162,7 @@ def prepare_contact(slug, data):
     crm_dir = brand_dir / "crm"
     pending_dir = crm_dir / "pending"
     pending_dir.mkdir(parents=True, exist_ok=True)
-    filepath = pending_dir / f"contact-{local_id}.json"
+    filepath = pending_dir / f"contact-{local_id}.json"  # path-safe: a sha256 hex digest (_generate_local_id)
     _save_json(filepath, payload)
 
     # Update contacts index for dedup
@@ -247,7 +247,7 @@ def prepare_deal(slug, data):
     crm_dir = brand_dir / "crm"
     pending_dir = crm_dir / "pending"
     pending_dir.mkdir(parents=True, exist_ok=True)
-    filepath = pending_dir / f"deal-{deal_id}.json"
+    filepath = pending_dir / f"deal-{deal_id}.json"  # path-safe: a sha256 hex digest
     _save_json(filepath, payload)
 
     return {"status": "prepared", "local_id": deal_id, "path": str(filepath), "payload": payload}
@@ -305,6 +305,9 @@ def log_synced(slug, data):
         return {"error": "Missing required fields: record_type, crm_platform, crm_record_id, local_id"}
     if record_type not in VALID_RECORD_TYPES:
         return {"error": f"Invalid record_type '{record_type}'. Must be one of: {VALID_RECORD_TYPES}"}
+    # local_id names a pending file that is deleted below: it must stay inside crm/pending/.
+    if not _common.is_safe_component(f"contact-{local_id}"):
+        return {"error": f"local_id: unsafe name {local_id!r}: use a plain id without path separators or '..'"}
 
     crm_dir = brand_dir / "crm"
     crm_dir.mkdir(exist_ok=True)
@@ -325,7 +328,7 @@ def log_synced(slug, data):
 
     # Remove from pending if present
     for prefix in ["contact", "deal", "campaign"]:
-        pending_path = crm_dir / "pending" / f"{prefix}-{local_id}.json"
+        pending_path = _common.safe_child(crm_dir / "pending", f"{prefix}-{local_id}", ".json")
         if pending_path.exists():
             pending_path.unlink()
             break

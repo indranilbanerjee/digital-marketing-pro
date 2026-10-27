@@ -201,7 +201,7 @@ def track_mentions(slug, competitor, platform, sentiment, content, url=None):
         "recorded_at": datetime.now().isoformat(),
     }
 
-    _save_json(mentions_dir / f"mention-{ts}.json", mention)
+    _save_json(mentions_dir / f"mention-{ts}.json", mention)  # path-safe: a timestamp
     return {"status": "recorded", **mention}
 
 
@@ -246,7 +246,7 @@ def share_of_voice(slug, data):
         "raw_scores": all_scores,
         "share_of_voice_pct": sov,
     }
-    _save_json(sov_dir / f"sov-{ts}.json", record)
+    _save_json(sov_dir / f"sov-{ts}.json", record)  # path-safe: a timestamp
 
     return {"status": "recorded", **record}
 
@@ -272,7 +272,7 @@ def track_ads(slug, competitor, platform, ad_type, content, url=None):
         "recorded_at": datetime.now().isoformat(),
     }
 
-    _save_json(ads_dir / f"ad-{ts}.json", record)
+    _save_json(ads_dir / f"ad-{ts}.json", record)  # path-safe: a timestamp
     return {"status": "recorded", **record}
 
 
@@ -408,7 +408,7 @@ def win_loss(slug, competitor, outcome, deal_size=None, reason=None, segment=Non
         "recorded_at": datetime.now().isoformat(),
     }
 
-    _save_json(wl_dir / f"wl-{ts}.json", record)
+    _save_json(wl_dir / f"wl-{ts}.json", record)  # path-safe: a timestamp
     return {"status": "recorded", **record}
 
 

@@ -105,7 +105,7 @@ def save_learning(slug, agent, insight, conditions, confidence, evidence):
 
     _, active_dir, _ = _intel_dirs(slug)
     active_dir.mkdir(parents=True, exist_ok=True)
-    _save_json(active_dir / f"{learning_id}.json", record)
+    _save_json(active_dir / f"{learning_id}.json", record)  # path-safe: a sha256 hex digest
 
     return {"status": "saved", "learning_id": learning_id, "confidence": record["confidence"]}
 
@@ -176,7 +176,9 @@ def update_confidence(slug, learning_id, direction, evidence):
         return err
 
     _, active_dir, _ = _intel_dirs(slug)
-    fpath = active_dir / f"{learning_id}.json"
+    fpath, err = _common.child_or_error(active_dir, learning_id, ".json")
+    if err:
+        return {"error": err}
     if not fpath.exists():
         return {"error": f"Learning '{learning_id}' not found."}
 
@@ -314,8 +316,10 @@ def archive_stale(slug, max_age_days, min_confidence):
         conf = l.get("confidence", 0.5)
         if age > max_age_days and conf < min_confidence:
             lid = l["learning_id"]
-            src = active_dir / f"{lid}.json"
-            dst = archived_dir / f"{lid}.json"
+            if not _common.is_safe_component(str(lid)):
+                continue  # a stored id that isn't a plain name is never used as a path
+            src = active_dir / f"{lid}.json"  # path-safe: lid checked by is_safe_component just above
+            dst = archived_dir / f"{lid}.json"  # path-safe: lid checked by is_safe_component just above
             l["archived_at"] = now.isoformat()
             l["archive_reason"] = f"age={age}d, confidence={conf}"
             _save_json(dst, l)
@@ -410,7 +414,10 @@ def apply_time_decay(slug, decay_rate):
 
         if new_conf != old_conf:
             l["confidence"] = new_conf
-            _save_json(active_dir / f"{l['learning_id']}.json", l)
+            target, bad = _common.child_or_error(active_dir, str(l["learning_id"]), ".json")
+            if bad:
+                continue  # a stored id that isn't a plain name is never used as a path
+            _save_json(target, l)
             affected += 1
 
         confs_after.append(new_conf)

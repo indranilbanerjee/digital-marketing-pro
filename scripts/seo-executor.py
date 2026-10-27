@@ -110,7 +110,7 @@ def update_meta(slug, url, title=None, description=None,
         "created_at": datetime.now().isoformat(),
     }
 
-    _save_json(changes_dir / f"{change_id}.json", change)
+    _save_json(changes_dir / f"{change_id}.json", change)  # path-safe: _change_id: a constant prefix and a timestamp
 
     return {
         "status": "recorded",
@@ -156,7 +156,7 @@ def deploy_schema(slug, url, schema_type, schema_data):
         "created_at": datetime.now().isoformat(),
     }
 
-    _save_json(schema_dir / f"{deploy_id}.json", record)
+    _save_json(schema_dir / f"{deploy_id}.json", record)  # path-safe: _change_id: a constant prefix, an argparse choice and a timestamp
 
     return {
         "status": "recorded",
@@ -217,7 +217,7 @@ def create_redirect(slug, source_url, target_url, redirect_type):
         "created_at": datetime.now().isoformat(),
     }
 
-    _save_json(redirects_dir / f"{redirect_id}.json", record)
+    _save_json(redirects_dir / f"{redirect_id}.json", record)  # path-safe: _change_id: a constant prefix and a timestamp
 
     result = {
         "status": "recorded",
@@ -270,7 +270,7 @@ def request_indexing(slug, url):
         "requested_at": datetime.now().isoformat(),
     }
 
-    _save_json(indexing_dir / f"{request_id}.json", record)
+    _save_json(indexing_dir / f"{request_id}.json", record)  # path-safe: _change_id: a constant prefix and a timestamp
     return {"status": "recorded", "request_id": request_id, "url": url}
 
 

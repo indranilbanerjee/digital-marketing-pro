@@ -520,7 +520,7 @@ def log_correction(slug, campaign_id, issue, correction_applied, was_auto, expec
         "timestamp": now.isoformat(),
     }
 
-    fp = cdir / f"{correction_id}.json"
+    fp = cdir / f"{correction_id}.json"  # path-safe: an md5 hex digest
     fp.write_text(json.dumps(correction, indent=2), encoding="utf-8")
 
     return {"status": "logged", "correction_id": correction_id, "path": str(fp)}

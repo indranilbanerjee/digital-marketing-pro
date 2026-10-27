@@ -47,9 +47,11 @@ def save_campaign(slug, data):
     campaigns_dir = brand_dir / "campaigns"
     campaigns_dir.mkdir(exist_ok=True)
 
-    # Generate campaign ID from name
-    name = data.get("name", "untitled")
-    campaign_id = name.lower().replace(" ", "-")[:50]
+    # Campaign ID from the name. The name comes from agent-written JSON, which can carry text
+    # from a web page or a brief, so the id is a slug and the file a checked child of campaigns/
+    # (before 3.40.0, "../../../../x" wrote outside the brand folder).
+    name = str(data.get("name", "untitled"))
+    campaign_id = _common.safe_slug(name, "campaign")[:50].rstrip("-")
     timestamp = datetime.now().strftime("%Y%m%d")
     campaign_id = f"{campaign_id}-{timestamp}"
 
@@ -61,7 +63,7 @@ def save_campaign(slug, data):
     }
 
     # Save campaign file
-    filepath = campaigns_dir / f"{campaign_id}.json"
+    filepath = _common.safe_child(campaigns_dir, campaign_id, ".json")
     filepath.write_text(json.dumps(campaign, indent=2), encoding="utf-8")
 
     # Update campaign index
@@ -122,7 +124,9 @@ def get_campaign(slug, campaign_id):
     if err:
         return {"error": err}
 
-    filepath = brand_dir / "campaigns" / f"{campaign_id}.json"
+    filepath, err = _common.child_or_error(brand_dir / "campaigns", campaign_id, ".json")
+    if err:
+        return {"error": err}
     if not filepath.exists():
         return {"error": f"Campaign '{campaign_id}' not found."}
 
@@ -150,7 +154,9 @@ def save_performance(slug, data):
         **data,
     }
 
-    filepath = perf_dir / f"{campaign_id}-{timestamp}.json"
+    filepath, err = _common.child_or_error(perf_dir, f"{campaign_id}-{timestamp}", ".json")
+    if err:
+        return {"error": f"campaign_id: {err}"}
     filepath.write_text(json.dumps(snapshot, indent=2), encoding="utf-8")
 
     return {"status": "saved", "snapshot_id": snapshot["snapshot_id"], "path": str(filepath)}
@@ -292,7 +298,7 @@ def main():
                                  "save-violation", "get-violations"],
                         help="Action to perform")
     parser.add_argument("--data", help="JSON data (for save actions)")
-    parser.add_argument("--id", help="Campaign ID (for get-campaign)")
+    parser.add_argument("--id", type=_common.path_component, help="Campaign ID (for get-campaign)")
     parser.add_argument("--type", dest="insight_type", help="Filter insights by type")
     parser.add_argument("--category", help="Filter violations by guideline category")
     parser.add_argument("--severity", help="Filter violations by severity (low/medium/high)")

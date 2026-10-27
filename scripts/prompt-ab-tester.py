@@ -90,7 +90,7 @@ def get_tests_dir(slug):
 
 def load_test(tests_dir, test_name):
     """Load a test file by name. Returns (data, error)."""
-    filepath = tests_dir / f"{test_name}.json"
+    filepath = tests_dir / f"{test_name}.json"  # path-safe: slugged by sanitize_test_name in main() before any action runs
     if not filepath.exists():
         return None, f"Test '{test_name}' not found."
     try:
@@ -101,7 +101,7 @@ def load_test(tests_dir, test_name):
 
 def save_test(tests_dir, test_name, data):
     """Save a test file."""
-    filepath = tests_dir / f"{test_name}.json"
+    filepath = tests_dir / f"{test_name}.json"  # path-safe: slugged by sanitize_test_name in main() before any action runs
     filepath.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
@@ -116,7 +116,7 @@ def action_create_test(slug, test_name, data):
         return {"error": err}
 
     # Check if test already exists
-    filepath = tests_dir / f"{test_name}.json"
+    filepath = tests_dir / f"{test_name}.json"  # path-safe: slugged by sanitize_test_name in main() before any action runs
     if filepath.exists():
         return {"error": f"Test '{test_name}' already exists. Choose a different name."}
 

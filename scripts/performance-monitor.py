@@ -114,7 +114,7 @@ def pull_metrics(slug, data):
         "metrics": normalized,
     }
 
-    filepath = perf_dir / f"snapshot-{timestamp}.json"
+    filepath = perf_dir / f"snapshot-{timestamp}.json"  # path-safe: a timestamp
     filepath.write_text(json.dumps(snapshot, indent=2), encoding="utf-8")
     _prune_snapshots(perf_dir)
 
@@ -145,7 +145,7 @@ def save_snapshot(slug, data):
         "metrics": data,
     }
 
-    filepath = perf_dir / f"snapshot-{timestamp}.json"
+    filepath = perf_dir / f"snapshot-{timestamp}.json"  # path-safe: a timestamp
     filepath.write_text(json.dumps(snapshot, indent=2), encoding="utf-8")
     _prune_snapshots(perf_dir)
 

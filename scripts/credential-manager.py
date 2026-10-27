@@ -37,7 +37,7 @@ def _profile_path(brand_slug: str):
     an unsanitised '../../x' brand_slug used to resolve OUTSIDE the credentials
     directory. Returns (path, safe_slug)."""
     safe = _common.slugify_brand(brand_slug)
-    return CREDENTIALS_DIR / f"{safe}.json", safe
+    return CREDENTIALS_DIR / f"{safe}.json", safe  # path-safe: a slugify_brand slug: ASCII letters, digits, hyphens
 
 
 def _now_iso():

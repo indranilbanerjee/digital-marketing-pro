@@ -121,10 +121,12 @@ def is_opted_in(brand_slug: str) -> tuple[bool, str]:
     if not profile_path.exists():
         return False, f"no profile found at {profile_path}"
     try:
-        profile = json.loads(profile_path.read_text(encoding="utf-8-sig"))
+        profile = _common.read_json(profile_path)
     except json.JSONDecodeError as exc:
         return False, f"profile.json is not valid JSON: {exc}"
-    flag = profile.get("auto_save_insights", False)
+    except (ValueError, OSError) as exc:
+        return False, str(exc)
+    flag = profile.get("auto_save_insights", False) if isinstance(profile, dict) else False
     if flag is True:
         return True, "auto_save_insights enabled"
     return False, "auto_save_insights not enabled"

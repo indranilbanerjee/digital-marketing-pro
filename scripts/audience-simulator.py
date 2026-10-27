@@ -99,7 +99,10 @@ def _score_with_profile(base, segment, factor_key, panel_id, variant_idx=0):
 def _load_panel(slug, panel_id):
     """Load a panel by ID. Returns (panel_dict, error_dict_or_None)."""
     pdir = _panels_dir(slug)
-    panel_path = pdir / panel_id / "panel.json"
+    folder, err = _common.child_or_error(pdir, str(panel_id))
+    if err:
+        return None, {"error": err}
+    panel_path = folder / "panel.json"
     panel = _load_json(panel_path)
     if not panel or "segments" not in panel:
         return None, {"error": f"Panel '{panel_id}' not found. Run create-panel first."}
@@ -288,7 +291,7 @@ def focus_group(slug, panel_id, stimulus, questions_str):
 
     # Increment tests_run
     panel["tests_run"] = panel.get("tests_run", 0) + 1
-    _save_json(_panels_dir(slug) / panel_id / "panel.json", panel)
+    _save_json(_common.safe_child(_panels_dir(slug), str(panel_id)) / "panel.json", panel)
 
     return {
         "responses_by_segment": responses_by_segment,
@@ -380,7 +383,7 @@ def test_message(slug, panel_id, variants_str):
 
     # Increment tests_run
     panel["tests_run"] = panel.get("tests_run", 0) + 1
-    _save_json(_panels_dir(slug) / panel_id / "panel.json", panel)
+    _save_json(_common.safe_child(_panels_dir(slug), str(panel_id)) / "panel.json", panel)
 
     return {
         "variant_scores": variant_scores,
@@ -476,7 +479,7 @@ def test_pricing(slug, panel_id, price_points_str, product_description):
 
     # Increment tests_run
     panel["tests_run"] = panel.get("tests_run", 0) + 1
-    _save_json(_panels_dir(slug) / panel_id / "panel.json", panel)
+    _save_json(_common.safe_child(_panels_dir(slug), str(panel_id)) / "panel.json", panel)
 
     return {
         "product_description": product_description,
@@ -594,7 +597,7 @@ def test_positioning(slug, panel_id, statements_str):
 
     # Increment tests_run
     panel["tests_run"] = panel.get("tests_run", 0) + 1
-    _save_json(_panels_dir(slug) / panel_id / "panel.json", panel)
+    _save_json(_common.safe_child(_panels_dir(slug), str(panel_id)) / "panel.json", panel)
 
     return {
         "statement_scores": statement_scores,
@@ -678,7 +681,7 @@ def calibrate(slug, panel_id, test_type, predicted_str, actual_str):
     calibrations = panel.get("calibrations", [])
     calibrations.append(calibration_record)
     panel["calibrations"] = calibrations
-    _save_json(_panels_dir(slug) / panel_id / "panel.json", panel)
+    _save_json(_common.safe_child(_panels_dir(slug), str(panel_id)) / "panel.json", panel)
 
     return {
         "accuracy_score": accuracy,

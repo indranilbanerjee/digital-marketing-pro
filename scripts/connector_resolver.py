@@ -931,7 +931,7 @@ def _execute_arm_watchdog(brand, kwargs):
                  "and re-arm with --alert-channels slack,email.",
     }
 
-    path = watchdog_dir / f"{watchdog_id}.json"
+    path = watchdog_dir / f"{watchdog_id}.json"  # path-safe: a timestamp
     path.write_text(json.dumps(config, indent=2), encoding="utf-8")
 
     return {

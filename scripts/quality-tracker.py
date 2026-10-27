@@ -168,7 +168,7 @@ def action_log_eval(slug, data):
 
     # Save individual eval file
     evals_dir = quality_dir / "evals"
-    filepath = evals_dir / f"{eval_id}.json"
+    filepath = evals_dir / f"{eval_id}.json"  # path-safe: eval-<timestamp>
     filepath.write_text(json.dumps(record, indent=2), encoding="utf-8")
 
     # Update running summary

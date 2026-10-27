@@ -20,6 +20,12 @@ import json
 import math
 import sys
 
+for _stream in (sys.stdout, sys.stderr):  # UTF-8 output, even where a Windows pipe defaults to cp1252
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 
 # ---------------------------------------------------------------------------
 # Statistical helper functions (stdlib only, no scipy)

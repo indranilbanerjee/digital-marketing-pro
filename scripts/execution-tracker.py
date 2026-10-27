@@ -116,7 +116,9 @@ def log_execution(slug, data):
 
     # Save individual execution file (atomically — this is the source of truth
     # the index is rebuilt from).
-    filepath = executions_dir / f"{execution_id}.json"
+    filepath, err = _common.child_or_error(executions_dir, execution_id, ".json")
+    if err:
+        return {"error": f"platform: {err}"}
     _common.atomic_write_json(filepath, execution)
 
     # Update index

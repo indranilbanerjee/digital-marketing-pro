@@ -283,8 +283,9 @@ def trend(brand_slug, segment_name, current_score):
     churn_dir = brand_dir / "churn"
     churn_dir.mkdir(parents=True, exist_ok=True)
 
-    safe_name = segment_name.lower().replace(" ", "-").replace("/", "-")
-    history_path = churn_dir / f"{safe_name}.json"
+    # A slug, so a backslash or ".." in the segment name can't leave churn/ (it could on Windows).
+    safe_name = _common.safe_slug(str(segment_name), "segment")
+    history_path = _common.safe_child(churn_dir, safe_name, ".json")
     history = _load_json(history_path, [])
 
     # Append current score
