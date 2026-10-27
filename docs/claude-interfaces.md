@@ -55,7 +55,7 @@ You: Help me plan a summer campaign
 
 Claude Code v2.1.149 (released May 2026) exposes per-model token usage and projected cost via the `/usage` slash command. For agencies running multi-client workloads, this is the cleanest way to attribute Claude Code consumption to brands:
 
-- **Per-session view**: shows tokens consumed by each model (e.g. Opus 5, Fable 5, Sonnet 5, Haiku 4.5) and any sub-agent runs in the current session — with billed cost in USD if your account has billing enabled.
+- **Per-session view**: shows tokens consumed by each model (e.g. Opus 5.5, Fable 5.1, Sonnet 5.5, Haiku 5.5) and any sub-agent runs in the current session — with billed cost in USD if your account has billing enabled.
 - **Time-window view**: `/usage --since 7d` aggregates the last 7 days. Useful for the weekly agency pulse.
 - **Project / directory scoped**: usage is tracked per working directory, so a brand-per-directory pattern (`~/work/clients/{slug}`) automatically gives you brand-attributable spend without extra tooling.
 

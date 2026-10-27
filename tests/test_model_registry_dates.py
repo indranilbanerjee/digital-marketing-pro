@@ -1,0 +1,179 @@
+"""The model registry's dates and statuses must agree with each other and with today.
+
+The failures this prevents (all found in the 2026-10-04 registry on 2026-10-27):
+  * latest-fast-anthropic pointed at Claude Haiku 4.5 three weeks after Haiku 5.5
+    shipped, with a note saying no Haiku 5.x existed;
+  * gemini-2.5-flash-image was marked "retired 2026-10-02": that was its RELEASE date
+    (its shutdown is 2027-03-15);
+  * Gemini 2.5 was marked deprecated with a 2026-10-16 shutdown the vendor page no
+    longer showed;
+  * veo-3.0 entries fell forward to a preview id that had itself shut down.
+
+Rules (dates are ISO strings; DMP_TODAY=YYYY-MM-DD freezes "today" for planting):
+  1. A `current`/`supported` entry with a `shutdown_date` on or before today is wrong:
+     mark it retired. A `deprecated` entry past its `shutdown_date`: same.
+  2. A `current`/`supported` entry past its `tentative_retirement` ("not sooner than")
+     must carry `retirement_checked` on or after that date and at most RECHECK_DAYS old.
+  3. No alias may point at a deprecated or retired id, or at one whose `shutdown_date`
+     is within SHUTDOWN_WARN_DAYS.
+  4. Every deprecated/retired entry's `replacement_id` exists and is current or supported.
+  5. A retired entry is dropped DROP_AFTER_DAYS after its shutdown date.
+  6. `next_review_due` is not in the past.
+The weekly dated-checks job runs this file.
+"""
+from __future__ import annotations
+
+import json
+import os
+import unittest
+from datetime import date, timedelta
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent.parent
+REGISTRY = REPO / "scripts" / "model_registry.json"
+
+RECHECK_DAYS = 30
+SHUTDOWN_WARN_DAYS = 30
+DROP_AFTER_DAYS = 120
+LIVE = {"current", "supported"}
+
+
+def today() -> date:
+    frozen = os.environ.get("DMP_TODAY")
+    return date.fromisoformat(frozen) if frozen else date.today()
+
+
+def _d(value):
+    return date.fromisoformat(value[:10]) if value else None
+
+
+def registry_problems(reg: dict, on: date) -> list[str]:
+    out = []
+    models = {m["id"]: m for m in reg["models"]}
+    for mid, m in models.items():
+        status = m.get("status", "current")
+        shut, floor, checked = _d(m.get("shutdown_date")), _d(m.get("tentative_retirement")), _d(m.get("retirement_checked"))
+        if status in LIVE | {"deprecated"} and shut and shut <= on:
+            out.append(f"{mid}: {status} but shut down {shut}; mark it retired")
+        if status in LIVE and floor and floor < on:
+            if not checked or checked < floor:
+                out.append(f"{mid}: past its retirement floor {floor} with no retirement_checked on or after it")
+            elif (on - checked).days > RECHECK_DAYS:
+                out.append(f"{mid}: retirement floor {floor} passed; last checked {checked}, over {RECHECK_DAYS} days ago")
+        if status in {"deprecated", "retired"}:
+            rep = m.get("replacement_id")
+            if not rep or rep not in models:
+                out.append(f"{mid}: {status} with replacement {rep!r} missing from the registry")
+            elif models[rep].get("status", "current") not in LIVE:
+                out.append(f"{mid}: falls forward to {rep}, which is {models[rep].get('status')}")
+        if status == "retired" and shut and (on - shut).days > DROP_AFTER_DAYS:
+            out.append(f"{mid}: retired {shut}, over {DROP_AFTER_DAYS} days ago; drop it")
+    for alias, target in reg.get("aliases", {}).items():
+        m = models.get(target)
+        if m is None:
+            out.append(f"alias {alias}: target {target} missing")
+            continue
+        if m.get("status", "current") not in LIVE:
+            out.append(f"alias {alias}: points at {target}, which is {m.get('status')}")
+        shut = _d(m.get("shutdown_date"))
+        if shut and shut - on <= timedelta(days=SHUTDOWN_WARN_DAYS):
+            out.append(f"alias {alias}: {target} shuts down {shut}; repoint it")
+    due = _d(reg.get("next_review_due"))
+    if not due or due < on:
+        out.append(f"next_review_due {reg.get('next_review_due')!r} has passed; review the registry")
+    return out
+
+
+class TestRegistryDates(unittest.TestCase):
+
+    def test_registry_is_consistent_today(self):
+        reg = json.loads(REGISTRY.read_text(encoding="utf-8"))
+        problems = registry_problems(reg, today())
+        self.assertEqual(problems, [], "\n  " + "\n  ".join(problems))
+
+    def test_plants_from_the_2026_10_04_registry(self):
+        old = {
+            "next_review_due": "2026-11-01",
+            "aliases": {"latest-fast-anthropic": "claude-haiku-4-5-20251001",
+                        "latest-image-balanced-google": "gemini-3.1-flash-image"},
+            "models": [
+                # Haiku 4.5: floor passed, nobody re-checked
+                {"id": "claude-haiku-4-5-20251001", "status": "current", "tentative_retirement": "2026-10-15"},
+                # Nano Banana 2 deprecated on 2026-10-06 but still the alias target
+                {"id": "gemini-3.1-flash-image", "status": "deprecated", "replacement_id": "gemini-nano-banana-2.1"},
+                {"id": "gemini-nano-banana-2.1", "status": "current"},
+                # veo-3.0 falling forward to a retired preview
+                {"id": "veo-3.1-generate-preview", "status": "retired", "shutdown_date": "2026-10-22",
+                 "replacement_id": "veo-3.1-generate-001"},
+                {"id": "veo-3.1-generate-001", "status": "current"},
+                {"id": "veo-3.0-generate-001", "status": "retired", "shutdown_date": "2026-06-30",
+                 "replacement_id": "veo-3.1-generate-preview"},
+                # deprecated with a shutdown that passed
+                {"id": "gemini-2.5-flash", "status": "deprecated", "shutdown_date": "2026-10-16",
+                 "replacement_id": "gemini-nano-banana-2.1"},
+            ],
+        }
+        problems = registry_problems(old, date(2026, 11, 20))
+        joined = "\n".join(problems)
+        for expected in ("claude-haiku-4-5-20251001: past its retirement floor",
+                         "alias latest-image-balanced-google: points at gemini-3.1-flash-image",
+                         "veo-3.0-generate-001: falls forward to veo-3.1-generate-preview",
+                         "gemini-2.5-flash: deprecated but shut down",
+                         "veo-3.0-generate-001: retired 2026-06-30, over",
+                         "next_review_due"):
+            self.assertIn(expected, joined)
+
+    def test_recheck_and_shutdown_windows(self):
+        reg = {"next_review_due": "2027-01-01", "aliases": {"a": "x"},
+               "models": [{"id": "x", "status": "current", "shutdown_date": "2026-11-20"},
+                          {"id": "y", "status": "supported", "tentative_retirement": "2026-10-15",
+                           "retirement_checked": "2026-10-27"}]}
+        self.assertEqual(registry_problems(reg, date(2026, 10, 1)), [])
+        late = "\n".join(registry_problems(reg, date(2026, 11, 30)))
+        self.assertIn("alias a: x shuts down", late)
+        self.assertIn("y: retirement floor 2026-10-15 passed; last checked 2026-10-27", late)
+
+
+class TestCuratorDocMatchesRegistry(unittest.TestCase):
+    """docs/MODEL-CURATOR.md's alias table said Haiku 4.5, Gemini 3 Pro and "Veo 3.1 preview"
+    for three months after the registry moved on. It must name each alias's live target."""
+
+    ROW = __import__("re").compile(r"^\| `([a-z0-9.-]+)` \| `([^`]+)`")
+
+    def doc_aliases(self, text: str) -> dict:
+        return {m.group(1): m.group(2) for line in text.splitlines() if (m := self.ROW.match(line))}
+
+    def test_alias_table_matches_registry(self):
+        reg = json.loads(REGISTRY.read_text(encoding="utf-8"))
+        doc = self.doc_aliases((REPO / "docs" / "MODEL-CURATOR.md").read_text(encoding="utf-8"))
+        self.assertEqual(doc, reg["aliases"])
+
+    def test_drift_is_caught(self):
+        stale = "| `latest-fast-anthropic` | `claude-haiku-4-5-20251001` (Claude Haiku 4.5) |\n"
+        self.assertNotEqual(self.doc_aliases(stale)["latest-fast-anthropic"], "claude-haiku-5-5")
+
+
+class TestCheckParamsScope(unittest.TestCase):
+    """API version 2026-10-21 rejects temperature/top_p/top_k on every Anthropic model."""
+
+    def test_scan_flags_any_claude_target(self):
+        import subprocess
+        import sys
+        import tempfile
+        code = 'c.messages.create(model="claude-haiku-5-5", max_tokens=10, temperature=0.2)\n'
+        with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False, encoding="utf-8") as f:
+            f.write(code)
+        try:
+            proc = subprocess.run([sys.executable, str(REPO / "scripts" / "resolve_model.py"),
+                                   "--check-params", f.name, "--json"],
+                                  capture_output=True, text=True, timeout=60)
+        finally:
+            os.unlink(f.name)
+        self.assertEqual(proc.returncode, 1, proc.stdout + proc.stderr)
+        payload = json.loads(proc.stdout)
+        self.assertTrue(payload["targets_anthropic"])
+        self.assertEqual(payload["findings"][0]["param"], "temperature")
+
+
+if __name__ == "__main__":
+    unittest.main()

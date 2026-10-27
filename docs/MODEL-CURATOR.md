@@ -45,41 +45,43 @@ python scripts/resolve_model.py --list --vendor anthropic --status current
 
 ## Aliases (the public API for "give me the latest X")
 
-| Alias | What it resolves to today (July 12, 2026) |
+| Alias | Resolves to (registry, 2026-10-27) |
 |---|---|
-| `latest-text-anthropic` | Claude Opus 5 (Anthropic's current recommendation; Fable 5 = `claude-fable-5` for the highest-capability tier) |
-| `latest-balanced-anthropic` | Claude Sonnet 4.6 |
-| `latest-fast-anthropic` | Claude Haiku 4.5 |
-| `latest-text-openai` | GPT-5.6 Sol (flagship of the Sol/Terra/Luna family, GA July 9 2026; GPT-5.5 still available) |
-| `latest-balanced-openai` | GPT-5.4 mini |
-| `latest-fast-openai` | GPT-5.4 nano |
-| `latest-image-openai` | GPT Image 2 |
-| `latest-text-google` | Gemini 3 Pro |
-| `latest-balanced-google` | Gemini 3.5 Flash (GA May 19 2026) |
-| `latest-vision-google` | Gemini 3.5 Flash |
-| `latest-multimodal-google` | Gemini Omni |
-| `latest-image-google` | Nano Banana Pro (gemini-3-pro-image — GA May 28 2026; preview retired June 25) |
-| `latest-image-balanced-google` | Nano Banana 2 (gemini-3.1-flash-image — GA May 28; supersedes gemini-2.5-flash-image) |
-| `latest-image-edit-google` | Nano Banana Pro (for higher-fidelity edits) |
-| `latest-image-photoreal-google` | Nano Banana Pro (Imagen 4 was deprecated June 15 2026 — migrated to gemini-3-pro-image) |
-| `latest-video-google` | Veo 3.1 preview (replacement for Veo 2.0/3.0/3.0-Fast, all retired June 30 2026) |
-| `latest-video-wavespeed` | Kling v3.0 Pro |
-| `latest-image-character-higgsfield` | Higgsfield Soul v2 |
-| `latest-text-evolink` | GPT-5.2 (via Evolink) |
-| `latest-balanced-evolink` | DeepSeek Chat (via Evolink) |
-| `latest-fast-evolink` | DeepSeek V4 Flash (via Evolink) |
+| `latest-text-anthropic` | `claude-opus-5-5` (Claude Opus 5.5) |
+| `latest-balanced-anthropic` | `claude-sonnet-5-5` (Claude Sonnet 5.5) |
+| `latest-fast-anthropic` | `claude-haiku-5-5` (Claude Haiku 5.5) |
+| `latest-text-openai` | `gpt-6-astra` (GPT-6 Astra) |
+| `latest-balanced-openai` | `gpt-6.1-sol` (GPT-6.1 Sol) |
+| `latest-fast-openai` | `gpt-6-luna` (GPT-6 Luna) |
+| `latest-image-openai` | `gpt-image-2.5-sunburst` (GPT Image 2.5 Sunburst) |
+| `latest-text-google` | `gemini-4-argon` (Gemini 4 Argon) |
+| `latest-balanced-google` | `gemini-3.8-flash` (Gemini 3.8 Flash) |
+| `latest-fast-google` | `gemini-3.5-flash-lite` (Gemini 3.5 Flash-Lite) |
+| `latest-vision-google` | `gemini-3.8-flash` (Gemini 3.8 Flash) |
+| `latest-multimodal-google` | `gemini-omni-1.1-flash` (Gemini Omni Flash 1.1) |
+| `latest-image-google` | `gemini-3-pro-image` (Nano Banana Pro (Gemini 3 Pro Image)) |
+| `latest-image-balanced-google` | `gemini-nano-banana-2.1` (Nano Banana 2.1) |
+| `latest-image-edit-google` | `gemini-3-pro-image` (Nano Banana Pro (Gemini 3 Pro Image)) |
+| `latest-image-photoreal-google` | `gemini-3-pro-image` (Nano Banana Pro (Gemini 3 Pro Image)) |
+| `latest-video-google` | `veo-3.1-generate-001` (Veo 3.1) |
+| `latest-video-gemini-api` | `gemini-omni-1.1-flash` (Gemini Omni Flash 1.1) |
+| `latest-video-wavespeed` | `kwaivgi/kling-v3.0-pro/image-to-video` (Kling v3.0 Pro (image-to-video)) |
+| `latest-image-character-higgsfield` | `higgsfield-soul-v2` (Higgsfield Soul v2) |
+| `latest-text-evolink` | `gpt-5.2` (GPT-5.2) |
+| `latest-balanced-evolink` | `deepseek-chat` (DeepSeek Chat (V3)) |
+| `latest-fast-evolink` | `deepseek-v4-flash` (DeepSeek V4 Flash) |
+
+This table is generated from `scripts/model_registry.json`; `tests/test_model_registry_dates.py` fails if it drifts. `latest-video-google` is Veo 3.1 on **Vertex AI only**; the Gemini API's video model is `latest-video-gemini-api` (Gemini Omni, a different call shape: see `param_compatibility_notes.veo_backend`).
 
 Run `python scripts/resolve_model.py --aliases` to list the live mappings.
 
 ---
 
-## ⚠ Parameter compatibility — Claude Opus 4.7 and later (incl. the Claude 5 family)
+## ⚠ Parameter compatibility — every Anthropic model (API version 2026-10-21)
 
-**Claude Opus 4.7/4.8 and the Claude 5 family (Fable 5, Opus 5, Sonnet 5) reject `temperature`, `top_p`, and `top_k` with HTTP 400** when set to a non-default value. The Anthropic SDK still accepts these parameters in request types (for type-check compatibility), but the runtime returns a 400.
+**From Anthropic API version 2026-10-21, `temperature`, `top_p` and `top_k` are removed for every model:** a request that sends any of them returns HTTP 400, even at the default value. On the older 2023-06-01 version, Claude 4.7 and later (Opus 4.7, 4.8, 5, 5.5, Sonnet 5, 5.5, Fable 5, 5.1, Haiku 5.5) already reject a non-default value.
 
-If your script calls these models via the SDK, **omit** these parameters entirely — let the system default apply. Use prompting (and on Claude 5, the `effort` parameter) to guide model behavior instead.
-
-Plugins call current Anthropic models via `resolve_model("latest-text-anthropic")` (now → **Claude Opus 5**); the resolver's `--strict` mode warns when an active script also sets `temperature` / `top_p` / `top_k`. Run `python scripts/resolve_model.py --check-params script.py` to scan a file for unsafe param use before shipping.
+Omit all three on every Anthropic call; use prompting (and on Claude 5, the `effort` parameter) to guide behaviour. Plugins call current Anthropic models through aliases such as `resolve_model("latest-text-anthropic")`. Run `python scripts/resolve_model.py --check-params script.py` to scan a file: it flags `temperature` / `top_p` / `top_k` anywhere in a file that names a Claude model id or a `latest-*-anthropic` alias.
 
 **Claude Fable 5 refusal handling:** Fable 5's safety classifiers can decline a request with `stop_reason: "refusal"` returned as a **successful HTTP 200** — not an error. Handle it explicitly: pass the server-side `fallbacks` parameter (or retry client-side on another Claude model, e.g. `claude-opus-5`); refused requests aren't billed, and fallback credit refunds the prompt-cache cost of switching.
 

@@ -45,10 +45,16 @@ class TestAliasResolution(unittest.TestCase):
 
 
 class TestDeprecationCheck(unittest.TestCase):
-    # Tests use `gemini-2.5-flash` as the canonical *deprecated-but-not-yet-retired*
-    # model in the registry (shutdown 2026-10-16). After Oct 16 it'll need updating
-    # to whatever is the next deprecated-not-retired entry.
-    DEPRECATED_FIXTURE = "gemini-2.5-flash"
+    # Fixtures come from the live registry, so a refresh never strands them (the old
+    # hard-coded gemini-2.5-flash stopped being deprecated on 2026-10-27).
+    @classmethod
+    def setUpClass(cls):
+        models = resolve_model.get_registry()["models"]
+        cls.DEPRECATED_FIXTURE = next(m["id"] for m in models
+                                      if m.get("status") == "deprecated" and m.get("replacement_id"))
+        cls.RETIRED_FIXTURE = next(m["id"] for m in models
+                                   if m.get("status") == "retired" and m.get("replacement_id"))
+        cls.CURRENT_FIXTURE = resolve_model.get_registry()["aliases"]["latest-text-anthropic"]
 
     def test_deprecated_returns_replacement(self):
         result = resolve_model.resolve(self.DEPRECATED_FIXTURE)
@@ -66,7 +72,7 @@ class TestDeprecationCheck(unittest.TestCase):
         self.assertIsNotNone(replacement)
 
     def test_check_current(self):
-        status, _ = resolve_model.check("claude-opus-4-7")
+        status, _ = resolve_model.check(self.CURRENT_FIXTURE)
         self.assertEqual(status, "current")
 
     def test_check_unknown(self):
@@ -76,12 +82,11 @@ class TestDeprecationCheck(unittest.TestCase):
 
     def test_retired_falls_forward_unconditionally(self):
         # Retired models no longer respond at the API — resolver MUST rewrite
-        # them regardless of allow_deprecated flag. Use gemini-2.0-flash
-        # (retired 2026-06-01).
-        result_default = resolve_model.resolve("gemini-2.0-flash")
-        result_allow = resolve_model.resolve("gemini-2.0-flash", allow_deprecated=True)
-        self.assertNotEqual(result_default, "gemini-2.0-flash")
-        self.assertNotEqual(result_allow, "gemini-2.0-flash",
+        # them regardless of allow_deprecated flag.
+        result_default = resolve_model.resolve(self.RETIRED_FIXTURE)
+        result_allow = resolve_model.resolve(self.RETIRED_FIXTURE, allow_deprecated=True)
+        self.assertNotEqual(result_default, self.RETIRED_FIXTURE)
+        self.assertNotEqual(result_allow, self.RETIRED_FIXTURE,
                             "retired models must fall forward even with allow_deprecated=True")
 
 

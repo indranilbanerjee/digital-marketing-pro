@@ -5,9 +5,9 @@
   "fallbackModel": [
     "claude-sonnet-5-5",
     "claude-sonnet-5",
-    "claude-haiku-4-5"
+    "claude-haiku-5-5"
   ],
-  "_fallback_model_ids_verified": "2026-10-04 against platform.claude.com/docs/en/docs/about-claude/models/overview. Model ids age: re-check that page (or run scripts/refresh_models.py) before relying on this list — claude-haiku-4-5 retires 'not sooner than 2026-10-15'.",
+  "_fallback_model_ids_verified": "2026-10-27 against platform.claude.com/docs/en/models/overview (Claude Haiku 5.5 released 2026-10-07). Model ids age: re-check that page (or run scripts/refresh_models.py) before relying on this list.",
 
   "_required_min_version_comment": "Optional managed setting (v2.1.163). Claude Code refuses to START if its version is outside the range you set here. A plugin cannot declare this for itself (plugin.json has no such field), so this is the only way to enforce a floor — use it if your team standardises on a minimum.",
 
