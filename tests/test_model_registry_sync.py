@@ -80,8 +80,10 @@ class TestDmpRegistryShape(unittest.TestCase):
 
 
 SIBLING_REGISTRIES = {
-    name: Path(__file__).resolve().parent.parent.parent / name / "scripts" / "model_registry.json"
-    for name in ("contentforge", "socialforge")
+    name: Path(__file__).resolve().parent.parent.parent / folder / rel
+    for name, folder, rel in (("contentforge", "contentforge", "scripts/model_registry.json"),
+                              ("socialforge", "socialforge", "scripts/model_registry.json"),
+                              ("cutforge", "CutForge", "engine/template/tools/model_registry.json"))
 }
 
 
@@ -248,6 +250,30 @@ class TestRegistryMirror(unittest.TestCase):
         canon = dict(self.canon, aliases=dict(self.canon["aliases"], **{"latest-x": "gpt-5.2"}))
         with self.assertRaisesRegex(ValueError, "alias latest-x -> gpt-5.2"):
             registry_mirror.mirror(canon)
+
+    def test_cutforge_copy_is_created_by_its_first_sync(self):
+        shutil.rmtree(self.tmp / "cutforge")
+        tools = self.tmp / "CutForge" / "engine" / "template" / "tools"
+        tools.mkdir(parents=True)
+        code, out = self.run_mirror("--check")
+        self.assertEqual(code, 1, out)
+        self.assertIn("DRIFT cutforge: no registry copy yet", out)
+        self.assertFalse((tools / "model_registry.json").exists())
+        code, out = self.run_mirror()
+        self.assertEqual(code, 0, out)
+        self.assertIn("SYNC  cutforge created", out)
+        self.assertEqual((tools / "model_registry.json").read_text(encoding="utf-8"),
+                         registry_mirror.render(registry_mirror.mirror(self.canon)))
+        code, out = self.run_mirror("--check")
+        self.assertEqual(code, 0, out)
+        self.assertIn("OK    cutforge", out)
+
+    def test_a_cutforge_checkout_without_the_template_folder_is_skipped(self):
+        shutil.rmtree(self.tmp / "cutforge")
+        (self.tmp / "CutForge").mkdir()
+        code, out = self.run_mirror("--check")
+        self.assertEqual(code, 0, out)
+        self.assertIn("SKIP  cutforge (no registry at", out)
 
     def test_missing_sibling_is_skipped(self):
         shutil.rmtree(self.tmp / "socialforge")

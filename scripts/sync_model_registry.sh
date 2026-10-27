@@ -2,7 +2,9 @@
 # sync_model_registry.sh
 # ======================
 # Distributes the canonical Neelverse Marketing Suite model registry from this
-# repo (Digital Marketing Pro) to the sibling plugin repos checked out next to it.
+# repo (Digital Marketing Pro) to the sibling plugin repos checked out next to it
+# (ContentForge, SocialForge, and CutForge's engine/template/tools/ folder, whose first
+# sync creates the copy).
 #
 # Each sibling's copy is a MIRROR: the canonical scripts/model_registry.json minus
 # the DMP-only model families and aliases (DMP_ONLY_MODELS / DMP_ONLY_ALIASES in

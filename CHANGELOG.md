@@ -55,6 +55,12 @@ Both adapters were built fixtures first: the planted cases were written as faili
 - Behaviour change: `--anthropic-model` or `--openai-model` with a deprecated id used to be silently replaced by its registry successor. It is now kept with a warning, because the provider still serves it. A retired id is refused (exit 2).
 - **Natural experiment.** Claude Sonnet 4.5 retires 2026-11-30. With no model named, the checker keeps working with no registry edit. A run that names Sonnet 4.5 warns until that day, then stops with the replacement in the message.
 
+**Changed: the registry mirror reaches CutForge**
+
+- `scripts/sync_model_registry.sh` (through `scripts/registry_mirror.py`) now also mirrors the registry into CutForge, at `engine/template/tools/model_registry.json`. CutForge has no `scripts/` folder; `engine/template/` is what each new project copies, so the registry travels with every project, next to its resolver.
+- CutForge has no copy yet, so its first sync creates one, provided its `engine/template/tools/` folder exists. `--check` reports the missing copy as drift.
+- Folder names are tried in both spellings (`CutForge`/`cutforge`, `ContentForge`/`contentforge`, `SocialForge`/`socialforge`), because a case-sensitive disk matches only one.
+
 **Fixed**
 
 - `docs/MODEL-CURATOR.md`:
@@ -87,7 +93,7 @@ Both adapters were built fixtures first: the planted cases were written as faili
 - `tests/test_model_registry_dates.py` (weekly dated job):
   - the curator doc's examples must match the registry, or the hint book's record for OpenAI;
   - the deprecations record fails after 45 days.
-- Suite: 825 tests, also run on Python 3.10.18 (no NLTK).
+- Suite: 827 tests, also run on Python 3.10.18 (no NLTK).
 - **Unverified:** whether Anthropic's list returns `lifecycle` and `line` under `anthropic-version: 2023-06-01`, the version the pinned SDK sends (the docs example uses 2026-10-21). If not, the router uses the registry default and says so. The first real run with a key will show which.
 
 ## [3.37.2] - 2026-10-27

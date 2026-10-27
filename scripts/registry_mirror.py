@@ -38,11 +38,23 @@ DMP_ONLY_ALIASES = frozenset({
     "latest-balanced-evolink", "latest-fast-evolink", "latest-text-evolink",
 })
 
-# Sibling repo folder -> its registry copy, relative to the folder.
+# Sibling -> its registry copy, relative to the sibling's repo folder.
 SIBLINGS = {
     "contentforge": "scripts/model_registry.json",
     "socialforge": "scripts/model_registry.json",
+    # CutForge has no scripts/ folder: engine/template/ is what each new project copies, so the
+    # registry travels with every project next to the resolver that reads it.
+    "cutforge": "engine/template/tools/model_registry.json",
 }
+# Folder spellings to try, in order (working copies are capitalised on some machines, and a
+# case-sensitive disk will not match the other spelling).
+FOLDERS = {
+    "contentforge": ("contentforge", "ContentForge"),
+    "socialforge": ("socialforge", "SocialForge"),
+    "cutforge": ("CutForge", "cutforge"),
+}
+# Siblings whose first sync creates the copy (its folder must already exist).
+CREATE_IF_MISSING = frozenset({"cutforge"})
 
 
 def mirror(canonical: dict, sibling: dict | None = None) -> dict:
@@ -105,8 +117,20 @@ def main(argv: list[str] | None = None) -> int:
     canonical = json.loads(CANONICAL.read_text(encoding="utf-8-sig"))
     status = 0
     for name, rel in SIBLINGS.items():
-        dest = args.parent / name / rel
+        folder = next((args.parent / f for f in FOLDERS.get(name, (name,)) if (args.parent / f).is_dir()), None)
+        if folder is None:
+            print(f"SKIP  {name} (not checked out under {args.parent})")
+            continue
+        dest = folder / rel
         if not dest.is_file():
+            if name in CREATE_IF_MISSING and dest.parent.is_dir():
+                if args.check:
+                    print(f"DRIFT {name}: no registry copy yet at {dest} (a sync creates it)")
+                    status = 1
+                else:
+                    dest.write_text(render(mirror(canonical)), encoding="utf-8", newline="")
+                    print(f"SYNC  {name} created {dest} as the canonical mirror")
+                continue
             print(f"SKIP  {name} (no registry at {dest})")
             continue
         text = dest.read_text(encoding="utf-8-sig")
