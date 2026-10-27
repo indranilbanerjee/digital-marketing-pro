@@ -138,7 +138,7 @@ Sources: [Claude model deprecations — API parameter deprecations](https://plat
 
 **API compatibility:** OpenAI-compatible (`https://direct.evolink.ai/v1/chat/completions`). Set `EVOLINK_API_KEY` in your environment. Models from other vendors (GPT-5, Claude, Gemini) already tracked under `openai`/`anthropic`/`google` are also proxied by Evolink — use the existing vendor entries and configure the Evolink endpoint as the base URL for those SDKs.
 
-**Keeping the registry fresh:** `refresh_models.py` calls Evolink's `GET /v1/models` when `EVOLINK_API_KEY` is set.
+**Keeping the registry fresh:** `refresh_models.py` calls Evolink's `GET /v1/models` when `EVOLINK_API_KEY` is set. Evolink's docs don't describe that endpoint; it answers in OpenAI's shape, so the script reads one page, or follows `has_more`/`last_id` if it ever sends them.
 
 ```bash
 # See all Evolink-curated models
@@ -168,6 +168,8 @@ ANTHROPIC_API_KEY=... OPENAI_API_KEY=... GEMINI_API_KEY=... EVOLINK_API_KEY=... 
 # After a manual curation pass, bump the timestamp
 python scripts/refresh_models.py --bump-timestamp
 ```
+
+The drift report reads every page of each list (Anthropic's default page is 20 models, Google's 50) with the model router's own readers. Each key goes only in its provider's header, never in a URL, and a refused call is reported by its HTTP status alone, never with the provider's error message, which can echo part of the key. Before 3.39.0 the Gemini call put the key in the URL, and a model on page two of a list was reported STALE.
 
 The drift report shows:
 - **NEW** — model ids the provider lists that are not in your registry (triage and add).

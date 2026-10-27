@@ -9,7 +9,7 @@ Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Ac
 [![Version](https://img.shields.io/badge/version-3.39.0-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=yellow)](https://github.com/indranilbanerjee/digital-marketing-pro/stargazers)
-[![Tests](https://img.shields.io/badge/tests-860%2F860%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-868%2F868%20passing-brightgreen.svg)](tests/)
 [![Platforms](https://img.shields.io/badge/platforms-9%20native%20%2B%2035%20Agent%20Skills-success.svg)](#works-on-40-agent-harnesses-via-the-agent-skills-open-standard)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Article%2050%20ready-darkred.svg)](skills/context-engine/compliance-rules.md)
 
@@ -204,7 +204,7 @@ Other marketing plugins exist, including Anthropic's own marketing plugin and co
 | AEO / GEO | **A 6-platform audit, including Google AI Mode** |
 | Where it runs | **9 native hosts**: Claude Code, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes, OpenClaw, Grok |
 | Live-write safety | **Single-use approval record for writes it sends itself; MCP writes: typed yes + host prompt** |
-| Tests | **860 stdlib unittest** tests |
+| Tests | **868 stdlib unittest** tests |
 | License | **MIT: no telemetry, no seats** |
 
 ---
@@ -415,7 +415,7 @@ If you run into a platform-specific install snag, file a [GitHub issue](https://
 
 ### v3.39.0 — the model router reaches Google (October 27, 2026)
 
-The model router can now pick Google models the same way it picks Anthropic and OpenAI ones: from the list of models your key can use, by job, never by name. Google's list gives no retirement or release dates, so the router reads them from Google's deprecations page, recorded with the date it was read. That page gives the earliest possible shutdown dates and marks the models already switched off, and the router follows both. It never picks a model whose requests Google now sends to a different model. Your Google key goes only in a request header, never in a web address where logs would keep it. No DMP feature uses Google yet; the router ships here as the master copy that [SocialForge](https://github.com/indranilbanerjee/socialforge) uses for its photo indexing. One fix for all providers: when a retiring model's replacement comes from a vendor's deprecations page, the warning now says so instead of calling it the router's choice. The two can differ. 860 tests.
+The model router can now pick Google models the same way it picks Anthropic and OpenAI ones: from the list of models your key can use, by job, never by name. Google's list gives no retirement or release dates, so the router reads them from Google's deprecations page, recorded with the date it was read. That page gives the earliest possible shutdown dates and marks the models already switched off, and the router follows both. It never picks a model whose requests Google now sends to a different model. Your Google key goes only in a request header, never in a web address where logs would keep it. No DMP feature uses Google yet; the router ships here as the master copy that [SocialForge](https://github.com/indranilbanerjee/socialforge) uses for its photo indexing. One fix for all providers: when a retiring model's replacement comes from a vendor's deprecations page, the warning now says so instead of calling it the router's choice. The two can differ. The registry's drift report now also keeps the Google key out of web addresses and reads every page of each provider's list; it used to stop at the first page and wrongly flag models listed further on. 868 tests.
 
 ### v3.38.2 — deprecation checks offline too; public files point only at what a reader can open (October 27, 2026)
 
@@ -618,7 +618,7 @@ Frontier models change every ~6 weeks. Hardcoding `claude-sonnet-4-5-20250929` o
 
 - **`scripts/model_registry.json`** — single source of truth for every model id used by the plugin, with vendor, tier, modality, status, and `replacement_id` for deprecated entries.
 - **`scripts/resolve_model.py`** — Python module + CLI. Resolves human aliases (`latest-balanced-anthropic`, `latest-fast-anthropic`, `latest-text-openai`, `latest-vision-google`, `latest-image-google`, `latest-video-google`) to concrete ids at call time. Deprecated ids passed via `--model` auto-fall-forward to their replacement (with a stderr warning).
-- **`scripts/refresh_models.py`** — polls Anthropic / OpenAI / Google / Evolink list endpoints with your API keys and reports drift versus the registry (NEW models in the provider catalog, STALE models in the registry).
+- **`scripts/refresh_models.py`** — polls Anthropic / OpenAI / Google / Evolink list endpoints with your API keys (every page; each key only in its provider's request header) and reports drift versus the registry (NEW models in the provider catalog, STALE models in the registry).
 - **Speech kinds are pins with an expiry.** `latest-tts-*` and `latest-stt-*` (OpenAI, ElevenLabs, Sarvam) can't be discovered, because no list endpoint tells a speech model from a chat model. Each entry carries `pinned_on` and `pin_expires`, and the weekly dated check fails once a pin expires.
 - **`scripts/sync_model_registry.sh`** — copies the registry into the sibling plugins as a mirror: the canonical file minus the marketing-only model families. `--check` reports entries a copy is missing and entries upstream has dropped.
 - **`scripts/model_router.py`** (first job: both legs of `scripts/ai-visibility-checker.py`) — picks the model from the provider's own live list instead of the registry: the newest current, generally available model in the job's line (Anthropic) or family (OpenAI, Google) from `scripts/model_hints.json`, at least 14 days old. A model asked for by name is kept if current, kept with a warning if deprecated, and refused if retired. One list call per provider per 7 days per key name; `MODEL_ROUTER_OFFLINE=1` uses the registry aliases instead. The Google adapter has no DMP job yet; [docs/MODEL-CURATOR.md](docs/MODEL-CURATOR.md) explains why it ships here.
@@ -800,7 +800,7 @@ Use the direct repo form: `grok plugin install indranilbanerjee/digital-marketin
 ### General (any platform)
 
 **"Tests in `tests/` fail when I `git clone` locally"**
-Run `python tests/run_all.py` from the repo root. All 860 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+; `scripts/setup.py` recommends 3.11 or newer, and the floor moves to 3.11 once Claude's Cowork environment does) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
+Run `python tests/run_all.py` from the repo root. All 868 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+; `scripts/setup.py` recommends 3.11 or newer, and the floor moves to 3.11 once Claude's Cowork environment does) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
 
 **"`/digital-marketing-pro:doctor` shows my action as stub_unconfigured"**
 That action needs an MCP connector configured. Run `python scripts/connector-status.py --action setup-guide --name <connector-name>` for the exact setup snippet. Add it to your `.mcp.json` under `mcpServers`, restart your agent, and the action becomes `manifest_ready`. See [Connector-aware action resolver](#connector-aware-action-resolver) for the full readiness model.

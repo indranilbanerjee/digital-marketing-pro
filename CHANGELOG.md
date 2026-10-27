@@ -30,6 +30,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 - The warning now says "openai's deprecations page names X as its replacement", and a retired model's refusal says the same. Anthropic's warnings name the router's own pick, so they are unchanged.
 - The worked example in `docs/MODEL-CURATOR.md` used the old wording. A new test regenerates both examples from the real hint book and requires the doc to quote them word for word.
 
+**Fixed: the drift report kept the Gemini key out of the URL and reads every page**
+
+- `scripts/refresh_models.py` built the Gemini call as `.../v1beta/models?key=<key>`, so the key sat in a URL, where proxies and server logs keep it. It now goes only in the `x-goog-api-key` header.
+- Every list was read to its first page only. Anthropic's default page is 20 models and Google's is 50, so a model on page two was reported STALE ("in registry, not in provider list"), or never reported NEW. Anthropic is now read by `has_more`/`last_id` and Google by `nextPageToken`, using the model router's own readers; `scripts/model_router.py` itself is unchanged. OpenAI's list is one page. Evolink's docs don't describe its endpoint, so it is read one page at a time, following `has_more`/`last_id` if it ever sends them.
+- A refused call used to say only "no API key or fetch failed". It now gives the HTTP status, and Google's status name, without the provider's message, which can echo part of the key. A missing key says "no API key".
+
 **Tests**
 
 - 17 new Google tests in `tests/test_model_router.py`, written before the adapter. All 17 fail on the 3.38.2 router. They cover:
@@ -48,7 +54,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 - The fixtures in `tests/fixtures/model_router/google_*.json` follow the documented `models.list` shape, with ids from the deprecations page.
 - `tests/test_no_internal_references.py` now also catches a session label preceded by up to two descriptive words. "A/B tester" and "testers" in prose still pass.
 - The router's parity test compared raw working-file bytes. A checkout with `core.autocrlf=true` writes the file with CRLF line endings while the committed blob stays LF, so an identical sibling copy would have failed. It now compares the file as git stores it, and a new test shows that a line-ending difference passes while a changed byte fails.
-- Suite: 860 tests.
+- 8 new in `tests/test_refresh_models.py`, written before the fix, using a recording opener and two-page fixtures for Anthropic and Google. All 8 fail on the earlier script; two of them (no key, a refused call) fail only on the report's wording. They cover: the key in no URL and in nothing printed; every page for Anthropic and Google; OpenAI and Evolink, one page or more; a page-two model in the drift report; refused calls (400, 401, 403) whose error bodies echo part of the key.
+- Suite: 868 tests.
 
 ## [3.38.2] - 2026-10-27
 
