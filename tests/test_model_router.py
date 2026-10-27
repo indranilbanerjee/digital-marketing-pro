@@ -937,17 +937,32 @@ class TestPrivacyDocsTruth(unittest.TestCase):
             self.assertIn(f"WARNING ({provider}): {r['warnings'][0]}", doc)
 
 
+def committed_bytes(path: Path) -> bytes:
+    """The file as git stores it: a checkout with core.autocrlf=true writes CRLF on disk while the
+    committed blob stays LF, so two identical copies can differ only in that setting."""
+    return path.read_bytes().replace(b"\r\n", b"\n")
+
+
 class TestParity(unittest.TestCase):
     """One file, byte-identical wherever it is copied (the hero-sync pattern)."""
 
     def test_sibling_copies_are_identical(self):
-        mine = (SCRIPTS / "model_router.py").read_bytes()
+        mine = committed_bytes(SCRIPTS / "model_router.py")
         copies = [p for p in (REPO.parent / name / "scripts" / "model_router.py"
                               for name in ("contentforge", "socialforge", "CutForge")) if p.exists()]
         for p in copies:
-            self.assertEqual(p.read_bytes(), mine, f"{p} differs from DMP's model_router.py")
+            self.assertEqual(committed_bytes(p), mine, f"{p} differs from DMP's model_router.py")
         if not copies:
             self.skipTest("no sibling copy checked out yet")
+
+    def test_line_endings_from_a_checkout_are_not_a_difference(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            lf, crlf, edited = Path(tmp, "lf.py"), Path(tmp, "crlf.py"), Path(tmp, "edited.py")
+            lf.write_bytes(b"a = 1\nb = 2\n")
+            crlf.write_bytes(b"a = 1\r\nb = 2\r\n")
+            edited.write_bytes(b"a = 1\nb = 3\n")
+            self.assertEqual(committed_bytes(crlf), committed_bytes(lf))
+            self.assertNotEqual(committed_bytes(edited), committed_bytes(lf))
 
 
 if __name__ == "__main__":

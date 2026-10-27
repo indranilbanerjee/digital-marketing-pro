@@ -47,7 +47,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
   - the hint-book rules.
 - The fixtures in `tests/fixtures/model_router/google_*.json` follow the documented `models.list` shape, with ids from the deprecations page.
 - `tests/test_no_internal_references.py` now also catches a session label preceded by up to two descriptive words. "A/B tester" and "testers" in prose still pass.
-- Suite: 859 tests.
+- The router's parity test compared raw working-file bytes. A checkout with `core.autocrlf=true` writes the file with CRLF line endings while the committed blob stays LF, so an identical sibling copy would have failed. It now compares the file as git stores it, and a new test shows that a line-ending difference passes while a changed byte fails.
+- Suite: 860 tests.
 
 ## [3.38.2] - 2026-10-27
 
