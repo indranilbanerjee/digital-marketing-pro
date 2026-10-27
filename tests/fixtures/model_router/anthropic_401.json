@@ -1,0 +1,8 @@
+{
+  "_fixture": "Shape of GET https://api.anthropic.com/v1/models as documented at platform.claude.com/docs/en/api/models/list (read 2026-10-27). Ids, dates and capabilities here are test data for tests/test_model_router.py, not claims.",
+  "type": "error",
+  "error": {
+    "type": "authentication_error",
+    "message": "invalid x-api-key"
+  }
+}

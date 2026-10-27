@@ -1,0 +1,20 @@
+{
+  "basis": "live",
+  "counts": {
+    "eligible": 2,
+    "in_line": 3,
+    "listed": 6
+  },
+  "discovered_at": "2026-10-27T12:00:00Z",
+  "job": "ai-visibility.probe",
+  "line": "sonnet",
+  "model": "claude-sonnet-5-5",
+  "model_requested": null,
+  "offline": false,
+  "provider": "anthropic",
+  "reason": null,
+  "replacement": null,
+  "router": "model_router/1",
+  "source": "https://api.anthropic.com/v1/models",
+  "warnings": []
+}

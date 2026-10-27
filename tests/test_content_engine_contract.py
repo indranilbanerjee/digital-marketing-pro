@@ -32,6 +32,8 @@ from __future__ import annotations
 
 import importlib.util
 import re
+import sys
+import types
 import unittest
 from pathlib import Path
 
@@ -42,9 +44,26 @@ VALIDATE = (SKILLS / "validate-profile" / "SKILL.md").read_text(encoding="utf-8"
 
 
 def _load(name, filename):
-    spec = importlib.util.spec_from_file_location(name, REPO / "scripts" / filename)
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
+    """Load a script as a module. brand-voice-scorer.py exits at import when NLTK is missing,
+    and the suite is stdlib-only, so on a clean machine a stub stands in: these tests call
+    its pure scoring functions, never the tokenisers."""
+    stubbed = {}
+    if importlib.util.find_spec("nltk") is None:
+        nltk = types.ModuleType("nltk")
+        nltk.data = types.SimpleNamespace(find=lambda *a, **k: None)
+        nltk.download = lambda *a, **k: True
+        tok = types.ModuleType("nltk.tokenize")
+        tok.sent_tokenize, tok.word_tokenize = (lambda t: [t]), str.split
+        nltk.tokenize = tok
+        stubbed = {"nltk": nltk, "nltk.tokenize": tok}
+        sys.modules.update(stubbed)
+    try:
+        spec = importlib.util.spec_from_file_location(name, REPO / "scripts" / filename)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+    finally:
+        for key in stubbed:
+            sys.modules.pop(key, None)
     return mod
 
 

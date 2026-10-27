@@ -3,7 +3,7 @@
 `scripts/model_registry.json` is the single source of truth for every AI model id that the plugin's scripts hand to a provider SDK. The resolver `scripts/resolve_model.py` reads the registry and answers three questions for the rest of the plugin:
 
 1. "What's the current best model for X?" → `resolve("latest-fast-anthropic")` returns the concrete id.
-2. "Is this model id still good?" → `check("claude-sonnet-4-5-20250929")` returns `("deprecated", "claude-sonnet-4-6")`.
+2. "Is this model id still good?" → `check("claude-sonnet-4-5-20250929")` returns `("deprecated", "claude-sonnet-5-5")`.
 3. "What's available?" → `list_models(vendor="google", modality="image-gen")` returns the matching catalog.
 
 This means a single edit to `model_registry.json` propagates to every script the next time it runs — no grep-and-replace across the plugin when a model is deprecated.
@@ -26,20 +26,37 @@ Every script that calls a provider model accepts `--model` (or `--openai-model` 
 - **No `--model`** → resolve via the script's default alias (e.g. `latest-balanced-anthropic`).
 
 ```bash
-# Default — uses the registry's latest-balanced-anthropic alias (claude-sonnet-5-5 on 2026-10-27)
+# Default — OpenAI uses the registry's latest-balanced-openai alias (gpt-6.1-sol on 2026-10-27);
+# Anthropic is chosen from Anthropic's live model list (see "The model router" below)
 python scripts/ai-visibility-checker.py --brand acme --mode api
 
-# Override to a specific id
-python scripts/ai-visibility-checker.py --brand acme --mode api --anthropic-model claude-opus-4-7
-
-# Pass a deprecated id — script warns and substitutes its replacement, claude-sonnet-5-5
-python scripts/ai-visibility-checker.py --brand acme --mode api --anthropic-model claude-sonnet-4-5-20250929
-# WARNING (anthropic): claude-sonnet-4-5-20250929 is deprecated, using claude-sonnet-5-5 instead
+# Pass a deprecated OpenAI id — the curator warns and substitutes its replacement
+python scripts/ai-visibility-checker.py --brand acme --mode api --openai-model gpt-4o
+# WARNING (openai): gpt-4o is deprecated, using gpt-6-luna instead
 
 # See what's curated
 python scripts/ai-visibility-checker.py --list-models
 python scripts/resolve_model.py --list --vendor anthropic --status current
 ```
+
+---
+
+## The model router (Anthropic leg of the AI-visibility checker)
+
+`scripts/model_router.py` stops depending on the registry for the decision. A job in `scripts/model_hints.json` names a provider, a model **line** and the capabilities it needs, never an id; every rule carries the page it was read from and the date. At run time the router lists the models the key can use (Anthropic's GET `/v1/models`, which reports each model's `lifecycle`, `line`, `created_at`, `retires_at` and capabilities) and picks the newest model in the line that is `active`, generally available (no preview, exp, beta, alpha or rc id) and at least 14 days old. The registry alias (`default_alias`) is the fallback, used only offline.
+
+- One list call per 7 days per key name serves every job; the cache (`model-router-cache.json`) is keyed by the environment variable's name and holds chosen ids, lifecycle dates and counts, never the key or the list. `MODEL_ROUTER_OFFLINE=1` makes no call.
+- A model asked for by name (`--anthropic-model`) is kept if active, kept with a warning if deprecated, and refused with exit 2 if retired, naming the replacement. Nothing is swapped silently.
+- A rejected key or an empty list stops the run before any probe is sent (exit 2). A timeout, or a list without lifecycle fields, falls back to the registry alias and tags the output `offline`.
+- The run's output carries `model_routing.anthropic`: the model asked for, the model sent, where the answer came from (`live`, `cache`, `requested` or `offline`) and when.
+
+```bash
+# Ask for a deprecated Anthropic model by name — kept, with a warning naming the router's choice
+python scripts/ai-visibility-checker.py --brand acme --mode api --anthropic-model claude-sonnet-4-5-20250929
+# WARNING (anthropic): claude-sonnet-4-5-20250929 is deprecated and retires 2026-11-30; the router would choose claude-sonnet-5-5. Keeping claude-sonnet-4-5-20250929 because it was asked for by name.
+```
+
+When Sonnet 4.5 retires on 2026-11-30, a job with no model named keeps working without a registry edit, and a run that names Sonnet 4.5 stops with the replacement in the message.
 
 ---
 

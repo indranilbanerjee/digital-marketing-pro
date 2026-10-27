@@ -1,0 +1,15 @@
+{
+  "$comment": "Hint book for scripts/model_router.py: each job names a provider, a model line and the capabilities it needs, never a model id. The router picks the newest active, generally available model in that line at least 14 days old from the provider's live list. default_alias names the scripts/model_registry.json alias used offline. Every rule carries the page it was read from and the date.",
+  "schema": 1,
+  "jobs": {
+    "ai-visibility.probe": {
+      "provider": "anthropic",
+      "line": "sonnet",
+      "capabilities": [],
+      "default_alias": "latest-balanced-anthropic",
+      "why": "Asks the model the brand's buyer questions and checks whether the brand is named; a mid-tier line is what most people meet in Claude, and the job needs no special capability.",
+      "source": "https://platform.claude.com/docs/en/api/models/list",
+      "read_on": "2026-10-27"
+    }
+  }
+}

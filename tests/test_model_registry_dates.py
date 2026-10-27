@@ -197,17 +197,25 @@ class TestCuratorDocMatchesRegistry(unittest.TestCase):
         self.assertEqual(doc, reg["aliases"])
 
     def test_worked_examples_name_live_targets(self):
-        # 3.37.1's examples still said claude-sonnet-4-6 was the default and the substitute.
+        # 3.37.1's examples still said claude-sonnet-4-6 was the default and the substitute,
+        # and check() on Sonnet 4.5 was shown returning claude-sonnet-4-6 until 3.38.0.
         import re
         reg = json.loads(REGISTRY.read_text(encoding="utf-8"))
         models = {m["id"]: m for m in reg["models"]}
         text = (REPO / "docs" / "MODEL-CURATOR.md").read_text(encoding="utf-8")
-        default = re.search(r"latest-balanced-anthropic alias \(([a-z0-9.-]+)", text)
-        self.assertEqual(default.group(1), reg["aliases"]["latest-balanced-anthropic"])
-        warnings = re.findall(r"WARNING \(anthropic\): (\S+) is deprecated, using (\S+) instead", text)
-        self.assertTrue(warnings)
-        for old, new in warnings:
+        default = re.search(r"latest-balanced-openai alias \(([a-z0-9.-]+)", text)
+        self.assertEqual(default.group(1), reg["aliases"]["latest-balanced-openai"])
+        substitutes = re.findall(r"WARNING \((?:openai|anthropic)\): (\S+) is deprecated, using (\S+) instead", text)
+        substitutes += re.findall(r'check\("([^"]+)"\)` returns `\("deprecated", "([^"]+)"\)', text)
+        self.assertGreaterEqual(len(substitutes), 2)
+        for old, new in substitutes:
             self.assertEqual(models[old].get("replacement_id"), new, old)
+        kept = re.findall(r"WARNING \(anthropic\): (\S+) is deprecated and retires (\d{4}-\d{2}-\d{2}); "
+                          r"the router would choose (\S+)\.", text)
+        self.assertTrue(kept)
+        for old, when, new in kept:
+            self.assertEqual((models[old]["status"], models[old].get("shutdown_date"), models[old].get("replacement_id")),
+                             ("deprecated", when, new), old)
 
     def test_drift_is_caught(self):
         stale = "| `latest-fast-anthropic` | `claude-haiku-4-5-20251001` (Claude Haiku 4.5) |\n"
