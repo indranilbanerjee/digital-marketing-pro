@@ -80,10 +80,7 @@ def map_landscape(slug, data_str):
     if err:
         return err
 
-    try:
-        data = json.loads(data_str) if isinstance(data_str, str) else data_str
-    except json.JSONDecodeError:
-        return {"error": "Invalid JSON in --data"}
+    data = _common.json_arg(data_str, "--data") if isinstance(data_str, str) else data_str
 
     dimensions = data.get("dimensions", [])
     competitors = data.get("competitors", [])
@@ -212,10 +209,8 @@ def detect_shifts(slug, competitor, new_positions_str):
     if err:
         return err
 
-    try:
-        new_positions = json.loads(new_positions_str) if isinstance(new_positions_str, str) else new_positions_str
-    except json.JSONDecodeError:
-        return {"error": "Invalid JSON in --new-positions"}
+    new_positions = (_common.json_arg(new_positions_str, "--new-positions")
+                     if isinstance(new_positions_str, str) else new_positions_str)
 
     landscape = _load_json(_narrative_dir(slug) / "landscape.json")
     if not landscape or "landscape_map" not in landscape:
@@ -356,10 +351,7 @@ def track_narrative(slug, data_str):
     if err:
         return err
 
-    try:
-        data = json.loads(data_str) if isinstance(data_str, str) else data_str
-    except json.JSONDecodeError:
-        return {"error": "Invalid JSON in --data"}
+    data = _common.json_arg(data_str, "--data") if isinstance(data_str, str) else data_str
 
     ndir = _narrative_dir(slug)
     snapshots = _load_json(ndir / "snapshots.json", [])

@@ -234,6 +234,7 @@ def main():
     result = audit_run(run_dir, strict=args.strict)
     out = pathlib.Path(args.out).expanduser() if args.out \
         else run_dir / "run-audit.json"
+    out.parent.mkdir(parents=True, exist_ok=True)  # create the folder on demand
     out.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n",
                    encoding="utf-8")
     result["written_to"] = str(out)

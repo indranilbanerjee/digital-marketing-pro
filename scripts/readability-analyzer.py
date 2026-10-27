@@ -26,18 +26,20 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 
-try:
-    import textstat
-except ImportError:
-    print(json.dumps({
-        "fallback": True,
-        "error": "textstat_not_installed",
-        "message": "textstat not installed. Readability analysis requires it; install the tested version with: "
-                   + _common.install_command(["textstat"]),
-        "overall_score": None,
-        "recommendation": "Install textstat for automated readability analysis, or evaluate manually using grade-level and reading-ease guidelines."
-    }))
-    sys.exit(0)
+# Loaded by _load_deps() after the arguments are parsed.
+textstat = None
+
+
+def _load_deps() -> None:
+    global textstat
+    try:
+        import textstat as _textstat
+    except ImportError:
+        _common.fallback_exit("textstat_not_installed", "textstat not installed. Readability analysis requires "
+                              "it; install the tested version with: " + _common.install_command(["textstat"]),
+                              "Install textstat for automated readability analysis, or evaluate manually using "
+                              "grade-level and reading-ease guidelines.")
+    textstat = _textstat
 
 # ---------------------------------------------------------------------------
 # Audience profiles — ideal readability ranges
@@ -447,9 +449,10 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
+    _load_deps()
 
     # Resolve input text
-    if args.text:
+    if args.text is not None:  # an empty --text is empty input, not a missing one
         text = args.text
     else:
         file_path = Path(args.file)
@@ -465,6 +468,9 @@ def main() -> None:
                 "error": f"Could not read file: {exc}",
             }, indent=2))
             sys.exit(1)
+    if not text.strip():  # an empty --text or file: nothing to score (exit 4, like the other empty cases)
+        print(json.dumps({"error": "nothing to score: the text is empty", "status": "nothing_to_score"}, indent=2))
+        sys.exit(4)
 
     # Compute metrics
     metrics = compute_metrics(text)
@@ -492,6 +498,7 @@ def main() -> None:
         output["target_comparison"] = target_comparison
 
     print(json.dumps(output, indent=2))
+    sys.exit(1 if isinstance(output, dict) and "error" in output else 0)  # an error payload never exits 0
 
 
 if __name__ == "__main__":

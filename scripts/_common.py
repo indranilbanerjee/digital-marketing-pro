@@ -174,14 +174,14 @@ class UnsafePathError(ValueError):
 def is_safe_component(name) -> bool:
     """True if `name` can only ever name an entry directly inside a directory:
     non-empty, no `/` or `\\`, no `..`, not absolute, no drive or stream colon,
-    no NUL, and not a Windows device name (NUL, CON, COM1, ...). A colon is refused because on
+    no NUL, at most 200 characters, and not a Windows device name (NUL, CON, COM1, ...). A colon is refused because on
     NTFS "a:b" writes an alternate data stream of "a"."""
     if not isinstance(name, str):
         return False
     n = name.strip()
     return bool(n) and n not in (".", "..") and not any(
         bad in n for bad in ("/", "\\", "..", ":", "\x00")
-    ) and not os.path.isabs(n) and n.split(".")[0].lower() not in WINDOWS_RESERVED
+    ) and not os.path.isabs(n) and n.split(".")[0].lower() not in WINDOWS_RESERVED and len(n) <= 200
 
 
 def safe_child(base, name, suffix: str = "") -> Path:
@@ -627,6 +627,106 @@ def load_profile(path) -> dict:
         raise JsonFileError("; ".join(problems) + ". Fix it in profile.json, or run "
                             "/digital-marketing-pro:brand-setup to rewrite it.")
     return profile
+
+
+_JSON_KIND = {dict: "object", list: "array", str: "string", (int, float): "number", (dict, list): "object or array"}
+
+
+def _kind_of(value) -> str:
+    if isinstance(value, bool):
+        return "true/false"
+    for types, word in ((dict, "object"), (list, "array"), (str, "string"), ((int, float), "number")):
+        if isinstance(value, types):
+            return word
+    return "null" if value is None else type(value).__name__
+
+
+def json_arg(value, name: str, expect=dict, items=None):
+    """Parse a JSON command-line option and check its shape, or print {"error": ...} and exit 2.
+
+    `expect` is the top-level type (dict, list, or a tuple of them); `items` the type every element
+    of a list must have. Before 3.40.0, null, a list or a string where an object was expected
+    ended 15 scripts in AttributeError or TypeError."""
+    try:
+        data = json.loads(value)
+    except (TypeError, ValueError) as exc:
+        _input_error(f"{name} is not valid JSON: {exc}")
+    if isinstance(data, bool) or not isinstance(data, expect):
+        _input_error(f"{name} must be a JSON {_JSON_KIND.get(expect, 'value')}, not {_kind_of(data)}")
+    if items is not None and isinstance(data, list):
+        for i, item in enumerate(data):
+            if isinstance(item, bool) or not isinstance(item, items):
+                _input_error(f"{name} item {i} must be a {_JSON_KIND.get(items, 'value')}, not {_kind_of(item)}")
+    return data
+
+
+def _input_error(message: str):
+    print(json.dumps({"error": message}, indent=2, ensure_ascii=False))
+    sys.exit(2)
+
+
+def fallback_exit(error: str, message: str, recommendation: str) -> None:
+    """A scorer whose package or data is missing prints one JSON line and exits 0 (a fallback, not
+    an error: eval-runner reports the dimension as missing and the result as partial)."""
+    print(json.dumps({"fallback": True, "error": error, "message": message, "overall_score": None,
+                      "recommendation": recommendation}, indent=2))
+    sys.exit(0)
+
+
+def load_nltk_tokenizers(recommendation: str):
+    """Import nltk and make sure its sentence and word tokenizers work, downloading their data once.
+    Returns (sent_tokenize, word_tokenize), or calls fallback_exit: no nltk, or tokenizer data that
+    can't be downloaded (offline, or NLTK refusing a fetch through a proxy). Before 3.40.0 the
+    download result was ignored and the scorer died later in a LookupError banner."""
+    try:
+        import nltk
+    except ImportError:
+        fallback_exit("nltk_not_installed", "NLTK not installed. This scorer requires it; install the "
+                      "tested version with: " + install_command(["nltk"]), recommendation)
+    from nltk.tokenize import sent_tokenize, word_tokenize
+    for res in ("punkt_tab", "punkt"):
+        try:
+            nltk.data.find(f"tokenizers/{res}")
+        except LookupError:
+            try:
+                nltk.download(res, quiet=True)
+            except Exception:  # noqa: BLE001 - a failed download is reported below
+                pass
+    try:
+        sent_tokenize("One. Two.")
+        word_tokenize("One two.")
+    except LookupError:
+        fallback_exit("nltk_data_missing", "NLTK's tokenizer data (punkt_tab) is missing and could not be "
+                      "downloaded: offline, or NLTK refused a fetch through a proxy. On a connected machine "
+                      "run `python -m nltk.downloader punkt_tab punkt` (or setup.py --install lite), or set "
+                      "NLTK_DATA to a folder that holds it.", recommendation)
+    return sent_tokenize, word_tokenize
+
+
+def _registry_documents():
+    """The Documents folder Windows Explorer shows, from the "Personal" shell-folder value, expanded
+    with this process's environment; None off Windows or when it can't be read."""
+    if os.name != "nt":
+        return None
+    try:
+        import winreg
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,
+                            r"Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders") as key:
+            value, _ = winreg.QueryValueEx(key, "Personal")
+        return Path(os.path.expandvars(value))
+    except (OSError, ImportError):
+        return None
+
+
+def documents_dir() -> Path:
+    """The user's Documents folder. On Windows that is where Explorer shows it, which OneDrive's
+    "Known Folder Move" puts inside the OneDrive folder; before 3.40.0 deliverables went to a second,
+    unsynced ~/Documents that Explorer's Documents page never shows. The registry folder is used
+    only when it exists, so a run with another HOME/USERPROFILE (a test sandbox) stays inside it."""
+    found = _registry_documents()
+    if found is not None and found.is_dir():
+        return found
+    return Path.home() / "Documents"
 
 
 # The keys eval-config-manager.py writes and eval-runner.py reads: one table, so the two can't drift.

@@ -337,6 +337,9 @@ def main():
     raw = args.subjects.strip()
     try:
         subjects = json.loads(raw)
+        if isinstance(subjects, list) and any(not isinstance(s, str) for s in subjects):
+            print(json.dumps({"error": "--subjects must be a JSON array of strings"}, indent=2))
+            sys.exit(2)
         if isinstance(subjects, str):
             subjects = [subjects]
         elif not isinstance(subjects, list):
@@ -368,9 +371,12 @@ def main():
             "worst_subject": worst["subject"] if worst else None,
             "results": results,
         }
+        if not valid:
+            output["error"] = "no subject line could be scored; see each result's error"
 
     json.dump(output, sys.stdout, indent=2)
     print()
+    sys.exit(1 if isinstance(output, dict) and "error" in output else 0)  # an error payload never exits 0
 
 
 if __name__ == "__main__":

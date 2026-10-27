@@ -549,7 +549,7 @@ def main():
     args = parser.parse_args()
 
     # Resolve input text
-    if args.text:
+    if args.text is not None:  # an empty --text is empty input, not a missing one
         text = args.text
     else:
         file_path = Path(args.file)
@@ -561,10 +561,10 @@ def main():
         except Exception as exc:
             print(json.dumps({"error": f"Could not read file: {exc}"}))
             sys.exit(1)
+    if not text.strip():  # an empty --text or file: nothing to score (exit 4, like the other empty cases)
+        print(json.dumps({"error": "nothing to score: the text is empty", "status": "nothing_to_score"}, indent=2))
+        sys.exit(4)
 
-    if not text or not text.strip():
-        print(json.dumps({"error": "Empty content provided."}))
-        sys.exit(1)
 
     # Dispatch action
     if args.action == "detect":

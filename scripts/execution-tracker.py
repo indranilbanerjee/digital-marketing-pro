@@ -319,7 +319,7 @@ def main():
             print(json.dumps({"error": "Provide --data with execution JSON"}))
             sys.exit(1)
         try:
-            data = json.loads(args.data)
+            data = _common.json_arg(args.data, "--data")
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --data"}))
             sys.exit(1)
@@ -330,7 +330,7 @@ def main():
             print(json.dumps({"error": "Provide --data with {\"campaign_id\":..,\"from_step\":N}"}))
             sys.exit(1)
         try:
-            data = json.loads(args.data)
+            data = _common.json_arg(args.data, "--data")
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --data"}))
             sys.exit(1)

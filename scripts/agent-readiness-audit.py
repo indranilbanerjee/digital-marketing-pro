@@ -620,12 +620,32 @@ def _norm_key(k: str) -> str:
 
 
 def _read_text(path: Path) -> str:
+    if not str(path).strip() or str(path) == ".":
+        raise BadInput("an empty file path was given")  # Path("") is the current folder
     try:
         return path.read_text(encoding="utf-8-sig")
     except FileNotFoundError:
         raise BadInput(f"file not found: {path}")
     except UnicodeDecodeError:
         raise BadInput(f"not UTF-8 text: {path}")
+    except OSError as exc:  # a folder, no permission, a name too long, or JSON passed where a path goes
+        raise BadInput(f"cannot read {str(path)[:200]}: {exc.strerror or exc}")
+
+
+def _url_paths(paths) -> list:
+    """--path values are URL paths. Git Bash on Windows rewrites a leading "/products/" into
+    "C:/Program Files/Git/products/" before Python sees it, and the audit then tested a path that
+    doesn't exist and said "ready" (found 2026-10-27). Refuse anything that doesn't start with "/";
+    "//products/" (Git Bash's own escape) is read as "/products/"."""
+    out = []
+    for raw in paths or []:
+        value = raw[1:] if raw.startswith("//") else raw
+        if not value.startswith("/"):
+            raise BadInput(f"--path must be a URL path starting with '/', not {raw!r}. Git Bash on Windows "
+                           "rewrites '/products/' into a Windows folder: run the command with "
+                           "MSYS_NO_PATHCONV=1 set, or write the path as //products/")
+        out.append(value)
+    return out
 
 
 def _rows_from_delimited(text: str) -> list[dict]:
@@ -909,6 +929,7 @@ def _note_unreachable(check: dict, why: str | None) -> dict:
 
 
 def run_audit(args) -> dict:
+    args.path = _url_paths(args.path)
     robots_text = None
     robots_label = None
     robots_unreachable = None

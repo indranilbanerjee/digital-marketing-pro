@@ -24,6 +24,10 @@ for _stream in (sys.stdout, sys.stderr):  # UTF-8 output, even where a Windows p
     except Exception:
         pass
 
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _common  # noqa: E402
+
 # ---------------------------------------------------------------------------
 # Pacing calculations
 # ---------------------------------------------------------------------------
@@ -341,7 +345,7 @@ def main():
     daily_spend = None
     if args.daily_spend:
         try:
-            daily_spend = json.loads(args.daily_spend)
+            daily_spend = _common.json_arg(args.daily_spend, "--daily-spend", list, (int, float))
             if not isinstance(daily_spend, list):
                 json.dump({"error": "daily-spend must be a JSON array of numbers"}, sys.stdout, indent=2)
                 print()
@@ -356,7 +360,7 @@ def main():
     channels_data = None
     if args.channels:
         try:
-            channels_data = json.loads(args.channels)
+            channels_data = _common.json_arg(args.channels, "--channels", list, dict)
             if not isinstance(channels_data, list):
                 json.dump({"error": "channels must be a JSON array"}, sys.stdout, indent=2)
                 print()

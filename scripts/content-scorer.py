@@ -31,39 +31,23 @@ import _common  # noqa: E402
 # ---------------------------------------------------------------------------
 # Dependency checks
 # ---------------------------------------------------------------------------
-try:
-    import textstat
-except ImportError:
-    print(json.dumps({
-        "fallback": True,
-        "error": "textstat_not_installed",
-        "message": "textstat not installed. Content scoring requires it; install the tested version with: "
-                   + _common.install_command(["textstat"]),
-        "overall_score": None,
-        "recommendation": "Install textstat for automated content scoring, or evaluate manually using skills/context-engine/scoring-rubrics.md"
-    }, indent=2))
-    sys.exit(0)
+# Loaded by _load_deps() after the arguments are parsed (a mistyped option is reported even where
+# the packages are missing).
+textstat = sent_tokenize = None
+_RECOMMEND = ("Install textstat and NLTK for automated content scoring, or evaluate manually using "
+              "skills/context-engine/scoring-rubrics.md")
 
-try:
-    import nltk
-except ImportError:
-    print(json.dumps({
-        "fallback": True,
-        "error": "nltk_not_installed",
-        "message": "NLTK not installed. Content scoring requires it; install the tested version with: "
-                   + _common.install_command(["nltk"]),
-        "overall_score": None,
-        "recommendation": "Install NLTK for automated content scoring, or evaluate manually using skills/context-engine/scoring-rubrics.md"
-    }, indent=2))
-    sys.exit(0)
 
-for _res in ("punkt", "punkt_tab"):
+def _load_deps() -> None:
+    global textstat, sent_tokenize
     try:
-        nltk.data.find(f"tokenizers/{_res}")
-    except LookupError:
-        nltk.download(_res, quiet=True)
-
-from nltk.tokenize import sent_tokenize
+        import textstat as _textstat
+    except ImportError:
+        _common.fallback_exit("textstat_not_installed", "textstat not installed. Content scoring requires it; "
+                              "install the tested version with: " + _common.install_command(["textstat"]),
+                              _RECOMMEND)
+    textstat = _textstat
+    sent_tokenize, _ = _common.load_nltk_tokenizers(_RECOMMEND)
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -907,9 +891,10 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
+    _load_deps()
 
     # Resolve input text
-    if args.text:
+    if args.text is not None:  # an empty --text is empty input, not a missing one
         text = args.text
     else:
         file_path = Path(args.file)
@@ -925,6 +910,9 @@ def main() -> None:
                 "error": f"Could not read file: {exc}",
             }, indent=2))
             sys.exit(1)
+    if not text.strip():  # an empty --text or file: nothing to score (exit 4, like the other empty cases)
+        print(json.dumps({"error": "nothing to score: the text is empty", "status": "nothing_to_score"}, indent=2))
+        sys.exit(4)
 
     # Score
     result = score_content(text, args.content_type, args.keyword)

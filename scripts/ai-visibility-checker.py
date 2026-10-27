@@ -288,17 +288,26 @@ def run_api_mode(brand, queries, competitors=None, openai_model_override=None, a
             "fallback": "Use --mode manual to generate a manual testing checklist instead.",
         }
 
-    # Compute summary
+    # Compute summary. The rate counts answered queries only: before 3.40.0 a run whose 15 requests
+    # all failed reported "0.0%" with exit 0, which a client report could quote as real visibility.
     total = len(results)
+    failed = sum(1 for r in results if r.get("error"))
+    answered = total - failed
     mentioned_count = sum(1 for r in results if r.get("brand_mentioned"))
     summary = {
         "brand": brand,
         "mode": "api",
         "total_queries_run": total,
-        "mention_rate": f"{round(mentioned_count / max(total, 1) * 100, 1)}%",
+        "answered": answered,
+        "errors": failed,
+        "mention_rate": f"{round(mentioned_count / answered * 100, 1)}%" if answered else None,
         "mentions": mentioned_count,
         "results": results,
     }
+    if total and not answered:
+        first = next((r.get("error") for r in results if r.get("error")), "")
+        summary["error"] = (f"every request failed ({failed} of {total}), so no mention rate can be "
+                            f"reported. First error: {first}")
     if sdk_note:
         summary["warning"] = sdk_note
     if model_routing:
@@ -308,7 +317,7 @@ def run_api_mode(brand, queries, competitors=None, openai_model_override=None, a
 
 def main():
     parser = argparse.ArgumentParser(description="Check brand visibility in AI responses")
-    parser.add_argument("--brand", type=_common.path_component, required=False, default="", help="Brand name to check (required unless --list-models)")
+    parser.add_argument("--brand", type=_common.path_component, required=False, default=None, help="Brand name to check (required unless --list-models)")
     parser.add_argument("--queries", help="Comma-separated queries to test")
     parser.add_argument("--mode", choices=["manual", "api"], default="manual",
                         help="manual = checklist, api = run queries via APIs")

@@ -4,11 +4,11 @@ build_skills_index.py — The Depth Contract: what each skill actually guarantee
 
 WHY THIS EXISTS
 ---------------
-163 skills is a strength only if you can tell what each one does WITHOUT
+A large skill catalogue is a strength only if you can tell what each one does WITHOUT
 reading it. Before this index, depth was invisible: some skills execute real
 scripts with exit-code gates, some route their output through the /check
 quality machinery, some are structured guidance — and nothing distinguished
-them from the outside. "163 skills" read as a claim nobody could verify.
+them from the outside. A skill count read as a claim nobody could verify.
 
 This script derives, for every skill, a DEPTH TIER from what the skill's own
 files actually reference:
@@ -27,9 +27,10 @@ exist, or arrive unindexed. The index doubles as the machine-readable routing
 surface for /help — name, tier, description, scripts, and cross-references in
 one place, generated, never hand-maintained.
 
-Usage:
-    python scripts/build_skills_index.py            # write skills-index.json
+Usage (a maintainer tool; it ships with the plugin, so the default writes nothing):
+    python scripts/build_skills_index.py            # same as --check
     python scripts/build_skills_index.py --check    # exit 1 if committed file drifted
+    python scripts/build_skills_index.py --write    # regenerate skills-index.json
     python scripts/build_skills_index.py --stdout   # print, don't write
 """
 from __future__ import annotations
@@ -150,6 +151,8 @@ def main() -> int:
     ap.add_argument("--check", action="store_true",
                     help="Compare against committed skills-index.json; exit 1 on drift")
     ap.add_argument("--stdout", action="store_true", help="Print instead of writing")
+    ap.add_argument("--write", action="store_true",
+                    help="Regenerate skills-index.json (the default only checks: an installed copy can be read-only)")
     args = ap.parse_args()
 
     index = build_index()
@@ -158,21 +161,25 @@ def main() -> int:
     if args.stdout:
         sys.stdout.write(rendered)
         return 0
-    if args.check:
+    if args.check or not args.write:
         if not INDEX_PATH.exists():
-            print(f"DRIFT: {INDEX_PATH.name} missing — run build_skills_index.py",
+            print(f"DRIFT: {INDEX_PATH.name} missing — run build_skills_index.py --write",
                   file=sys.stderr)
             return 1
         committed = INDEX_PATH.read_text(encoding="utf-8-sig")
         if committed != rendered:
             print(f"DRIFT: {INDEX_PATH.name} does not match the repo — "
-                  "run build_skills_index.py and commit the result.", file=sys.stderr)
+                  "run build_skills_index.py --write and commit the result.", file=sys.stderr)
             return 1
         print(f"{INDEX_PATH.name}: in sync "
               f"({index['skill_count']} skills — E:{index['tiers']['E']} "
               f"M:{index['tiers']['M']} G:{index['tiers']['G']})")
         return 0
-    INDEX_PATH.write_text(rendered, encoding="utf-8")
+    try:
+        INDEX_PATH.write_text(rendered, encoding="utf-8")
+    except OSError as exc:
+        print(f"ERROR: cannot write {INDEX_PATH}: {exc.strerror or exc}", file=sys.stderr)
+        return 2
     print(f"Wrote {INDEX_PATH.name}: {index['skill_count']} skills — "
           f"E:{index['tiers']['E']} M:{index['tiers']['M']} G:{index['tiers']['G']}")
     return 0

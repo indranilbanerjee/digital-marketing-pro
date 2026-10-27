@@ -9,7 +9,7 @@ Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Ac
 [![Version](https://img.shields.io/badge/version-3.39.1-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=yellow)](https://github.com/indranilbanerjee/digital-marketing-pro/stargazers)
-[![Tests](https://img.shields.io/badge/tests-945%2F945%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-966%2F966%20passing-brightgreen.svg)](tests/)
 [![Platforms](https://img.shields.io/badge/platforms-9%20native%20%2B%2035%20Agent%20Skills-success.svg)](#works-on-40-agent-harnesses-via-the-agent-skills-open-standard)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Article%2050%20ready-darkred.svg)](skills/context-engine/compliance-rules.md)
 
@@ -204,7 +204,7 @@ Other marketing plugins exist, including Anthropic's own marketing plugin and co
 | AEO / GEO | **A 6-platform audit, including Google AI Mode** |
 | Where it runs | **9 native hosts**: Claude Code, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes, OpenClaw, Grok |
 | Live-write safety | **Single-use approval record for writes it sends itself; MCP writes: typed yes + host prompt** |
-| Tests | **945 stdlib unittest** tests |
+| Tests | **966 stdlib unittest** tests |
 | License | **MIT: no telemetry, no seats** |
 
 ---
@@ -554,7 +554,7 @@ Two user-team complaints from the v3.7.5 cycle drove this release: "dm pro is ta
 /digital-marketing-pro:resume engagement <run-id>          # pick a specific run
 ```
 
-**Fix 2 — Visible output folder.** Every artifact a workflow produces is now copied to TWO locations: the internal tracking copy under `~/.claude-marketing/brands/{brand}/output/{workflow}/...` (system-of-record), and a user-visible published copy under `~/Documents/DigitalMarketingPro/{brand}/{workflow}/{YYYY-MM}/{filename}` (visible in Windows Explorer / macOS Finder by default). Override the visible root with `DIGITAL_MARKETING_PRO_PUBLISH_DIR=/path` (e.g. a Dropbox share for the team). Reveal the folder any time with:
+**Fix 2 — Visible output folder.** Every artifact a workflow produces is now copied to TWO locations: the internal tracking copy under `~/.claude-marketing/brands/{brand}/output/{workflow}/...` (system-of-record), and a user-visible published copy under `~/Documents/DigitalMarketingPro/{brand}/{workflow}/{YYYY-MM}/{filename}` (visible in Windows Explorer / macOS Finder by default; on Windows the script uses the Documents folder Explorer shows, including one OneDrive has moved). Override the visible root with `DIGITAL_MARKETING_PRO_PUBLISH_DIR=/path` (e.g. a Dropbox share for the team). Reveal the folder any time with:
 
 ```
 /digital-marketing-pro:output-folder                       # opens ~/Documents/DigitalMarketingPro/{brand}/
@@ -800,7 +800,7 @@ Use the direct repo form: `grok plugin install indranilbanerjee/digital-marketin
 ### General (any platform)
 
 **"Tests in `tests/` fail when I `git clone` locally"**
-Run `python tests/run_all.py` from the repo root. All 945 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+; `scripts/setup.py` recommends 3.11 or newer, and the floor moves to 3.11 once Claude's Cowork environment does) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
+Run `python tests/run_all.py` from the repo root. All 966 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+; `scripts/setup.py` recommends 3.11 or newer, and the floor moves to 3.11 once Claude's Cowork environment does) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
 
 **"`/digital-marketing-pro:doctor` shows my action as stub_unconfigured"**
 That action needs an MCP connector configured. Run `python scripts/connector-status.py --action setup-guide --name <connector-name>` for the exact setup snippet. Add it to your `.mcp.json` under `mcpServers`, restart your agent, and the action becomes `manifest_ready`. See [Connector-aware action resolver](#connector-aware-action-resolver) for the full readiness model.

@@ -261,8 +261,13 @@ def main():
                              "the run simply has no authorship record."),
             })
 
-    result = classify(src_path.read_text(encoding="utf-8-sig"),
-                      draft_path.read_text(encoding="utf-8-sig"))
+    texts = {}
+    for label, p in (("source", src_path), ("draft", draft_path)):
+        try:
+            texts[label] = _common.decode_text(p.read_bytes(), p.name)
+        except (OSError, ValueError) as exc:  # a binary or Windows-1252 file: say so, no traceback
+            _common.finish({"error": f"--{label} can't be read: {exc}"})
+    result = classify(texts["source"], texts["draft"])
     result["source_file"] = str(src_path)
     result["draft_file"] = str(draft_path)
 

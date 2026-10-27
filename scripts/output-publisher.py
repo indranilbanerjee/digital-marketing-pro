@@ -74,7 +74,7 @@ def get_visible_publish_dir(brand: str, workflow: str | None = None,
     if base:
         root = Path(base).expanduser()
     else:
-        root = Path.home() / "Documents" / "DigitalMarketingPro" / brand
+        root = _common.documents_dir() / "DigitalMarketingPro" / brand
     if workflow:
         root = _common.safe_child(root, workflow)
     return root

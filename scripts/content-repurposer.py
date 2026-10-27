@@ -561,7 +561,7 @@ def main():
     key_points = None
     if args.key_points:
         try:
-            key_points = json.loads(args.key_points)
+            key_points = _common.json_arg(args.key_points, "--key-points", list, str)
             if not isinstance(key_points, list):
                 json.dump({"error": "key-points must be a JSON array of strings"}, sys.stdout, indent=2)
                 print()
@@ -574,7 +574,7 @@ def main():
     platforms = None
     if args.platforms:
         try:
-            platforms = json.loads(args.platforms)
+            platforms = _common.json_arg(args.platforms, "--platforms", list, str)
             if not isinstance(platforms, list):
                 json.dump({"error": "platforms must be a JSON array of strings"}, sys.stdout, indent=2)
                 print()
@@ -595,6 +595,7 @@ def main():
 
     json.dump(output, sys.stdout, indent=2)
     print()
+    sys.exit(1 if isinstance(output, dict) and "error" in output else 0)  # an error payload never exits 0
 
 
 if __name__ == "__main__":

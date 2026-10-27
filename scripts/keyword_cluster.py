@@ -492,9 +492,12 @@ def main() -> int:
         print(f"ERROR: {e}", file=sys.stderr); return 2
     except ValueError as e:
         print(f"ERROR: {e}", file=sys.stderr); return 2
+    except OSError as e:  # an empty path (a folder), no permission, a name too long
+        print(f"ERROR: cannot read --keywords or --serps: {e.strerror or e}", file=sys.stderr); return 2
 
     out_text = json.dumps(result, indent=2, ensure_ascii=False) if args.format == "json" else _format_text(result)
     if args.out:
+        args.out.parent.mkdir(parents=True, exist_ok=True)  # create the folder on demand
         args.out.write_text(out_text, encoding="utf-8")
         print(f"Wrote {args.out} ({result['stats']['clusters']} clusters, status={result['quality_scorecard']['status']})")
     else:

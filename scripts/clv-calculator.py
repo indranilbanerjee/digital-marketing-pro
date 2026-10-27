@@ -399,6 +399,7 @@ def main():
 
     json.dump(output, sys.stdout, indent=2)
     print()
+    sys.exit(1 if isinstance(output, dict) and "error" in output else 0)  # an error payload never exits 0
 
 
 if __name__ == "__main__":

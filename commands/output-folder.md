@@ -19,7 +19,7 @@ User runs `/digital-marketing-pro:output-folder`, or asks any variant of "where 
 DMP writes two copies of every workflow artifact:
 
 1. **Internal tracking copy** at `~/.claude-marketing/brands/{brand}/output/{workflow}/{run_id}/...` (or `$CLAUDE_PLUGIN_DATA/digital-marketing-pro/brands/{brand}/output/...` when that env var is set). This is the system-of-record for `/digital-marketing-pro:status`, the checkpoint manager, audit history. It lives inside a dotfolder that Windows hides by default.
-2. **User-visible published copy** at `~/Documents/DigitalMarketingPro/{brand}/{workflow}/{YYYY-MM}/{filename}` (or wherever `$DIGITAL_MARKETING_PRO_PUBLISH_DIR` points). This is the one to surface.
+2. **User-visible published copy** at `~/Documents/DigitalMarketingPro/{brand}/{workflow}/{YYYY-MM}/{filename}` (or wherever `$DIGITAL_MARKETING_PRO_PUBLISH_DIR` points). This is the one to surface. `~/Documents` means the Documents folder your file manager shows: on Windows with OneDrive folder backup that is `OneDrive\Documents`, and the script finds it.
 
 The published copy was added specifically because users running the 12-Part engagement workflow couldn't find the 50-60 deliverable files it produces. They were saving — just somewhere Explorer hid by default.
 

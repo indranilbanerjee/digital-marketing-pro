@@ -46,6 +46,54 @@ SKIP_FILES = {"CHANGELOG.md"}
 # `npx -y name` in prose, and `"-y", "name"` in JSON-ish snippets
 NPX_PROSE = re.compile(r"npx\s+-y\s+(@?[A-Za-z0-9._/<>-]+(?:@[A-Za-z0-9.<>-]+)?)")
 NPX_ARGS = re.compile(r'"-y",\s*"([^"]+)"')
+INLINE_CODE = re.compile(r"`([^`]+)`")
+# A runner in command position: first on the line, after an optional prompt and `cmd /c`.
+COMMAND_START = re.compile(r"^\s*(?:\$|>|PS>)?\s*(?:cmd(?:\.exe)?\s+/c\s+)?(?:npx|npm\s+(?:exec|x))\b", re.I)
+# npx and npm-exec options that take a value: the value is never the package that runs, except
+# --package / -p, whose value IS the package installed (the name after it is only its bin).
+NPX_VALUE_FLAGS = {"--cache", "--registry", "--userconfig", "-c", "--call", "-w", "--workspace"}
+
+
+def npx_specs(tokens: list) -> tuple:
+    """(runner_found, specs): the packages an npx, `npm exec` or `npm x` command line would install,
+    wherever it sits (`cmd /c npx ...` included). Before 3.40.0 only `npx -y name` was read, so
+    `npx name`, `npx -y --package=X name` (which runs X while the config shows name), `npm exec`
+    and `cmd /c npx` went unchecked (found in ContentForge's scanner on 2026-10-27; DMP's had the
+    same gap)."""
+    tokens = [str(x).strip("`'\"(),;") for x in tokens]
+    found, specs, i = False, [], 0
+    while i < len(tokens):
+        tok = tokens[i].lower()
+        start = None
+        if tok in ("npx", "npx.cmd"):
+            start = i + 1
+        elif tok in ("npm", "npm.cmd") and i + 1 < len(tokens) and tokens[i + 1] in ("exec", "x"):
+            start = i + 2
+        if start is None:
+            i += 1
+            continue
+        found = True
+        packages, first, j = [], None, start
+        while j < len(tokens):
+            arg = tokens[j]
+            if arg == "--":
+                j += 1
+            elif arg.startswith("--package="):
+                packages.append(arg.split("=", 1)[1])
+                j += 1
+            elif arg in ("--package", "-p") and j + 1 < len(tokens):
+                packages.append(tokens[j + 1])
+                j += 2
+            elif arg in NPX_VALUE_FLAGS:
+                j += 2
+            elif arg.startswith("-"):
+                j += 1
+            else:
+                first = arg
+                break
+        specs.extend(packages or ([first] if first else []))
+        i = j + 1
+    return found, specs
 
 
 def _status_module():
@@ -84,17 +132,18 @@ def allowlist_problems(table: dict, on: date) -> list[str]:
 def example_problems(example: dict, table: dict) -> list[str]:
     out = []
     for name, cfg in example.get("mcpServers", {}).items():
-        if cfg.get("command") != "npx":
+        found, specs = npx_specs([cfg.get("command", ""), *cfg.get("args", [])])
+        if not found:
             continue
-        specs = [a for a in cfg.get("args", []) if not a.startswith("-")]
         if not specs:
             out.append(f"{name}: npx entry without a package")
             continue
-        pkg, version = split_spec(specs[0])
-        if pkg not in table:
-            out.append(f"{name}: {pkg} is not a vendor-verified package (VERIFIED_NPX_PACKAGES)")
-        elif version != table[pkg]["version"]:
-            out.append(f"{name}: {pkg} must be pinned as {pkg}@{table[pkg]['version']}, got {specs[0]}")
+        for spec in specs:
+            pkg, version = split_spec(spec)
+            if pkg not in table:
+                out.append(f"{name}: {pkg} is not a vendor-verified package (VERIFIED_NPX_PACKAGES)")
+            elif version != table[pkg]["version"]:
+                out.append(f"{name}: {pkg} must be pinned as {pkg}@{table[pkg]['version']}, got {spec}")
     return out
 
 
@@ -118,15 +167,23 @@ def prose_problems(root: Path, table: dict) -> list[str]:
         if path.name in SKIP_FILES or set(rel.parts) & SKIP_DIRS:
             continue
         text = path.read_text(encoding="utf-8-sig", errors="replace")
+        fenced = False
         for n, line in enumerate(text.splitlines(), 1):
-            for rx in (NPX_PROSE, NPX_ARGS):
-                for m in rx.finditer(line):
-                    spec = m.group(1).rstrip(".,;:)`'\"")
-                    if "<" in spec or spec.startswith("-"):
-                        continue  # a <placeholder> or a flag
-                    pkg, version = split_spec(spec)
-                    if pkg not in table or version != table[pkg]["version"]:
-                        out.append(f"{rel}:{n}: npx {spec} is not a pinned vendor-verified package")
+            if line.lstrip().startswith("```"):
+                fenced = not fenced
+                continue
+            specs = [m.group(1).rstrip(".,;:)`'\"") for rx in (NPX_PROSE, NPX_ARGS) for m in rx.finditer(line)]
+            # Every runner form, but only where a command is written: a code block or inline code
+            # (plain prose says "npx connectors" without naming a package).
+            for snippet in ([line] if fenced else INLINE_CODE.findall(line)):
+                if COMMAND_START.match(snippet):  # not output listings such as "intercom  npx (needs ...)"
+                    specs += npx_specs(snippet.split())[1]
+            for spec in dict.fromkeys(specs):
+                if any(ch in spec for ch in "<{$") or spec.startswith("-"):
+                    continue  # a <placeholder>, a ${variable} or a flag
+                pkg, version = split_spec(spec)
+                if pkg not in table or version != table[pkg]["version"]:
+                    out.append(f"{rel}:{n}: npx {spec} is not a pinned vendor-verified package")
     return out
 
 
@@ -187,6 +244,35 @@ class TestShippedConfig(unittest.TestCase):
                 'npx -y deepl-mcp-server\nnpx -y <vendor-package>@<exact-version>\n', encoding="utf-8")
             problems = prose_problems(root, reg.VERIFIED_NPX_PACKAGES)
         self.assertEqual(len(problems), 3, problems)
+
+    def test_every_runner_form_is_read(self):
+        import tempfile
+        pinned = reg.verified_npx_args("deepl-mcp-server")[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "forms.md").write_text(
+                "Run `npx mcp-evil-one` once.\n"
+                f"Or `npx -y --package=mcp-evil-two {pinned}`.\n"
+                "Or `npm exec mcp-evil-three`.\n"
+                "```\ncmd /c npx -y mcp-evil-four\nnpx -p mcp-evil-five some-bin\n```\n"
+                "Plain prose about npx connectors names no package.\n"
+                f"`npx -y {pinned}` is fine.\n", encoding="utf-8")
+            problems = "\n".join(prose_problems(root, reg.VERIFIED_NPX_PACKAGES))
+        for n in ("one", "two", "three", "four", "five"):
+            self.assertIn(f"mcp-evil-{n}", problems)
+        self.assertEqual(problems.count("\n") + 1, 5, problems)
+
+    def test_every_runner_form_in_a_config(self):
+        pinned = reg.verified_npx_args("deepl-mcp-server")[1]
+        planted = {"mcpServers": {
+            "a": {"command": "cmd", "args": ["/c", "npx", "-y", "mcp-evil"]},
+            "b": {"command": "npm", "args": ["exec", "--", "mcp-evil"]},
+            "c": {"command": "npx", "args": ["-y", "--package=mcp-evil", pinned]},
+            "d": {"command": "npx", "args": ["mcp-evil"]},
+            "ok": {"command": "npx", "args": ["-y", pinned]},
+        }}
+        got = example_problems(planted, reg.VERIFIED_NPX_PACKAGES)
+        self.assertEqual(sorted(p.split(":")[0] for p in got), ["a", "b", "c", "d"], got)
 
 
 class TestNoNpxForUnlistedPackages(unittest.TestCase):

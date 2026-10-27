@@ -651,4 +651,11 @@ if __name__ == "__main__":
     exe = (sys.executable or "python").replace("\\", "/")
     exe = f'"{exe}"' if " " in exe else exe
     note = "  # in PowerShell, put & before it" if exe.startswith('"') else ""
-    print(f'Usage: {exe} "{Path(__file__).resolve().as_posix()}" self-test{note}')
+    usage = f'Usage: {exe} "{Path(__file__).resolve().as_posix()}" self-test{note}'
+    if sys.argv[1:] in (["-h"], ["--help"]):
+        print(usage)
+        sys.exit(0)
+    if len(sys.argv) > 1:
+        print(f"unknown argument: {sys.argv[1]}", file=sys.stderr)
+    print(usage, file=sys.stderr)
+    sys.exit(2)  # nothing to do: before 3.40.0 any argument printed usage and exited 0

@@ -157,7 +157,7 @@ class TestErrorResultsExitNonZero(unittest.TestCase):
         ("tech-seo-auditor.py", [], 2, "Provide at least one URL"),
         ("local-seo-checker.py", ["--file", "x.json"], 2, "Provide --nap"),
         ("local-seo-checker.py", ["--nap", '{"name": "A"}', "--file", "no-such-file.json"], 1, "File not found"),
-        ("local-seo-checker.py", ["--nap", "{bad"], 2, "Invalid JSON in --nap"),
+        ("local-seo-checker.py", ["--nap", "{bad"], 2, "--nap is not valid JSON"),
         ("ad-budget-pacer.py", ["--budget", "-5", "--period-days", "30", "--days-elapsed", "3",
                                 "--spend-to-date", "1"], 2, "positive number"),
         ("link-profile-analyzer.py", [], 2, "Provide either --links"),
@@ -168,7 +168,7 @@ class TestErrorResultsExitNonZero(unittest.TestCase):
         ("roi-calculator.py", ["--file", "no-such-file.json"], 1, "File not found"),
         ("clv-calculator.py", ["--margin", "0"], 2, "margin must be"),
         ("content-repurposer.py", ["--content-type", "blog", "--title", "T", "--key-points", "{bad"], 2,
-         "Invalid JSON in --key-points"),
+         "--key-points is not valid JSON"),
         ("connector-status.py", ["--action", "check", "--name", "no-such-connector"], 1, "Unknown connector"),
         ("drive-sync-state.py", ["--action", "profile-drive-state"], 1, "--brand required"),
         ("output-validator.py", ["--action", "check-format", "--text", "   "], 1, "No content provided"),
@@ -181,7 +181,9 @@ class TestErrorResultsExitNonZero(unittest.TestCase):
                 self.assertEqual(code, expected, raw[-600:])
                 self.assertIn(text, json.dumps(out) if out is not None else raw)
 
-    def test_scorers_exit_1_on_empty_text(self):
+    def test_scorers_exit_4_on_empty_text(self):
+        # Empty text is "nothing to score" (exit 4, as the other empty cases); before 3.40.0 it was
+        # exit 1, and an empty --text (not just blank) crashed on the missing --file.
         with tempfile.TemporaryDirectory() as home:
             brand = Path(home) / "brands" / "acme"
             brand.mkdir(parents=True)
@@ -190,8 +192,8 @@ class TestErrorResultsExitNonZero(unittest.TestCase):
                                  ("content-scorer.py", ["--text", "   ", "--type", "blog"])):
                 with self.subTest(script=script):
                     code, out, raw = run(script, *args, prelude=NO_NLTK, env_extra={"CLAUDE_MARKETING_HOME": home})
-                    self.assertEqual(code, 1, raw[-600:])
-                    self.assertIn("Empty text", out["error"])
+                    self.assertEqual(code, 4, raw[-600:])
+                    self.assertIn("nothing to score", out["error"])
 
     def test_the_missing_package_fallback_keeps_exit_0(self):
         blocker = ("import importlib.abc, runpy, sys\n"

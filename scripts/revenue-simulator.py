@@ -143,7 +143,10 @@ def simulate(scenarios, target, seed):
             entry["target"] = target
 
         results.append(entry)
-    return {"scenarios": results, "simulations_per_scenario": NUM_SIMULATIONS, "seed": seed}
+    out = {"scenarios": results, "simulations_per_scenario": NUM_SIMULATIONS, "seed": seed}
+    if results and all("error" in r for r in results):
+        out["error"] = "no scenario could be simulated; see each scenario's error"  # exits non-zero
+    return out
 
 
 def what_if(current, alternatives, seed):
@@ -329,7 +332,7 @@ def main():
             print(json.dumps({"error": "Provide --scenarios JSON array"}))
             sys.exit(1)
         try:
-            scenarios = json.loads(args.scenarios)
+            scenarios = _common.json_arg(args.scenarios, "--scenarios", (dict, list))
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --scenarios"}))
             sys.exit(1)
@@ -345,8 +348,8 @@ def main():
             print(json.dumps({"error": "Provide --scenarios JSON alternatives"}))
             sys.exit(1)
         try:
-            current = json.loads(args.current)
-            alternatives = json.loads(args.scenarios)
+            current = _common.json_arg(args.current, "--current")
+            alternatives = _common.json_arg(args.scenarios, "--scenarios", (dict, list))
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --current or --scenarios"}))
             sys.exit(1)
@@ -365,8 +368,8 @@ def main():
             print(json.dumps({"error": "Provide --range [min, max, steps]"}))
             sys.exit(1)
         try:
-            base = json.loads(args.base_scenario)
-            vr = json.loads(args.var_range)
+            base = _common.json_arg(args.base_scenario, "--base-scenario")
+            vr = _common.json_arg(args.var_range, "--range", list, (int, float))
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --base-scenario or --range"}))
             sys.exit(1)
@@ -380,7 +383,7 @@ def main():
             print(json.dumps({"error": "Provide --data JSON with channels"}))
             sys.exit(1)
         try:
-            data = json.loads(args.data)
+            data = _common.json_arg(args.data, "--data")
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --data"}))
             sys.exit(1)
@@ -397,7 +400,7 @@ def main():
             print(json.dumps({"error": "Provide --performance-history JSON array"}))
             sys.exit(1)
         try:
-            history = json.loads(args.perf_history)
+            history = _common.json_arg(args.perf_history, "--performance-history", list)
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --performance-history"}))
             sys.exit(1)

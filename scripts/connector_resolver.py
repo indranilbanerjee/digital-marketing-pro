@@ -2,7 +2,7 @@
 """
 connector_resolver.py
 =====================
-The action-resolution layer that sits between the 12 campaign-audit /
+The action-resolution layer that sits between the campaign-audit /
 launch-campaign actions and the connector registry.
 
 Every action resolves to one of three modes:
@@ -1273,4 +1273,11 @@ if __name__ == "__main__":
         r = resolve_action("audit-workflows", "test-brand")
         print(json.dumps(r, indent=2)[:600])
         sys.exit(0)
-    print("Usage: " + _common.script_command("connector_resolver.py", "self-test"))
+    usage = "Usage: " + _common.script_command("connector_resolver.py", "self-test")
+    if sys.argv[1:] in (["-h"], ["--help"]):
+        print(usage)
+        sys.exit(0)
+    if len(sys.argv) > 1:
+        print(f"unknown argument: {sys.argv[1]}", file=sys.stderr)
+    print(usage, file=sys.stderr)
+    sys.exit(2)  # nothing to do: before 3.40.0 any argument printed usage and exited 0

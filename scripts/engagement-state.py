@@ -442,7 +442,7 @@ def cmd_set_part_status(args: argparse.Namespace) -> None:
 def cmd_add_stone_fact(args: argparse.Namespace) -> None:
     """Append a Stone fact to part-01-client-inputs/stone-facts.json."""
     try:
-        fact = json.loads(args.fact_json)
+        fact = _common.json_arg(args.fact_json, "--fact-json")
     except json.JSONDecodeError as exc:
         err(f"invalid --fact-json: {exc}")
 
@@ -470,7 +470,7 @@ def cmd_add_stone_fact(args: argparse.Namespace) -> None:
 def cmd_add_opinion(args: argparse.Namespace) -> None:
     """Append an Opinion hypothesis to part-01-client-inputs/opinion-hypotheses.json."""
     try:
-        hypothesis = json.loads(args.hypothesis_json)
+        hypothesis = _common.json_arg(args.hypothesis_json, "--hypothesis-json")
     except json.JSONDecodeError as exc:
         err(f"invalid --hypothesis-json: {exc}")
 

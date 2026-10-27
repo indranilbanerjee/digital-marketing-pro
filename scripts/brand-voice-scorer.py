@@ -51,29 +51,15 @@ import _common  # noqa: E402
 # ---------------------------------------------------------------------------
 # NLTK bootstrap — download the required data silently on first run
 # ---------------------------------------------------------------------------
-try:
-    import nltk
-except ImportError:
-    print(json.dumps({
-        "fallback": True,
-        "error": "nltk_not_installed",
-        "message": "NLTK not installed. Voice scoring requires it; install the tested version with: "
-                   + _common.install_command(["nltk"]),
-        "overall_score": None,
-        "recommendation": "Install NLTK for automated scoring, or review manually against brand voice guidelines."
-    }, indent=2))
-    sys.exit(0)
+# Loaded by _load_deps() after the arguments are parsed, so a mistyped option is reported even
+# where NLTK is missing (before 3.40.0 the import ran first and exited 0 with a fallback).
+sent_tokenize = word_tokenize = None
 
-# Ensure tokenizer models are available
-for _res in ("punkt", "punkt_tab", "averaged_perceptron_tagger",
-             "averaged_perceptron_tagger_eng"):
-    try:
-        nltk.data.find(f"tokenizers/{_res}" if "punkt" in _res
-                       else f"taggers/{_res}")
-    except LookupError:
-        nltk.download(_res, quiet=True)
 
-from nltk.tokenize import sent_tokenize, word_tokenize
+def _load_deps() -> None:
+    global sent_tokenize, word_tokenize
+    sent_tokenize, word_tokenize = _common.load_nltk_tokenizers(
+        "Install NLTK for automated scoring, or review manually against brand voice guidelines.")
 
 # ---------------------------------------------------------------------------
 # Constants & indicator word-lists
@@ -357,12 +343,13 @@ def score_content(text: str, profile: dict) -> dict:
             "score": 0,
         }
 
-    targets = profile.get("voice_dimensions", {
-        "formality": 0.5,
-        "energy": 0.5,
-        "humor": 0.0,
-        "authority": 0.5,
-    })
+    # No voice targets, no score. Before 3.40.0 a profile without brand_voice or voice_dimensions was
+    # scored against neutral defaults, and neutral text came out 100 "Excellent".
+    targets = profile.get("voice_dimensions")
+    if not isinstance(targets, dict) or not targets:
+        return {"overall_score": None, "error": "no_voice_profile",
+                "hint": "The brand profile has no voice targets (brand_voice). Run "
+                        "/digital-marketing-pro:brand-setup to add them, then score again."}
 
     # Tokenize
     sentences = sent_tokenize(text)
@@ -504,6 +491,7 @@ def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
     args.brand = _common.slugify_brand(args.brand)
+    _load_deps()
 
     # Load brand profile
     profile = load_brand_profile(args.brand)
@@ -512,7 +500,7 @@ def main() -> None:
         sys.exit(1)
 
     # Resolve input text
-    if args.text:
+    if args.text is not None:  # an empty --text is empty input, not a missing one
         text = args.text
     else:
         file_path = Path(args.file)
@@ -528,9 +516,15 @@ def main() -> None:
                 "error": f"Could not read file: {exc}",
             }, indent=2))
             sys.exit(1)
+    if not text.strip():  # an empty --text or file: nothing to score (exit 4, like the other empty cases)
+        print(json.dumps({"error": "nothing to score: the text is empty", "status": "nothing_to_score"}, indent=2))
+        sys.exit(4)
 
     # Score
     result = score_content(text, profile)
+    if result.get("error") == "no_voice_profile":
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        sys.exit(4)  # action required: add the voice targets
     _common.finish(result)  # exit 1 on an error result (empty text)
 
 

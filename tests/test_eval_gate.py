@@ -1,6 +1,6 @@
 """The scored quality gate (eval-runner.py) applies the brand's settings and stops on CRITICAL issues.
 
-From the Tester's installed-copy audit of 3.39.1 (planted before the fix):
+From an audit of an installed 3.39.1 copy (planted before the fix):
   * T-H1: _load_eval_config returned the manager's whole {"brand", "config"} reply and looked up
     "minimum_dimension_scores" (the writer's key is "minimum_scores") and weights.full/quick/
     compliance (the writer stores one flat map). Every lookup missed, so set-auto-reject 60 with a
@@ -32,7 +32,7 @@ import _common  # noqa: E402
 
 CLEAN = ("Spreadsheets are a good place to start. Most small teams track invoices in one, then move to "
          "dedicated software when the volume grows. Pick a tool your accountant already knows.\n")
-# The Tester's draft. The detector marks a placeholder URL critical in a call to action ("Buy now at").
+# The audit's draft. The detector marks a placeholder URL critical in a call to action ("Buy now at").
 PLACEHOLDER = ("Our miracle formula cures diabetes in 30 days, guaranteed. 76% of buyers prefer Sehat. "
                "Buy now at https://your-site.com/buy or write to info@example.com.\n")
 

@@ -6,7 +6,7 @@ Dynamic content scoring that adapts based on brand profile, industry benchmarks,
 and past performance data. Wraps content-scorer.py with intelligence.
 
 Usage:
-    python adaptive-scorer.py --brand acme --text "Content..." --type blog --keyword "AI"
+    python adaptive-scorer.py --brand acme --text "Content..." --type blog
     python adaptive-scorer.py --brand acme --file article.md --type email
 """
 
@@ -153,7 +153,7 @@ def main():
                         help="Content type")
     parser.add_argument("--text", help="Content text (inline)")
     parser.add_argument("--file", help="Path to content file")
-    parser.add_argument("--keyword", help="Primary SEO keyword")
+    parser.add_argument("--keyword", help="Not used: the weights don't depend on a keyword (accepted so older commands still run)")
     parser.add_argument("--weights-only", action="store_true",
                         help="Only output the computed adaptive weights")
     args = parser.parse_args()
@@ -190,7 +190,11 @@ def main():
         if not fpath.exists():
             print(json.dumps({"error": f"File not found: {args.file}"}))
             sys.exit(1)
-        text = fpath.read_text(encoding="utf-8-sig")
+        try:
+            text = _common.decode_text(fpath.read_bytes(), fpath.name)
+        except (OSError, ValueError) as exc:  # a binary or Windows-1252 file: say so, no traceback
+            print(json.dumps({"error": f"--file can't be read: {exc}"}))
+            sys.exit(2)
 
     json.dump({
         "brand": args.brand,

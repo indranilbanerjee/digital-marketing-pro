@@ -24,6 +24,10 @@ for _stream in (sys.stdout, sys.stderr):  # UTF-8 output, even where a Windows p
         _stream.reconfigure(encoding="utf-8", errors="replace")
     except Exception:
         pass
+
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _common  # noqa: E402
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -528,7 +532,7 @@ def main():
     # --- NAP analysis ---
     if args.nap:
         try:
-            canonical = json.loads(args.nap)
+            canonical = _common.json_arg(args.nap, "--nap")
         except json.JSONDecodeError as exc:
             json.dump({"error": f"Invalid JSON in --nap: {exc}"}, sys.stdout, indent=2)
             print()
@@ -537,7 +541,7 @@ def main():
         citations = []
         if args.citations:
             try:
-                citations = json.loads(args.citations)
+                citations = _common.json_arg(args.citations, "--citations", list, dict)
             except json.JSONDecodeError as exc:
                 json.dump({"error": f"Invalid JSON in --citations: {exc}"}, sys.stdout, indent=2)
                 print()
@@ -580,7 +584,7 @@ def main():
     # --- GBP analysis ---
     if args.gbp:
         try:
-            gbp_data = json.loads(args.gbp)
+            gbp_data = _common.json_arg(args.gbp, "--gbp")
         except json.JSONDecodeError as exc:
             json.dump({"error": f"Invalid JSON in --gbp: {exc}"}, sys.stdout, indent=2)
             print()
@@ -609,6 +613,7 @@ def main():
 
     json.dump(output, sys.stdout, indent=2)
     print()
+    sys.exit(1 if isinstance(output, dict) and "error" in output else 0)  # an error payload never exits 0
 
 
 if __name__ == "__main__":

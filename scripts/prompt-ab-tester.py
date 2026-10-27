@@ -66,7 +66,7 @@ def sanitize_test_name(name):
     if not raw or ".." in raw or "/" in raw or "\\" in raw:
         return None, ("Invalid --test-name: must be non-empty and must not "
                       "contain path separators or '..'.")
-    slug = re.sub(r"[^a-z0-9-]+", "-", raw.lower()).strip("-")
+    slug = re.sub(r"[^a-z0-9-]+", "-", raw.lower()).strip("-")[:80].rstrip("-")  # a long name is cut, not an OSError
     if not slug:
         return None, ("Invalid --test-name: no usable characters after "
                       "slugifying (use letters, digits, hyphens).")
