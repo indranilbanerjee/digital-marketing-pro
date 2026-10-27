@@ -30,7 +30,7 @@ PLATFORM_SPECS = {
         },
         "mention_format": "@username",
         "features": ["carousel", "reels", "stories", "guides"],
-        "notes": ["First 125 chars show before 'more' on feed posts", "Hashtags can go in first comment"],
+        "notes": ["First 125 chars show before 'more' on feed posts", "At most 5 hashtags; keep them in the caption (whether first-comment tags count is undocumented)"],
     },
     "linkedin": {
         "name": "LinkedIn",
@@ -100,6 +100,44 @@ PLATFORM_SPECS = {
         "notes": ["First 100 chars of description visible without expand", "Max 15 hashtags in description"],
     },
 }
+
+
+def _apply_platform_specs():
+    """Overwrite the numbers this table shares with scripts/platform_specs.json, the one sourced
+    copy. Before 3.40.0 it said 30 Instagram hashtags, 5 for Threads and 4,000 TikTok characters."""
+    spec = _common.platform_spec
+
+    def hashtags(platform):
+        return (spec(platform, "hashtags_cap") or spec(platform, "topic_tags_cap")
+                or (spec(platform, "hashtags_advised") or [0, None])[1])
+
+    rows = {  # table key -> (spec platform, chars field, display field, links field)
+        "twitter": ("twitter", "post_chars", None, "links_advised"),
+        "instagram": ("instagram", "caption_chars", "caption_display_chars", None),
+        "linkedin": ("linkedin", "post_chars", "post_display_chars", None),
+        "facebook": ("facebook", "post_chars", "post_display_chars", None),
+        "tiktok": ("tiktok", "caption_chars", None, None),
+        "threads": ("threads", "post_chars", None, "links_cap"),
+        "bluesky": ("bluesky", "post_chars", None, None),
+    }
+    for key, (platform, chars, display, links) in rows.items():
+        limits = PLATFORM_SPECS[key]["limits"]
+        for kind in ("post", "reel", "thread"):
+            if kind not in limits:
+                continue
+            if spec(platform, chars) is not None:
+                limits[kind]["chars"] = spec(platform, chars)
+            if kind != "thread" and hashtags(platform) is not None:
+                limits[kind]["hashtags"] = hashtags(platform)
+            if kind == "post" and display and spec(platform, display) is not None:
+                limits[kind]["display_chars"] = spec(platform, display)
+            if kind == "post" and links and spec(platform, links) is not None:
+                limits[kind]["links"] = spec(platform, links)
+    if "article" in PLATFORM_SPECS["linkedin"]["limits"] and spec("linkedin", "article_chars"):
+        PLATFORM_SPECS["linkedin"]["limits"]["article"]["chars"] = spec("linkedin", "article_chars")
+
+
+_apply_platform_specs()
 
 
 def count_hashtags(text):

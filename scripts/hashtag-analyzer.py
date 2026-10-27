@@ -24,13 +24,23 @@ import _common  # noqa: E402
 # Constants
 # ---------------------------------------------------------------------------
 
+def _limits(platform: str, placement: str) -> dict:
+    """Hashtag limits from scripts/platform_specs.json: the platform's cap where it has one
+    (Instagram 5, Threads one topic tag), else the advised range's top. Before 3.40.0 this table
+    said Instagram 5-15 with a maximum of 30, and Threads 5."""
+    cap = _common.platform_spec(platform, "hashtags_cap") or _common.platform_spec(platform, "topic_tags_cap")
+    low, high = _common.platform_spec(platform, "hashtags_advised") or [min(1, cap or 0), cap or 0]
+    high = min(high, cap) if cap else high
+    return {"optimal_min": low, "optimal_max": high, "absolute_max": cap or high, "placement": placement}
+
+
 PLATFORM_LIMITS = {
-    "instagram": {"optimal_min": 5, "optimal_max": 15, "absolute_max": 30, "placement": "caption or first comment"},
-    "linkedin": {"optimal_min": 3, "optimal_max": 5, "absolute_max": 5, "placement": "end of post"},
-    "twitter": {"optimal_min": 1, "optimal_max": 3, "absolute_max": 5, "placement": "within text or end"},
-    "tiktok": {"optimal_min": 3, "optimal_max": 5, "absolute_max": 5, "placement": "caption"},
-    "threads": {"optimal_min": 1, "optimal_max": 3, "absolute_max": 5, "placement": "within text"},
-    "facebook": {"optimal_min": 1, "optimal_max": 3, "absolute_max": 10, "placement": "end of post"},
+    "instagram": _limits("instagram", "end of the caption (whether first-comment tags count toward the cap is undocumented)"),
+    "linkedin": _limits("linkedin", "end of post"),
+    "twitter": _limits("twitter", "within text or end"),
+    "tiktok": _limits("tiktok", "caption"),
+    "threads": _limits("threads", "one topic tag, which renders without the #"),
+    "facebook": _limits("facebook", "end of post"),
 }
 
 BANNED_HASHTAGS = {

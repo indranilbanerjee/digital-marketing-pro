@@ -729,6 +729,24 @@ def documents_dir() -> Path:
     return Path.home() / "Documents"
 
 
+_PLATFORM_SPECS = None
+
+
+def platform_specs() -> dict:
+    """scripts/platform_specs.json's platforms: one value per social-platform fact, each with its
+    source_url, source_date, verified_on and review_by (tests/test_platform_specs.py checks them)."""
+    global _PLATFORM_SPECS
+    if _PLATFORM_SPECS is None:
+        _PLATFORM_SPECS = read_json(Path(__file__).resolve().parent / "platform_specs.json").get("platforms", {})
+    return _PLATFORM_SPECS
+
+
+def platform_spec(platform: str, field: str, default=None):
+    """The value of one platform fact, or `default` when the file doesn't list it."""
+    entry = platform_specs().get(platform, {}).get(field)
+    return entry.get("value", default) if isinstance(entry, dict) else default
+
+
 # The keys eval-config-manager.py writes and eval-runner.py reads: one table, so the two can't drift.
 # Before 3.40.0 the runner read "minimum_dimension_scores" and weights.full/quick/compliance, and it
 # looked for them in the manager's whole {"brand", "config"} reply, so no brand setting ever applied.

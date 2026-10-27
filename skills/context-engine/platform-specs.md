@@ -1,7 +1,7 @@
 # Platform Specifications Reference
 
 > Last updated: 2026-02-11
-> This file is consumed by an AI agent to validate marketing content against platform requirements. All specs reflect current 2026 platform standards.
+> This file is consumed by an AI agent to validate marketing content against platform requirements. A value tagged `(platform_specs.json: platform.field)` comes from `scripts/platform_specs.json`, where each limit carries its source, the date it was checked and a review date, and the social scripts read the same file. Untagged values are carried from earlier releases and were last reviewed as a whole on the date above: check the vendor's page before relying on one for a hard commitment.
 
 ---
 
@@ -20,7 +20,7 @@
 | Portrait image | 1080 x 1350 px (4:5) |
 | Landscape image | 1080 x 566 px (1.91:1) |
 | Max file size (image) | 30 MB |
-| Hashtag limit | 30 max, 3-5 recommended |
+| Hashtag limit | 5 (platform_specs.json: instagram.hashtags_cap); 3-5 recommended; keep them in the caption |
 | Algorithm priority signals | Saves, shares, comments, watch time, relationship closeness |
 | Best posting times | Tue-Thu 9-11 AM, Wed 11 AM, Fri 10-11 AM (local) |
 
@@ -28,14 +28,14 @@
 
 | Spec | Value |
 |---|---|
-| Duration | 15s, 30s, 60s, 90s (up to 3 min with some accounts) |
+| Duration | Up to 20 min (platform_specs.json: instagram.reel_max_seconds); keep to 3 min (platform_specs.json: instagram.reel_recommended_max_seconds) or less to be recommended to new audiences |
 | Aspect ratio | 9:16 (vertical) |
 | Resolution | 1080 x 1920 px |
 | Video format | MP4, MOV |
 | Max file size | 4 GB |
 | Cover photo | 1080 x 1920 px |
 | Caption limit | 2,200 characters |
-| Hashtag limit | 30 max, 3-8 recommended |
+| Hashtag limit | 5 (platform_specs.json: instagram.hashtags_cap); 3-5 recommended |
 | Algorithm priority signals | Watch-through rate, replays, shares, audio usage, originality |
 | Best posting times | Mon-Thu 9 AM, 12 PM, 7-8 PM (local) |
 
@@ -77,7 +77,7 @@
 | Resolution | 1080 x 1920 px minimum |
 | Video format | MP4, MOV, WebM |
 | Max file size | 10 GB (desktop), 287 MB (mobile) |
-| Caption limit | 4,000 characters |
+| Caption limit | 2200 characters (platform_specs.json: tiktok.caption_chars); sources disagree (2,200 vs 4,000), so 2,200 fits either until an in-app check |
 | Hashtag limit | No hard limit; 3-5 relevant hashtags recommended |
 | Photo mode | Up to 35 images per carousel post |
 | Algorithm priority signals | Completion rate, rewatch rate, shares, comments, profile visits after viewing, content diversity score |
@@ -175,7 +175,7 @@
 
 | Spec | Value |
 |---|---|
-| Duration | Up to 90 seconds |
+| Duration | Any length: Facebook posts every video as a reel (platform_specs.json: facebook.reel_max_seconds) |
 | Aspect ratio | 9:16 |
 | Resolution | 1080 x 1920 px |
 | Video format | MP4, MOV |

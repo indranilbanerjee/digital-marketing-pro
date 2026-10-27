@@ -694,7 +694,7 @@
         "verify-claims"
       ],
       "doc_files": 18,
-      "bytes": 156344
+      "bytes": 156409
     },
     {
       "name": "content-repurpose",
@@ -777,7 +777,7 @@
         "validate-profile"
       ],
       "doc_files": 56,
-      "bytes": 904554
+      "bytes": 905517
     },
     {
       "name": "continuous-improvement-loop",
@@ -1024,7 +1024,7 @@
         "brand-setup"
       ],
       "doc_files": 10,
-      "bytes": 148229
+      "bytes": 148217
     },
     {
       "name": "engagement-workflow",
@@ -2229,7 +2229,7 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 14057
+      "bytes": 14242
     },
     {
       "name": "search-knowledge",
