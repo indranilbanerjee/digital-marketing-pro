@@ -10,6 +10,10 @@ documented set of marketing-suite-specific model families. This test enforces:
      must match. This is what sync_model_registry.sh keeps true.
   2. DMP's extra entries are exactly the DOCUMENTED deviation allowlist below,
      so a new, undocumented DMP-only id (silent drift) fails the build.
+  3. Each sibling IS the mirror (canonical minus DMP_ONLY, its own $comment kept),
+     and `sync_model_registry.sh --check` reports drift in both directions: entries
+     a sibling lacks and entries upstream dropped. The surgical by-id sync it
+     replaced (3.37.2) reported neither, so Worker B finished the 3.36.2 sync by hand.
 
 If the ContentForge sibling repo is not checked out next to this repo, the
 cross-repo assertions are skipped (the deviation allowlist is still checked).
@@ -17,25 +21,26 @@ cross-repo assertions are skipped (the deviation allowlist is still checked).
 from __future__ import annotations
 
 import json
+import shutil
+import subprocess
+import sys
+import tempfile
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
+from io import StringIO
 from pathlib import Path
+
+SCRIPTS = Path(__file__).resolve().parent.parent / "scripts"
+sys.path.insert(0, str(SCRIPTS))
+import registry_mirror  # noqa: E402
+from registry_mirror import DMP_ONLY_ALIASES, DMP_ONLY_MODELS  # noqa: E402
 
 DMP_REGISTRY = Path(__file__).resolve().parent.parent / "scripts" / "model_registry.json"
 CF_REGISTRY = (Path(__file__).resolve().parent.parent.parent
                / "contentforge" / "scripts" / "model_registry.json")
 
-# Documented DMP-only additions (marketing-suite-specific model families). Two
-# of these (deepseek-chat, gpt-5.2) plus the evolink aliases are referenced by
-# tests/test_resolve_model.py, so per the reconciliation rule they are kept and
-# reported as intentional deviations rather than deleted to match CF.
-DMP_ONLY_MODELS = {
-    "deepseek-chat", "deepseek-reasoner", "deepseek-v4-flash", "deepseek-v4-pro",
-    "doubao-seed-2.0-lite", "doubao-seed-2.0-pro", "evolink-auto",
-    "gpt-5.1", "gpt-5.2", "minimax-m2.5", "minimax-m3",
-}
-DMP_ONLY_ALIASES = {
-    "latest-balanced-evolink", "latest-fast-evolink", "latest-text-evolink",
-}
+# The documented DMP-only families (DMP_ONLY_MODELS / DMP_ONLY_ALIASES) live in
+# scripts/registry_mirror.py, the one place the mirror and these tests read them.
 
 
 def _load(path: Path) -> dict:
@@ -153,6 +158,112 @@ class TestSharedEntriesNoDrift(unittest.TestCase):
         missing = set(self.cf_models) - set(self.dmp_models)
         self.assertEqual(missing, set(),
                          f"CF has models DMP is missing (DMP must be the superset): {sorted(missing)}")
+
+
+class TestSiblingsAreTheMirror(unittest.TestCase):
+    """Checked-out siblings must equal the mirror exactly (skipped when none is checked out)."""
+
+    def test_each_checked_out_sibling(self):
+        canon, checked = _load(DMP_REGISTRY), 0
+        for name, path in SIBLING_REGISTRIES.items():
+            if not path.exists():
+                continue
+            checked += 1
+            sibling = _load(path)
+            with self.subTest(sibling=name):
+                found = registry_mirror.differences(registry_mirror.mirror(canon, sibling), sibling)
+                self.assertEqual(found, [], f"{name}: run sh scripts/sync_model_registry.sh")
+        if not checked:
+            self.skipTest("sibling repos not checked out")
+
+
+class TestRegistryMirror(unittest.TestCase):
+    """The mirror against throwaway sibling folders."""
+
+    def setUp(self):
+        self.canon = _load(DMP_REGISTRY)
+        self.tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        for name in registry_mirror.SIBLINGS:
+            self.write(name, registry_mirror.mirror(self.canon, {"$comment": f"{name} copy"}))
+
+    def path(self, name: str) -> Path:
+        p = self.tmp / name / registry_mirror.SIBLINGS[name]
+        p.parent.mkdir(parents=True, exist_ok=True)
+        return p
+
+    def write(self, name: str, doc: dict) -> None:
+        self.path(name).write_text(registry_mirror.render(doc), encoding="utf-8", newline="")
+
+    def run_mirror(self, *args: str) -> tuple[int, str]:
+        out, err = StringIO(), StringIO()
+        with redirect_stdout(out), redirect_stderr(err):
+            code = registry_mirror.main([*args, "--parent", str(self.tmp)])
+        return code, out.getvalue() + err.getvalue()
+
+    def test_mirror_drops_dmp_only_and_keeps_the_sibling_comment(self):
+        m = registry_mirror.mirror(self.canon, {"$comment": "ContentForge copy"})
+        self.assertEqual(m["$comment"], "ContentForge copy")
+        self.assertEqual([x["id"] for x in m["models"]],
+                         [x["id"] for x in self.canon["models"] if x["id"] not in DMP_ONLY_MODELS])
+        self.assertFalse(set(m["aliases"]) & DMP_ONLY_ALIASES)
+        self.assertEqual(m["tiers"], self.canon["tiers"])
+
+    def test_check_reports_both_directions_and_writes_nothing(self):
+        # What the by-id sync could not see: an unreferenced canonical entry and alias key
+        # the sibling lacks, and an entry and alias key upstream has dropped.
+        doc = registry_mirror.mirror(self.canon, {"$comment": "x"})
+        doc["models"] = [m for m in doc["models"] if m["id"] != "scribe_v1"]
+        doc["models"].append({"id": "dropped-upstream", "vendor": "x", "family": "x",
+                              "display_name": "x", "status": "current"})
+        del doc["aliases"]["latest-stt-sarvam"]
+        doc["aliases"]["latest-dropped-upstream"] = "dropped-upstream"
+        self.write("contentforge", doc)
+        before = self.path("contentforge").read_text(encoding="utf-8")
+        code, out = self.run_mirror("--check")
+        self.assertEqual(code, 1, out)
+        for expected in ("DRIFT contentforge", "missing models: scribe_v1",
+                         "extra models (dropped or DMP-only upstream): dropped-upstream",
+                         "missing aliases: latest-stt-sarvam",
+                         "extra aliases (dropped or DMP-only upstream): latest-dropped-upstream",
+                         "OK    socialforge"):
+            self.assertIn(expected, out)
+        self.assertEqual(self.path("contentforge").read_text(encoding="utf-8"), before)
+
+    def test_sync_writes_the_mirror_and_is_idempotent(self):
+        doc = registry_mirror.mirror(self.canon, {"$comment": "keep me"})
+        doc["models"] = doc["models"][:5]
+        doc["tiers"] = {}
+        self.write("socialforge", doc)
+        code, out = self.run_mirror()
+        self.assertEqual(code, 0, out)
+        self.assertIn("SYNC  socialforge", out)
+        want = registry_mirror.render(registry_mirror.mirror(self.canon, {"$comment": "keep me"}))
+        self.assertEqual(self.path("socialforge").read_text(encoding="utf-8"), want)
+        code, out = self.run_mirror("--check")
+        self.assertEqual(code, 0, out)
+        self.assertIn("OK    socialforge", out)
+
+    def test_an_alias_to_a_dmp_only_model_cannot_be_mirrored(self):
+        canon = dict(self.canon, aliases=dict(self.canon["aliases"], **{"latest-x": "gpt-5.2"}))
+        with self.assertRaisesRegex(ValueError, "alias latest-x -> gpt-5.2"):
+            registry_mirror.mirror(canon)
+
+    def test_missing_sibling_is_skipped(self):
+        shutil.rmtree(self.tmp / "socialforge")
+        code, out = self.run_mirror("--check")
+        self.assertEqual(code, 0, out)
+        self.assertIn("SKIP  socialforge", out)
+
+    @unittest.skipUnless(shutil.which("sh"), "no POSIX sh on PATH")
+    def test_shell_wrapper_passes_its_arguments(self):
+        script = (SCRIPTS / "sync_model_registry.sh").as_posix()
+        ok = subprocess.run(["sh", script, "--check", "--parent", str(self.tmp)],
+                            capture_output=True, text=True, timeout=60)
+        self.assertEqual(ok.returncode, 0, ok.stdout + ok.stderr)
+        self.assertIn("OK    contentforge", ok.stdout)
+        bad = subprocess.run(["sh", script, "--bogus"], capture_output=True, text=True, timeout=60)
+        self.assertEqual(bad.returncode, 2, bad.stdout + bad.stderr)
 
 
 if __name__ == "__main__":

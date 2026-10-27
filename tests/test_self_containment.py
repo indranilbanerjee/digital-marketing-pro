@@ -41,6 +41,7 @@ EXTENDED_SUFFIXES = {".md", ".py", ".sh", ".yaml", ".yml"}
 # distribution infrastructure — build tooling, not capability delegation).
 FILE_ALLOWLIST = {
     "scripts/sync_model_registry.sh",
+    "scripts/registry_mirror.py",
     "scripts/model_registry.json",
 }
 

@@ -26,15 +26,15 @@ Every script that calls a provider model accepts `--model` (or `--openai-model` 
 - **No `--model`** → resolve via the script's default alias (e.g. `latest-balanced-anthropic`).
 
 ```bash
-# Default — uses the registry's latest-balanced-anthropic alias (claude-sonnet-4-6 today)
+# Default — uses the registry's latest-balanced-anthropic alias (claude-sonnet-5-5 on 2026-10-27)
 python scripts/ai-visibility-checker.py --brand acme --mode api
 
 # Override to a specific id
 python scripts/ai-visibility-checker.py --brand acme --mode api --anthropic-model claude-opus-4-7
 
-# Pass a deprecated id — script warns and substitutes claude-sonnet-4-6
+# Pass a deprecated id — script warns and substitutes its replacement, claude-sonnet-5-5
 python scripts/ai-visibility-checker.py --brand acme --mode api --anthropic-model claude-sonnet-4-5-20250929
-# WARNING (anthropic): claude-sonnet-4-5-20250929 is deprecated, using claude-sonnet-4-6 instead
+# WARNING (anthropic): claude-sonnet-4-5-20250929 is deprecated, using claude-sonnet-5-5 instead
 
 # See what's curated
 python scripts/ai-visibility-checker.py --list-models
@@ -70,8 +70,20 @@ python scripts/resolve_model.py --list --vendor anthropic --status current
 | `latest-text-evolink` | `gpt-5.2` (GPT-5.2) |
 | `latest-balanced-evolink` | `deepseek-chat` (DeepSeek Chat (V3)) |
 | `latest-fast-evolink` | `deepseek-v4-flash` (DeepSeek V4 Flash) |
+| `latest-tts-openai` | `gpt-realtime-2.1-mini` (GPT-Realtime-2.1 mini) |
+| `latest-stt-openai` | `gpt-transcribe` (GPT Transcribe) |
+| `latest-tts-elevenlabs` | `eleven_v4` (Eleven v4) |
+| `latest-stt-elevenlabs` | `scribe_v2` (Scribe v2) |
+| `latest-tts-sarvam` | `bulbul:v3` (Bulbul v3) |
+| `latest-stt-sarvam` | `saaras:v4` (Saaras v4) |
 
 This table is generated from `scripts/model_registry.json`; `tests/test_model_registry_dates.py` fails if it drifts. `latest-video-google` is Veo 3.1 on **Vertex AI only**; the Gemini API's video model is `latest-video-gemini-api` (Gemini Omni, a different call shape: see `param_compatibility_notes.veo_backend`).
+
+**Speech kinds are pins with an expiry.** No vendor list endpoint tells a speech model from a chat model, so the `text-to-speech` and `speech-to-text` entries are not discovered: each carries `pinned_on` and `pin_expires` (at most 92 days apart), and the weekly dated check fails once a pin expires, so someone re-reads the vendor page and re-pins. Three facts from the 2026-10-27 read change how callers work, not just which id they send:
+
+- OpenAI shuts down every `/v1/audio/speech` model (`tts-1`, `tts-1-hd`, `gpt-4o-mini-tts`) on **2027-01-06**. Its replacement, `gpt-realtime-2.1-mini`, runs only on the Realtime API, so OpenAI text-to-speech needs a Realtime client.
+- OpenAI's `whisper-1` and `gpt-4o-transcribe` shut down on **2027-02-26**; `gpt-transcribe` takes the same `/v1/audio/transcriptions` call.
+- Sarvam's `/speech-to-text` accepts only `saaras:v4` and `saaras:v3` now; `saarika:v2.5` is deprecated. Send `mode="transcribe"` for a plain transcript.
 
 Run `python scripts/resolve_model.py --aliases` to list the live mappings.
 

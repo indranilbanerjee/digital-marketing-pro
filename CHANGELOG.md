@@ -6,6 +6,75 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.37.2] - 2026-10-27
+
+### Speech models join the registry as pins with an expiry, and the registry sync becomes a two-way mirror
+
+Two jobs. The first lets the suite's video tool drop its hardcoded voice and transcription model ids. The second makes `sync_model_registry.sh` catch what it used to miss. Every vendor fact below was read on its own page on 2026-10-27. Each guard has a test that fails on the 3.37.1 registry, doc or script.
+
+**Added: speech kinds** (`scripts/model_registry.json`)
+
+- Two new tiers, `text-to-speech` and `speech-to-text`, and six aliases:
+
+  | Alias | Pinned to | Why |
+  |---|---|---|
+  | `latest-tts-openai` | `gpt-realtime-2.1-mini` | OpenAI's named replacement for every `/v1/audio/speech` model. It runs **only on the Realtime API** |
+  | `latest-stt-openai` | `gpt-transcribe` | Released 2026-07-28; same `/v1/audio/transcriptions` call as Whisper |
+  | `latest-tts-elevenlabs` | `eleven_v4` | Flagship since 2026-09-28; 90+ languages |
+  | `latest-stt-elevenlabs` | `scribe_v2` | Current batch model; `scribe_v1` is deprecated |
+  | `latest-tts-sarvam` | `bulbul:v3` | Sarvam's "stable model (API default)". `bulbul:v4-flash` is newer, but Sarvam publishes no release date for it |
+  | `latest-stt-sarvam` | `saaras:v4` | Default and recommended; generally available 2026-09-02 |
+
+- Thirteen entries, including the deprecated ids callers still send:
+  - `gpt-4o-mini-tts`: shuts down 2027-01-06, together with `tts-1` and `tts-1-hd`;
+  - `whisper-1` and `gpt-4o-transcribe`: shut down 2027-02-26;
+  - `saarika:v2.5`: deprecated, and Sarvam's `/speech-to-text` now accepts only `saaras:v4` and `saaras:v3`;
+  - `scribe_v1`: deprecated;
+  - `eleven_multilingual_v2`: previous generation, not deprecated.
+
+  `resolve_model.py --check saarika:v2.5` now reports it as deprecated and names `saaras:v4`.
+- **Pins, not discovery.** No vendor list endpoint tells a speech model from a chat model, so these entries can't be discovered. Each carries `pinned_on` and `pin_expires`, set 90 days apart.
+- Sources:
+  - OpenAI: models, deprecations, changelog, the text-to-speech guide, and the `gpt-transcribe` and `gpt-realtime-2.1-mini` pages;
+  - ElevenLabs: models page and changelog;
+  - Sarvam: models page, the text-to-speech and speech-to-text API references, the Saarika page and the changelog.
+
+**Changed: `scripts/sync_model_registry.sh` mirrors the registry**
+
+- Each sibling copy is now exactly the canonical registry minus the DMP-only families, keeping the sibling's own `$comment`. The merge lives in the new `scripts/registry_mirror.py` (stdlib), which also holds the DMP-only lists, and the shell script only finds Python.
+- The old surgical by-id update left entries DMP had dropped. It also never added canonical entries or alias keys that nothing pointed at yet, so the 3.36.2 sync had to be finished by hand.
+- `--check` now reports both directions:
+  - entries and alias keys a copy is missing;
+  - entries and alias keys upstream dropped;
+  - drifted entries;
+  - differing metadata.
+
+  It exits 1 on any drift. `--parent DIR` points it at another checkout layout, and an unknown flag exits 2.
+- The mirror refuses to write a copy whose alias or fall-forward would point at a DMP-only or missing entry.
+- Rebuilt from the 3.37.1 registry, the mirror reproduces both sibling copies byte for byte.
+
+**Fixed: docs**
+
+- `docs/MODEL-CURATOR.md`:
+  - adds the six speech aliases and a note on the three changes callers must make: OpenAI text-to-speech needs a Realtime client, Whisper swaps to `gpt-transcribe`, and Saarika moves to `saaras:v4` with `mode="transcribe"`;
+  - its worked examples still named `claude-sonnet-4-6` as the default and as the substitute for the deprecated Sonnet 4.5. They now say `claude-sonnet-5-5`, as the registry does.
+- README "Model curator" covers speech pins and the mirror.
+
+**Tests**
+
+- `tests/test_model_registry_dates.py`:
+  - rule 7: an entry in a pinned tier without `pinned_on` and `pin_expires`, a pin past its expiry, or a pin longer than 92 days fails. The weekly dated-checks job runs it;
+  - every speech kind has an alias per vendor, and each speech alias resolves to its kind;
+  - the curator doc's worked examples must name live targets.
+
+  On the 3.37.1 registry and doc: 2 failures.
+- `tests/test_model_registry_sync.py`:
+  - the mirror against throwaway sibling folders: both-direction drift, a write followed by an idempotent re-check, a refused dangling alias, a skipped sibling, and the shell wrapper passing its arguments;
+  - checked-out siblings must equal the mirror.
+
+  The 3.37.1 test module fails to import without `registry_mirror`. On the same both-direction scenario, the 3.37.1 `sync_model_registry.sh --check` printed "already in sync" for both siblings.
+- Suite: 780 tests. In the main tree, the cross-repo registry checks fail until the content plugins take the new mirror.
+
 ## [3.37.1] - 2026-10-27
 
 ### Every jurisdiction re-read at its source, TikTok's Smart+ cutoff, and no agent pins a model

@@ -1,8 +1,8 @@
 {
-  "$comment": "Canonical model registry for the Neelverse Marketing Suite (DMP / ContentForge / SocialForge). Update this file then run scripts/sync_model_registry.sh to distribute. The resolver consults this registry to map human-readable aliases to concrete model IDs and to warn when a deprecated model is being used. See refresh_models.py to poll provider APIs for drift.",
+  "$comment": "Canonical model registry for the Neelverse Marketing Suite (DMP / ContentForge / SocialForge). Update this file then run scripts/sync_model_registry.sh to distribute: each sibling copy is this file minus the DMP-only families listed in scripts/registry_mirror.py. The resolver consults this registry to map human-readable aliases to concrete model IDs and to warn when a deprecated model is being used. See refresh_models.py to poll provider APIs for drift.",
   "schema_version": "1.0",
   "last_updated": "2026-10-27",
-  "last_updated_by": "manual refresh from vendor pages read 2026-10-27; see _shared/REGISTRY-PATCH-2026-10-27.md",
+  "last_updated_by": "manual refresh from vendor pages read 2026-10-27; see _shared/REGISTRY-PATCH-2026-10-27.md; speech kinds (text-to-speech, speech-to-text) added in DMP 3.37.2 as pins with an expiry",
   "next_review_due": "2026-11-16",
   "stewardship_policy": "Re-validate at least quarterly OR whenever a script call returns a 404 / deprecation warning. Frontier model landscape shifts every ~6 weeks; treat any entry older than 3 months as suspect. Verify the next time `refresh_models.py` reports drift, or before any new feature ship.",
   "param_compatibility_notes": {
@@ -20,7 +20,9 @@
     "frontier-image-character": "Specialised for consistent character / face preservation.",
     "frontier-video": "Best-in-class video generation.",
     "frontier-multimodal": "Native handling of text + image + audio + video in one call.",
-    "balanced-video": "Production-grade video generation, lower cost than the frontier video tier."
+    "balanced-video": "Production-grade video generation, lower cost than the frontier video tier.",
+    "text-to-speech": "Turns text into speech. Pinned with an expiry: no vendor list endpoint tells speech models from chat models, so each entry is re-read at the vendor's page before its pin_expires date.",
+    "speech-to-text": "Transcribes speech to text. Pinned with an expiry, like text-to-speech."
   },
   "models": [
     {
@@ -1530,6 +1532,232 @@
       ],
       "docs_url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/veo/3-1-generate",
       "notes": "Vertex AI, Preview; text input only (no image input or reference images); no retirement date listed. Gemini-API id veo-3.1-lite-generate-preview shut down 2026-10-22."
+    },
+    {
+      "id": "gpt-realtime-2.1-mini",
+      "vendor": "openai",
+      "family": "gpt",
+      "display_name": "GPT-Realtime-2.1 mini",
+      "tier": "text-to-speech",
+      "modality": [
+        "text",
+        "audio",
+        "speech-gen"
+      ],
+      "status": "current",
+      "released": "2026-07-06",
+      "pinned_on": "2026-10-27",
+      "pin_expires": "2027-01-25",
+      "api_endpoint": "wss://api.openai.com/v1/realtime",
+      "docs_url": "https://developers.openai.com/api/docs/models/gpt-realtime-2.1-mini",
+      "notes": "OpenAI's named replacement for tts-1, tts-1-hd and gpt-4o-mini-tts (deprecations page and text-to-speech guide, read 2026-10-27). Realtime API only (v1/realtime): 'Not supported' on /v1/audio/speech and Chat Completions, so moving text-to-speech here is a change of API workflow, not a model swap. Input text, audio, image; output text, audio."
+    },
+    {
+      "id": "gpt-4o-mini-tts",
+      "vendor": "openai",
+      "family": "gpt",
+      "display_name": "GPT-4o mini TTS",
+      "tier": "text-to-speech",
+      "modality": [
+        "speech-gen"
+      ],
+      "status": "deprecated",
+      "deprecation_date": "2026-10-01",
+      "shutdown_date": "2027-01-06",
+      "replacement_id": "gpt-realtime-2.1-mini",
+      "pinned_on": "2026-10-27",
+      "pin_expires": "2027-01-25",
+      "api_endpoint": "https://api.openai.com/v1/audio/speech",
+      "docs_url": "https://developers.openai.com/api/docs/deprecations",
+      "notes": "Shuts down 2027-01-06 with both snapshots (gpt-4o-mini-tts-2025-03-20, -2025-12-15) and with tts-1 and tts-1-hd (announced 2026-10-01). The replacement runs on the Realtime API, not /v1/audio/speech. Supports `instructions` (tone, accent, pace) until then."
+    },
+    {
+      "id": "gpt-transcribe",
+      "vendor": "openai",
+      "family": "gpt",
+      "display_name": "GPT Transcribe",
+      "tier": "speech-to-text",
+      "modality": [
+        "transcription"
+      ],
+      "status": "current",
+      "released": "2026-07-28",
+      "pinned_on": "2026-10-27",
+      "pin_expires": "2027-01-25",
+      "api_endpoint": "https://api.openai.com/v1/audio/transcriptions",
+      "docs_url": "https://developers.openai.com/api/docs/models/gpt-transcribe",
+      "notes": "High-accuracy speech-to-text for files and Realtime input. Endpoints: /v1/audio/transcriptions and v1/realtime/transcription_sessions; not /v1/audio/translations. gpt-live-transcribe (same release) is the low-latency streaming variant."
+    },
+    {
+      "id": "whisper-1",
+      "vendor": "openai",
+      "family": "gpt",
+      "display_name": "Whisper",
+      "tier": "speech-to-text",
+      "modality": [
+        "transcription"
+      ],
+      "status": "deprecated",
+      "deprecation_date": "2026-08-26",
+      "shutdown_date": "2027-02-26",
+      "replacement_id": "gpt-transcribe",
+      "pinned_on": "2026-10-27",
+      "pin_expires": "2027-01-25",
+      "api_endpoint": "https://api.openai.com/v1/audio/transcriptions",
+      "docs_url": "https://developers.openai.com/api/docs/deprecations",
+      "notes": "Shuts down 2027-02-26 (announced 2026-08-26); replacement gpt-transcribe or gpt-live-transcribe. /v1/audio/translations shuts down the same day."
+    },
+    {
+      "id": "gpt-4o-transcribe",
+      "vendor": "openai",
+      "family": "gpt",
+      "display_name": "GPT-4o Transcribe",
+      "tier": "speech-to-text",
+      "modality": [
+        "transcription"
+      ],
+      "status": "deprecated",
+      "deprecation_date": "2026-08-26",
+      "shutdown_date": "2027-02-26",
+      "replacement_id": "gpt-transcribe",
+      "pinned_on": "2026-10-27",
+      "pin_expires": "2027-01-25",
+      "api_endpoint": "https://api.openai.com/v1/audio/transcriptions",
+      "docs_url": "https://developers.openai.com/api/docs/deprecations",
+      "notes": "Shuts down 2027-02-26 (announced 2026-08-26) with gpt-4o-mini-transcribe and gpt-4o-transcribe-diarize; replacement gpt-transcribe or gpt-live-transcribe."
+    },
+    {
+      "id": "eleven_v4",
+      "vendor": "elevenlabs",
+      "family": "eleven",
+      "display_name": "Eleven v4",
+      "tier": "text-to-speech",
+      "modality": [
+        "speech-gen"
+      ],
+      "status": "current",
+      "released": "2026-09-28",
+      "pinned_on": "2026-10-27",
+      "pin_expires": "2027-01-25",
+      "api_endpoint": "https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+      "docs_url": "https://elevenlabs.io/docs/overview/models",
+      "notes": "Flagship text-to-speech: 90+ languages, 10,000 characters per request. eleven_v4_turbo is the real-time variant (~100 ms median inference). Released with v4 Turbo on 2026-09-28 (changelog)."
+    },
+    {
+      "id": "eleven_multilingual_v2",
+      "vendor": "elevenlabs",
+      "family": "eleven",
+      "display_name": "Eleven Multilingual v2",
+      "tier": "text-to-speech",
+      "modality": [
+        "speech-gen"
+      ],
+      "status": "supported",
+      "replacement_id": "eleven_v4",
+      "pinned_on": "2026-10-27",
+      "pin_expires": "2027-01-25",
+      "api_endpoint": "https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+      "docs_url": "https://elevenlabs.io/docs/overview/models",
+      "notes": "'Previous generation' on the models page, not deprecated, no shutdown date. 29 languages, 10,000 characters per request."
+    },
+    {
+      "id": "scribe_v2",
+      "vendor": "elevenlabs",
+      "family": "eleven",
+      "display_name": "Scribe v2",
+      "tier": "speech-to-text",
+      "modality": [
+        "transcription"
+      ],
+      "status": "current",
+      "pinned_on": "2026-10-27",
+      "pin_expires": "2027-01-25",
+      "api_endpoint": "https://api.elevenlabs.io/v1/speech-to-text",
+      "docs_url": "https://elevenlabs.io/docs/overview/models",
+      "notes": "Batch speech-to-text, 90+ languages. scribe_v2_realtime (~150 ms) streams; scribe_v2_medical is for clinical audio. ElevenLabs' MCP server has defaulted to scribe_v2 since 2026-08-03 (changelog); no release date found."
+    },
+    {
+      "id": "scribe_v1",
+      "vendor": "elevenlabs",
+      "family": "eleven",
+      "display_name": "Scribe v1",
+      "tier": "speech-to-text",
+      "modality": [
+        "transcription"
+      ],
+      "status": "deprecated",
+      "replacement_id": "scribe_v2",
+      "pinned_on": "2026-10-27",
+      "pin_expires": "2027-01-25",
+      "api_endpoint": "https://api.elevenlabs.io/v1/speech-to-text",
+      "docs_url": "https://elevenlabs.io/docs/overview/models",
+      "notes": "Listed under 'Deprecated models' with replacement scribe_v2; no shutdown date published."
+    },
+    {
+      "id": "bulbul:v3",
+      "vendor": "sarvam",
+      "family": "bulbul",
+      "display_name": "Bulbul v3",
+      "tier": "text-to-speech",
+      "modality": [
+        "speech-gen"
+      ],
+      "status": "current",
+      "pinned_on": "2026-10-27",
+      "pin_expires": "2027-01-25",
+      "api_endpoint": "https://api.sarvam.ai/text-to-speech",
+      "docs_url": "https://docs.sarvam.ai/api-reference-docs/text-to-speech/convert",
+      "notes": "'Stable model (API default when model is omitted)'. 11 languages; default speaker shubh; speaker names are lowercase and must match the model. Reaches end of life on Sarvam's Voice Agents on 2026-11-10 but stays on the Text-to-Speech API (changelog, 2026-10-14)."
+    },
+    {
+      "id": "bulbul:v4-flash",
+      "vendor": "sarvam",
+      "family": "bulbul",
+      "display_name": "Bulbul v4 Flash",
+      "tier": "text-to-speech",
+      "modality": [
+        "speech-gen"
+      ],
+      "status": "current",
+      "pinned_on": "2026-10-27",
+      "pin_expires": "2027-01-25",
+      "api_endpoint": "https://api.sarvam.ai/text-to-speech",
+      "docs_url": "https://docs.sarvam.ai/api-reference-docs/text-to-speech/convert",
+      "notes": "'Latest' on the models page: 200+ persona voices named <name>_<language>_<style> (default shubh_enhi_ads), same request and response contract as v3. No release date published (Bulbul V4 reached Voice Agents on 2026-10-06), so the alias stays on v3, the vendor's stable default."
+    },
+    {
+      "id": "saaras:v4",
+      "vendor": "sarvam",
+      "family": "saaras",
+      "display_name": "Saaras v4",
+      "tier": "speech-to-text",
+      "modality": [
+        "transcription"
+      ],
+      "status": "current",
+      "released": "2026-09-02",
+      "pinned_on": "2026-10-27",
+      "pin_expires": "2027-01-25",
+      "api_endpoint": "https://api.sarvam.ai/speech-to-text",
+      "docs_url": "https://docs.sarvam.ai/api-reference-docs/speech-to-text/transcribe",
+      "notes": "'Default, recommended, latest' on /speech-to-text (generally available 2026-09-02). 23 languages; modes transcribe, translate, verbatim, translit, codemix: send mode=\"transcribe\" for a plain transcript. saaras:v3 is the other accepted value."
+    },
+    {
+      "id": "saarika:v2.5",
+      "vendor": "sarvam",
+      "family": "saarika",
+      "display_name": "Saarika v2.5",
+      "tier": "speech-to-text",
+      "modality": [
+        "transcription"
+      ],
+      "status": "deprecated",
+      "replacement_id": "saaras:v4",
+      "pinned_on": "2026-10-27",
+      "pin_expires": "2027-01-25",
+      "api_endpoint": "https://api.sarvam.ai/speech-to-text",
+      "docs_url": "https://docs.sarvam.ai/api/getting-started/models/saarika",
+      "notes": "Deprecated on Sarvam's Saarika page, with no removal date. The /speech-to-text reference (read 2026-10-27) accepts only saaras:v4 and saaras:v3, so a call naming saarika may already fail. Move to saaras:v4 with mode=\"transcribe\"."
     }
   ],
   "aliases": {
@@ -1555,6 +1783,12 @@
     "latest-image-character-higgsfield": "higgsfield-soul-v2",
     "latest-text-evolink": "gpt-5.2",
     "latest-balanced-evolink": "deepseek-chat",
-    "latest-fast-evolink": "deepseek-v4-flash"
+    "latest-fast-evolink": "deepseek-v4-flash",
+    "latest-tts-openai": "gpt-realtime-2.1-mini",
+    "latest-stt-openai": "gpt-transcribe",
+    "latest-tts-elevenlabs": "eleven_v4",
+    "latest-stt-elevenlabs": "scribe_v2",
+    "latest-tts-sarvam": "bulbul:v3",
+    "latest-stt-sarvam": "saaras:v4"
   }
 }
