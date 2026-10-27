@@ -317,10 +317,10 @@ class TestPythonMinimum(unittest.TestCase):
     FLOOR_MINOR = 10
     OPTIONAL_EXTRA_MINOR = None
     OPTIONAL_EXTRA_LINE = None
-    # The announced next minimum (Python 3.10 reached end of life in October 2026):
-    # allowed only on a line that names the release that will require it.
+    # The recommended version (Python 3.10 reached end of life on 2026-10-01): allowed only
+    # on a line that explains why the floor stays at 3.10 (Claude's Cowork VM ran 3.10.12).
     NEXT_MINOR = 11
-    NEXT_LINE = re.compile(r"\b3\.37\.0\b")
+    NEXT_LINE = re.compile(r"Cowork")
     STATEMENT = re.compile(r"Python\s+3\.(\d{1,2})\s*(?:\+|or newer)|\b3\.(\d{1,2})\+")
 
     def statements(self):
@@ -348,6 +348,32 @@ class TestPythonMinimum(unittest.TestCase):
                              % (f.relative_to(REPO).as_posix(), i, minor, self.FLOOR_MINOR))
         self.assertGreater(seen, 0, "no Python-minimum statement found; the guard is vacuous")
         self.assertEqual(wrong, [], "Python minimum disagrees:\n  " + "\n  ".join(wrong))
+
+    # A future Python floor tied to a release would break Cowork users (its VM ran 3.10.12),
+    # and we cannot re-check Cowork from here, so no doc or setup.py may promise one.
+    FLOOR_PROMISE = re.compile(
+        r"will require (?:Python )?3\.\d+|requires? (?:Python )?3\.\d+(?: or newer)? from (?:its |the )?"
+        r"(?:next|release|\d)|3\.\d+(?:\+| or newer) from release", re.I)
+
+    def promise_lines(self, items):
+        return ["%s:%d" % (name, i) for name, text in items
+                for i, line in enumerate(text.splitlines(), 1) if self.FLOOR_PROMISE.search(line)]
+
+    def test_no_future_floor_promise(self):
+        setup = REPO / "scripts" / "setup.py"
+        items = [(f.relative_to(REPO).as_posix(), text) for f, text in live_docs()]
+        items.append(("scripts/setup.py", setup.read_text(encoding="utf-8")))
+        found = self.promise_lines(items)
+        self.assertEqual(found, [], "Python floor promised for a future release:\n  " + "\n  ".join(found))
+
+    def test_floor_promise_guard_can_fail(self):
+        """Plant-check: the 3.36.0 draft wording must be caught."""
+        planted = [
+            ("README.md", "(DMP supports Python 3.10+ in this release; 3.37.0 will require 3.11+)"),
+            ("getting-started.md", "- **Python 3.10 or newer** (3.11 or newer from release 3.37.0)"),
+            ("setup.py", "Digital Marketing Pro requires Python 3.11 or newer from its next minor release"),
+        ]
+        self.assertEqual(len(self.promise_lines(planted)), 3)
 
     def test_guard_can_fail(self):
         """Plant-check: the old wrong forms must be seen and rejected."""

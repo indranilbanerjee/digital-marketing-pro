@@ -50,12 +50,12 @@ From the 2026-10-27 freshness review. Meta Marketing API v24.0, which DMP's requ
   - every agent is named somewhere.
 - The weekly dated-checks job now also runs `test_api_versions` (`tests/run_all.py --dated`).
 - One-command install for Claude Code 2.1.292 or newer: `claude plugin install digital-marketing-pro --marketplace indranilbanerjee/neels-plugins`. The two-step `/plugin marketplace add` plus `/plugin install` stays for older versions and in-session use.
-- `scripts/setup.py` prints a `PYTHON_WARNING` on stderr under Python 3.10, which reached end of life in October 2026. This release still runs on 3.10; 3.37.0 will require 3.11.
+- `scripts/setup.py` prints a `PYTHON_WARNING` on stderr under Python 3.10, which reached end of life on 2026-10-01. DMP still runs on 3.10 and promises no date for a 3.11 floor: Claude's Cowork VM ran Python 3.10.12 when last checked, so the floor moves only once Cowork does.
 
 **Tests**
 
-- New: `tests/test_api_versions.py`, `tests/test_agent_descriptions.py` and the Python-notice tests in `tests/test_setup.py`. Updated: the one-command install check in `tests/test_release_consistency.py`, the announced-minimum rule in `tests/test_doc_counts.py`, and the re-check date rule in `tests/test_ai_surfaces_and_official_mcps.py`.
-- Suite: 738 tests.
+- New: `tests/test_api_versions.py`, `tests/test_agent_descriptions.py` and the Python-notice tests in `tests/test_setup.py`. Updated: the one-command install check in `tests/test_release_consistency.py`, the recommended-version rule in `tests/test_doc_counts.py` (3.11 only beside the Cowork reason; no "will require" promise anywhere), and the re-check date rule in `tests/test_ai_surfaces_and_official_mcps.py`.
+- Suite: 740 tests.
 
 ## [3.35.9] - 2026-10-27
 

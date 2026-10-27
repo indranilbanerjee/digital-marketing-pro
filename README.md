@@ -9,7 +9,7 @@ Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Ac
 [![Version](https://img.shields.io/badge/version-3.36.0-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=yellow)](https://github.com/indranilbanerjee/digital-marketing-pro/stargazers)
-[![Tests](https://img.shields.io/badge/tests-738%2F738%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-740%2F740%20passing-brightgreen.svg)](tests/)
 [![Platforms](https://img.shields.io/badge/platforms-9%20native%20%2B%2035%20Agent%20Skills-success.svg)](#works-on-40-agent-harnesses-via-the-agent-skills-open-standard)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Article%2050%20ready-darkred.svg)](skills/context-engine/compliance-rules.md)
 
@@ -204,7 +204,7 @@ Other marketing plugins exist, including Anthropic's own marketing plugin and co
 | AEO / GEO | **A 6-platform audit, including Google AI Mode** |
 | Where it runs | **9 native hosts**: Claude Code, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes, OpenClaw, Grok |
 | Live-write safety | **Single-use approval record for writes it sends itself; MCP writes: typed yes + host prompt** |
-| Tests | **738 stdlib unittest** tests |
+| Tests | **740 stdlib unittest** tests |
 | License | **MIT: no telemetry, no seats** |
 
 ---
@@ -415,7 +415,7 @@ If you run into a platform-specific install snag, file a [GitHub issue](https://
 
 ### v3.36.0 — API versions in one dated table; Meta v26.0; shorter agents (October 27, 2026)
 
-Meta's Marketing API v24.0, which DMP's ad templates used, stops working on 10 November 2026, and nothing in the repo knew. Every pinned platform API version now lives in one table with its sunset date and source page: Meta v26.0, LinkedIn 202610 on the documented campaign path, Google Ads v26 without the developer token Google retired in September, plus TikTok, X Ads and Klaviyo. Tests fail 30 days before a sunset and whenever the docs name a different version from the code, and the weekly GitHub job runs them. The 24 agent descriptions, which Claude Code lists in full in every session, are now 112 to 140 characters with each agent's routing words kept, cutting the plugin's always-on cost by about 1,300 tokens. Claude Code 2.1.292+ installs in one command, and setup warns on Python 3.10, since 3.37.0 will require 3.11. 738 tests.
+Meta's Marketing API v24.0, which DMP's ad templates used, stops working on 10 November 2026, and nothing in the repo knew. Every pinned platform API version now lives in one table with its sunset date and source page: Meta v26.0, LinkedIn 202610 on the documented campaign path, Google Ads v26 without the developer token Google retired in September, plus TikTok, X Ads and Klaviyo. Tests fail 30 days before a sunset and whenever the docs name a different version from the code, and the weekly GitHub job runs them. The 24 agent descriptions, which Claude Code lists in full in every session, are now 112 to 140 characters with each agent's routing words kept, cutting the plugin's always-on cost by about 1,300 tokens. Claude Code 2.1.292+ installs in one command, and setup warns on Python 3.10, which reached end of life on 2026-10-01 (DMP still runs on it while Claude's Cowork environment does). 740 tests.
 
 ### v3.35.9 — connector setup offers only vendor-verified packages (October 27, 2026)
 
@@ -797,7 +797,7 @@ Use the direct repo form: `grok plugin install indranilbanerjee/digital-marketin
 ### General (any platform)
 
 **"Tests in `tests/` fail when I `git clone` locally"**
-Run `python tests/run_all.py` from the repo root. All 738 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+ in this release; 3.37.0 will require 3.11+, and `scripts/setup.py` warns on 3.10) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
+Run `python tests/run_all.py` from the repo root. All 740 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+; `scripts/setup.py` recommends 3.11 or newer, and the floor moves to 3.11 once Claude's Cowork environment does) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
 
 **"`/digital-marketing-pro:doctor` shows my action as stub_unconfigured"**
 That action needs an MCP connector configured. Run `python scripts/connector-status.py --action setup-guide --name <connector-name>` for the exact setup snippet. Add it to your `.mcp.json` under `mcpServers`, restart your agent, and the action becomes `manifest_ready`. See [Connector-aware action resolver](#connector-aware-action-resolver) for the full readiness model.

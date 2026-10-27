@@ -66,8 +66,9 @@ class TestNoPython3InSource(unittest.TestCase):
 
 
 class TestPythonVersionNotice(SetupBase):
-    """Python 3.10 reached end of life in October 2026; 3.37.0 will require 3.11.
-    setup.py says so now, on stderr, without failing or changing stdout."""
+    """Python 3.10 reached end of life on 2026-10-01. setup.py says so on stderr, without
+    failing or changing stdout, and promises no release: Cowork's VM ran 3.10.12, so DMP
+    moves to 3.11 only once Cowork does."""
 
     def _module(self):
         import importlib.util
@@ -83,7 +84,9 @@ class TestPythonVersionNotice(SetupBase):
         mod = self._module()
         notice = mod.python_version_notice((3, 10, 14, "final", 0))
         self.assertIn("3.11", notice)
-        self.assertIn("3.37.0", notice)
+        self.assertIn("Cowork", notice)
+        self.assertIn("still runs on it", notice)
+        self.assertNotRegex(notice, r"3\.3\d\.\d|will require|requires Python")
         self.assertTrue(notice.startswith("PYTHON_WARNING:"))
         self.assertIsNone(mod.python_version_notice((3, 11, 0, "final", 0)))
         self.assertIsNone(mod.python_version_notice((3, 13, 1, "final", 0)))
