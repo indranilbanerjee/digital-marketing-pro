@@ -55,8 +55,8 @@ A CMP is the foundation of privacy-compliant measurement. It must handle:
 | **Consent propagation** | Pass consent signals to all tags, pixels, and server-side integrations |
 | **Consent withdrawal** | Allow users to change preferences at any time via a persistent link |
 | **Geo-based rules** | Apply GDPR rules to EU visitors, CCPA to California, etc. |
-| **TCF 2.2 compliance** | Support IAB Transparency & Consent Framework for programmatic |
-| **Google Consent Mode v2** | Required for ads in EEA — sends consent signals to Google tags |
+| **TCF 2.3 compliance** | Support the IAB Transparency & Consent Framework v2.3 for programmatic: the move from 2.2 ended 2026-02-28, and IAB Europe's CMP policy deadlines are mid-October 2026 (web) and mid-February 2027 (apps) (IAB Europe letter, 2026-05-29) |
+| **Google Consent Mode v2** | Required by Google's EU user consent policy for ad personalization and measurement of users in the EEA, the UK and Switzerland. It sends four consent signals to Google tags (table below) |
 
 ### CMP Tool Options
 
@@ -78,6 +78,12 @@ Google Consent Mode v2 allows your tags to adjust behavior based on user consent
 | `ad_storage = denied` | Cookieless pings for conversion modeling | Aggregated, modeled conversions |
 | `analytics_storage = granted` | Full GA4 tracking | User-level analytics data |
 | `analytics_storage = denied` | Cookieless pings for analytics modeling | Modeled, aggregated analytics |
+| `ad_user_data = granted` | User data may be sent to Google for advertising | Needed for enhanced conversions and tag-based conversion tracking |
+| `ad_user_data = denied` | No user data sent for advertising | Enhanced conversions and tag-based conversion tracking get no data |
+| `ad_personalization = granted` | Data may be used for personalized ads | Remarketing audiences |
+| `ad_personalization = denied` | No personalized advertising | Remarketing in Google Ads, DV360 and SA360 receives no data |
+
+Both `ad_user_data` and `ad_personalization` must be granted for personalized advertising (Google Ads consent mode reference, support.google.com/google-ads/answer/13802165, undated, read 2026-10-27).
 
 **Implementation checklist:**
 

@@ -9,7 +9,7 @@ Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Ac
 [![Version](https://img.shields.io/badge/version-3.39.1-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=yellow)](https://github.com/indranilbanerjee/digital-marketing-pro/stargazers)
-[![Tests](https://img.shields.io/badge/tests-985%2F985%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-990%2F990%20passing-brightgreen.svg)](tests/)
 [![Platforms](https://img.shields.io/badge/platforms-9%20native%20%2B%2035%20Agent%20Skills-success.svg)](#works-on-40-agent-harnesses-via-the-agent-skills-open-standard)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Article%2050%20ready-darkred.svg)](skills/context-engine/compliance-rules.md)
 
@@ -204,7 +204,7 @@ Other marketing plugins exist, including Anthropic's own marketing plugin and co
 | AEO / GEO | **A 6-platform audit, including Google AI Mode** |
 | Where it runs | **9 native hosts**: Claude Code, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes, OpenClaw, Grok |
 | Live-write safety | **Single-use approval record for writes it sends itself; MCP writes: typed yes + host prompt** |
-| Tests | **985 stdlib unittest** tests |
+| Tests | **990 stdlib unittest** tests |
 | License | **MIT: no telemetry, no seats** |
 
 ---
@@ -658,13 +658,13 @@ DM Pro carries jurisdiction-specific compliance rules that auto-apply when a bra
 ## AEO / GEO — what changed in 2026
 
 The search landscape pivoted hard in 2025–2026:
-- Google AI Overviews appear on ~55% of all Google searches (Seer Interactive, Sept 2025); organic CTR on AI Overview queries dropped ~61% (1.76% → 0.61%); ~58% of Google searches are now zero-click
-- **Google AI Mode** became the default conversational search experience for opted-in users at I/O 2026 (19 May 2026), backed by Gemini 3.5 Flash — ~1B MAUs
-- ChatGPT search reaches ~883M MAU; Perplexity heavily skews citations to Reddit (47% of factual cites); Wikipedia drives 48% of ChatGPT citations
+- AI Overviews and lower click-through on the queries that show them: the figures come from vendor studies (for example Seer Interactive, September 2025) and differ by study. Google's own statement is that clicks from AI Overviews are "higher quality".
+- **Google AI Mode** has more than one billion monthly users and runs on Gemini 3.5 Flash by default; AI Overviews remain the default search surface (Google, I/O 2026, 2026-05-19).
+- **ChatGPT**: more than 1.2 billion people use it each week (OpenAI, October 2026). Which sites the engines cite (Reddit, Wikipedia) comes from vendor studies and varies by study.
 
 DM Pro's AEO/GEO skills (`/digital-marketing-pro:aeo-audit`, `:geo-monitor`, `:entity-audit`) reflect this:
 - **6-platform audit standard** — ChatGPT, Perplexity, Google AI Mode, Google AI Overviews, Gemini, Microsoft Copilot (was 5 — AI Mode added May 2026)
-- Schema strategy refresh — Google's March 2026 core update demoted FAQ/Review/HowTo schema on non-primary pages. Skills emphasise entity-rich JSON-LD (Article + Organization + Person + Product) and offer an optional **LLMs.txt** companion (Google states it is not required for AI-features eligibility)
+- Schema strategy — Google: "Structured data isn't required for generative AI search, and there's no special schema.org markup you need to add" (AI optimization guide, updated 2026-07-10). Skills keep structured data that matches the visible text (Article, Organization, Person, Product) for the rich results it still earns. Google Search ignores llms.txt; the skills add one only when a client insists, as harmless
 - Citation tracking across all 6 surfaces, with Profound / Otterly / Conductor AgentStack integration paths in the connectors layer
 - **Share of AI Voice** as a first-class metric in `/digital-marketing-pro:performance-report`
 
@@ -672,10 +672,10 @@ DM Pro's AEO/GEO skills (`/digital-marketing-pro:aeo-audit`, `:geo-monitor`, `:e
 
 ## Channel guidance — 2026 platform changes built in
 
-- **LinkedIn (March 2026 algorithm shift):** external links and engagement bait penalized ~60%. New **Depth Score** measures dwell time. Followers no longer guarantee reach. Skills optimize for relevance and Depth Score.
-- **Email:** Apple MPP affects ~64% of B2C opens — open rate is functionally dead as a primary KPI. **DMARC + RFC 8058 one-click POST unsubscribe** mandatory; non-compliant bulk mail to Gmail/Yahoo/Microsoft gets permanent 550 rejections. Spam threshold tightened to <0.10%.
+- **LinkedIn:** links in the post body may reduce reach, so test per account; native documents and video travel further. LinkedIn has published no ranking statement with a number, so the skills quote none.
+- **Email:** Apple Mail Privacy Protection inflates opens, so the skills score clicks, conversions and complaints (one sourced figure in `skills/context-engine/platform-specs.md`). Gmail and Yahoo require authentication (DMARC at least p=none), one-click unsubscribe for bulk senders, and a spam rate under 0.3% (0.1% recommended); Gmail has ramped up enforcement since November 2025, with temporary and then permanent rejections. Outlook.com sends non-compliant mail from senders of over 5,000 a day to junk since 5 May 2025, with rejection announced. Honor unsubscribes within 2 days.
 - **TikTok (post Jan 22 2026 USDS Joint Venture closing):** US data + algorithm under USDS LLC; ByteDance retains <20%. AI-generated creators require disclosure label; AI content excluded from Creator Rewards Program; daily shoppable-post limits effective May 11 2026.
-- **Meta Advantage+ Leads** (global as of May 2026), **Threads ads** (global, image-only), **brand-safety inventory tiers** (Expanded/Moderate/Limited — Limited costs ~30% reach).
+- **Meta Advantage+ Leads** (global as of May 2026), **Threads ads** (global; image, carousel, video, catalog and app ads), **brand-safety inventory tiers** (Expanded/Moderate/Limited — Limited costs ~30% reach).
 - **WhatsApp** per-message pricing (since 1 July 2025) — India marketing template ≈ USD 0.0118 per message; 72-hour free service window from CTWA ads or Page CTAs.
 - **Third-party cookies — deprecation cancelled.** First-party data is the strategic priority. The `attribution-model` skill defaults to first-party + MMM + incrementality stack.
 - **Sora dependency note:** OpenAI consumer Sora app discontinued April 26 2026; Sora API September 24 2026. AI creative briefs default to **Veo 3.1, Kling v3.0 Pro, Runway Gen-4, Gemini Omni**.
@@ -800,7 +800,7 @@ Use the direct repo form: `grok plugin install indranilbanerjee/digital-marketin
 ### General (any platform)
 
 **"Tests in `tests/` fail when I `git clone` locally"**
-Run `python tests/run_all.py` from the repo root. All 985 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+; `scripts/setup.py` recommends 3.11 or newer, and the floor moves to 3.11 once Claude's Cowork environment does) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
+Run `python tests/run_all.py` from the repo root. All 990 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+; `scripts/setup.py` recommends 3.11 or newer, and the floor moves to 3.11 once Claude's Cowork environment does) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
 
 **"`/digital-marketing-pro:doctor` shows my action as stub_unconfigured"**
 That action needs an MCP connector configured. Run `python scripts/connector-status.py --action setup-guide --name <connector-name>` for the exact setup snippet. Add it to your `.mcp.json` under `mcpServers`, restart your agent, and the action becomes `manifest_ready`. See [Connector-aware action resolver](#connector-aware-action-resolver) for the full readiness model.

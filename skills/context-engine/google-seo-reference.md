@@ -23,7 +23,7 @@ Three stages: **Crawling** (Googlebot discovers pages via links and sitemaps), *
 - No keyword stuffing, link spam (buying links, excessive exchanges)
 - No scraped or auto-generated content without added value
 - No sneaky redirects, thin affiliate pages
-- **Scaled Content Abuse** (March 2024): AI-generated content at scale without unique value — major enforcement since June 2025
+- **Scaled Content Abuse** (March 2024): many pages made mainly to rank, "no matter how it's created" (spam policies, updated 2026-08-28)
 - **Site Reputation Abuse** (November 2024): Third-party content on high-authority domains without editorial oversight
 
 ### Key Best Practices
@@ -47,7 +47,7 @@ Three stages: **Crawling** (Googlebot discovers pages via links and sitemaps), *
 
 **YMYL**: Health, finance, safety, legal topics held to highest E-E-A-T standards.
 
-**December 2025 update**: E-E-A-T evaluation now extends to ALL competitive queries, not just YMYL topics.
+**Updates since late 2025**: Google's Search Status Dashboard (status.search.google.com, read 2026-10-27) lists the December 2025 core update (11-29 Dec), the March 2026 spam (24-25 Mar) and core (27 Mar-8 Apr) updates, the May 2026 core update (21 May-1 Jun), spam updates in June, August and September 2026, and the August 2025 spam update (26 Aug-21 Sep), none with a description of what changed. Google published no statement that any of them changed how E-E-A-T applies.
 
 ---
 
@@ -100,7 +100,7 @@ Google recommends JSON-LD for all structured data. Microdata and RDFa are suppor
 
 ### Canonical surfaces (6, mid-2026)
 The plugin scores AI visibility across six surfaces (the `PLATFORMS` constant in `scripts/geo-tracker.py`; scored with the rubric in `/digital-marketing-pro:aeo-audit`):
-- **Google AI Mode** — conversational search tab; became the default experience for opted-in users at Google I/O (19 May 2026), ~1B MAUs, Gemini 3.5 Flash backbone. **Distinct from AI Overviews** — different citation pattern for the same query; audit it separately.
+- **Google AI Mode** — conversational search tab; 1B+ monthly users and Gemini 3.5 Flash as its default model; AI Overviews stay the default surface (see the AI Mode note in `skills/aeo-geo/SKILL.md`). **Distinct from AI Overviews** — different citation pattern for the same query; audit it separately.
 - **Google AI Overviews** — summary block above classic SERP results
 - ChatGPT (web search mode)
 - Perplexity

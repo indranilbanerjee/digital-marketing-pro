@@ -87,7 +87,7 @@ DMP is a **deployer**, not a provider — and the same logic applies to any othe
 
 ### Mandatory disclosure paths used by the plugin
 
-1. **Machine-readable mark** — embed a C2PA manifest with the `c2pa.ai-disclosure` assertion (spec 2.4, April 2026) via `/digital-marketing-pro:c2pa-metadata`. **This satisfies the Section 1 secured-metadata requirement automatically.** Note: the Code Section 1 also requires a watermarking layer — this is a *provider* obligation, but if you're stitching together outputs from multiple providers (e.g., AI-generated images composited in a separate design tool), verify the marks survive your post-processing pipeline.
+1. **Machine-readable mark** — embed a C2PA manifest with the `c2pa.ai-disclosure` assertion (added in spec 2.4, April 2026; the current spec is 2.5, October 2026) via `/digital-marketing-pro:c2pa-metadata`. **This satisfies the Section 1 secured-metadata requirement automatically.** Note: the Code Section 1 also requires a watermarking layer — this is a *provider* obligation, but if you're stitching together outputs from multiple providers (e.g., AI-generated images composited in a separate design tool), verify the marks survive your post-processing pipeline.
 2. **Visible deepfake disclosure** — for any AI-generated image/video/audio that resembles a real person, place, or object: visible icon/label/disclaimer on the asset OR in the adjacent caption / alt text / publication metadata. DMP's content pipeline auto-adds this when `c2pa_auto_sign: true` is on for the brand and the generator emitted `ai-claim: ai-generated-content`. **Anticipate the standardized EU icon** — the standardized EU disclosure icons shipped in the final Code annex (10 June 2026), DMP will adopt the standardized EU disclosure icon from the annex.
 3. **Editorial-review proof for AI-generated text** — if you're publishing long-form AI-written articles to inform the public on matters of public interest, the editorial-review exception applies only if a human editor signed off with editorial responsibility. Your documented review records (the quality-assurance agent's logged evals, reviewer scorecards, sign-off notes) serve as evidence; **archive them for at least 3 years** (typical regulatory retention).
 
@@ -103,7 +103,7 @@ Under the final Code, the C2PA `c2pa.ai-disclosure` + IPTC digital-source-type p
 
 ## Operational checklist for marketing teams (Aug 2 readiness)
 
-Run this checklist before 2 August 2026 for any brand with EU target markets:
+Run this checklist for any brand with EU target markets (Article 50 applies since 2 August 2026; systems on the market before then have until 2 December 2026 for the 50(2) marking):
 
 - [ ] `brand.profile.json → target_markets` reviewed; EU jurisdictions identified
 - [ ] `c2pa_auto_sign: true` enabled for any brand with EU markets

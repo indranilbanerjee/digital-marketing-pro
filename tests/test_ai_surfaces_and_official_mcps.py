@@ -191,13 +191,16 @@ class TestHonestAiMeasurement(unittest.TestCase):
 
 
 class TestAdsInAiAnswersSourcing(unittest.TestCase):
-    def test_secondary_rollout_claims_are_labelled(self):
+    def test_rollout_claims_cite_openai(self):
+        # 3.40.0: the scale, audience and country rows come from OpenAI's own October 2026 post,
+        # not trade press; what is still secondary-sourced stays labelled.
         t = _read("skills/paid-advertising/ads-in-ai-answers.md")
         self.assertIn("developers.openai.com/ads", t)
         self.assertIn("blog.google/products/ads-commerce/google-marketing-live-search-ads", t)
-        i = t.index("31 European markets")
-        self.assertIn("secondary", t[max(0, i - 600):i].lower(),
-                      "country rollout must sit under the secondary-sourced label")
+        i = t.index("Ads run in 89 countries")
+        self.assertIn("ChatGPT Ads expands to 26 new countries", t[max(0, i - 600):i])
+        j = t.index('"Sponsored Agents"')
+        self.assertIn("secondary-sourced", t[max(0, j - 200):j])
 
     def test_no_invented_prices(self):
         for rel in ("skills/paid-advertising/ads-in-ai-answers.md", "skills/media-plan/SKILL.md"):

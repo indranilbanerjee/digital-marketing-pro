@@ -213,16 +213,9 @@
 | Algorithm priority signals | Save rate, click-through rate, pin quality score, domain quality, keyword relevance, freshness |
 | Best posting times | Sat 8-11 PM, Fri-Sun for lifestyle; Tue-Thu for B2B (local) |
 
-#### Idea Pin
+#### Idea Pin (retired)
 
-| Spec | Value |
-|---|---|
-| Pages | Up to 20 |
-| Image resolution | 1080 x 1920 px (9:16) |
-| Video duration per page | Up to 60 seconds |
-| Video format | MP4, MOV |
-| Title limit | 100 characters |
-| Algorithm priority signals | View-through rate, saves, follows from pin, topic tag relevance |
+Pinterest unified its formats into one Pin and stopped new Idea Pin creation (Pinterest's creator blog; the date is REPORTED, about 2025). A client who asks for an Idea Pin means a multi-image or video Pin: use the standard Pin specs above.
 
 #### Video Pin
 
@@ -424,7 +417,7 @@
 
 | Impact | Detail |
 |---|---|
-| Open tracking | Unreliable. Apple pre-fetches all images (including tracking pixels) via proxy, inflating open rates. Approximately 50-60% of Apple Mail users have MPP enabled. |
+| Open tracking | Unreliable. Apple pre-fetches all images (including tracking pixels) via proxy, inflating open rates. Apple's mail clients account for about 62% of tracked opens (Litmus, July 2026, through vendor summaries: REPORTED). This is the one place DMP states that figure. Score clicks, conversions and complaints; treat opens as directional. |
 | IP-based geolocation | No longer accurate for Apple Mail users. Apple proxies mask true IP. |
 | Device detection | Unreliable. User-agent data is obscured. |
 | Recommended response | Shift KPIs to click-through rate, conversion rate, and revenue attribution. Use UTM parameters for tracking. Build engagement segments based on clicks, not opens. |
@@ -660,7 +653,7 @@
 | Video resolution | 1080 px width minimum |
 | Video format | MP4, MOV |
 | Video max file size | 2 GB |
-| Idea Pin ad | Up to 20 pages, 1080 x 1920 px per page |
+| Idea Pin ad (retired: use a video or carousel Pin ad) | No longer created |
 | Shopping ad | Linked to product catalog; standard Pin specs |
 | CTA options | Automated based on campaign objective |
 

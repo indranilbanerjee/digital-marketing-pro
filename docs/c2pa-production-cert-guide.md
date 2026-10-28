@@ -63,7 +63,7 @@ Once you have `cert.pem` and `key.pem` from any of the four authorities above:
     --signing-key /secure/c2pa-prod-key.pem
 ```
 
-`--ai-disclosure` adds the **C2PA 2.4 `c2pa.ai-disclosure` assertion** alongside the IPTC digital-source-type claim — the machine-readable marking the EU AI Act Article 50 deployer pathway relies on. Include it on every production sign of AI-generated assets bound for EU markets.
+`--ai-disclosure` adds the **`c2pa.ai-disclosure` assertion** (added in C2PA 2.4; the current spec is 2.5) alongside the IPTC digital-source-type claim — the machine-readable marking the EU AI Act Article 50 deployer pathway relies on. Include it on every production sign of AI-generated assets bound for EU markets.
 
 ## Production key management — do this right
 
@@ -96,7 +96,7 @@ After production signing, verify before publishing:
 | Before 2 Aug 2026 | Cert in hand, key-management in place, production-signing tested end-to-end against [contentcredentials.org/verify](https://contentcredentials.org/verify) |
 | After 2 Aug 2026 | EU AI Act Article 50 enforcement active. Penalties up to €15M / 3% global turnover. |
 
-Article 50 applies on **2 August 2026 — days away**. If you don't yet have a production cert, start today: Truepic's onboarding (account → API key → certificate) is the fastest path, and the dev-cert flow keeps your pipeline testable while you wait.
+Article 50 has applied since **2 August 2026**; generative systems already on the market before that date have until **2 December 2026** for the 50(2) machine-readable marking, and content made before 2 August 2026 needs no retroactive label (Commission FAQ on Article 50, updated 2026-07-24). If you don't yet have a production cert, start now: Truepic's onboarding (account → API key → certificate) is the fastest path, and the dev-cert flow keeps your pipeline testable while you wait.
 
 ## Related plugin references
 

@@ -8,7 +8,7 @@ argument-hint: "[brand-name or URL]"
 
 ## Purpose
 
-Evaluate the brand's visibility and accuracy across AI answer engines. Analyze how the brand is cited, described, and recommended by ChatGPT, Perplexity, **Google AI Mode** (the conversational search surface that became Google's default at I/O 2026 — ~1B MAUs as of May 2026), Google AI Overviews, Gemini, and Microsoft Copilot. Produce optimization recommendations to improve AI visibility.
+Evaluate the brand's visibility and accuracy across AI answer engines. Analyze how the brand is cited, described, and recommended by ChatGPT, Perplexity, **Google AI Mode** (the conversational search tab; see the AI Mode note in `skills/aeo-geo/SKILL.md`), Google AI Overviews, Gemini, and Microsoft Copilot. Produce optimization recommendations to improve AI visibility.
 
 **AI Mode vs AI Overviews — why both matter:** AI Overviews are the summary block at the top of a classic Google SERP and trigger on a subset of queries. AI Mode is a conversational tab (and now the default search experience for opted-in users) backed by Gemini 3.5 Flash with deeper reasoning, follow-ups, and a different citation pattern. The two surfaces select different sources for the same query in a large share of cases (internal observation, 05/2026 — "40–60%" is a rough estimate; re-verify against your own probe set). Audit both.
 

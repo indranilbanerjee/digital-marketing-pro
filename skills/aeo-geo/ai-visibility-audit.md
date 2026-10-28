@@ -4,7 +4,7 @@
 
 A systematic process for auditing how a brand appears across AI-generated answers on **6 platforms**: ChatGPT, Perplexity, **Google AI Mode**, Google AI Overviews, Gemini, and Microsoft Copilot.
 
-> **Why 6, not 5 (changed May 2026):** Google split its AI search surfaces. AI Mode (Gemini 3.5 Flash, conversational, default for opted-in users since I/O 2026) and AI Overviews (classic SERP summary block) now select different citations for the same query 40–60% of the time. Audit both independently — a brand cited in AI Overviews is not necessarily cited in AI Mode.
+> **Why 6, not 5 (changed May 2026):** Google split its AI search surfaces. AI Mode (Gemini 3.5 Flash, conversational) and AI Overviews (classic SERP summary block) now select different citations for the same query 40–60% of the time. Audit both independently — a brand cited in AI Overviews is not necessarily cited in AI Mode.
 
 ---
 
@@ -55,7 +55,7 @@ For each query, test on all 6 platforms and record:
 
 - **ChatGPT**: Test with latest model. Note that responses vary by session — test 2-3 times. Web-search mode on.
 - **Perplexity**: Check both the answer AND the cited sources list.
-- **Google AI Mode (May 2026, default)**: Test from the AI Mode tab (or directly via the conversational entry point that appears for opted-in users). Gemini 3.5 Flash backbone. Capture the full conversational thread including any follow-up clarifiers — citations evolve across turns. AI Mode often selects different sources than AI Overviews for the same query.
+- **Google AI Mode**: Test from the AI Mode tab, or the follow-up box under an AI Overview (see the AI Mode note in `skills/aeo-geo/SKILL.md`). Gemini 3.5 Flash backbone. Capture the full conversational thread including any follow-up clarifiers — citations evolve across turns. AI Mode often selects different sources than AI Overviews for the same query.
 - **Google AI Overviews**: Not all queries trigger AI Overviews — document which do. This is the SERP summary block, separate from AI Mode.
 - **Gemini**: Test via gemini.google.com, note any "I don't have enough info" responses.
 - **Copilot**: Test in Bing chat mode for web-grounded responses.

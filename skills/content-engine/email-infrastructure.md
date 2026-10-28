@@ -71,7 +71,7 @@ default._bimi.yourdomain.com TXT "v=BIMI1; l=https://yourdomain.com/logo.svg; a=
 
 ### Benefits
 - Brand logo displays next to emails in supported clients (Gmail, Yahoo)
-- Increases open rates 10-30% (brand recognition in inbox)
+- Recognition in the inbox (vendor studies claim higher opens, but opens are inflated by Apple Mail Privacy Protection: judge it on clicks)
 
 ---
 
@@ -103,7 +103,7 @@ For new sending domains or IPs:
 ### List Hygiene
 - Remove hard bounces immediately (never retry)
 - Suppress soft bounces after 3 consecutive failures
-- Remove unengaged subscribers after 6-12 months of no opens/clicks
+- Remove unengaged subscribers after 6-12 months without a click, a purchase or site activity (opens can't prove engagement: Apple Mail Privacy Protection fires them automatically)
 - Run email verification on old/imported lists before sending
 - Clean list quarterly
 
@@ -111,7 +111,7 @@ For new sending domains or IPs:
 - Maintain consistent sending schedule (ISPs expect predictable patterns)
 - Keep spam complaint rate below 0.1% (Google requires <0.3%)
 - Include clear unsubscribe link in every email
-- Honor unsubscribes within 24 hours (required) — aim for instant
+- Honor unsubscribes within 2 days (Gmail: within 48 hours; Yahoo: within 2 days) — aim for instant
 - Segment and personalize (better engagement = better deliverability)
 
 ### Content Practices

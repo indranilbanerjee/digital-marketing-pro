@@ -9,8 +9,8 @@ AI Overviews — 6 surfaces as of May 2026) represent a brand in their responses
 Records visibility audits, baselines, competitive benchmarks, narrative
 alignment, and entity consistency to produce an overall GEO health score.
 
-Note: 'ai-mode' is Google's conversational search default (Gemini 3.5 Flash,
-launched I/O 2026) and is a SEPARATE surface from 'ai-overviews' (the SERP
+Note: 'ai-mode' is Google's conversational search tab (Gemini 3.5 Flash; AI Overviews
+remain the default surface) and is a SEPARATE surface from 'ai-overviews' (the SERP
 summary block) — both should be tracked independently.
 
 Storage: ~/.claude-marketing/brands/{slug}/geo/

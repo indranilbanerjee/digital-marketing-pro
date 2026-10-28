@@ -5,10 +5,11 @@ baselines second, and the ESP's per-recipient optimization above both.
 THE LADDER
 ----------
 0. ESP SEND-TIME OPTIMIZATION: if the connected email platform offers
-   per-recipient STO, it outperforms ANY global window (current platform
-   reports: 5-15% open-rate lift) — every output says so. Global windows are
+   per-recipient STO, use it before ANY global window — every output says so
+   (judge it on clicks and conversions: opens are inflated). Global windows are
    for platforms without STO, first sends to new lists, and A/B baselines.
-1. FIRST-PARTY (--history): the brand's own send log with opens. Only the
+1. FIRST-PARTY (--history): the brand's own send log, ranked by clicks (opens only
+   when the log has no clicks, labelled as inflated by Apple Mail Privacy Protection). Only the
    list's measured behavior can earn "high" confidence. Honest statistics:
    minimum send counts per bucket, sample sizes in the output, refusal to
    rank what the data cannot support.
@@ -19,8 +20,8 @@ Usage:
     python send-time-optimizer.py --industry saas --audience-type b2b
     python send-time-optimizer.py --industry ecommerce --audience-type b2c --timezone "+0"
     python send-time-optimizer.py --industry saas --audience-type b2b --history sends.json
-      history format: [{"sent_at": ISO-8601, "opens": N, "recipients": N}, ...]
-      (clicks accepted in place of opens via "clicks"; recipients optional)
+      history format: [{"sent_at": ISO-8601, "clicks": N, "recipients": N}, ...]
+      ("opens" is used only when an entry has no "clicks"; recipients optional)
 """
 
 import argparse
@@ -44,8 +45,7 @@ MIN_BUCKET_SENDS = 3
 
 STO_NOTE = (
     "If the connected email platform offers per-recipient send-time "
-    "optimization, use it ABOVE any global window here — per-recipient timing "
-    "currently reports 5-15% open-rate lift over batch windows. The doctrine: "
+    "optimization, use it ABOVE any global window here. The doctrine: "
     "A/B test segment-level windows for 4-6 weeks (judge on clicks/conversions, "
     "not opens alone), then layer the ESP's STO for individual timing.")
 
@@ -82,10 +82,14 @@ def analyze_history(entries):
     """Aggregate the list's own sends into ranked day x 2-hour windows by open
     rate (or click rate when opens are absent). Returns (payload, ok)."""
     parsed = []
+    metric_kinds = set()
     for e in entries:
         try:
             ts = datetime.fromisoformat(str(e["sent_at"]).replace("Z", "+00:00"))
-            responses = float(e.get("opens", e.get("clicks")))
+            # Clicks first: Apple Mail Privacy Protection pre-fetches tracking pixels, so opens
+            # are inflated. Before 3.40.0 opens won whenever both were present.
+            responses = float(e["clicks"] if e.get("clicks") is not None else e.get("opens"))
+            metric_kinds.add("click" if e.get("clicks") is not None else "open")
             recipients = float(e.get("recipients", 0)) or None
             parsed.append((ts, responses, recipients))
         except (KeyError, ValueError, TypeError):
@@ -116,7 +120,7 @@ def analyze_history(entries):
             continue
         if b["recipients"]:
             metric = round(b["responses"] / b["recipients"], 4)
-            metric_name = "open_rate"
+            metric_name = "click_rate" if "click" in metric_kinds else "open_rate"
         else:
             metric = round(sum(b["rates"]) / len(b["rates"]), 2)
             metric_name = "avg_responses"
@@ -135,7 +139,11 @@ def analyze_history(entries):
                  "send log is too scattered to rank; falling back to the "
                  "population baseline."}, False)
 
-    ranked.sort(key=lambda r: -(r.get("open_rate") or r.get("avg_responses") or 0))
+    ranked.sort(key=lambda r: -(r.get("click_rate") or r.get("open_rate") or r.get("avg_responses") or 0))
+    if "open" in metric_kinds and "click" not in metric_kinds:
+        for r in ranked:
+            r["metric_note"] = ("Ranked by opens, which Apple Mail Privacy Protection inflates: add clicks "
+                                "to the send log for a ranking you can trust")
     for i, r in enumerate(ranked):
         r["rank"] = i + 1
     return ({

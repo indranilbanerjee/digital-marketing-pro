@@ -42,7 +42,7 @@
         "video-script"
       ],
       "doc_files": 1,
-      "bytes": 6220
+      "bytes": 6454
     },
     {
       "name": "add-integration",
@@ -77,7 +77,7 @@
         "seo-drift"
       ],
       "doc_files": 1,
-      "bytes": 10675
+      "bytes": 10653
     },
     {
       "name": "aeo-geo",
@@ -94,7 +94,7 @@
         "gsc-ai-performance"
       ],
       "doc_files": 5,
-      "bytes": 46000
+      "bytes": 46406
     },
     {
       "name": "agency-dashboard",
@@ -153,7 +153,7 @@
         "gsc-ai-performance"
       ],
       "doc_files": 11,
-      "bytes": 179081
+      "bytes": 180254
     },
     {
       "name": "anomaly-scan",
@@ -197,7 +197,7 @@
         "gsc-ai-performance"
       ],
       "doc_files": 1,
-      "bytes": 12373
+      "bytes": 12517
     },
     {
       "name": "audience-intelligence",
@@ -332,7 +332,7 @@
         "check"
       ],
       "doc_files": 1,
-      "bytes": 9920
+      "bytes": 10248
     },
     {
       "name": "campaign-audit",
@@ -355,7 +355,7 @@
         "validate-profile"
       ],
       "doc_files": 1,
-      "bytes": 16233
+      "bytes": 16382
     },
     {
       "name": "campaign-orchestrator",
@@ -694,7 +694,7 @@
         "verify-claims"
       ],
       "doc_files": 18,
-      "bytes": 156409
+      "bytes": 156723
     },
     {
       "name": "content-repurpose",
@@ -777,7 +777,7 @@
         "validate-profile"
       ],
       "doc_files": 56,
-      "bytes": 905517
+      "bytes": 907402
     },
     {
       "name": "continuous-improvement-loop",
@@ -1008,7 +1008,7 @@
         "send-sms"
       ],
       "doc_files": 2,
-      "bytes": 9095
+      "bytes": 9157
     },
     {
       "name": "emerging-channels",
@@ -1202,7 +1202,7 @@
         "brand-setup"
       ],
       "doc_files": 6,
-      "bytes": 55453
+      "bytes": 56102
     },
     {
       "name": "funnel-audit",
@@ -1774,7 +1774,7 @@
         "brand-setup"
       ],
       "doc_files": 5,
-      "bytes": 97915
+      "bytes": 98006
     },
     {
       "name": "martech-audit",
@@ -1892,7 +1892,7 @@
         "launch-ad-campaign"
       ],
       "doc_files": 14,
-      "bytes": 215858
+      "bytes": 216418
     },
     {
       "name": "pdf-report",
@@ -2000,7 +2000,7 @@
       "gates": [],
       "cross_refs": [],
       "doc_files": 1,
-      "bytes": 7198
+      "bytes": 7647
     },
     {
       "name": "prompt-test",

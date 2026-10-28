@@ -62,9 +62,11 @@ WEIGHTS = {
         "spend_pacing": 15, "ctr": 15, "cpa": 20, "roas": 20,
         "bounce_rate": 10, "landing_page": 10, "frequency": 10,
     },
+    # Opens are not scored: Apple Mail Privacy Protection pre-fetches tracking pixels, so they're
+    # inflated. Their weight moved to clicks and the spam-complaint rate mailbox providers enforce.
     "retention": {
-        "spend_pacing": 10, "deliverability": 20, "open_rate": 20,
-        "ctr": 15, "unsubscribe_rate": 20, "bounce_rate": 15,
+        "spend_pacing": 10, "deliverability": 20, "complaint_rate": 10,
+        "ctr": 25, "unsubscribe_rate": 20, "bounce_rate": 15,
     },
     "engagement": {
         "spend_pacing": 10, "ctr": 25, "bounce_rate": 15,
@@ -283,10 +285,16 @@ def health_score(campaign_id, campaign_type, metrics):
         elif deliverability < 95:
             issues.append({"issue": "deliverability-drop", "detail": f"Deliverability at {deliverability}%", "severity": "medium"})
 
-    # Open rate
-    open_rate = metrics.get("open_rate")
-    if "open_rate" in weights and open_rate is not None:
-        scores["open_rate"] = min(open_rate / 25 * 100, 100)  # 25% open rate = perfect
+    # Spam-complaint rate: Gmail and Yahoo require under 0.3% and recommend under 0.1%.
+    complaint_rate = metrics.get("complaint_rate")
+    if "complaint_rate" in weights and complaint_rate is not None:
+        scores["complaint_rate"] = max(0.0, min(100.0, (0.3 - complaint_rate) / 0.2 * 100))  # 0.1% = 100, 0.3% = 0
+        if complaint_rate >= 0.3:
+            issues.append({"issue": "spam-complaints", "detail": f"Complaint rate {complaint_rate}% (ceiling 0.3%)",
+                           "severity": "critical"})
+        elif complaint_rate > 0.1:
+            issues.append({"issue": "spam-complaints", "detail": f"Complaint rate {complaint_rate}% (target under 0.1%)",
+                           "severity": "medium"})
 
     # Unsubscribe rate
     unsub_rate = metrics.get("unsubscribe_rate")
@@ -330,7 +338,7 @@ def health_score(campaign_id, campaign_type, metrics):
     severity_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
     issues.sort(key=lambda x: severity_order.get(x.get("severity", "low"), 4))
 
-    return {
+    result = {
         "campaign_id": campaign_id,
         "campaign_type": campaign_type,
         "health_score": health,
@@ -339,6 +347,10 @@ def health_score(campaign_id, campaign_type, metrics):
         "top_issue": issues[0]["issue"] if issues else None,
         "contributing_factors": contributing_factors,
     }
+    if metrics.get("open_rate") is not None:
+        result["open_rate_directional"] = metrics["open_rate"]
+        result["open_rate_note"] = ("Apple Mail Privacy Protection pre-fetches tracking pixels (since iOS 15), so opens are inflated: the open rate is shown as a directional figure and never scored. Clicks, conversions and complaints are.")
+    return result
 
 
 def detect_issues(slug, campaigns):

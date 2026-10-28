@@ -63,7 +63,7 @@
 | YouTube Remarketing | Video ads to past visitors or channel engagers | Google Tag + linked YouTube channel |
 | Dynamic Remarketing | Auto-generated ads showing specific products viewed | Google Tag + Merchant Center product feed |
 | Customer Match | Upload email/phone lists for targeting on Search, YouTube, Gmail | Hashed customer list (minimum 1,000 matched users) |
-| Similar Segments | Auto-generated audiences similar to your lists | Existing audience with 100+ users |
+| Optimized targeting / Demand Gen lookalike segments | Reach people like your lists (Google stopped generating Similar Segments on 2023-05-01: a client who asks for them means these) | A first-party list or conversion data (Google Ads help 16902001) |
 
 ### Meta (Facebook & Instagram)
 
@@ -87,7 +87,7 @@
 | Video Viewers | Target users who viewed LinkedIn video ads | Previous video ad campaigns |
 | Lead Gen Form Openers | Target users who opened but didn't submit form | Previous Lead Gen Form campaigns |
 | Event Attendees | Target attendees of LinkedIn Events | LinkedIn Event association |
-| Lookalike Audiences | Similar professionals to seed audience | Matched Audience with 300+ members |
+| Predictive Audiences (+ Audience Expansion) | Similar professionals to a seed (LinkedIn discontinued Lookalike Audiences on 2024-02-29: a client who asks for them means these) | A source of at least 300 members; up to 30 per account (LinkedIn help) |
 
 ### TikTok
 

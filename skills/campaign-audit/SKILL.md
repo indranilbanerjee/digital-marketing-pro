@@ -40,7 +40,7 @@ This skill produces the third option: a single audit document that captures the 
 | **Content / SEO** | Pages publishing in last 90 days, ranking keywords (top 50), schema markup state, internal-link density | Indexation health (GSC), Core Web Vitals, AI-Overview citation rate, technical-debt items |
 | **AEO / GEO** | Brand mention rate across Google AI Mode, Perplexity, ChatGPT search, Claude search, Copilot, Gemini App | Mention rate vs top 5 competitors, citation share, recommendation share |
 | **CRM + automation** | Live workflows in HubSpot / Salesforce / Pipedream / Zapier / Make, segments in use, lifecycle stage mappings | Orphaned workflows (no recent execution), broken connectors, duplicate-contact rate |
-| **Web analytics** | GA4 properties + GSC properties wired to which domains, conversion events configured, consent-mode state | Tag-firing health, event-naming consistency, attribution model selected |
+| **Web analytics** | GA4 properties + GSC properties wired to which domains, key events configured (GA4 calls them key events; Google Ads conversions are created from them), consent-mode state | Tag-firing health, event-naming consistency, attribution model selected |
 | **Influencer / PR** | Active creator deals (live + paused), contracted deliverables, FTC-disclosure compliance | Cost per engagement, creator-audience-authenticity check, disclosure completeness |
 | **Compliance posture** | Active brand-level claims, EU AI Act Article 50 disclosure state on AI content, C2PA signing state, cookie/consent banner version | Each regulated claim mapped to a primary source; missing disclosures escalated |
 
@@ -107,7 +107,7 @@ For each item discovered, apply the **scoring rubric** (4-tier, conservative):
 
 | Tier | Meaning | Examples |
 |---|---|---|
-| **🟢 Healthy** | Performing within benchmark, no action needed | Email automation with >25% open rate; Google Ads campaign with QS ≥ 7; SEO page in top 10 for primary keyword |
+| **🟢 Healthy** | Performing within benchmark, no action needed | Email automation with click and complaint rates within benchmark (opens are inflated by Apple Mail Privacy Protection); Google Ads campaign with QS ≥ 7; SEO page in top 10 for primary keyword |
 | **🟡 Quick win** | Small fix unlocks meaningful gain (<2hr effort) | Ad copy missing a sitelink extension; email template with broken merge tag; landing page with no schema markup |
 | **🟠 Strategic gap** | Needs a real intervention (workshop, asset, decision) | No active retargeting audience; no negative-keyword list; no AEO disclosure on AI-generated content |
 | **🔴 Red flag / leak** | Actively losing money OR creating compliance risk | Campaign spending with conversion tracking broken; email list with no GDPR provenance; CRM workflow firing on duplicate contacts |

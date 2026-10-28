@@ -21,7 +21,7 @@ Activate this module when the user's request involves any of the following:
 
 **Trigger phrases**: "AI visibility," "how does ChatGPT describe my brand," "Perplexity results," "AI Mode optimization," "AI Overview optimization," "answer engine," "generative engine," "LLM optimization," "AI citations," "entity consistency," "Knowledge Graph"
 
-**Google AI Mode (May 2026 — treat as a distinct surface)**: At Google I/O on 19 May 2026 AI Mode became the default search experience for opted-in users, crossed ~1B MAUs, and switched to Gemini 3.5 Flash as the base model. AI Mode is **not** the same as AI Overviews — it is a separate conversational tab with deeper reasoning, multi-turn follow-ups, and a citation pattern that frequently diverges from AI Overviews for the same query. Brands must audit AI Mode independently. Practical implication: an AEO program that only tests AI Overviews + ChatGPT + Perplexity now has a measurable blind spot.
+**Google AI Mode (May 2026 — treat as a distinct surface)**: This is DMP's one statement of the fact; other files point here. Google AI Mode has more than one billion monthly users, Gemini 3.5 Flash is its default model, and it is reachable from every AI Overview worldwide (Google, "Google Search's I/O 2026 updates", 2026-05-19). AI Overviews remain the default search surface: AI Mode is a separate conversational tab, not the default search experience. AI Mode is **not** the same as AI Overviews — it is a separate conversational tab with deeper reasoning, multi-turn follow-ups, and a citation pattern that frequently diverges from AI Overviews for the same query. Brands must audit AI Mode independently. Practical implication: an AEO program that only tests AI Overviews + ChatGPT + Perplexity now has a measurable blind spot.
 
 **Additional I/O 2026 announcements that change AEO scope** ([source: blog.google/products-and-platforms/products/search/search-io-2026](https://blog.google/products-and-platforms/products/search/search-io-2026/)):
 
@@ -82,7 +82,7 @@ If the user cannot provide all context, proceed with what is available and flag 
 - **Entity Consistency Audit**: Cross-referencing brand information across Google Knowledge Graph, Wikidata, Wikipedia, Crunchbase, LinkedIn, and industry databases to identify inconsistencies
 - **LLM Content Strategy**: Creating content specifically designed to be ingested and accurately represented by language models
 - **AI Answer Monitoring Framework**: Setting up systematic tracking of AI mentions and citations over time
-- **Structured Data for AI Citation**: Implementing Organization, Product, FAQ, HowTo, and other schema types that improve AI comprehension
+- **Structured data that matches the page**: Organization, Product, Article and the types that still earn rich results. Google: "Structured data isn't required for generative AI search, and there's no special schema.org markup you need to add" (guide to optimizing for generative AI features, last updated 2026-07-10).
 - **Knowledge Graph Optimization**: Improving entity representation in structured knowledge bases
 - **Topical Authority Mapping**: Identifying content gaps that prevent a brand from being recognized as an authority by AI models
 - **AI-First Content Formatting**: Restructuring existing content with clear definitions, factual statements, and citation-worthy snippets
@@ -101,7 +101,7 @@ If the user cannot provide all context, proceed with what is available and flag 
 
 2. **AI Platform Testing**
    - For each target query, document how the brand appears (or fails to appear) on:
-     - **Google AI Mode** (default conversational surface, Gemini 3.5 Flash backbone — May 2026)
+     - **Google AI Mode** (the conversational tab; see the AI Mode note above)
      - Google AI Overviews (classic SERP summary block)
      - ChatGPT (latest model, web-search mode on)
      - Perplexity
@@ -145,7 +145,7 @@ If the user cannot provide all context, proceed with what is available and flag 
    - Clear definitional statements (AI models favor content with unambiguous definitions)
    - Structured formatting (clear headings, bullet points, tables that AI can parse)
    - Source credibility signals (author credentials, citations to primary research, organizational authority)
-4. Implement supporting schema markup (FAQ, HowTo, Article, Organization as appropriate)
+4. Keep supporting structured data that matches the visible text (Article, Organization, Product as appropriate); FAQ and HowTo markup doesn't improve AI citation
 5. Build inbound authority signals (internal links from high-authority pages, external citations)
 6. Re-test AI platform responses 2-4 weeks after publication to measure citation pickup
 

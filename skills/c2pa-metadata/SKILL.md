@@ -20,7 +20,8 @@ The resulting asset can be inspected by any C2PA-aware viewer (Adobe Photoshop, 
 
 ### C2PA spec versions to be aware of (June 2026)
 
-- **Content Credentials 2.3** (released 9 February 2026 — [launch post](https://c2pa.org/the-c2pa-launches-content-credentials-2-3-and-celebrates-5-years-of-impact-across-the-digital-ecosystem/)) added format support for: **live video** (broadcast/streaming), **plain text documents**, **OGG Vorbis audio**, **large AVI video files**, and **EXIF Original Preservation Images**. If a brand is signing live-stream video or text-based assets for the first time, 2.3 is the floor version to target.
+- **C2PA 2.3** (December 2025 in the spec's version history; announced 9 February 2026 — [launch post](https://c2pa.org/the-c2pa-launches-content-credentials-2-3-and-celebrates-5-years-of-impact-across-the-digital-ecosystem/)) added format support for: **live video** (broadcast/streaming), **plain text documents**, **OGG Vorbis audio**, **large AVI video files**, and **EXIF Original Preservation Images**. If a brand is signing live-stream video or text-based assets for the first time, 2.3 is the floor version to target.
+- **C2PA 2.5 is the current specification** (October 2026, spec.c2pa.org, read 2026-10-27). Whether the pinned c2pa-python reads 2.5 manifests is unverified; check `embed-c2pa.py --verify` on a 2.5 file before relying on it.
 - **C2PA Spec 2.4** (April 2026 — [spec.c2pa.org/specifications/specifications/2.4](https://spec.c2pa.org/specifications/specifications/2.4/specs/C2PA_Specification.html)) introduces the **AI Disclosure Assertion (`c2pa.ai-disclosure`)** for machine-readable AI transparency info — this is the assertion the EU AI Act Article 50 deployer pathway will rely on. The final Code of Practice on Transparency of AI-Generated Content (published 10 June 2026) references C2PA-style assertions as the canonical machine-readable marking mechanism for both providers and deployers. See `skills/context-engine/eu-code-of-practice.md` for the full Article 50 context.
 - The **C2PA Trust List** is now handled via the public C2PA Conformance Program (any CA meeting the Certificate Policy can join). Production signing certificates should come from a Conformance-Program-listed CA, not an ad-hoc cert.
 
@@ -31,7 +32,7 @@ The resulting asset can be inspected by any C2PA-aware viewer (Adobe Photoshop, 
 - Right after any AI image / video / audio generation step in the engagement workflow (Part 11 — AI Creative Instructions output)
 - Before handing a generated asset to the design team for review
 - As a pre-publish gate in `/digital-marketing-pro:check` for EU-targeted assets
-- Bulk-applying to a backlog of AI-generated assets before EU AI Act enforcement on 2 Aug 2026
+- Bulk-applying to a backlog of AI-generated assets for EU publication (Article 50 applies since 2 Aug 2026; content made before that date needs no retroactive label)
 
 ## Quick examples
 
