@@ -1,5 +1,7 @@
 # AI Visibility Audit — Methodology & Scoring
 
+> **Metrics:** mention rate, citation rate, share of model, share of AI voice, sentiment and the AI Visibility Score are defined, with formulas, in `skills/context-engine/ai-visibility-metrics.md`. Report every score with its formula and its sample size (n).
+
 ## Overview
 
 A systematic process for auditing how a brand appears across AI-generated answers on **6 platforms**: ChatGPT, Perplexity, **Google AI Mode**, Google AI Overviews, Gemini, and Microsoft Copilot.

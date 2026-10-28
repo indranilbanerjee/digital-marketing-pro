@@ -27,7 +27,7 @@ TESTS_DIR = Path(__file__).resolve().parent
 # stamps, re-verification ages).
 DATED_TESTS = ("test_api_versions", "test_benchmark_provenance", "test_compliance_dates",
                "test_model_registry_dates", "test_npx_allowlist", "test_registry_record_agreement",
-               "test_platform_specs")
+               "test_platform_specs", "test_review_dates")
 
 sys.path.insert(0, str(TESTS_DIR))
 

@@ -37,7 +37,7 @@ That is it. Everything else is optional.
 **Optional but nice to have:**
 
 - **Python 3.10 or newer** (3.11 or newer where you can: Python 3.10 reached end of life on 2026-10-01, and DMP moves to 3.11 once Claude's Cowork environment does) --- unlocks advanced scoring features like brand voice analysis and content readability. The plugin works perfectly without Python; you just get bonus capabilities if it is installed.
-- **No API keys required** --- the plugin ships with 177 reference knowledge files that power all 16 marketing modules (including the v3.0 methodology and framework reference docs). The optional MCP integrations (13 registry-backed HTTP connectors (11 work in Cowork as-is; Google Ads MCP and Amazon Ads MCP need your own endpoint first), plus a few vendor-published npm packages pinned to an exact version, for Claude Code) use your own account credentials and can be configured later. Run `/digital-marketing-pro:integrations` to see which connectors are available and `/digital-marketing-pro:connect <name>` for step-by-step setup.
+- **No API keys required** --- the plugin ships with 178 reference knowledge files that power all 16 marketing modules (including the v3.0 methodology and framework reference docs). The optional MCP integrations (13 registry-backed HTTP connectors (11 work in Cowork as-is; Google Ads MCP and Amazon Ads MCP need your own endpoint first), plus a few vendor-published npm packages pinned to an exact version, for Claude Code) use your own account credentials and can be configured later. Run `/digital-marketing-pro:integrations` to see which connectors are available and `/digital-marketing-pro:connect <name>` for step-by-step setup.
 
 > **Bottom line:** If you can run Claude Code or Claude Cowork, you can use this plugin right now.
 
@@ -575,7 +575,7 @@ printed                  (just ask for things)        session
 
 ## 9. Python Dependencies (Optional)
 
-Digital Marketing Pro is designed to work at full capability without Python. All 24 specialist agents, 5 top-level commands, and 164 skills function using the plugin's built-in reference knowledge (177 reference files). Python adds bonus scoring and automation features (and the engagement-state, dm-status, auto-save-insight, and eval scripts that power the v3.0 methodology + v3.2 quality gates — install Python if you plan to use the engagement workflow or the /digital-marketing-pro:check + /digital-marketing-pro:status commands).
+Digital Marketing Pro is designed to work at full capability without Python. All 24 specialist agents, 5 top-level commands, and 164 skills function using the plugin's built-in reference knowledge (178 reference files). Python adds bonus scoring and automation features (and the engagement-state, dm-status, auto-save-insight, and eval scripts that power the v3.0 methodology + v3.2 quality gates — install Python if you plan to use the engagement workflow or the /digital-marketing-pro:check + /digital-marketing-pro:status commands).
 
 ### Three dependency modes
 
@@ -590,7 +590,7 @@ Digital Marketing Pro is designed to work at full capability without Python. All
 This is what you get out of the box. No setup required.
 
 You have access to:
-- All 16 marketing modules with 177 reference knowledge files (including the v3.0 methodology references)
+- All 16 marketing modules with 178 reference knowledge files (including the v3.0 methodology references)
 - All 164 skills + 18 top-level `/digital-marketing-pro:` commands (including the v3.0 engagement workflow)
 - All 24 specialist agents
 - Brand profiling and campaign tracking (session hooks are opt-in — see the Session Lifecycle section)

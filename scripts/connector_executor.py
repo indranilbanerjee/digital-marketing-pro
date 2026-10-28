@@ -67,7 +67,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import _common  # noqa: E402
-from connector_resolver import ACTION_SPECS, resolve_action  # type: ignore  # noqa: E402
+from connector_resolver import ACTION_SPECS, KLAVIYO_REVISION, resolve_action  # type: ignore  # noqa: E402
 
 APPROVAL_BLOCKED_EXIT = 2
 NOT_EXECUTED_EXIT = 3
@@ -819,6 +819,64 @@ def _log_execution(action_id: str, brand: str, connector: str,
         (executions_dir / f"{exec_id}.json").write_text(json.dumps(entry, indent=2, default=str), encoding="utf-8")  # path-safe: connector and action ids are registry names (resolve_action), plus a timestamp
     except Exception:
         pass  # logging never breaks the call
+
+
+# One harmless read per connector: proof that the key works, after connect. GET only, no body, no
+# write endpoint, and nothing but the HTTP status and a count leaves the call.
+PROBES = {
+    "slack": "https://slack.com/api/auth.test",
+    "hubspot": "https://api.hubapi.com/crm/v3/objects/contacts?limit=1",
+    "klaviyo": "https://a.klaviyo.com/api/accounts/",
+    "sendgrid": "https://api.sendgrid.com/v3/scopes",
+    "brevo": "https://api.brevo.com/v3/account",
+    "customer-io": "https://api.customer.io/v1/campaigns",
+    "mailchimp": "https://{dc}.api.mailchimp.com/3.0/ping",
+    "ahrefs": "https://api.ahrefs.com/v3/subscription-info/limits-and-usage",
+}
+
+
+def probe(connector: str, env: dict | None = None, timeout: int = 15, urlopen=None) -> dict:
+    """One read-only GET that proves a connector's key works. Never writes, never raises.
+
+    A connector reached through the host's MCP connection or OAuth (Google Ads, Meta, LinkedIn,
+    TikTok and the rest of the manifest-ready catalog) can't be probed from code: the result says
+    so instead of claiming it is connected."""
+    env = dict(os.environ) if env is None else env
+    profile = EXECUTE_PROFILES.get(connector)
+    if profile is None:
+        return {"connector": connector, "status": "unknown", "error": f"no such connector: {connector}"}
+    if profile.get("oauth_only") or connector not in PROBES:
+        return {"connector": connector, "status": "not_probeable",
+                "message": "This connector runs through the host's MCP connection or OAuth, so code can't test it. "
+                           "Check it in the host's connector settings (for example, run one read in the MCP tool)."}
+    credential = env.get(profile["env_var"], "")
+    if not credential:
+        return {"connector": connector, "status": "not_configured", "message": f"{profile['env_var']} is not set"}
+    url = _mailchimp_dc_url(PROBES[connector], credential)
+    headers = _build_auth_header(profile, credential, {"Accept": "application/json"})
+    if connector == "klaviyo":
+        headers["revision"] = KLAVIYO_REVISION
+    req = urllib.request.Request(url, method="GET")
+    for h, v in headers.items():
+        req.add_header(h, v)
+    try:
+        with (urlopen or urllib.request.urlopen)(req, timeout=timeout) as resp:
+            status, raw = resp.status, resp.read()
+    except urllib.error.HTTPError as exc:
+        return {"connector": connector, "status": "failed", "http_status": exc.code,
+                "message": "The key was refused or lacks the read scope this probe needs" if exc.code in (401, 403)
+                else f"HTTP {exc.code}"}
+    except (urllib.error.URLError, OSError, ValueError) as exc:
+        return {"connector": connector, "status": "failed", "message": f"no answer: {type(exc).__name__}"}
+    try:
+        body = json.loads(raw or b"{}")
+    except ValueError:
+        body = {}
+    if connector == "slack" and isinstance(body, dict) and not body.get("ok"):
+        return {"connector": connector, "status": "failed", "http_status": status, "message": "Slack answered ok: false"}
+    items = next((len(v) for v in (body.values() if isinstance(body, dict) else []) if isinstance(v, list)), None)
+    return {"connector": connector, "status": "ok", "http_status": status, "read": url.split("?")[0],
+            **({"items_returned": items} if items is not None else {})}
 
 
 def list_executable_connectors() -> list[str]:

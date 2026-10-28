@@ -301,6 +301,8 @@ def run_api_mode(brand, queries, competitors=None, openai_model_override=None, a
         "answered": answered,
         "errors": failed,
         "mention_rate": f"{round(mentioned_count / answered * 100, 1)}%" if answered else None,
+        "mention_rate_formula": "runs whose answer names the brand / runs answered (failed requests excluded)",
+        "metric_definitions": "skills/context-engine/ai-visibility-metrics.md",
         "mentions": mentioned_count,
         "results": results,
     }

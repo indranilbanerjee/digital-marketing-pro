@@ -326,7 +326,8 @@ def _probe_only(name, brand):
 def main():
     parser = argparse.ArgumentParser(description="Connector status and discovery")
     parser.add_argument("--action", required=True,
-                        choices=["status", "list-available", "check", "setup-guide"])
+                        choices=["status", "list-available", "check", "setup-guide", "probe"],
+                        help="probe: one read-only GET with the connector's key, to prove it works")
     parser.add_argument("--name", help="Connector name (for check/setup-guide)")
     parser.add_argument("name_positional", nargs="?", help="Connector name (positional)")
     # v3.7.6 — validate-profile skill support
@@ -369,6 +370,14 @@ def main():
             result = {"error": "Provide connector name: --name <name>"}
         else:
             result = setup_guide(name)
+    elif args.action == "probe":
+        if not name:
+            result = {"error": "Provide connector name: --name <name>"}
+        else:
+            from connector_executor import probe
+            result = probe(name)
+            if result.get("status") == "failed":
+                result["error"] = result.get("message", "probe failed")
     else:
         result = {"error": f"Unknown action: {args.action}"}
 

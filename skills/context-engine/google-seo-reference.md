@@ -85,7 +85,7 @@ Google recommends JSON-LD for all structured data. Microdata and RDFa are suppor
 
 ## Image SEO Best Practices
 
-- **Format**: WebP (97%+ support) or AVIF (92%+) over JPEG/PNG
+- **Format**: WebP or AVIF (both supported by every current major browser; check caniuse.com for a given audience) over JPEG/PNG
 - **`<picture>`**: Progressive enhancement with AVIF > WebP > JPEG fallback
 - **LCP image**: `fetchpriority="high"`, NO `loading="lazy"`, NO `decoding="async"`
 - **Non-LCP images**: `loading="lazy"` + `decoding="async"`

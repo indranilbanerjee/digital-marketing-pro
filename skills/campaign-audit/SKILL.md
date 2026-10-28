@@ -7,6 +7,8 @@ allowed-tools: Read Bash Glob Grep
 
 # /digital-marketing-pro:campaign-audit — Cross-Channel Current-State Audit
 
+> **Metrics:** mention rate, citation rate, share of model, share of AI voice, sentiment and the AI Visibility Score are defined, with formulas, in `skills/context-engine/ai-visibility-metrics.md`. Report every score with its formula and its sample size (n).
+
 > **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`. Run them with Python 3.10 or newer: `python`, or `python3` where `python` is not found (macOS, many Linux systems).
 
 This skill produces a single document describing **everything currently running for a brand across every channel** — what's live, what's spending, what's performing, what's leaking budget, what's quietly broken. It's the prerequisite for any informed `/digital-marketing-pro:campaign-plan`, `/digital-marketing-pro:performance-report`, or `/digital-marketing-pro:competitor-analysis` refresh.
@@ -173,9 +175,17 @@ Bulleted list. Each item: the specific issue · cost or risk in concrete numbers
 ## 9. Channels NOT running that probably should be
 Bulleted list. Each item: channel · why it's missing · what minimum viable activation looks like.
 
+## 10. How you'll know it worked
+One row per quick win and strategic gap:
+
+| Recommendation | Metric | Expected direction | Check by |
+|---|---|---|---|
+| Pause the three ad sets above target CPA | Blended CPA (Meta) | Down | 2026-12-01 |
+
 ---
 
 **Next steps:**
+- Record section 10's rows: `python "${CLAUDE_PLUGIN_ROOT}/scripts/recommendation-tracker.py" --brand {slug} --action add --source campaign-audit --data '[...]'` (each row needs metric, direction and check_by; the continuous-improvement loop checks them when due).
 - Take the quick-wins backlog into a 30-min triage with the account lead.
 - Bring the strategic gaps to the next `/digital-marketing-pro:campaign-plan` conversation.
 - Resolve every 🔴 red flag before the next routine work cycle.

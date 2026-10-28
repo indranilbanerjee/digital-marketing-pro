@@ -158,13 +158,16 @@ def _api_not_supported() -> dict:
         "api_status": "not_supported",
         "as_of_check": date.today().isoformat(),
         "reason": (
-            "Google Search Analytics API (searchanalytics.query) does not yet "
-            "expose the AI Performance Report. As of the 3 June 2026 rollout the "
-            "report is UI-only with CSV export."
+            "Google Search Analytics API (searchanalytics.query) does not "
+            "expose the generative AI performance report: its reference (last "
+            "updated 2026-08-11, read 2026-10-28) has no field for it. The report "
+            "is UI-only with CSV export."
         ),
         "workaround": "Export CSV from Search Console UI; pass with --csv.",
         "ref": "https://developers.google.com/webmaster-tools/v1/searchanalytics/query",
-        "recheck_after": "2026-09-01",
+        # tests/test_review_dates.py fails once this date passes: re-read the reference above,
+        # then move the date (before 3.40.0 it said 2026-09-01 and passed unnoticed).
+        "recheck_after": "2027-01-31",
     }
 
 

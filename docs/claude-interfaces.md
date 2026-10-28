@@ -8,7 +8,7 @@ This plugin works in both **Claude Code** and **Claude Cowork** with full featur
 
 ## Overview
 
-Digital Marketing Pro comprises **164 skills**, **24 specialist agents**, **5 top-level slash commands**, **98 Python scripts**, **35 HTTP MCP connectors**, and **177 reference knowledge files**. Hooks ship empty by default (as of v3.1+) for clean multi-plugin coexistence; the prior 3-phase hook configuration is preserved at `hooks/hooks-reference.example.json` for users who want to re-enable specific lifecycle events.
+Digital Marketing Pro comprises **164 skills**, **24 specialist agents**, **5 top-level slash commands**, **99 Python scripts**, **35 HTTP MCP connectors**, and **178 reference knowledge files**. Hooks ship empty by default (as of v3.1+) for clean multi-plugin coexistence; the prior 3-phase hook configuration is preserved at `hooks/hooks-reference.example.json` for users who want to re-enable specific lifecycle events.
 
 The plugin uses the standard Claude plugin format: `.claude-plugin/plugin.json` manifest, `skills/` directories with SKILL.md frontmatter, `agents/` for specialist agents, `hooks/hooks.json` for lifecycle automation, `scripts/` for Python execution, and `.mcp.json` for live data integrations. This format is supported by both Claude Code and Claude Cowork.
 
@@ -23,10 +23,10 @@ Everything works. Claude Code is the original target platform, and every feature
 - **Hooks**: Empty by default as of v3.1+ for clean multi-plugin coexistence. Prior SessionStart / PreToolUse / SessionEnd hook configuration preserved at `hooks/hooks-reference.example.json` — re-enable per-event by copying entries into `hooks/hooks.json` if you want automated brand context injection, content-compliance interception, or insight persistence.
 - **Skills and Commands**: All 18 top-level `/digital-marketing-pro:` slash commands available. All 164 skills (organized into modules like content-engine, seo-audit, aeo-geo, agency-dashboard, compliance, etc.) auto-discoverable via SKILL.md frontmatter routing.
 - **Agents**: All 24 specialist agents activate based on conversation context (Marketing Strategist, Content Creator, SEO Specialist, Media Buyer, Analytics Analyst, Brand Guardian, Competitive Intel, PR Outreach, Growth Engineer, Influencer Manager, Email Specialist, CRO Specialist, Social Media Manager, Agency Operations, Marketing Scientist, Localization Specialist, Performance Monitor, Quality Assurance, Memory Manager, CRM Manager, Journey Orchestrator, Intelligence Curator, Market Intelligence, Execution Coordinator). Ongoing competitor monitoring is handled by Competitive Intel in `mode: monitoring` (the former standalone Competitor Intelligence agent merged into it).
-- **Scripts**: All 98 Python scripts run natively — covering brand management, content scoring, campaign tracking, email testing, A/B testing, social optimization, technical SEO auditing, local SEO checking, ROI calculation, budget optimization, CLV analysis, revenue forecasting, GEO/AEO visibility tracking, C2PA content provenance, and more. Requires Python 3.10+ with optional dependencies.
+- **Scripts**: All 99 Python scripts run natively — covering brand management, content scoring, campaign tracking, email testing, A/B testing, social optimization, technical SEO auditing, local SEO checking, ROI calculation, budget optimization, CLV analysis, revenue forecasting, GEO/AEO visibility tracking, C2PA content provenance, and more. Requires Python 3.10+ with optional dependencies.
 - **MCP**: 35 HTTP MCP connectors available when env vars are configured (such as Slack, Canva, Figma, HubSpot, Amplitude, Notion, Ahrefs, SimilarWeb, Klaviyo, Google Calendar, Gmail, Stripe, Asana, Webflow). Additional Cowork-compatible aggregator paths (Pipedream, Composio, Zapier, Make.com) catalogued in `.mcp.json.connectors-reference`.
 - **Memory**: Full persistent brand memory at `~/.claude-marketing/`. Brand profiles, campaign data, audience segments, competitor intelligence, content libraries, and marketing insights all persist across sessions.
-- **Reference Knowledge**: All 177 reference files loaded automatically across the 164 skills.
+- **Reference Knowledge**: All 178 reference files loaded automatically across the 164 skills.
 
 ### What a session looks like
 
@@ -87,7 +87,7 @@ Every feature listed in the Claude Code section above also works in Cowork:
 - **Scripts**: Python scripts run in Cowork's execution environment. If Python or optional dependencies are missing, scripts fall back gracefully (structured JSON with `"fallback": true` and exit code 0) --- the plugin never crashes.
 - **MCP**: All 35 HTTP MCP connectors work when configured with your API credentials.
 - **Memory**: Full persistent brand memory at `~/.claude-marketing/`. You must authorize Cowork to access this folder (see setup below).
-- **Reference Knowledge**: All 177 reference files are loaded automatically.
+- **Reference Knowledge**: All 178 reference files are loaded automatically.
 
 ### Cowork bonus capabilities
 
@@ -172,7 +172,7 @@ Anthropic ships a [marketing plugin](https://github.com/anthropics/knowledge-wor
 | Slash commands | 7 | 5 top-level commands |
 | Specialist agents | 0 | 24 |
 | Python scripts | 0 | 86 |
-| Reference knowledge files | ~5 | 177 |
+| Reference knowledge files | ~5 | 178 |
 | MCP integrations | 9 | 35 HTTP MCP connectors (+ 3 vendor npx entries) |
 | Industry profiles | 0 | 22 with benchmarks |
 | Compliance rules | 0 | 16 privacy jurisdictions |
@@ -199,7 +199,7 @@ If you use Claude Desktop in standard chat mode (without activating Cowork), plu
 
 - **Skills and SKILL.md files**: The 164 SKILL.md files can be loaded as context, giving Claude access to the structured instructions for every module and command.
 - **Agent behavior rules**: The 24 agent definition files inform Claude's behavior when loaded.
-- **Reference knowledge**: All 177 reference knowledge files (industry profiles, compliance rules, platform specs, scoring rubrics, channel strategies, framework templates) can be loaded.
+- **Reference knowledge**: All 178 reference knowledge files (industry profiles, compliance rules, platform specs, scoring rubrics, channel strategies, framework templates) can be loaded.
 - **MCP integrations**: If MCP servers are configured separately in Claude Desktop's own settings, integrations can work.
 
 ### What does not work
@@ -207,13 +207,13 @@ If you use Claude Desktop in standard chat mode (without activating Cowork), plu
 - **SessionStart hook**: No automatic brand context injection. You must describe your brand at the start of each conversation.
 - **PreToolUse hook**: No automatic content compliance checking. You must ask Claude to review content against your brand guidelines explicitly.
 - **SessionEnd hook**: No auto-save of marketing insights. Session learnings are not persisted.
-- **Python scripts**: The 98 Python scripts will not run without terminal access.
+- **Python scripts**: The 99 Python scripts will not run without terminal access.
 - **Campaign tracking and adaptive scoring**: These require Python script execution and persistent file system access.
 - **Slash commands**: May not be available depending on plugin support in standard Desktop mode.
 
 ### Workaround: Knowledge-Only Mode
 
-Even without hooks and scripts, Claude Desktop can still deliver significant value if the reference files are loaded. You get access to all 177 reference knowledge files covering industry benchmarks, compliance rules, platform specifications, scoring rubrics, and strategic frameworks. Follow SKILL.md instructions manually for any of the 5 top-level commands.
+Even without hooks and scripts, Claude Desktop can still deliver significant value if the reference files are loaded. You get access to all 178 reference knowledge files covering industry benchmarks, compliance rules, platform specifications, scoring rubrics, and strategic frameworks. Follow SKILL.md instructions manually for any of the 5 top-level commands.
 
 ### What you need to do manually
 
@@ -289,7 +289,7 @@ If multiple team members use Digital Marketing Pro:
 | SessionEnd hook (insight auto-save) | Opt-in | Opt-in | No | No |
 | Python scripts (86 tools) | Yes | Yes | No | No |
 | MCP integrations (35 HTTP connectors) | Yes | Yes | Yes (separate config) | No |
-| Reference knowledge (177 files) | Auto-loaded | Auto-loaded | Auto-loaded if plugin supported | Manual upload via Projects |
+| Reference knowledge (178 files) | Auto-loaded | Auto-loaded | Auto-loaded if plugin supported | Manual upload via Projects |
 | Specialist agents (24 agents) | Yes | Yes | Depends on plugin support | No |
 | Campaign tracking | Yes | Yes | No | No |
 | Adaptive scoring | Yes | Yes | No | No |
@@ -359,6 +359,6 @@ If you are working in Claude Desktop (without Cowork) or Claude.ai and want to a
 
 ## Summary
 
-Digital Marketing Pro delivers its full value in **Claude Code** and **Claude Cowork**. Both interfaces support every plugin feature: hooks, persistent memory, Python scripts, MCP integrations, slash commands, and specialist agents. Cowork adds visual capabilities (document creation, screen review) on top. Other interfaces can access the knowledge base (177 reference files), but they lose the automation, persistence, and live data connections.
+Digital Marketing Pro delivers its full value in **Claude Code** and **Claude Cowork**. Both interfaces support every plugin feature: hooks, persistent memory, Python scripts, MCP integrations, slash commands, and specialist agents. Cowork adds visual capabilities (document creation, screen review) on top. Other interfaces can access the knowledge base (178 reference files), but they lose the automation, persistence, and live data connections.
 
 For marketing professionals: if you have Claude Pro, Max, Team, or Enterprise, use Cowork for the visual desktop experience or Claude Code for the terminal experience. Both give you the complete plugin.

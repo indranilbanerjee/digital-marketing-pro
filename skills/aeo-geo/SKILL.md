@@ -5,6 +5,8 @@ description: "Plan AEO/GEO strategy to get cited by AI: content, entities, schem
 
 # AEO/GEO Intelligence
 
+> **Metrics:** mention rate, citation rate, share of model, share of AI voice, sentiment and the AI Visibility Score are defined, with formulas, in `skills/context-engine/ai-visibility-metrics.md`. Report every score with its formula and its sample size (n).
+
 > **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`. Run them with Python 3.10 or newer: `python`, or `python3` where `python` is not found (macOS, many Linux systems).
 
 ## When to Use This Skill
@@ -29,7 +31,7 @@ Activate this module when the user's request involves any of the following:
 - **Personal Intelligence in AI Mode** is expanding to ~200 countries and 98 languages, no subscription required, with Gmail / Photos / Calendar connections. AEO implication: AI answers are increasingly personalized — generic brand-search results will be reweighted against the user's own context. Brand schema completeness and entity consistency (NAP, services, hours) matter even more.
 - **AI Information Agents** (user-created, monitoring blogs/news/social 24/7) launch for AI Pro & Ultra subscribers in summer 2026. AEO implication: brands that publish structured, dated updates on owned channels will be more legible to user-configured agents than those relying on third-party PR pickup.
 
-**Official Google guidance on AI search optimization** (updated 15 May 2026 — [Google AI Optimization Guide](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide)):
+**Official Google guidance on AI search optimization** (last updated 2026-07-10 — [Google AI Optimization Guide](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide)):
 
 - **No `llms.txt` file is needed.** Google's official position: "You don't need to create new machine readable files, AI text files, markup, or Markdown to appear in generative AI search." Do not waste time generating `llms.txt` for Google AI Features. (Other AI search engines may or may not consume it; current Anthropic / OpenAI / Perplexity public positions are also that they do not require it. Document any client pressure to ship `llms.txt` as a low-priority deliverable with no measurable upside.)
 - **No special AI-specific schema is needed.** "Structured data isn't required for generative AI search, and there's no special schema.org markup you need to add." Schema continues to matter for classic SEO and rich results.
@@ -131,7 +133,7 @@ If the user cannot provide all context, proceed with what is available and flag 
 6. **Monitoring & Iteration**
    - Define monitoring cadence (weekly for priority queries, monthly for full audit)
    - Set up tracking framework to detect citation changes
-   - Establish KPIs: citation rate, accuracy score, query coverage percentage
+   - Establish KPIs: mention rate and citation rate (formulas in `skills/context-engine/ai-visibility-metrics.md`), the share of judged answers that describe the brand accurately (n stated), and query coverage (prompts tested ÷ prompts planned)
    - Track competitor citation changes as part of ongoing monitoring
    - Re-test after major content updates or schema implementations to measure impact
    - Log all AI platform model updates that may affect visibility (new model releases, retrieval changes)

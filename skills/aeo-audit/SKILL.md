@@ -6,6 +6,10 @@ argument-hint: "[brand-name or URL]"
 
 # /digital-marketing-pro:aeo-audit
 
+> **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`. Run them with Python 3.10 or newer: `python`, or `python3` where `python` is not found (macOS, many Linux systems).
+
+> **Metrics:** mention rate, citation rate, share of model, share of AI voice, sentiment and the AI Visibility Score are defined, with formulas, in `skills/context-engine/ai-visibility-metrics.md`. Report every score with its formula and its sample size (n).
+
 ## Purpose
 
 Evaluate the brand's visibility and accuracy across AI answer engines. Analyze how the brand is cited, described, and recommended by ChatGPT, Perplexity, **Google AI Mode** (the conversational search tab; see the AI Mode note in `skills/aeo-geo/SKILL.md`), Google AI Overviews, Gemini, and Microsoft Copilot. Produce optimization recommendations to improve AI visibility.
@@ -16,7 +20,7 @@ Evaluate the brand's visibility and accuracy across AI answer engines. Analyze h
 
 **Cross-reference with GSC AI Performance Report (rolled out 3 June 2026):** The Google Search Console AI Performance Report (UK rollout first, global to follow) gives you actual *impressions* in AI Overviews + AI Mode for verified properties. Synthetic probe results from this skill should be reconciled against GSC actuals — see `/digital-marketing-pro:gsc-ai-performance` for the workflow. Important caveat: the GSC report intentionally excludes click data; click-through attribution must come from GA4 (the new `AI Assistant` channel group, added 13 May 2026, captures `Medium=ai-assistant` referrals from ChatGPT/Gemini/Claude; see `/digital-marketing-pro:analytics-insights`).
 
-**Google's official position on AI optimization** (Google AI Optimization Guide, updated 15 May 2026): no `llms.txt`, no AI-specific schema, no separate AI eligibility gate. Pages eligible for snippets in classic Search are eligible for AI Features. Don't manufacture work around fictional ranking factors — `/digital-marketing-pro:aeo-geo` documents what *does* work (entity consistency, citation-worthy snippets, knowledge graph alignment).
+**Google's official position on AI optimization** (Google AI Optimization Guide, last updated 2026-07-10): no `llms.txt`, no AI-specific schema, no separate AI eligibility gate. Pages eligible for snippets in classic Search are eligible for AI Features. Don't manufacture work around fictional ranking factors — `/digital-marketing-pro:aeo-geo` documents what *does* work (entity consistency, citation-worthy snippets, knowledge graph alignment).
 
 **Information Agents (Google AI Pro / Ultra, summer 2026 launch):** Google announced at I/O 2026 a new class of persistent agents that continuously monitor web / news / real-time data for subscribers and deliver synthesized updates with actionable capabilities. Once these go live, they become a **7th probe target** for this skill (alongside ChatGPT / Perplexity / AI Mode / AI Overviews / Gemini / Copilot). Until then, treat AI Mode as the proxy — agents are powered by the same Gemini 3.5 Flash backbone. Source: [blog.google/search-io-2026](https://blog.google/products-and-platforms/products/search/search-io-2026/).
 
@@ -41,6 +45,22 @@ The user must provide (or will be prompted for):
 7. Evaluate structured data and knowledge panel presence
 8. Identify content gaps where the brand should appear but does not
 9. Generate optimization recommendations for improved AI visibility
+
+## How you'll know it worked
+
+Every recommendation gets a metric it should move, the direction it should move in, and a date to check it. Add this table to the report, one row per recommendation:
+
+| Recommendation | Metric | Expected direction | Check by |
+|---|---|---|---|
+| Add a dated statistic with its source to the pricing page | Citation rate on ChatGPT for 10 pricing prompts | Up | 2027-02-01 |
+
+Then record the rows so the continuous-improvement loop checks them when they fall due:
+
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/recommendation-tracker.py" --brand {slug} --action add --source aeo-audit --data '[{"recommendation": "...", "metric": "...", "direction": "up", "check_by": "YYYY-MM-DD"}]'
+```
+
+A recommendation without a metric, a direction (up or down) and a future check-by date is refused (exit 2): if you can't say how you'd know it worked, rewrite it until you can.
 
 ## Output
 
