@@ -6,7 +6,7 @@
 
 A systematic process for auditing how a brand appears across AI-generated answers on **6 platforms**: ChatGPT, Perplexity, **Google AI Mode**, Google AI Overviews, Gemini, and Microsoft Copilot.
 
-> **Why 6, not 5 (changed May 2026):** Google split its AI search surfaces. AI Mode (Gemini 3.5 Flash, conversational) and AI Overviews (classic SERP summary block) now select different citations for the same query 40–60% of the time. Audit both independently — a brand cited in AI Overviews is not necessarily cited in AI Mode.
+> **Why 6, not 5 (changed May 2026):** Google split its AI search surfaces. AI Mode (Gemini 3.5 Flash, conversational) and AI Overviews (classic SERP summary block) often select different citations for the same query; no figure is published, so measure the overlap in your own probe set (share of model per engine: `skills/context-engine/ai-visibility-metrics.md`). Audit both independently — a brand cited in AI Overviews is not necessarily cited in AI Mode.
 
 ---
 

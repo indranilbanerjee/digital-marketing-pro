@@ -12,8 +12,8 @@ Wraps `scripts/embed-c2pa.py` to add a **C2PA (Coalition for Content Provenance 
 This is the technical mechanism brands use to comply with:
 
 - **EU AI Act Article 50** (applicable 2 August 2026) — generative-AI marketing content must be marked in a machine-readable format using open, interoperable standards. C2PA is the emerging backbone. Penalty for non-compliance: up to **€15 million or 3% global annual turnover**.
-- **NY synthetic-performer disclosure law** (effective June 2026) — $1K–$5K per violation, $10K repeat; applies to synthetic influencers and AI-generated endorsements.
-- **FTC May 2026 endorsement guidance** — covers AI testimonials and synthetic creator content.
+- **NY synthetic-performer disclosure law** (S.8420-A, signed 2025-12-11, in force 2026-06-09: an ad that uses an AI-generated synthetic performer must disclose it conspicuously; $1,000 for a first violation and $5,000 for each later one; applies to ads reaching New York audiences ([Governor's release](https://www.governor.ny.gov/news/governor-hochul-signs-legislation-protect-consumers-and-boost-ai-transparency-film-industry), 2025-12-11; the effective date and penalties as reported by law-firm summaries)).
+- **FTC rules on endorsements and reviews**: the Endorsement Guides (16 CFR Part 255, revised 2023) and the Consumer Reviews and Testimonials Rule (16 CFR Part 465, in force 2024-10-21), which bans fake reviews and testimonials, AI-generated ones included; the FTC's Q&A says an AI avatar can still be a testimonial and can deceive ([FTC Q&A](https://www.ftc.gov/business-guidance/resources/consumer-reviews-testimonials-rule-questions-answers)).
 - **Australia Online Safety Act / UK Online Safety Act** — emerging deepfake disclosure requirements.
 
 The resulting asset can be inspected by any C2PA-aware viewer (Adobe Photoshop, Lightroom, Truepic, [contentcredentials.org/verify](https://contentcredentials.org/verify)).

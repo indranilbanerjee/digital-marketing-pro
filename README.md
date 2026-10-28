@@ -646,9 +646,9 @@ DM Pro carries jurisdiction-specific compliance rules that auto-apply when a bra
 - Final Article 50 Guidelines + final Code of Practice on Transparency of AI-Generated Content (10 June 2026) in `compliance-rules.md` §1.1b.i with six-row clarification table + five-point action list
 - Production cert guide at `docs/c2pa-production-cert-guide.md` covers the four CAI-recognised authorities (Adobe Content Credentials, Truepic, Numbers Protocol, Microsoft Azure Confidential Ledger)
 
-**Other May 2026 regulatory updates baked in:**
-- NY synthetic-performer disclosure law (live June 2026, $1K–$5K per violation, $10K repeat) — applies to synthetic influencers + AI endorsements
-- FTC May 2026 endorsement guidance — synthetic influencers, AI testimonials, AI-edited creator content
+**Other regulatory updates baked in:**
+- NY synthetic-performer disclosure law S.8420-A (in force 2026-06-09; $1,000 for a first violation, $5,000 after) — ads that use AI-generated performers
+- FTC Consumer Reviews and Testimonials Rule (in force 2024-10-21) and Endorsement Guides — fake reviews and testimonials, AI-generated ones included
 - CJEU March 2026 ruling — pseudonymized cookie IDs are personal data when re-identification is feasible
 - CCPA ADMT regulations (in effect 1 Jan 2026; ADMT compliance from 1 Jan 2027) + AI-derived sensitive data classification
 - DPDP Phase II preparation — consent manager registration opens Nov 2026

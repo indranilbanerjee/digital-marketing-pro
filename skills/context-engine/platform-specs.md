@@ -19,6 +19,7 @@
 | Square image | 1080 x 1080 px (1:1) |
 | Portrait image | 1080 x 1350 px (4:5) |
 | Landscape image | 1080 x 566 px (1.91:1) |
+| Profile grid crop | 3:4. Since January 2025 profile-grid thumbnails crop to 3:4 (reported: trade press quoting Instagram's head; no Instagram help page found). Post 4:5 or 3:4 and keep the subject inside the 3:4 centre |
 | Max file size (image) | 30 MB |
 | Hashtag limit | 5 (platform_specs.json: instagram.hashtags_cap); 3-5 recommended; keep them in the caption |
 | Algorithm priority signals | Saves, shares, comments, watch time, relationship closeness |
@@ -77,7 +78,7 @@
 | Resolution | 1080 x 1920 px minimum |
 | Video format | MP4, MOV, WebM |
 | Max file size | 10 GB (desktop), 287 MB (mobile) |
-| Caption limit | 2200 characters (platform_specs.json: tiktok.caption_chars); sources disagree (2,200 vs 4,000), so 2,200 fits either until an in-app check |
+| Caption limit | 2200 characters (platform_specs.json: tiktok.caption_chars); sources disagree (2,200 vs 4,000), so 2,200 fits either until an in-app check (owner to check in the app) |
 | Hashtag limit | No hard limit; 3-5 relevant hashtags recommended |
 | Photo mode | Up to 35 images per carousel post |
 | Algorithm priority signals | Completion rate, rewatch rate, shares, comments, profile visits after viewing, content diversity score |
@@ -259,6 +260,8 @@ Pinterest unified its formats into one Pin and stopped new Idea Pin creation (Pi
 | Resolution | 1080 x 1920 px |
 | Title limit | 100 characters |
 | Algorithm priority signals | Swipe-away rate (lower is better), replays, likes, subscriber conversion from Shorts |
+| View counting | Since 2025-03-31 a view counts each time a Short starts or replays, with no minimum watch time; the old metric is "Engaged views" in YouTube Analytics (https://support.google.com/youtube/answer/10059070, read 2026-10-28) |
+| Monetisation through Shorts | YouTube Partner Program: 1,000 subscribers and 10 million qualified Shorts views in the last 90 days (https://support.google.com/youtube/answer/72851, read 2026-10-28) |
 
 #### YouTube Live
 
@@ -463,13 +466,13 @@ Pinterest unified its formats into one Pin and stopped new Idea Pin creation (Pi
 |---|---|
 | Images | Up to 20. Landscape (1200x628), square (1200x1200), portrait (960x1200). Min 1 landscape and 1 square required. |
 | Logos | Up to 5. Square (1200x1200) required. Landscape (1200x300) recommended. |
-| Videos | Up to 5. Landscape (16:9), square (1:1), vertical (9:16). Min 10 seconds. If none provided, Google auto-generates from assets. |
+| Videos | Up to 15 per asset group (support.google.com/google-ads/answer/14528532, "About video assets for Performance Max campaigns", read 2026-10-28; the setup guide support.google.com/google-ads/answer/15865151 still says 5). Landscape (16:9), square (1:1), vertical (9:16). Min 10 seconds. If none provided, Google auto-generates from assets. |
 | Headlines | Up to 5, max 30 characters each |
 | Long headlines | Up to 5, max 90 characters each |
 | Descriptions | Up to 5, max 90 characters each. Plus 1 short description max 60 characters. |
 | Business name | Max 25 characters |
 | CTA | Automated or manual selection from standard options |
-| Audience signals | Required: custom segments, interests, demographics, remarketing lists |
+| Audience signals | Optional, and recommended: they guide Google's learning rather than limit targeting (support.google.com/google-ads/answer/15865151, read 2026-10-28). Custom segments, interests, demographics, remarketing lists |
 
 #### YouTube Ads
 

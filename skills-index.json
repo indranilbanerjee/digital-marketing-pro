@@ -78,7 +78,7 @@
         "seo-drift"
       ],
       "doc_files": 1,
-      "bytes": 12076
+      "bytes": 11962
     },
     {
       "name": "aeo-geo",
@@ -91,11 +91,12 @@
       "gates": [],
       "cross_refs": [
         "aeo-audit",
+        "agent-readiness-audit",
         "brand-setup",
         "gsc-ai-performance"
       ],
       "doc_files": 5,
-      "bytes": 47098
+      "bytes": 47517
     },
     {
       "name": "agency-dashboard",
@@ -135,7 +136,7 @@
         "tech-seo-audit"
       ],
       "doc_files": 1,
-      "bytes": 17159
+      "bytes": 17986
     },
     {
       "name": "analytics-insights",
@@ -154,7 +155,7 @@
         "gsc-ai-performance"
       ],
       "doc_files": 11,
-      "bytes": 180514
+      "bytes": 180809
     },
     {
       "name": "anomaly-scan",
@@ -333,7 +334,7 @@
         "check"
       ],
       "doc_files": 1,
-      "bytes": 10248
+      "bytes": 10938
     },
     {
       "name": "campaign-audit",
@@ -696,7 +697,7 @@
         "verify-claims"
       ],
       "doc_files": 18,
-      "bytes": 156723
+      "bytes": 158191
     },
     {
       "name": "content-repurpose",
@@ -779,7 +780,7 @@
         "validate-profile"
       ],
       "doc_files": 57,
-      "bytes": 910461
+      "bytes": 912045
     },
     {
       "name": "continuous-improvement-loop",
@@ -1418,7 +1419,7 @@
         "c2pa-metadata"
       ],
       "doc_files": 1,
-      "bytes": 4946
+      "bytes": 5096
     },
     {
       "name": "influencer-creator",
@@ -1898,7 +1899,7 @@
         "launch-ad-campaign"
       ],
       "doc_files": 14,
-      "bytes": 216418
+      "bytes": 217238
     },
     {
       "name": "pdf-report",
@@ -2171,7 +2172,7 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 7048
+      "bytes": 7137
     },
     {
       "name": "review-response",
@@ -2726,7 +2727,7 @@
         "video-script"
       ],
       "doc_files": 1,
-      "bytes": 4585
+      "bytes": 5207
     },
     {
       "name": "video-script",

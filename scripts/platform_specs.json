@@ -33,7 +33,7 @@
       "links_advised": {"value": 1, "source_url": "https://help.x.com/", "source_date": null, "verified_on": null, "review_by": "2027-01-31", "note": "Practice. A link counts as 23 characters."}
     },
     "tiktok": {
-      "caption_chars": {"value": 2200, "source_url": "https://support.tiktok.com/", "source_date": null, "verified_on": null, "review_by": "2027-01-15", "note": "Sources disagree (2,200 vs 4,000) and no primary page was readable on 2026-10-27; 2,200 fits either until an in-app check settles it."},
+      "caption_chars": {"value": 2200, "source_url": "https://support.tiktok.com/", "source_date": null, "verified_on": null, "review_by": "2027-01-15", "note": "Sources disagree (2,200 vs 4,000) and no primary page was readable on 2026-10-27; 2,200 fits either until an in-app check settles it. Owner to check in the app."},
       "hashtags_advised": {"value": [3, 5], "source_url": "https://support.tiktok.com/", "source_date": null, "verified_on": null, "review_by": "2027-01-31", "note": "Practice, not a platform cap."},
       "video_max_seconds": {"value": 600, "source_url": "https://support.tiktok.com/", "source_date": null, "verified_on": null, "review_by": "2027-01-31", "note": "In-app uploads up to 10 minutes. Carried from 3.39.1."}
     },

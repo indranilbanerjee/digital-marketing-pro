@@ -14,7 +14,7 @@ argument-hint: "[brand-name or URL]"
 
 Evaluate the brand's visibility and accuracy across AI answer engines. Analyze how the brand is cited, described, and recommended by ChatGPT, Perplexity, **Google AI Mode** (the conversational search tab; see the AI Mode note in `skills/aeo-geo/SKILL.md`), Google AI Overviews, Gemini, and Microsoft Copilot. Produce optimization recommendations to improve AI visibility.
 
-**AI Mode vs AI Overviews — why both matter:** AI Overviews are the summary block at the top of a classic Google SERP and trigger on a subset of queries. AI Mode is a conversational tab (and now the default search experience for opted-in users) backed by Gemini 3.5 Flash with deeper reasoning, follow-ups, and a different citation pattern. The two surfaces select different sources for the same query in a large share of cases (internal observation, 05/2026 — "40–60%" is a rough estimate; re-verify against your own probe set). Audit both.
+**AI Mode vs AI Overviews — why both matter:** AI Overviews are the summary block at the top of a classic Google SERP and trigger on a subset of queries. AI Mode is a separate conversational tab (AI Overviews remain the default) backed by Gemini 3.5 Flash with deeper reasoning, follow-ups, and a different citation pattern. The two surfaces often select different sources for the same query; no figure is published, so measure the overlap in your own probe set. Audit both.
 
 **Copilot citation gaps from Bing (13 Oct 2026):** Bing Webmaster Tools → AI Performance → **Topics Portfolio (beta)** lists, per topic, approximate citations across all sites, how many sites are cited, and **Top Opportunity Queries**: grounding queries where other sites are cited and yours is not. It is the first first-party citation-gap list; use its opportunity queries to seed this audit's probe set, and label its figures approximate (Bing does). It shows no clicks, and the tab appears only when Bing has enough data for the site. Source: [Bing Webmaster blog](https://blogs.bing.com/webmaster/2026/10/introducing-topics-portfolio-beta-in-ai-performance/).
 
@@ -125,7 +125,7 @@ This skill defines the plugin's **single AI-visibility scoring standard.** Every
 
 ## Tips & caveats
 
-- **AI Mode and AI Overviews frequently disagree on the same queries** (internal observation, 05/2026 — the "40-60%" figure is a rough estimate, re-verify against your own probe set) — always probe both separately, never roll them into "Google AI".
+- **AI Mode and AI Overviews frequently disagree on the same queries** (no figure is published, so measure the overlap in your own probe set) — always probe both separately, never roll them into "Google AI".
 - **Don't probe more than 25 queries per session.** Beyond that, model rate limits + token cost dominate. Pick the 10-25 highest-value queries.
 - **Citation accuracy is the audit's most-skipped step.** AI engines confidently hallucinate brand facts; if you don't fact-check, you're certifying wrong info. Always check at least the top-cited fact per platform.
 - **Synthetic probes overstate presence.** Real users phrase queries differently than the test set. The cross-reference with the GSC AI Performance Report (3 Jun 2026, UK first) is what tells you actual impressions.

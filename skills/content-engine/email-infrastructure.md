@@ -63,7 +63,7 @@ v=DMARC1; p=reject; rua=mailto:dmarc@yourdomain.com; ruf=mailto:dmarc@yourdomain
 ### Requirements
 1. DMARC policy must be at `p=quarantine` or `p=reject`
 2. SVG logo file meeting BIMI specifications
-3. VMC (Verified Mark Certificate) from DigiCert or Entrust (~$1,500/year)
+3. A mark certificate from an issuer such as DigiCert or Entrust: a VMC (Verified Mark Certificate; needs a registered trademark; Gmail shows a verified checkmark) or a CMC (Common Mark Certificate; logo only, no checkmark; Gmail accepts it since 2024-09-24, [Workspace Updates](https://workspaceupdates.googleblog.com/2024/09/gmail-additional-bimi-protections.html)). Both carry an annual fee: check the issuer's current price
 4. DNS record:
 ```
 default._bimi.yourdomain.com TXT "v=BIMI1; l=https://yourdomain.com/logo.svg; a=https://yourdomain.com/cert.pem"
@@ -132,3 +132,4 @@ For new sending domains or IPs:
 | High bounce rate | Stale list, bad data | Run verification, check acquisition source |
 | Blacklisted | Spam complaints exceeded threshold | Check blacklist databases, submit delisting request |
 | Gmail tabs (Promotions) | Content signals | Reduce images, simplify formatting |
+| Apple Mail categories (Promotions) | Apple Mail sorts mail into Primary, Transactions, Updates and Promotions; a time-sensitive message in the other three also shows in Primary ([Apple support](https://support.apple.com/guide/icloud/use-categories-mmafbebd3108/icloud), read 2026-10-28) | Send receipts and shipping notices from a transactional stream, keep marketing out of it, and don't fake urgency |

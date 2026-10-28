@@ -202,8 +202,9 @@ If the user cannot provide all context, proceed with what is available and flag 
 
 ## Tips & caveats
 
-- **Google's official position (15 May 2026):** no `llms.txt`, no AI-specific schema, no separate AI eligibility gate. Don't manufacture work around fictional ranking factors — schema + entity consistency + citation-worthy formatting are what works.
-- **AI Mode citation patterns frequently differ from AI Overviews** on the same query (internal observation, 05/2026 — the "40-60%" figure is a rough estimate, re-verify against your own probe set). Audit and optimise for both, treating them as distinct surfaces.
+- **Google's official position (AI features guide, last updated 2026-07-10):** no `llms.txt`, no AI-specific schema, no separate AI eligibility gate. Don't manufacture work around fictional ranking factors — schema + entity consistency + citation-worthy formatting are what works.
+- **AI Mode citation patterns frequently differ from AI Overviews** on the same query (no figure is published, so measure the overlap in your own probe set). Audit and optimise for both, treating them as distinct surfaces.
+- **Agentic commerce: discovery feed first; checkout is partner-gated** on ChatGPT and on Google (OpenAI, 2026-03-24; Merchant Center help 16837055, read 2026-10-28). Get the product feed right before planning for in-chat checkout; sources and checks in `/digital-marketing-pro:agent-readiness-audit`.
 - **Entity consistency across Knowledge Graph, Wikidata, Wikipedia, LinkedIn, Crunchbase is the single highest-leverage AEO investment** — more impactful than schema tweaks.
 - **AI citations are stickier than blue-link rankings** but slower to win. Expect 3-6 months of consistent work before measurable shift.
 - **Don't try to "trick" AI into citing you** with stuffed content or fake authority signals. AI platforms detect and demote this faster than traditional search.

@@ -6,6 +6,8 @@ Never quote CPMs, CPCs, auction mechanics, or audience sizes for these surfaces 
 
 ---
 
+> **No Perplexity ad channel.** Perplexity told the Financial Times in February 2026 that it won't pursue advertising and is winding down the ads it ran (reported by Campaign and TechSpot); it hasn't ruled ads out for good. Don't put a Perplexity ad line in a media plan: visibility there is organic (`skills/context-engine/geo-execution-guide.md`).
+
 ## 1. ChatGPT Ads as a paid channel
 
 ### 1.1 What the developer surface documents (primary)

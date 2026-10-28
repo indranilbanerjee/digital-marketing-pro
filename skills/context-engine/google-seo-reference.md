@@ -110,7 +110,7 @@ The plugin scores AI visibility across six surfaces (the `PLATFORMS` constant in
 ### What's new since March 2026
 - **GSC AI Performance Report (3 Jun 2026, UK-first then global):** actual impressions in AI Overviews + AI Mode for verified properties, plus a property-level **AI opt-out toggle** (no AI-specific robots directive needed). Excludes click data. See `/digital-marketing-pro:gsc-ai-performance`.
 - **GA4 `AI Assistant` channel group (13 May 2026):** captures `Medium=ai-assistant` referrals from ChatGPT / Gemini / Claude — the click-side complement to the GSC report.
-- **Official Google position (AI Optimization Guide, 15 May 2026):** no `llms.txt`, no AI-specific schema, no separate AI eligibility gate — pages eligible for snippets in classic Search are eligible for AI features.
+- **Official Google position (AI features guide, last updated 2026-07-10):** no `llms.txt`, no AI-specific schema, no separate AI eligibility gate — pages eligible for snippets in classic Search are eligible for AI features.
 - **`Google-Extended`** (robots.txt) still controls Google's *other* AI systems (Gemini training, Vertex grounding), distinct from the in-Search-Console AI Overviews/AI Mode toggle.
 
 ### Optimization Signals

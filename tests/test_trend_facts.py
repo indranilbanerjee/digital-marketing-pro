@@ -1,4 +1,4 @@
-"""Facts corrected by the 2026-10-27 trends audit stay corrected.
+"""Facts corrected by the 2026-10-27 trends audit stay corrected (findings 1-27 and 29).
 
 Each stale phrasing below shipped in 3.39.1 and was wrong against a primary source read that day
 (the source is named next to the corrected text in the docs). The REQUIRED rows are the corrected
@@ -55,6 +55,31 @@ STALE = {  # phrase -> why it is wrong
     "before EU AI Act enforcement on 2 Aug 2026": "Article 50 has applied since 2 August 2026",
     "Run this checklist before 2 August 2026": "Article 50 has applied since 2 August 2026",
     "no web browsing by default": "Claude has web search with citations (user-enabled)",
+    # findings 19-29 (3.40.0, primaries read 2026-10-28)
+    'REMOVED (deprecation completed)': 'call-only ads: no new ones since January 2026, existing ones serve until February 2027',
+    'Videos | Up to 5.': 'PMax takes up to 15 videos per asset group (Google Ads Help 14528532)',
+    '- [ ] 5 video assets': 'PMax takes up to 15 videos per asset group (Google Ads Help 14528532)',
+    'Audience signals | Required': 'audience signals are optional; they guide learning (Google Ads Help 15865151)',
+    '3-10x higher than other platforms': 'one LinkedIn CPC planning prior, 3-5x, in linkedin-ads.md',
+    'fatigues in 3-7 days': 'one TikTok refresh cadence, 7-14 days, in tiktok-ads.md',
+    '15–60 seconds (sweet spot': 'one TikTok ad length, 5-60 seconds, in platform-specs.md',
+    '3-5 impressions per day for display': 'frequency caps are weekly, in retargeting-audiences.md',
+    'cookies in Chrome (announced 2024)': 'July 2024 reversal, April 2025 no prompt, 2025-10-17 APIs retired',
+    'deprecation cancelled 2025': 'July 2024 reversal, April 2025 no prompt, 2025-10-17 APIs retired',
+    'Intent to Deprecate and Remove': 'Google retired the Privacy Sandbox APIs on 2025-10-17',
+    'winding down the Privacy Sandbox': 'Google retired the Privacy Sandbox APIs on 2025-10-17',
+    '~$1,500/year': 'an unsourced price; BIMI takes a VMC or a CMC',
+    '40–60% of the time': 'no published figure for AI Mode vs AI Overviews citation overlap',
+    '"40-60%" figure': 'no published figure for AI Mode vs AI Overviews citation overlap',
+    '"40–60%" is a rough estimate': 'no published figure for AI Mode vs AI Overviews citation overlap',
+    'now the default search experience': 'AI Overviews remain the default; AI Mode is a separate tab',
+    'JSONL "OpenAI format"': "OpenAI's product file format; feed onboarding is partner-gated",
+    'FTC May 2026': 'no such FTC document; the Endorsement Guides (2023) and the reviews rule (2024-10-21) stand',
+    'endorsement guidance (May 2026)': 'no such FTC document; the Endorsement Guides (2023) and the reviews rule (2024-10-21) stand',
+    '$10K repeat': 'NY S.8420-A: $1,000 first violation, $5,000 after',
+    '"altered or synthetic content" toggle': 'YouTube\'s upload setting is "AI use" (YouTube Help 14328491)',
+    "Google's official position (15 May 2026)": "Google's AI features guide was last updated 2026-07-10",
+    'AI Optimization Guide, 15 May 2026': "Google's AI features guide was last updated 2026-07-10",
 }
 REQUIRED = [  # (file, phrase)
     ("skills/analytics-insights/privacy-first-measurement.md", "ad_user_data = denied"),
@@ -65,6 +90,26 @@ REQUIRED = [  # (file, phrase)
     ("skills/paid-advertising/ads-in-ai-answers.md", "More than 1.2 billion people use ChatGPT each week"),
     ("skills/c2pa-metadata/SKILL.md", "C2PA 2.5 is the current specification"),
     ("skills/context-engine/platform-specs.md", "#### Idea Pin (retired)"),
+    ('skills/context-engine/platform-specs.md', 'Up to 15 per asset group'),
+    ('skills/context-engine/platform-specs.md', 'Audience signals | Optional, and recommended'),
+    ('skills/context-engine/platform-specs.md', '| Profile grid crop | 3:4.'),
+    ('skills/context-engine/platform-specs.md', '(owner to check in the app)'),
+    ('skills/context-engine/platform-specs.md', 'with no minimum watch time'),
+    ('skills/context-engine/platform-specs.md', '1,000 subscribers and 10 million qualified Shorts views in the last 90 days'),
+    ('skills/content-engine/video-scripting.md', '"inauthentic content"'),
+    ('skills/video-packaging/SKILL.md', '"inauthentic content"'),
+    ('skills/influencer-brief/SKILL.md', 'YouTube "AI use" setting'),
+    ('skills/content-engine/email-infrastructure.md', 'CMC (Common Mark Certificate'),
+    ('skills/content-engine/email-infrastructure.md', 'Primary, Transactions, Updates and Promotions'),
+    ('skills/analytics-insights/privacy-first-measurement.md', '2025-10-17, Google retired'),
+    ('skills/analytics-insights/privacy-first-measurement.md', 'CHIPS, FedCM, Private State Tokens'),
+    ('skills/agent-readiness-audit/SKILL.md', 'Discovery feed first; checkout is partner-gated on both platforms'),
+    ('skills/aeo-geo/SKILL.md', 'discovery feed first; checkout is partner-gated'),
+    ('skills/paid-advertising/ads-in-ai-answers.md', 'No Perplexity ad channel'),
+    ('skills/c2pa-metadata/SKILL.md', 'S.8420-A, signed 2025-12-11, in force 2026-06-09'),
+    ('skills/c2pa-metadata/SKILL.md', '$1,000 for a first violation and $5,000 for each later one'),
+    ('skills/c2pa-metadata/SKILL.md', '16 CFR Part 465, in force 2024-10-21'),
+    ('scripts/platform_specs.json', 'Owner to check in the app.'),
 ]
 
 
