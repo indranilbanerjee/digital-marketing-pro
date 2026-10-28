@@ -14,6 +14,7 @@
       "post_chars": {"value": 63206, "source_url": "https://www.facebook.com/help/", "source_date": null, "verified_on": null, "review_by": "2027-01-31", "note": "Carried from 3.39.1."},
       "post_display_chars": {"value": 477, "source_url": "https://www.facebook.com/help/", "source_date": null, "verified_on": null, "review_by": "2027-01-31", "note": "Characters shown before 'See more'. Carried from 3.39.1."},
       "hashtags_advised": {"value": [1, 3], "source_url": "https://www.facebook.com/help/", "source_date": null, "verified_on": null, "review_by": "2027-01-31", "note": "Practice, not a platform cap."},
+      "image_max_mb": {"value": 10, "source_url": "https://developers.facebook.com/docs/graph-api/reference/page/photos", "source_date": null, "verified_on": "2026-10-28", "review_by": "2027-03-31", "note": "Photo uploads to a Page: 'Files can not exceed 10MB. For .png files, we recommend not exceeding 1MB.' Formats: .jpeg, .bmp, .png, .gif, .tiff. Link-share preview images must not exceed 8 MB; 30 MB is the Meta ads figure (meta-ads.md). platform-specs.md said 30 MB and WebP before 3.40.0."},
       "reel_max_seconds": {"value": null, "source_url": "https://about.fb.com/news/", "source_date": "2025-06-17", "verified_on": "2026-10-27", "review_by": "2026-12-31", "note": "Meta newsroom post of 2025-06-17. No length limit: 'all videos on Facebook will be shared as reels ... Reels on Facebook will also not have any length or format restrictions' (updated 2025-07-14; completion end of September 2025 is REPORTED)."}
     },
     "threads": {
@@ -22,15 +23,17 @@
       "links_cap": {"value": 5, "source_url": "https://developers.facebook.com/docs/threads/changelog", "source_date": "2025-12-22", "verified_on": "2026-10-27", "review_by": "2027-01-31", "note": "Threads changelog, 2025-12-22: five links per post."}
     },
     "linkedin": {
-      "post_chars": {"value": 3000, "source_url": "https://www.linkedin.com/help/linkedin", "source_date": null, "verified_on": null, "review_by": "2027-01-31", "note": "Carried from 3.39.1."},
+      "post_chars": {"value": 3000, "source_url": "https://www.linkedin.com/help/linkedin/answer/a528176", "source_date": null, "verified_on": "2026-10-28", "review_by": "2027-03-31", "note": "'Posts can contain up to 3,000 characters.' LinkedIn's help shows only a relative date (updated about three weeks before the read)."},
       "post_display_chars": {"value": 140, "source_url": "https://www.linkedin.com/help/linkedin", "source_date": null, "verified_on": null, "review_by": "2027-01-31", "note": "About 140 on mobile, 210 on desktop before 'see more'. Carried from 3.39.1."},
-      "article_chars": {"value": 120000, "source_url": "https://www.linkedin.com/help/linkedin", "source_date": null, "verified_on": null, "review_by": "2027-01-31", "note": "Carried from 3.39.1."},
+      "article_chars": {"value": 125000, "source_url": "https://www.linkedin.com/help/linkedin/answer/a522483", "source_date": null, "verified_on": "2026-10-28", "review_by": "2027-03-31", "note": "'Articles ... are limited to 125,000 characters.' This file said 120,000 before 3.40.0 while platform-specs.md said 125,000. The page shows a relative date only."},
+      "image_max_mb": {"value": 5, "source_url": "https://www.linkedin.com/help/lms/answer/a527229", "source_date": null, "verified_on": "2026-10-28", "review_by": "2027-03-31", "note": "A photo in a post: 'The size limit for an upload is 5 MB.' LinkedIn's Media file types page (answer a564109) gives a generic 100 MB cap and 36 megapixels for all media; 5 MB is the only figure LinkedIn gives for a photo in a post. platform-specs.md said 8 MB before 3.40.0."},
       "hashtags_advised": {"value": [3, 5], "source_url": "https://www.linkedin.com/help/linkedin", "source_date": null, "verified_on": null, "review_by": "2027-01-31", "note": "Practice, not a platform cap."}
     },
     "twitter": {
-      "post_chars": {"value": 280, "source_url": "https://help.x.com/", "source_date": null, "verified_on": null, "review_by": "2027-01-31", "note": "Standard accounts; X Premium allows longer posts. Carried from 3.39.1."},
-      "hashtags_advised": {"value": [0, 2], "source_url": "https://help.x.com/", "source_date": null, "verified_on": null, "review_by": "2027-01-31", "note": "Practice, not a platform cap; hashtags spend the character budget."},
-      "links_advised": {"value": 1, "source_url": "https://help.x.com/", "source_date": null, "verified_on": null, "review_by": "2027-01-31", "note": "Practice. A link counts as 23 characters."}
+      "post_chars": {"value": 280, "source_url": "https://help.x.com/en/using-x/how-to-post", "source_date": "2026-10-12", "verified_on": "2026-10-28", "review_by": "2027-03-31", "note": "'Compose your message (up to 280 characters)'. Emoji and CJK characters count as 2 (docs.x.com/fundamentals/counting-characters). Longer posts for X Premium: 25,000 on two help pages, 4,000 on How to Post, all dated 2026-10-12."},
+      "hashtags_advised": {"value": [0, 2], "source_url": "https://help.x.com/en/using-x/how-to-use-hashtags", "source_date": "2026-09-28", "verified_on": "2026-10-28", "review_by": "2027-03-31", "note": "X's own recommendation, not a cap: 'We recommend using no more than 2 hashtags per post as best practice, but you may use as many hashtags in a post as you like.' Hashtags spend the character budget."},
+      "links_advised": {"value": 1, "source_url": "https://help.x.com/", "source_date": null, "verified_on": null, "review_by": "2027-01-31", "note": "Practice. A link counts as 23 characters (twitter.link_chars)."},
+      "link_chars": {"value": 23, "source_url": "https://docs.x.com/fundamentals/counting-characters", "source_date": null, "verified_on": "2026-10-28", "review_by": "2027-03-31", "note": "'All URLs are wrapped with t.co shortener and count as 23 characters, regardless of the original length.' X's ad specs (help.x.com, 2026-09-28) say the same."}
     },
     "tiktok": {
       "caption_chars": {"value": 2200, "source_url": "https://support.tiktok.com/", "source_date": null, "verified_on": null, "review_by": "2027-01-15", "note": "Sources disagree (2,200 vs 4,000) and no primary page was readable on 2026-10-27; 2,200 fits either until an in-app check settles it. Owner to check in the app."},
@@ -38,7 +41,7 @@
       "video_max_seconds": {"value": 600, "source_url": "https://support.tiktok.com/", "source_date": null, "verified_on": null, "review_by": "2027-01-31", "note": "In-app uploads up to 10 minutes. Carried from 3.39.1."}
     },
     "bluesky": {
-      "post_chars": {"value": 300, "source_url": "https://docs.bsky.app/", "source_date": null, "verified_on": null, "review_by": "2027-01-31", "note": "Carried from 3.39.1."},
+      "post_chars": {"value": 300, "source_url": "https://github.com/bluesky-social/atproto/blob/main/packages/api/lexicons/app/bsky/feed/post.json", "source_date": "2026-10-15", "verified_on": "2026-10-28", "review_by": "2027-03-31", "note": "The post lexicon's text field: maxGraphemes 300 (maxLength 3,000 bytes). The lexicons moved to packages/api/lexicons/ on 2026-10-15; the old lexicons/ path returns 404."},
       "hashtags_advised": {"value": [0, 3], "source_url": "https://docs.bsky.app/", "source_date": null, "verified_on": null, "review_by": "2027-01-31", "note": "Practice; discovery runs on custom feeds and search."}
     },
     "youtube_shorts": {

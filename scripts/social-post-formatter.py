@@ -10,12 +10,14 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 
-# Platform specifications: character limits, hashtag limits, and content types
+# Platform specifications: character limits, hashtag limits, and content types. The numbers that
+# scripts/platform_specs.json holds are re-read from it at import (_apply_platform_specs), and
+# tests/test_platform_specs.py fails when this table states a different one.
 PLATFORM_SPECS = {
     "twitter": {
         "name": "Twitter / X",
         "limits": {
-            "post": {"chars": 280, "hashtags": 5, "links": 1},
+            "post": {"chars": 280, "hashtags": 2, "links": 1},
             "thread": {"chars": 280, "note": "Per tweet in thread; split at sentence boundaries"},
         },
         "mention_format": "@username",
@@ -24,8 +26,8 @@ PLATFORM_SPECS = {
     "instagram": {
         "name": "Instagram",
         "limits": {
-            "post": {"chars": 2200, "hashtags": 30, "display_chars": 125},
-            "reel": {"chars": 2200, "hashtags": 30, "display_chars": 55},
+            "post": {"chars": 2200, "hashtags": 5, "display_chars": 125},
+            "reel": {"chars": 2200, "hashtags": 5, "display_chars": 55},
             "story": {"chars": 250, "hashtags": 10},
         },
         "mention_format": "@username",
@@ -36,7 +38,7 @@ PLATFORM_SPECS = {
         "name": "LinkedIn",
         "limits": {
             "post": {"chars": 3000, "hashtags": 5, "display_chars": 140},
-            "article": {"chars": 120000, "hashtags": 5},
+            "article": {"chars": 125000, "hashtags": 5},
         },
         "mention_format": "@Name",
         "features": ["articles", "newsletters", "polls", "documents"],
@@ -45,7 +47,7 @@ PLATFORM_SPECS = {
     "facebook": {
         "name": "Facebook",
         "limits": {
-            "post": {"chars": 63206, "hashtags": 5, "display_chars": 477},
+            "post": {"chars": 63206, "hashtags": 3, "display_chars": 477},
             "story": {"chars": 250, "hashtags": 5},
         },
         "mention_format": "@Page or @Person",
@@ -55,8 +57,8 @@ PLATFORM_SPECS = {
     "tiktok": {
         "name": "TikTok",
         "limits": {
-            "post": {"chars": 4000, "hashtags": 5},
-            "reel": {"chars": 4000, "hashtags": 5},
+            "post": {"chars": 2200, "hashtags": 5},
+            "reel": {"chars": 2200, "hashtags": 5},
         },
         "mention_format": "@username",
         "features": ["duets", "stitches", "live"],
@@ -65,7 +67,7 @@ PLATFORM_SPECS = {
     "threads": {
         "name": "Threads",
         "limits": {
-            "post": {"chars": 500, "hashtags": 5, "links": 1},
+            "post": {"chars": 500, "hashtags": 1, "links": 5},
         },
         "mention_format": "@username",
         "features": ["polls", "carousel"],
@@ -104,7 +106,8 @@ PLATFORM_SPECS = {
 
 def _apply_platform_specs():
     """Overwrite the numbers this table shares with scripts/platform_specs.json, the one sourced
-    copy. Before 3.40.0 it said 30 Instagram hashtags, 5 for Threads and 4,000 TikTok characters."""
+    copy. Before 3.40.0 it said 30 Instagram hashtags, 5 for Threads and 4,000 TikTok characters.
+    The table now states the file's numbers as well, so the source shows what the script uses."""
     spec = _common.platform_spec
 
     def hashtags(platform):

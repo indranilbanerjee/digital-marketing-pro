@@ -93,11 +93,11 @@
 
 | Spec | Value |
 |---|---|
-| Character limit | 3,000 |
+| Character limit | 3,000 (platform_specs.json: linkedin.post_chars) |
 | Optimal length | 800-1,200 characters for engagement |
 | Image dimensions | 1200 x 627 px (landscape), 1080 x 1080 px (square), 1080 x 1350 px (portrait) |
 | Image format | JPEG, PNG, GIF |
-| Max image file size | 8 MB |
+| Max image file size | 5 MB (platform_specs.json: linkedin.image_max_mb) for a photo in a post |
 | Video duration | 3 seconds to 10 minutes |
 | Video format | MP4 |
 | Max video file size | 5 GB |
@@ -112,7 +112,7 @@
 | Spec | Value |
 |---|---|
 | Headline limit | 100 characters |
-| Body limit | 125,000 characters |
+| Body limit | 125,000 characters (platform_specs.json: linkedin.article_chars) |
 | Cover image | 1920 x 1080 px recommended |
 | Supports | Rich text, images, embeds, links |
 | Algorithm priority signals | Read-through rate, comments, external shares |
@@ -125,7 +125,7 @@
 | Description limit | 250 characters |
 | Logo image | 300 x 300 px |
 | Cover image | 1920 x 1080 px |
-| Body limit | Same as Article (125,000 characters) |
+| Body limit | Same as Article: 125,000 characters (platform_specs.json: linkedin.article_chars) |
 | Frequency options | Daily, weekly, biweekly, monthly |
 | Algorithm priority signals | Subscriber growth rate, open rate, engagement rate |
 
@@ -135,11 +135,11 @@
 
 | Spec | Value |
 |---|---|
-| Character limit (free) | 280 |
+| Character limit (free) | 280 (platform_specs.json: twitter.post_chars) |
 | Character limit (Premium) | 25,000 |
 | Optimal tweet length | 71-100 characters for engagement |
 | Image dimensions | 1600 x 900 px (16:9) recommended |
-| Image formats | JPEG, PNG, GIF, WebP |
+| Image formats | GIF, JPEG, PNG; X accepts no other format |
 | Max images per tweet | 4 |
 | Max image file size | 5 MB (static), 15 MB (GIF) |
 | Video duration | 0.5s to 140 seconds (up to 240 min for Premium) |
@@ -162,8 +162,8 @@
 | Character limit | 63,206 |
 | Optimal length | 40-80 characters for engagement |
 | Image dimensions | 1200 x 630 px (landscape), 1080 x 1080 px (square) |
-| Image format | JPEG, PNG, GIF, WebP |
-| Max image file size | 30 MB |
+| Image format | JPEG, PNG, GIF (a Page photo upload also takes BMP and TIFF, nothing else) |
+| Max image file size | 10 MB (platform_specs.json: facebook.image_max_mb); keep a PNG under 1 MB. The 30 MB in Meta Ads below is for ads |
 | Link preview image | 1200 x 630 px minimum |
 | Video duration | 1 second to 240 minutes |
 | Video format | MP4, MOV |
