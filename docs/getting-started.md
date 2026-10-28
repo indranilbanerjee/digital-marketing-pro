@@ -400,7 +400,7 @@ For claim verification, create a JSON evidence file:
 ```
 
 ### Eval Grades
-A+ (95-100) through F (<40). Content below the auto-reject threshold (default 40) is blocked from the approval workflow.
+A+ (95-100) through F (<40). Content below the auto-reject threshold (default 40), or with a CRITICAL issue, comes back BLOCKED (exit 3) and stays out of the approval workflow. A run that couldn't score every dimension is marked partial and its grade is capped.
 
 ---
 

@@ -436,7 +436,7 @@ These run when a content skill or the `brand-guardian` / `quality-assurance` age
 
 | Bad content | Expected detection |
 |---|---|
-| "87% of marketers agree..." (no source) | Flagged — unattributed stat (hallucination_risk dimension) |
+| "87% of marketers agree..." (no source) | Flagged — unattributed stat (hallucination dimension) |
 | "Visit https://example.com/pricing" | Flagged — placeholder URL |
 | "The #1 marketing platform" | Flagged — unsupported superlative |
 

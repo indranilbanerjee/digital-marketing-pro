@@ -6,6 +6,156 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.40.0] - 2026-10-28
+
+### An audit release: keys go only to their vendor, brands can't overwrite each other, the quality gate blocks, and the platform facts are re-read at source
+
+Upgrading: nothing migrates, but several behaviours are stricter. [UPGRADE-GUIDE.md](UPGRADE-GUIDE.md) lists each one and what to change.
+
+**Security: a connector key goes only to its own vendor**
+
+- A Mailchimp key whose ending wasn't a data centre built its URL on another host. For example, `abc-evil.example/x?` built `https://evil.example/x?.api.mailchimp.com/...`, and the key was sent there. Now:
+  - the data centre must be letters then digits, such as `us21`, or the call is refused before any request;
+  - `MAILCHIMP_DC`, `PIPEDRIVE_COMPANY_DOMAIN` and `SALESFORCE_INSTANCE_URL` are checked before they become part of a host;
+  - the finished URL must be https on the connector's own domain, or nothing is sent.
+- No key follows a redirect. Python's urllib copies every ordinary header, `Authorization` included, to whatever host a 3xx response names. These now send their keys as unredirected headers:
+  - the connector executor and probe;
+  - the model router (the Anthropic, OpenAI and Google keys);
+  - `refresh_models.py` (Evolink).
+
+  The AI-visibility checker's OpenAI and Anthropic SDK clients no longer follow redirects at all. Both SDKs follow them by default, and httpx drops only `Authorization` on the way, so Anthropic's `x-api-key` went along. Static guards fail on any urllib request that sets a credential header the old way, and on any SDK client built without its own HTTP client.
+
+**Security: brands stay separate, and files stay inside the brand**
+
+- `setup.py --create-brand` refuses a brand that already exists (`BRAND_EXISTS`, exit 2) unless you pass `--force`, and even then refuses a slug that belongs to another brand. Before, it replaced the profile with a blank one and exited 0.
+- Brand names in Devanagari, CJK or emoji get their own slug: the ASCII part plus a six-character tag (`brand-d08c85`). Every such name used to become `brand`, so the second wiped the first. ASCII names keep their slug. A folder made under the old slug is still found when its profile is that brand.
+- Every user-supplied name reaches the disk through one containment check:
+  - campaign and execution trackers, CRM sync log, intelligence graph and macro signals;
+  - reports and PDFs, checkpoints and run manifests, the publisher, churn and audience panels.
+
+  `../`, a colon (on Windows, an alternate data stream) and Windows device names (`NUL`, `CON`, `COM1`) are refused. A static guard fails on any new unchecked path join.
+- Output is UTF-8 whatever the console code page. Before, `dm-status`, `setup --list-brands` and others crashed with UnicodeEncodeError on a brand name outside the code page when `PYTHONUTF8` was unset.
+- `read_json` reads UTF-8 (with or without a BOM) and UTF-16 with a BOM, which is PowerShell 5.1's default. For a Windows-1252 file it says to re-save it instead of printing a traceback. One unreadable profile no longer hides the others in `--list-brands`.
+
+**The quality gate applies the brand's settings and blocks**
+
+- `eval-runner.py` read the eval manager's reply under the wrong keys, so no brand setting and no shipped minimum ever applied. For example, an auto-reject line of 60 passed a composite of 57. It now reads them through the same key table the manager writes with.
+- The result carries every flagged issue with its severity, and a decision:
+  - BLOCKED (exit 3): a CRITICAL issue, or a composite under the auto-reject line;
+  - WARN: high or medium issues, or a dimension below its minimum;
+  - PASS.
+- A dimension that should have run but failed makes the run partial: the missing dimensions are listed and the grade is capped. A fresh install no longer grades A+ from one dimension.
+- `--schema list` prints the output schemas. An unknown schema or a missing `--file` exits 2 and says why.
+
+**Wrong input gets a message; an error never exits 0**
+
+- `_common.json_arg` checks the shape of JSON options in 16 scripts and exits 2 naming the option. Before, `null`, a list or a string ended in a traceback.
+- Twelve scripts that printed an error payload and exited 0 now exit 1, and a guard covers every script's main.
+- The text scorers: `--text ""` is "nothing to score" (exit 4). A brand with no voice targets gets `no_voice_profile` (exit 4) instead of a score of 100 against defaults. A missing NLTK download is reported in one line.
+- Paths:
+  - an empty or overlong path, or JSON where a path goes, is an input error;
+  - a path component is at most 200 characters;
+  - `agent-readiness-audit` refuses a `--path` that Git Bash rewrote and names `MSYS_NO_PATHCONV=1`.
+- `--out` folders are created on demand (`seo_drift`, `keyword_cluster`, `backlink_gap`, `run-audit`).
+- The visible output folder uses the Documents folder Explorer shows, including when OneDrive has moved it.
+- `build_skills_index.py` checks by default; `--write` regenerates. `connector_resolver.py` and `_connector_registry.py` exit 2 on an unknown argument.
+- `ai-visibility-checker.py`:
+  - `--list-models` works on its own;
+  - the mention rate counts answered queries only;
+  - when every request fails there is no rate, an error, and a non-zero exit.
+
+**New**
+
+- **How you'll know it worked.** `seo-audit`, `aeo-audit`, `landing-page-audit` and `campaign-audit` end with a table: recommendation, metric, expected direction (up or down) and check-by date.
+  - `scripts/recommendation-tracker.py` records the rows and refuses one without all four (exit 2).
+  - The continuous-improvement loop lists the rows that have fallen due and records what the metric did.
+- **`connector-status.py --action probe --name <connector>`** proves a key works with one read-only GET to a read endpoint. Nothing comes back but the HTTP status and an item count, never the key. Connectors that run through the host's MCP connection or OAuth answer `not_probeable` instead of claiming a connection. The `connect` skill asks before probing. PRIVACY.md has a row for it.
+- **`skills/context-engine/ai-visibility-metrics.md`** defines each AI-visibility metric with its formula:
+  - mention rate and citation rate;
+  - share of model: an inclusion frequency, with low-confidence bands below 30 runs;
+  - share of AI voice;
+  - sentiment, with answers not judged kept apart;
+  - the AI Visibility Score.
+
+  Every AI-visibility skill points to it, and no score is reported without its formula and its sample size.
+- **`scripts/platform_specs.json`** holds one sourced value per social-platform limit: 29 limits across 8 platforms, each with a source, a date and a review date. `hashtag-analyzer.py` and `social-post-formatter.py` read it, the formatter's own table states the same numbers, and the docs tag their numbers to it. A tagged number or a table entry that differs from the JSON fails a test.
+
+**Models**
+
+- `gpt-5.1` is deprecated (shutdown 2027-04-01, replacement `gpt-6-sol`), per OpenAI's deprecations page read 2026-10-27. A new guard fails when a model in both the registry and a deprecations record has a different status, date or replacement in each.
+- A replacement can depend on the backend. `veo-3.1-generate-preview` forwards to `gemini-omni-1.1-flash` on the Gemini API and to `veo-3.1-generate-001` on Vertex AI. `resolve_model` takes `--backend`, and without one refuses (exit 2), naming both.
+- `scripts/model_router.py` changed (the backend-specific replacement and the redirect fix). The copy in [SocialForge](https://github.com/indranilbanerjee/socialforge) is re-copied from this release's blob and its pinned sha256 updated.
+
+**Platform facts re-read at their source (2026-10-27 and 2026-10-28)**
+
+- **Social platforms:**
+  - Instagram allows 5 hashtags, not 30;
+  - Threads ads include carousels and video;
+  - Facebook reels have no length limit;
+  - Instagram's profile grid crops to 3:4 (reported);
+  - LinkedIn articles run to 125,000 characters (the JSON said 120,000), and a photo in a post to 5 MB, not 8;
+  - X takes GIF, JPEG and PNG only (no WebP), counts a link as 23 characters, and itself recommends no more than 2 hashtags;
+  - a Facebook Page photo is up to 10 MB, with no WebP (30 MB is the ads figure);
+  - Bluesky's 300 is graphemes, per its post lexicon;
+  - the TikTok caption stays at 2,200 characters until an in-app check (sources disagree).
+- **Measurement and paid:**
+  - Consent Mode v2 lists `ad_user_data` and `ad_personalization`;
+  - email opens are directional, not scored (Apple Mail Privacy Protection);
+  - Google Ads defaults to data-driven attribution;
+  - GA4 says "key events";
+  - Performance Max takes up to 15 videos per asset group, and audience signals are optional;
+  - new call-only ads stopped in January 2026, and existing ones serve until February 2027.
+- **Privacy Sandbox:** Google retired most of the APIs on 2025-10-17. CHIPS, FedCM and Private State Tokens continue. The cookie timeline is stated once: July 2024, April 2025, October 2025.
+- **YouTube:**
+  - Shorts views count with no minimum watch time;
+  - Partner Program through Shorts needs 1,000 subscribers and 10 million Shorts views in 90 days;
+  - "inauthentic content" (mass-produced, templated) is not monetised;
+  - realistic AI content is disclosed at upload as "AI use".
+- **Email:** Apple Mail sorts into Primary, Transactions, Updates and Promotions. BIMI takes a VMC (with a checkmark) or a CMC (logo only).
+- **AI search and commerce:**
+  - AI Overviews remain Google's default and AI Mode is a separate tab;
+  - ChatGPT has more than 1.2 billion weekly users;
+  - no schema is required for AI search;
+  - product feeds come first and checkout is partner-gated on ChatGPT and Google;
+  - Perplexity has left advertising (reported).
+- **Retired products are named as retired:** Similar Segments, LinkedIn Lookalike Audiences, Idea Pins.
+- **Compliance:**
+  - New York's synthetic-performer law S.8420-A is in force since 2026-06-09, with $1,000 for a first violation and $5,000 after;
+  - the FTC texts are the Endorsement Guides and the Consumer Reviews and Testimonials Rule; there was no "May 2026" guidance;
+  - Article 50 is stated in the present tense: it has applied since 2 August 2026, and generative systems that existed before then have until 2 December 2026 to mark their output under Article 50(2).
+- **Claims removed:** LinkedIn's "Depth Score", the four "Google said" sentences Google never said, and unsourced third-party percentages. A "platform said" sentence now needs a source and a date, or "reported".
+
+**Docs say what the scripts do**
+
+- Every concrete example in a SKILL.md runs offline in a test, and 54 do. The budget-optimizer, exec-summary, budget-tracker and roi-calculator examples were wrong.
+- One computed count per thing: 35 ready-to-copy HTTP MCP entries plus 3 vendor npx entries, and a catalog of 36 connectors (8 live, 28 manifest-ready).
+- `roi-calculator.py` says its attribution weights only label channels and move no revenue.
+- The guide names `credential-manager.py --action switch-profile`, and brand-setup switches with `setup.py --switch-brand`.
+- `SECURITY.md` names 3.40.x as supported, and a test keeps it in step with the manifest.
+
+**Tests**
+
+- New guards:
+  - vendor hosts;
+  - keys on redirects;
+  - brand names, paths and encodings;
+  - the eval gate;
+  - CLI inputs and exits;
+  - skill examples;
+  - connector counts;
+  - platform specs;
+  - trend facts;
+  - "platform said";
+  - review dates (a `recheck_after` or `review_by` stamp fails once it passes);
+  - the AI-metric glossary;
+  - the recommendation tracker;
+  - the connector probe;
+  - registry and deprecations-record agreement.
+
+  Each was planted: it fails on the code or text it replaced.
+- The npm allowlist scanner reads `npx` without `-y`, `npx --package`, `npm exec` and `cmd /c npx`.
+- Suite: 1027 tests, run on Python 3.13 and 3.10.18.
+
 ## [3.39.1] - 2026-10-27
 
 ### The model router's offline check reads the deprecations record too; a cut-off list is refused
