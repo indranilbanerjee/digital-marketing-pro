@@ -4,7 +4,7 @@ This file is auto-loaded by OpenAI Codex, Google Antigravity, GitHub Copilot CLI
 
 ## What this plugin is
 
-Digital Marketing Pro is a comprehensive open-source AI marketing plugin shipping **164 skills, 24 specialist agents, a 12-Part Strategy Flow, and EU AI Act Article 50 readiness**. Built for marketing agencies, in-house teams running 50–200 brands, and consultancies.
+Digital Marketing Pro is a comprehensive open-source AI marketing plugin shipping **164 skills, 24 specialist agents, a 12-Part Strategy Flow, and EU AI Act Article 50 compliance tooling**. Built for marketing agencies, in-house teams running 50–200 brands, and consultancies.
 
 **Supported surfaces (v3.39.1):** Claude Code (CLI + IDE extensions), Anthropic Cowork, OpenAI Codex (CLI + IDE + App), Cursor 2.5+, GitHub Copilot CLI, Google Antigravity 2.0 (CLI + IDE), **Hermes Agent (Nous Research, Desktop v0.15.2+)**, **OpenClaw (formerly Clawdbot/Moltbot)**, **Grok (xAI Build CLI, native `.grok-plugin/` pair)**. Plus 35+ additional platforms via the Agent Skills open standard (Goose, OpenHands, OpenCode, Junie, Gemini CLI, Roo Code, Kiro, Amp, Letta, Mux, Factory, Workshop, Tabnine, Mistral Vibe, and more — see README "Works on 40+ agent harnesses").
 
@@ -17,7 +17,7 @@ Digital Marketing Pro is a comprehensive open-source AI marketing plugin shippin
 3. **Skill bodies may reference Python scripts at `scripts/<name>.py`** — invoke via Bash / `run_shell_command`.
 4. **HTTP MCP connectors are opt-in.** See `.mcp.json.connectors-reference` for the full catalog (Slack, HubSpot, Notion, Gmail, Google Calendar, Stripe, Ahrefs, SimilarWeb, Klaviyo, Amplitude, Canva, Figma, Asana, Webflow). User must configure env vars or set up MCP servers before they connect.
 5. **Compliance is mandatory.** Skills enforce GDPR / CCPA / EU AI Act / DPDPA / LGPD / 11 other privacy jurisdictions. Don't skip the compliance gates.
-6. **C2PA content provenance is required for AI-generated assets in EU campaigns** (Article 50, applicable 2 Aug 2026). Use `scripts/embed-c2pa.py` to sign before delivery.
+6. **C2PA content provenance is required for AI-generated assets in EU campaigns** (Article 50, in force since 2 August 2026). Use `scripts/embed-c2pa.py` to sign before delivery.
 
 ## Canonical entry points
 
@@ -43,7 +43,7 @@ Digital Marketing Pro is a comprehensive open-source AI marketing plugin shippin
 - `plugin.yaml` + `__init__.py` at repo root — **Hermes Agent native plugin** (native since v3.13.0). `__init__.py` exposes `register(ctx)` which walks `skills/` and exposes all 164 skills via `ctx.register_skill()`. Read ONLY by Hermes; ignored by every other platform.
 - `openclaw.plugin.json` at repo root — **OpenClaw native manifest** (native since v3.13.0). `skills` field points at `./skills`. OpenClaw also auto-detects `.claude-plugin/plugin.json` as a Claude-compatible bundle fallback.
 - `scripts/*.py` — 99 Python helpers (optional, run when Python 3.10+ is present). Includes `_common.py` (shared workspace-root / slugify / atomic-write helpers), `connector_resolver.py` + `connector_executor.py` (8 executable HTTP connectors), `resolve_model.py` + `refresh_models.py` (shared model curator with auto-fall-forward on deprecated IDs), `platform_specs.json` (one sourced value per social-platform limit, with a review date; read by `hashtag-analyzer.py` and `social-post-formatter.py`), `recommendation-tracker.py` (each audit recommendation with its metric, expected direction and check-by date; the continuous-improvement loop checks the ones due), `model_router.py` + `model_hints.json` (picks a model by job from the provider's live list: Anthropic, OpenAI or Google; DMP's jobs are both legs of the AI-visibility checker; the Google adapter has no DMP job yet, see docs/MODEL-CURATOR.md), `plugin-metadata.py` (environment + asset probes), `drive-sync-state.py` (Cowork+Drive routing ledger), `check_skill_contracts.py` (doc-vs-argparse linter), and `skill-line-check.py` (CI line guard).
-- `tests/test_*.py` + `tests/run_all.py` — 1023 stdlib-unittest tests covering `resolve_model`, `drive-sync-state`, `plugin-metadata`, `skill-line-check`, `connector_resolver`, `_common`, engagement/checkpoint/execution state, the doc-vs-script contract scanner, release-consistency locks, the Hermes adapter (`plugin.yaml` + `__init__.py`), and the OpenClaw manifest. Run with `python tests/run_all.py`.
+- `tests/test_*.py` + `tests/run_all.py` — 1025 stdlib-unittest tests covering `resolve_model`, `drive-sync-state`, `plugin-metadata`, `skill-line-check`, `connector_resolver`, `_common`, engagement/checkpoint/execution state, the doc-vs-script contract scanner, release-consistency locks, the Hermes adapter (`plugin.yaml` + `__init__.py`), and the OpenClaw manifest. Run with `python tests/run_all.py`.
 - `settings.json.example` — recommended user settings: `fallbackModel` 3-model resilience chain, the optional `requiredMinimumVersion` managed setting, `skillOverrides`, OTel resource attrs (under `env`).
 - `hooks/hooks.json` — ships as `{"hooks":{}}` (zero global hooks). Add hooks at user scope if needed.
 - `.mcp.json` — not shipped (gitignored): zero auto-connecting MCPs. Full catalog at `.mcp.json.connectors-reference`.

@@ -96,7 +96,7 @@
         "gsc-ai-performance"
       ],
       "doc_files": 5,
-      "bytes": 47517
+      "bytes": 47644
     },
     {
       "name": "agency-dashboard",
@@ -334,7 +334,7 @@
         "check"
       ],
       "doc_files": 1,
-      "bytes": 10938
+      "bytes": 11058
     },
     {
       "name": "campaign-audit",
@@ -455,7 +455,7 @@
         "eval-content"
       ],
       "doc_files": 1,
-      "bytes": 18933
+      "bytes": 18938
     },
     {
       "name": "churn-risk",
@@ -632,7 +632,7 @@
         "c2pa-metadata"
       ],
       "doc_files": 1,
-      "bytes": 4341
+      "bytes": 4359
     },
     {
       "name": "content-calendar",
@@ -697,7 +697,7 @@
         "verify-claims"
       ],
       "doc_files": 18,
-      "bytes": 158191
+      "bytes": 158312
     },
     {
       "name": "content-repurpose",
@@ -2141,7 +2141,7 @@
         "performance-report"
       ],
       "doc_files": 1,
-      "bytes": 13337
+      "bytes": 13341
     },
     {
       "name": "reputation-management",

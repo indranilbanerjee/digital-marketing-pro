@@ -38,6 +38,18 @@ except ImportError:  # pragma: no cover — curator should always be present
     _get_registry = lambda: None  # type: ignore
 
 
+def no_redirect_http_client(sdk, **kwargs):
+    """An HTTP client for a vendor SDK that never follows a redirect. The openai and anthropic SDKs
+    follow redirects by default, and httpx strips only Authorization when a redirect leaves the
+    origin: Anthropic's x-api-key header would go to the new host. API endpoints don't redirect, so
+    a 3xx comes back as an error instead."""
+    factory = getattr(sdk, "DefaultHttpxClient", None)
+    if factory is None:  # an SDK older than the pinned one: treated like a missing SDK
+        raise ImportError(f"{sdk.__name__} is too old to turn redirects off; install the version in "
+                          f"_common.PINNED_DEPENDENCIES")
+    return factory(follow_redirects=False, **kwargs)
+
+
 def _route(job, provider, credential_name, override, api_key, anthropic_version=None, fetch=None, now=None):
     """The model for one leg, chosen from the provider's live list by
     scripts/model_router.py. Raises model_router.RouterError when no request
@@ -192,7 +204,7 @@ def run_api_mode(brand, queries, competitors=None, openai_model_override=None, a
     if openai_key:
         try:
             import openai
-            client = openai.OpenAI(api_key=openai_key)
+            client = openai.OpenAI(api_key=openai_key, http_client=no_redirect_http_client(openai))
             routing = route_openai(openai_model_override, openai_key)
             openai_model = routing["model"]
             _report("openai", routing)
@@ -236,7 +248,7 @@ def run_api_mode(brand, queries, competitors=None, openai_model_override=None, a
     if anthropic_key:
         try:
             import anthropic
-            client = anthropic.Anthropic(api_key=anthropic_key)
+            client = anthropic.Anthropic(api_key=anthropic_key, http_client=no_redirect_http_client(anthropic))
             # The list call carries the same anthropic-version as the generation call.
             version = (getattr(client, "default_headers", None) or {}).get("anthropic-version")
             routing = route_anthropic(anthropic_model_override, anthropic_key, version)

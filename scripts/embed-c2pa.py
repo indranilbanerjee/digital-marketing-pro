@@ -6,7 +6,7 @@ Embeds a C2PA (Coalition for Content Provenance and Authenticity) manifest
 into an AI-generated marketing asset (image / video / audio / PDF) so the
 asset carries a machine-readable provenance trail and a visible AI-generation
 claim. This is the technical mechanism for EU AI Act Article 50 compliance
-(applicable 2 Aug 2026) and aligns with the broader Content Authenticity
+(in force since 2 Aug 2026) and aligns with the broader Content Authenticity
 Initiative (CAI) standard.
 
 Usage:
@@ -24,7 +24,7 @@ Usage:
 
 --ai-disclosure adds the C2PA 2.4 `c2pa.ai-disclosure` assertion — the explicit,
 machine-readable AI-generation disclosure that is the flagship EU AI Act
-Article 50 pathway (applicable 2 Aug 2026).
+Article 50 pathway (in force since 2 Aug 2026).
 
 The script never installs packages. If c2pa-python (or `cryptography`, needed
 only for the dev certificate) is missing, it prints the exact pinned install

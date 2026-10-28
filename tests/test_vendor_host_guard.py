@@ -274,5 +274,66 @@ class TestKeysNeverFollowARedirect(unittest.TestCase):
         self.assertNotIn("evo-secret", json.dumps(dict(follow.header_items())))
 
 
+class TestSdkClientsNeverFollowARedirect(unittest.TestCase):
+    """ai-visibility-checker calls OpenAI and Anthropic through their SDKs, which follow redirects;
+    httpx then drops only Authorization, so Anthropic's x-api-key would reach the new host. The
+    checker gives both SDKs a client that doesn't follow, proven here end to end over a mock
+    transport that answers 302 to another host."""
+
+    SDK_CALL = {"Anthropic", "OpenAI", "AsyncAnthropic", "AsyncOpenAI"}
+
+    @staticmethod
+    def checker():
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("ai_visibility_checker", REPO / "scripts" / "ai-visibility-checker.py")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod
+
+    def sdk_calls_without_http_client(self, name: str, source: str) -> list:
+        out = []
+        for node in ast.walk(ast.parse(source)):
+            if isinstance(node, ast.Call):
+                fname = node.func.attr if isinstance(node.func, ast.Attribute) else getattr(node.func, "id", "")
+                if fname in self.SDK_CALL and not any(kw.arg == "http_client" for kw in node.keywords):
+                    out.append(f"{name}:{node.lineno}: {fname}(...) without http_client=")
+        return out
+
+    def test_every_sdk_client_in_scripts_passes_an_http_client(self):
+        problems = []
+        for path in sorted((REPO / "scripts").glob("*.py")):
+            problems += self.sdk_calls_without_http_client(path.name, path.read_text(encoding="utf-8"))
+        self.assertEqual(problems, [], "\n  " + "\n  ".join(problems))
+        plant = "client = anthropic.Anthropic(api_key=k)\nc = openai.OpenAI(api_key=k, http_client=h)\n"
+        self.assertEqual(len(self.sdk_calls_without_http_client("plant", plant)), 1)
+
+    def test_the_key_never_reaches_the_redirect_host(self):
+        try:
+            import anthropic
+            import httpx
+            import openai
+        except ImportError:
+            self.skipTest("the anthropic, openai and httpx packages are not installed")
+        checker = self.checker()
+        for sdk, make, call in (
+                (anthropic, lambda h: anthropic.Anthropic(api_key="sk-ant-secret", http_client=h, max_retries=0),
+                 lambda c: c.models.list()),
+                (openai, lambda h: openai.OpenAI(api_key="sk-oai-secret", http_client=h, max_retries=0),
+                 lambda c: c.models.list())):
+            hosts = []
+
+            def handler(request):
+                hosts.append((request.url.host, dict(request.headers)))
+                if request.url.host == "evil.example":
+                    return httpx.Response(200, json={"data": [], "has_more": False})
+                return httpx.Response(302, headers={"location": "https://evil.example/v1/models"})
+            with self.subTest(sdk=sdk.__name__):
+                client = make(checker.no_redirect_http_client(sdk, transport=httpx.MockTransport(handler)))
+                with self.assertRaises(Exception):
+                    call(client)
+                self.assertEqual([h for h, _ in hosts], [urllib.parse.urlsplit(str(client.base_url)).hostname])
+                self.assertNotIn("secret", json.dumps([h for _, h in hosts[1:]]))
+
+
 if __name__ == "__main__":
     unittest.main()

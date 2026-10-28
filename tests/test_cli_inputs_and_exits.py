@@ -268,7 +268,8 @@ class TestCliBasics(Sandbox):
                 raise ConnectionError("Connection error.")
 
         fake = types.ModuleType("openai")
-        fake.OpenAI = lambda api_key: types.SimpleNamespace(chat=types.SimpleNamespace(completions=Completions()))
+        fake.DefaultHttpxClient = lambda **kw: kw
+        fake.OpenAI = lambda api_key, http_client: types.SimpleNamespace(chat=types.SimpleNamespace(completions=Completions()))
         env = {"OPENAI_API_KEY": "sk-test-not-a-key"}
         with mock.patch.dict(sys.modules, {"openai": fake}), mock.patch.dict(os.environ, env), \
                 mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": ""}), \

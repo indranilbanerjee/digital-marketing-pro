@@ -80,6 +80,10 @@ STALE = {  # phrase -> why it is wrong
     '"altered or synthetic content" toggle': 'YouTube\'s upload setting is "AI use" (YouTube Help 14328491)',
     "Google's official position (15 May 2026)": "Google's AI features guide was last updated 2026-07-10",
     'AI Optimization Guide, 15 May 2026': "Google's AI features guide was last updated 2026-07-10",
+    # Article 50 has applied since 2 August 2026 (3.40.0 re-cut)
+    'applicable 2 Aug': 'Article 50 has applied since 2 August 2026',
+    'applies from 2 Aug': 'Article 50 has applied since 2 August 2026',
+    'Article 50 readiness': 'Article 50 has applied since 2 August 2026',
 }
 REQUIRED = [  # (file, phrase)
     ("skills/analytics-insights/privacy-first-measurement.md", "ad_user_data = denied"),
@@ -110,6 +114,7 @@ REQUIRED = [  # (file, phrase)
     ('skills/c2pa-metadata/SKILL.md', '$1,000 for a first violation and $5,000 for each later one'),
     ('skills/c2pa-metadata/SKILL.md', '16 CFR Part 465, in force 2024-10-21'),
     ('scripts/platform_specs.json', 'Owner to check in the app.'),
+    ('skills/c2pa-metadata/SKILL.md', 'until 2 December 2026 to mark their output under Article 50(2)'),
 ]
 
 

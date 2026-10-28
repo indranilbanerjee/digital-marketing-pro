@@ -34,7 +34,7 @@ The check delegates to `scripts/eval-runner.py` (the master eval orchestrator) w
 | **Claims** | `claim-verifier.py` (when `--evidence` provided) | Cross-checks specific claims against a user-provided evidence file |
 | **Brand voice** | `brand-voice-scorer.py` (when `--brand` provided) | Scores content against the active brand's voice profile (formality, energy, humor, authority, prefer/avoid words) |
 | **Structure** | `output-validator.py` (when `--schema` provided) | Validates content matches expected schema (blog_post, email, ad_copy, social_post, landing_page, press_release, content_brief, campaign_plan) |
-| **C2PA provenance** (compliance) | `embed-c2pa.py` (presence check) | When the brand's `target_markets` include an EU/EEA jurisdiction AND an accompanying asset is AI-generated: verifies a C2PA provenance manifest is present and valid. Missing or invalid manifest → **CRITICAL / BLOCKED** (EU AI Act Article 50, applies from 2 Aug 2026) |
+| **C2PA provenance** (compliance) | `embed-c2pa.py` (presence check) | When the brand's `target_markets` include an EU/EEA jurisdiction AND an accompanying asset is AI-generated: verifies a C2PA provenance manifest is present and valid. Missing or invalid manifest → **CRITICAL / BLOCKED** (EU AI Act Article 50, in force since 2 August 2026) |
 
 Plus content quality and readability scoring (always run).
 
