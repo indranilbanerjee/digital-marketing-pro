@@ -305,15 +305,77 @@ def _build_auth_header(profile: dict, credential: str, headers: dict) -> dict:
     return headers
 
 
+# A key goes only to its own vendor. Three connectors build their host from credential or env
+# text; each piece is validated before it goes into a URL, and the finished URL's host must end
+# with the vendor's domain, or nothing is sent. Before 3.40.0 a Mailchimp key ending
+# "-evil.example/x?" built https://evil.example/x?.api.mailchimp.com/... and sent the key there.
+VENDOR_HOSTS = {
+    "mailchimp": ".api.mailchimp.com",
+    "pipedrive": ".pipedrive.com",
+    "salesforce": ".salesforce.com",
+}
+_MAILCHIMP_DC = re.compile(r"[a-z]{2,4}[0-9]{1,3}")
+_SUBDOMAIN = re.compile(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?")
+_SALESFORCE_HOST = re.compile(r"(?:[a-z0-9-]+\.)+salesforce\.com")
+
+
+class HostRefused(ValueError):
+    """A host piece or a finished URL failed the vendor check; no request was made."""
+
+
+def _salesforce_instance(value: str) -> str | None:
+    """https://<org>.my.salesforce.com, with nothing after the host, or None."""
+    try:
+        parts = urllib.parse.urlsplit(value)
+        port = parts.port
+    except ValueError:
+        return None
+    if (parts.scheme != "https" or parts.username or parts.password or port
+            or parts.path not in ("", "/") or parts.query or parts.fragment
+            or not _SALESFORCE_HOST.fullmatch(parts.hostname or "")):
+        return None
+    return "https://" + parts.hostname
+
+
+# Env variables that become part of a host: the check, and what to tell the user when it fails.
+HOST_PIECES = {
+    "MAILCHIMP_DC": (lambda v: v if _MAILCHIMP_DC.fullmatch(v) else None,
+                     "MAILCHIMP_DC must be a Mailchimp data centre such as us21"),
+    "PIPEDRIVE_COMPANY_DOMAIN": (lambda v: v if _SUBDOMAIN.fullmatch(v) else None,
+                                 "PIPEDRIVE_COMPANY_DOMAIN must be the company subdomain only, "
+                                 "such as acme for acme.pipedrive.com"),
+    "SALESFORCE_INSTANCE_URL": (_salesforce_instance,
+                                "SALESFORCE_INSTANCE_URL must be the org's https://...salesforce.com "
+                                "address, with nothing after the host"),
+}
+
+
+def _check_vendor_host(connector: str | None, url: str) -> None:
+    """Raise HostRefused unless the URL is https on the connector's own domain. The message
+    never repeats the host: for Mailchimp it was built from the key."""
+    suffix = VENDOR_HOSTS.get(connector or "")
+    if not suffix:
+        return
+    try:
+        parts = urllib.parse.urlsplit(url)
+        host = parts.hostname or ""
+    except ValueError:
+        host, parts = "", None
+    if parts is None or parts.scheme != "https" or parts.username or not host.endswith(suffix):
+        raise HostRefused(f"refusing to send: the request's host is not on {suffix.lstrip('.')}, "
+                          f"and a {connector} key goes only to {connector}. No request was sent")
+
+
 def _mailchimp_dc_url(url: str, credential: str) -> str:
     """Mailchimp URL has a {dc} placeholder derived from key suffix.
-    Key format: '<hex>-us6' -> dc='us6'.
+    Key format: '<hex>-us6' -> dc='us6'. A suffix that isn't a data centre raises HostRefused.
     """
     if "{dc}" not in url and "{MAILCHIMP_DC}" not in url:
         return url
-    if "-" not in credential:
-        return url  # malformed key; let the call fail
-    dc = credential.rsplit("-", 1)[-1]
+    dc = credential.rsplit("-", 1)[-1] if "-" in credential else ""
+    if not _MAILCHIMP_DC.fullmatch(dc):
+        raise HostRefused("the Mailchimp key doesn't end in a data centre such as -us21, "
+                          "so no request was sent. Copy the whole key from Mailchimp")
     return url.replace("{dc}", dc).replace("{MAILCHIMP_DC}", dc)
 
 
@@ -346,7 +408,16 @@ def build_request(http_request: dict, env: dict | None = None,
 
     # Substitute placeholders — only the connector's own variables (Hermes review)
     spec = deepcopy(http_request)
-    spec = _substitute_env(spec, _scoped_env(env, connector))
+    scoped = _scoped_env(env, connector)
+    template_url = str(spec.get("url") or "")
+    for var, (check, message) in HOST_PIECES.items():
+        if "{" + var + "}" in template_url and var in scoped:
+            good = check(str(scoped[var]).strip())
+            if good is None:
+                return {"status": "error", "sent": False, "error": f"{message}. No request was sent",
+                        "elapsed_ms": 0}
+            scoped[var] = good
+    spec = _substitute_env(spec, scoped)
     if data:
         spec = _substitute_data(spec, data)
 
@@ -358,7 +429,10 @@ def build_request(http_request: dict, env: dict | None = None,
 
     # Connector-specific URL post-processing
     if connector == "mailchimp" and env.get("MAILCHIMP_API_KEY"):
-        url = _mailchimp_dc_url(url, env["MAILCHIMP_API_KEY"])
+        try:
+            url = _mailchimp_dc_url(url, env["MAILCHIMP_API_KEY"])
+        except HostRefused as exc:
+            return {"status": "error", "sent": False, "error": str(exc), "method": method, "elapsed_ms": 0}
 
     # Check for unresolved placeholders (missing env vars / data)
     unresolved = _find_unresolved_placeholders({"url": url, "headers": headers,
@@ -389,6 +463,11 @@ def build_request(http_request: dict, env: dict | None = None,
             ).encode("utf-8")
         else:
             body_bytes = json.dumps(body_template).encode("utf-8")
+
+    try:
+        _check_vendor_host(connector, url)
+    except HostRefused as exc:
+        return {"status": "error", "sent": False, "error": str(exc), "method": method, "elapsed_ms": 0}
 
     return {"status": "built", "method": method, "url": url, "headers": headers,
             "body_bytes": body_bytes, "body": body_template}
@@ -424,7 +503,9 @@ def send_request(built: dict, timeout: int = 30) -> dict:
     started = time.time()
     req = urllib.request.Request(url, data=body_bytes, method=method)
     for h, v in headers.items():
-        req.add_header(h, str(v))
+        # Unredirected: urllib copies ordinary headers to whatever host a redirect names, and the
+        # key is in them. These stay on the request the vendor was meant to get.
+        req.add_unredirected_header(h, str(v))
 
     # Fire
     response = None
@@ -852,13 +933,17 @@ def probe(connector: str, env: dict | None = None, timeout: int = 15, urlopen=No
     credential = env.get(profile["env_var"], "")
     if not credential:
         return {"connector": connector, "status": "not_configured", "message": f"{profile['env_var']} is not set"}
-    url = _mailchimp_dc_url(PROBES[connector], credential)
+    try:
+        url = _mailchimp_dc_url(PROBES[connector], credential)
+        _check_vendor_host(connector, url)
+    except HostRefused as exc:
+        return {"connector": connector, "status": "failed", "sent": False, "message": str(exc)}
     headers = _build_auth_header(profile, credential, {"Accept": "application/json"})
     if connector == "klaviyo":
         headers["revision"] = KLAVIYO_REVISION
     req = urllib.request.Request(url, method="GET")
     for h, v in headers.items():
-        req.add_header(h, v)
+        req.add_unredirected_header(h, v)  # never copied to a redirect's host
     try:
         with (urlopen or urllib.request.urlopen)(req, timeout=timeout) as resp:
             status, raw = resp.status, resp.read()

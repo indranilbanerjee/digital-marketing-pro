@@ -293,7 +293,7 @@ You: Pull my deal pipeline and identify which stages have the highest drop-off r
 **Where to get credentials:**
 1. Go to Mailchimp > Account & Billing > Extras > API Keys
 2. Create a new API key
-3. The key format is `xxxxxxxxxx-usXX` where `usXX` is your data center
+3. The key format is `xxxxxxxxxx-usXX` where `usXX` is your data center. DMP sends the key only to `<dc>.api.mailchimp.com`: a key whose ending isn't a data centre (letters then digits, such as `-us21`) is refused before any request is made
 
 **Example usage:**
 ```
@@ -1482,7 +1482,7 @@ You: Create a Marketo smart list of leads who engaged with our webinar but haven
 |---|---|
 | `PARDOT_BUSINESS_UNIT_ID` | Pardot business unit ID |
 | `SALESFORCE_ACCESS_TOKEN` | Salesforce OAuth access token (Pardot uses Salesforce SSO) |
-| `SALESFORCE_INSTANCE_URL` | Your Salesforce instance URL |
+| `SALESFORCE_INSTANCE_URL` | Your Salesforce instance URL, `https://<org>.my.salesforce.com` with nothing after the host. Any other host is refused, so the token goes only to Salesforce |
 
 **Where to get credentials:**
 1. Pardot now authenticates through Salesforce SSO
