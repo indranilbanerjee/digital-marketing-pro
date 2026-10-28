@@ -5,15 +5,18 @@ put it in the host: MAILCHIMP_API_KEY="abc-evil.example/x?" built
 https://evil.example/x?.api.mailchimp.com/3.0/ping, and urllib sent the Basic-auth key to
 evil.example. The same shape waited in PIPEDRIVE_COMPANY_DOMAIN (a subdomain) and
 SALESFORCE_INSTANCE_URL (a whole base URL). And urllib copies ordinary headers to whatever host a
-redirect names, so a 302 could carry any key elsewhere.
+redirect names, so a 302 could carry any key elsewhere: in the executor, the model router and
+refresh_models alike.
 
 Now each host piece from credential or env text is validated, the finished URL's host must be on
 the vendor's domain, nothing is sent otherwise, and headers are unredirected.
 """
 from __future__ import annotations
 
+import ast
 import io
 import json
+import os
 import re
 import sys
 import unittest
@@ -202,6 +205,73 @@ class TestRedirectsCarryNoKey(unittest.TestCase):
         follow = urllib.request.HTTPRedirectHandler().redirect_request(
             calls[0], None, 302, "Found", {}, "https://evil.example/")
         self.assertNotIn("Authorization", dict(follow.header_items()))
+
+
+class TestKeysNeverFollowARedirect(unittest.TestCase):
+    """Every script that sends a key with urllib keeps it off a redirect, and a static guard keeps
+    it that way: a urllib request that sets a credential header must use add_unredirected_header."""
+
+    CRED_NAMES = {"authorization", "x-api-key", "x-goog-api-key", "api-key", "xi-api-key"}
+    CRED_VALUE = re.compile(r"(?i)\b(?:bearer|basic)\b")
+
+    def violations(self, name: str, source: str) -> list:
+        def lit(node):
+            return node.value if isinstance(node, ast.Constant) and isinstance(node.value, str) else None
+
+        def risky(key_node, value_node) -> bool:
+            key = lit(key_node) if key_node is not None else None
+            bits = [n.value for n in ast.walk(value_node) if isinstance(n, ast.Constant) and isinstance(n.value, str)]
+            return key is None or key.lower() in self.CRED_NAMES or any(self.CRED_VALUE.search(b) for b in bits)
+
+        out = []
+        for node in ast.walk(ast.parse(source)):
+            if not isinstance(node, ast.Call):
+                continue
+            func = node.func
+            fname = func.attr if isinstance(func, ast.Attribute) else getattr(func, "id", "")
+            if fname == "add_header" and len(node.args) >= 2 and risky(node.args[0], node.args[1]):
+                out.append(f"{name}:{node.lineno}: add_header with a credential (or unknown) header")
+            if fname == "Request":
+                headers = [kw.value for kw in node.keywords if kw.arg == "headers"] + node.args[2:3]
+                for h in headers:
+                    if not isinstance(h, ast.Dict):
+                        out.append(f"{name}:{node.lineno}: Request(headers=...) not a literal")
+                    elif any(risky(k, v) for k, v in zip(h.keys, h.values)):
+                        out.append(f"{name}:{node.lineno}: Request(headers=...) with a credential header")
+        return out
+
+    def test_scripts_keep_keys_off_redirects(self):
+        problems = []
+        for path in sorted((REPO / "scripts").glob("*.py")):
+            problems += self.violations(path.name, path.read_text(encoding="utf-8"))
+        self.assertEqual(problems, [], "\n  " + "\n  ".join(problems))
+
+    def test_guard_catches_plants(self):
+        planted = (
+            "req.add_header('Authorization', 'Bearer ' + key)\n"
+            "for name, value in headers.items():\n    req.add_header(name, value)\n"
+            "urllib.request.Request(url, headers={'x-api-key': key})\n"
+            "urllib.request.Request(url, headers=hdrs)\n"
+            "urllib.request.Request(url, None, {'xi-api-key': key})\n"
+            "req.add_header('User-Agent', 'dmp')\n"
+            "req.add_unredirected_header('Authorization', f'Bearer {key}')\n"
+            "urllib.request.Request(url, headers={'Accept': 'application/json'})\n"
+        )
+        self.assertEqual(len(self.violations("plant", planted)), 5)
+
+    def test_refresh_models_evolink_key_stays_off_the_redirect(self):
+        import refresh_models as rm
+        sent = []
+
+        def opener(req, timeout=None):
+            sent.append(req)
+            return Resp(b'{"data": [{"id": "evo-one"}], "has_more": false}')
+        with mock.patch.dict(os.environ, {"EVOLINK_API_KEY": "evo-secret"}):
+            self.assertEqual(rm.list_evolink(urlopen=opener), {"evo-one"})
+        self.assertEqual(sent[0].get_header("Authorization"), "Bearer evo-secret")
+        follow = urllib.request.HTTPRedirectHandler().redirect_request(
+            sent[0], None, 302, "Found", {}, "https://evil.example/")
+        self.assertNotIn("evo-secret", json.dumps(dict(follow.header_items())))
 
 
 if __name__ == "__main__":

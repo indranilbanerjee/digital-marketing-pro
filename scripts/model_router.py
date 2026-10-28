@@ -189,7 +189,9 @@ def _pages(first_url: str, headers: dict, api_key: str, cursor: str, timeout: fl
         full = url + (("&" if "?" in url else "?") + urllib.parse.urlencode({cursor: after}) if after else "")
         req = urllib.request.Request(full, method="GET")
         for name, value in headers.items():
-            req.add_header(name, value)
+            # Unredirected: urllib copies ordinary headers to whatever host a redirect names,
+            # and the key is in them. These stay on the request to the provider.
+            req.add_unredirected_header(name, value)
         try:
             page = _get_json(req, opener, timeout, api_key, items, omit_empty=bool(next_token))
         except FetchError as exc:

@@ -30,6 +30,7 @@ import tempfile
 import unittest
 import urllib.error
 import urllib.parse
+import urllib.request
 from contextlib import redirect_stderr
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -1183,6 +1184,41 @@ class TestParity(unittest.TestCase):
             edited.write_bytes(b"a = 1\nb = 3\n")
             self.assertEqual(committed_bytes(crlf), committed_bytes(lf))
             self.assertNotEqual(committed_bytes(edited), committed_bytes(lf))
+
+
+class TestNoKeyFollowsARedirect(unittest.TestCase):
+    """urllib's redirect handler copies every ordinary header to the host a 3xx names. The router's
+    key headers are unredirected, so a redirect from a model-list endpoint carries no key. The stub
+    answers the first request, then builds the follow-up exactly as urllib would."""
+
+    EVIL = "https://evil.example/v1/models"
+
+    def follow_ups(self, fetch, page):
+        sent, follows = [], []
+
+        def opener(req, timeout=None):
+            sent.append(req)
+            follows.append(urllib.request.HTTPRedirectHandler().redirect_request(
+                req, None, 302, "Found", {}, self.EVIL))
+            return Resp(json.dumps(page).encode())
+        fetch(opener)
+        return sent, follows
+
+    def test_each_provider_key_stays_off_the_redirect(self):
+        cases = (
+            ("x-api-key", KEY, lambda o: mr.fetch_anthropic(KEY, "2023-06-01", urlopen=o),
+             {"data": [], "has_more": False}),
+            ("Authorization", f"Bearer {OAI_KEY}", lambda o: mr.fetch_openai(OAI_KEY, urlopen=o),
+             {"data": [], "has_more": False}),
+            ("x-goog-api-key", G_KEY, lambda o: mr.fetch_google(G_KEY, urlopen=o), {"models": []}),
+        )
+        for header, value, fetch, page in cases:
+            with self.subTest(header=header):
+                sent, follows = self.follow_ups(fetch, page)
+                self.assertEqual(sent[0].get_header(header.capitalize()), value)
+                followed = {k.lower(): v for k, v in follows[0].header_items()}
+                self.assertNotIn(header.lower(), followed)
+                self.assertNotIn(value, json.dumps(followed))
 
 
 if __name__ == "__main__":
