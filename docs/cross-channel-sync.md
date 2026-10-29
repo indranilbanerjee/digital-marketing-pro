@@ -26,7 +26,7 @@ Here is what makes cross-channel marketing hard:
 
 **Different content formats.** A LinkedIn thought leadership article is not an Instagram Reel is not a Google responsive search ad is not a welcome email. The same campaign concept must be expressed in radically different containers. A 2,000-word article cannot be copy-pasted into a 280-character tweet. An email subject line requires a different writing muscle than a video script.
 
-**Different character limits.** Every platform enforces its own constraints. Twitter gives you 280 characters. LinkedIn allows up to 3,000 for organic posts. Instagram captions can run to 2,200 characters. TikTok descriptions allow up to 4,000. Google Ads headlines max out at 30 characters each. Email subject lines should stay under 40 characters for mobile preview. These are not suggestions — they are hard walls that truncate your message if you exceed them.
+**Different character limits.** Every platform enforces its own constraints. Twitter gives you 280 characters. LinkedIn allows up to 3,000 for organic posts. Instagram captions can run to 2,200 characters. A TikTok video caption takes 2,200 (platform_specs.json: tiktok.caption_chars). Google Ads headlines max out at 30 characters each. Email subject lines should stay under 40 characters for mobile preview. These are not suggestions — they are hard walls that truncate your message if you exceed them.
 
 **Different voice adaptations.** Your brand voice does not change across channels, but its expression does. LinkedIn expects a more professional register. TikTok rewards casual, direct energy. Email can be personal and conversational. Google Ads demand compressed clarity. The underlying personality is the same — the knobs are turned differently for each context.
 

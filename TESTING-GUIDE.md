@@ -102,7 +102,7 @@ mv ~/.claude-marketing ~/.claude-marketing.before-test
 - [ ] `agents/` — 24 agent .md files (all with YAML frontmatter)
 - [ ] `commands/` — 18 command .md files
 - [ ] `skills/` — 158 skill directories, each with SKILL.md
-- [ ] `scripts/` — 99 Python scripts
+- [ ] `scripts/` — 101 Python scripts
 - [ ] `.mcp.json` — not shipped (gitignored); zero auto-connecting MCPs
 - [ ] `.mcp.json.example` — runnable entries only for vendor-published npm packages, pinned (`tests/test_npx_allowlist.py`)
 - [ ] `hooks/hooks.json` — ships `{"hooks":{}}` (zero global hooks)
@@ -358,7 +358,7 @@ DM Pro has 24 specialist agents. Verify they register correctly and respond when
 
 ## 6. Script Tests
 
-DM Pro has 99 Python scripts. Test key scripts that are critical to plugin operation.
+DM Pro has 101 Python scripts. Test key scripts that are critical to plugin operation.
 
 ### 6.1 Core Scripts
 
@@ -368,6 +368,8 @@ DM Pro has 99 Python scripts. Test key scripts that are critical to plugin opera
 | `connector-status.py` | `/digital-marketing-pro:integrations` | Run integrations command | Lists 13 registry-backed HTTP + available connectors by category |
 | `campaign-tracker.py` | skill-invoked (e.g. sync-memory) | Save an insight | Session insights saved |
 | `guidelines-manager.py` | Brand compliance | Set up brand with guidelines | Rules stored and enforced |
+| `goldfish-review.py` | `/digital-marketing-pro:check --goldfish` | `--action pack` a plan with an unstated budget, then `--action check` | Packet holds only deliverable, brief and brand profile; check exits 3 naming the figure |
+| `crawler-log-report.py` | `/digital-marketing-pro:agent-readiness-audit` step 5 | `--log access.log` with and without `--refresh-ranges` | Without lists every crawler request is unverified; with them, verified or spoofed; no full IP in the output |
 
 ### 6.2 Analytics & Reporting Scripts
 

@@ -63,6 +63,10 @@ A structured client report containing:
 - **Appendix (if requested)**: Raw data tables, campaign-level breakdowns, full metric exports, creative performance data, and supporting calculations for detailed review
 - **Delivery confirmation**: Channel, timestamp, recipients, delivery status, and report version — or markdown artifact if no external delivery was requested
 
+## Before it goes to the client
+
+Run the zero-context review in `/digital-marketing-pro:check` (`--goldfish`). `goldfish-review.py` packs the deliverable, the brief and the brand profile into one file and nothing else, flags money figures and benchmark rates that nothing in the brief or profile supports, and writes the prompt for a reviewer that sees only that file. Answer each finding in the document itself (state the assumption for the client to confirm, cite the source, or cut the figure) before it is sent.
+
 ## Agents Used
 
 - **agency-operations** — Report voice and tone (agency professional, not brand personality), client context awareness, approval workflow management, white-label formatting, and delivery coordination

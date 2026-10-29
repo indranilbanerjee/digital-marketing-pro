@@ -6,6 +6,42 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.41.0] - 2026-10-29
+
+### A zero-context review before a client reads a deliverable, a report of what AI crawlers actually did, and a dated watch list of ad products
+
+Upgrading: nothing migrates. One script's output changes: the formatter's Facebook story row allows 3 hashtags, not 5 (see [UPGRADE-GUIDE.md](UPGRADE-GUIDE.md)).
+
+**A zero-context review of client deliverables** (`scripts/goldfish-review.py`, in `/digital-marketing-pro:check --goldfish`)
+
+- Whoever wrote a plan reads past what it assumes; the client doesn't. `--action pack` writes the review's whole input to one file holding exactly three things: the deliverable, the brief it answers and the brand profile. A test reads the file and fails on anything else, and `check` and `prompt` refuse a packet with a fourth key.
+- `--action check` reads only that file. It flags a money figure that the brief and profile never state (an unstated budget) and a benchmark rate with no source on its line (a made-up "industry average CTR"), and exits 3, the eval gate's BLOCKED code. A figure the document marks as an assumption, an estimate or its own target passes. Both failures are planted in the tests.
+- `--action prompt` gives the quality-assurance agent a prompt that names only the packet and tells the caller to add nothing. On a host without subagents (Hermes, OpenClaw), `--no-subagents` returns a fresh-turn form labelled "same-session review (weaker)". The QA agent gains a goldfish mode instead of a new agent, since agent descriptions are an always-on cost.
+- Client proposals, client reports, executive summaries, campaign plans, media plans and QBR plans now end with "Before it goes to the client".
+
+**What AI crawlers actually did** (`scripts/crawler-log-report.py`, step 5 of `/digital-marketing-pro:agent-readiness-audit`)
+
+- robots.txt says what a crawler may fetch; the logs say what it fetched. The report reads the site's own access logs (Apache or Nginx combined format, or JSON lines such as Cloudflare Logpush; `.gz` allowed) and counts every crawler the audit names, plus Googlebot, bingbot and Applebot.
+- Anyone can send a crawler's user-agent string, so each request is checked against the addresses the vendor publishes: **verified**, **spoofed** (the name from an address the vendor doesn't list) or **unverified** (the lists aren't downloaded, or not all of them). OpenAI, Anthropic, Perplexity, Google, Microsoft and Apple all publish lists; `scripts/crawler_ranges.json` holds the 13 URLs and their documentation pages, each read on 2026-10-29.
+- `--refresh-ranges` downloads the lists into the local data folder with the date, follows no redirect, and is the only network call. Lists older than 14 days are flagged.
+- Access logs hold visitors' IP addresses, personal data under the GDPR and the DPDP Act. They are read locally and nothing from them is sent. The report prints no full address (a spoofing source appears as its /24 or /48 network) and cuts query strings from paths. PRIVACY.md has the row.
+
+**Ad products on a dated watch list** (`scripts/paid_products.json`, trends finding 28)
+
+- 15 rows: Meta Andromeda and Opportunity score; Google campaign total budgets, AI Max for Shopping, AI Brief and the monthly Demand Gen drops; TikTok GMV Max, Buy Direct and Shopping Assistant, Agentic Leads, the Smart+ search campaign and the Ad Network's US opening; LinkedIn Qualified Leads Optimization; Pinterest Performance+ campaigns; and X's ad-text rules. Each row says whether its page was read or rests on a named press report, and whether the product is live, in beta or only announced.
+- The paid skill reads a product's row before naming it. A reported or announced product is called that, and is confirmed in the brand's own ad account before spend is planned on it. A test fails 30 days before any row's review date, and when the paid hub calls an unconfirmed product available.
+- LinkedIn's Conversion Value Optimization and appointment-booking ads were on the audit's list, but no page about them could be found, so they have no row.
+
+**Platform facts** (trends finding 30, and the 2026-10-28 re-read's leftovers)
+
+- **TikTok:** TikTok's Content Posting API reference settles the caption: a video caption is 2,200 UTF-16 runes. The 4,000 that third-party pages give is a photo post's description, and a photo post's title is 90. The "owner to check in the app" note is gone. Five docs still gave 4,000 for a video (`platform-specs.md`'s old note, `platform-publishing-specs.md`, `creator-briefs.md`, `cross-channel-sync.md`, `multi-brand-guide.md`). A guard now fails on any TikTok line that gives 4,000 without saying it is the photo description.
+- **Facebook:** 63,206 characters and the 477-character fold are marked reported: no Meta page states either, and both rest on SocialKit's counter. Stories follow Meta's Page Stories API: video 3 to 90 seconds (three tables said up to 20), photos 10 MB, and no video size from Meta (the 4 GB was the Stories-ads figure). Story text has no Meta limit, so the formatter's story row now reads the file: 250 characters as a practice, and 3 hashtags.
+- **Bluesky:** the hashtag advice cites the richtext facet lexicon instead of docs.bsky.app, which renders only with JavaScript. The post record's separate `tags` field (up to 8 tags that don't show in the text) is added.
+- **Threads:** five links per post (the API rejects more with `THREADS_API__LINK_LIMIT_EXCEEDED`), text attachments and ghost posts, each with its changelog date. **Instagram:** the "Your Algorithm" viewer controls. **X Ads:** a new section with the reported ad-text rules: no hashtag, at most one emoji, the URL in the card.
+- `creator-briefs.md` and both tables in `video-scripting.md` no longer cap Instagram reels at 3 minutes: reels run to 20 minutes (reported), and over 3 minutes aren't recommended to new audiences.
+
+**Tests:** 1063 (was 1027). The new suites are `test_goldfish_review`, `test_crawler_log_report` and `test_paid_products`; `test_platform_specs` and `test_trend_facts` carry the new pins, and the two dated suites run in the weekly job. Each new guard was run against 3.40.0 and failed there.
+
 ## [3.40.0] - 2026-10-28
 
 ### An audit release: keys go only to their vendor, brands can't overwrite each other, the quality gate blocks, and the platform facts are re-read at source

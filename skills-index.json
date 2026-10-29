@@ -3,8 +3,8 @@
   "skill_count": 164,
   "tiers": {
     "E": 113,
-    "M": 10,
-    "G": 41
+    "M": 14,
+    "G": 37
   },
   "skills": [
     {
@@ -42,7 +42,7 @@
         "video-script"
       ],
       "doc_files": 1,
-      "bytes": 6454
+      "bytes": 6608
     },
     {
       "name": "add-integration",
@@ -123,7 +123,8 @@
       "tier": "E",
       "description": "Audit agent readiness by script: AI-crawler rules, product schema, no-JS HTML, feeds. \\\"can AI agents use our site\\\"",
       "scripts": [
-        "agent-readiness-audit.py"
+        "agent-readiness-audit.py",
+        "crawler-log-report.py"
       ],
       "missing_scripts": [],
       "gates": [],
@@ -136,7 +137,7 @@
         "tech-seo-audit"
       ],
       "doc_files": 1,
-      "bytes": 17986
+      "bytes": 19978
     },
     {
       "name": "analytics-insights",
@@ -377,21 +378,24 @@
     },
     {
       "name": "campaign-plan",
-      "tier": "G",
+      "tier": "M",
       "description": "Write a multi-channel campaign plan: objectives, channel mix, budget, timeline, KPIs. \\\"build the Q3 campaign plan\\\"",
       "scripts": [],
       "missing_scripts": [],
-      "gates": [],
+      "gates": [
+        "digital-marketing-pro:check"
+      ],
       "cross_refs": [
         "brand-setup",
         "campaign-orchestrator",
+        "check",
         "competitor-monitor",
         "content-engine",
         "email-sequence",
         "media-plan"
       ],
       "doc_files": 2,
-      "bytes": 8634
+      "bytes": 9151
     },
     {
       "name": "campaign-status",
@@ -434,6 +438,7 @@
         "content-scorer.py",
         "embed-c2pa.py",
         "eval-runner.py",
+        "goldfish-review.py",
         "hallucination-detector.py",
         "output-validator.py",
         "readability-analyzer.py",
@@ -445,6 +450,7 @@
         "digital-marketing-pro:check",
         "eval-runner",
         "output-validator",
+        "quality-assurance",
         "hallucination-detector",
         "claim-verifier"
       ],
@@ -455,7 +461,7 @@
         "eval-content"
       ],
       "doc_files": 1,
-      "bytes": 18938
+      "bytes": 21430
     },
     {
       "name": "churn-risk",
@@ -487,16 +493,19 @@
     },
     {
       "name": "client-proposal",
-      "tier": "G",
+      "tier": "M",
       "description": "Draft a client proposal or RFP response: scope, deliverables, KPIs, pricing tiers. \\\"respond to this RFP\\\"",
       "scripts": [],
       "missing_scripts": [],
-      "gates": [],
+      "gates": [
+        "digital-marketing-pro:check"
+      ],
       "cross_refs": [
-        "brand-setup"
+        "brand-setup",
+        "check"
       ],
       "doc_files": 1,
-      "bytes": 6122
+      "bytes": 6639
     },
     {
       "name": "client-report",
@@ -508,12 +517,15 @@
         "report-generator.py"
       ],
       "missing_scripts": [],
-      "gates": [],
+      "gates": [
+        "digital-marketing-pro:check"
+      ],
       "cross_refs": [
-        "brand-setup"
+        "brand-setup",
+        "check"
       ],
       "doc_files": 1,
-      "bytes": 9755
+      "bytes": 10272
     },
     {
       "name": "client-validation-document",
@@ -697,7 +709,7 @@
         "verify-claims"
       ],
       "doc_files": 18,
-      "bytes": 158312
+      "bytes": 158526
     },
     {
       "name": "content-repurpose",
@@ -780,7 +792,7 @@
         "validate-profile"
       ],
       "doc_files": 57,
-      "bytes": 912545
+      "bytes": 914528
     },
     {
       "name": "continuous-improvement-loop",
@@ -1142,13 +1154,16 @@
         "roi-calculator.py"
       ],
       "missing_scripts": [],
-      "gates": [],
+      "gates": [
+        "digital-marketing-pro:check"
+      ],
       "cross_refs": [
         "brand-setup",
+        "check",
         "competitor-analysis"
       ],
       "doc_files": 1,
-      "bytes": 14162
+      "bytes": 14679
     },
     {
       "name": "executive-dashboard",
@@ -1435,7 +1450,7 @@
         "brand-setup"
       ],
       "doc_files": 8,
-      "bytes": 112624
+      "bytes": 112742
     },
     {
       "name": "integrations",
@@ -1798,16 +1813,19 @@
     },
     {
       "name": "media-plan",
-      "tier": "G",
+      "tier": "M",
       "description": "Build a paid media plan: channel split, weekly flighting, audiences, reach and frequency. \\\"plan our Q4 ad budget\\\"",
       "scripts": [],
       "missing_scripts": [],
-      "gates": [],
+      "gates": [
+        "digital-marketing-pro:check"
+      ],
       "cross_refs": [
-        "brand-setup"
+        "brand-setup",
+        "check"
       ],
       "doc_files": 1,
-      "bytes": 8579
+      "bytes": 9096
     },
     {
       "name": "message-test",
@@ -1899,7 +1917,7 @@
         "launch-ad-campaign"
       ],
       "doc_files": 14,
-      "bytes": 217238
+      "bytes": 218701
     },
     {
       "name": "pdf-report",
@@ -2045,16 +2063,19 @@
     },
     {
       "name": "qbr-plan",
-      "tier": "G",
+      "tier": "M",
       "description": "Prepare a QBR package: goals vs actuals, wins, root causes, ROI, next-quarter plan. \\\"prepare the QBR\\\"",
       "scripts": [],
       "missing_scripts": [],
-      "gates": [],
+      "gates": [
+        "digital-marketing-pro:check"
+      ],
       "cross_refs": [
-        "brand-setup"
+        "brand-setup",
+        "check"
       ],
       "doc_files": 1,
-      "bytes": 7050
+      "bytes": 7567
     },
     {
       "name": "quality-report",

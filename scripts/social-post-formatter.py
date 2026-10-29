@@ -48,11 +48,12 @@ PLATFORM_SPECS = {
         "name": "Facebook",
         "limits": {
             "post": {"chars": 63206, "hashtags": 3, "display_chars": 477},
-            "story": {"chars": 250, "hashtags": 5},
+            "story": {"chars": 250, "hashtags": 3},
         },
         "mention_format": "@Page or @Person",
         "features": ["reels", "stories", "groups", "events"],
-        "notes": ["Posts over 477 chars get truncated with 'See more'"],
+        "notes": ["Posts over about 477 chars get truncated with 'See more' on desktop (reported, not a Meta figure)",
+                  "Story text: Meta states no limit; 250 is a readability practice"],
     },
     "tiktok": {
         "name": "TikTok",
@@ -136,6 +137,14 @@ def _apply_platform_specs():
                 limits[kind]["display_chars"] = spec(platform, display)
             if kind == "post" and links and spec(platform, links) is not None:
                 limits[kind]["links"] = spec(platform, links)
+    # A Facebook story has no Meta text limit; the file's 250 is a practice, and a story takes the
+    # post's hashtag advice. Before 3.41.0 the row carried 250 with no source and allowed 5 hashtags.
+    story = PLATFORM_SPECS["facebook"]["limits"].get("story")
+    if story is not None:
+        if spec("facebook", "story_text_chars_advised") is not None:
+            story["chars"] = spec("facebook", "story_text_chars_advised")
+        if hashtags("facebook") is not None:
+            story["hashtags"] = hashtags("facebook")
     if "article" in PLATFORM_SPECS["linkedin"]["limits"] and spec("linkedin", "article_chars"):
         PLATFORM_SPECS["linkedin"]["limits"]["article"]["chars"] = spec("linkedin", "article_chars")
 

@@ -25,9 +25,9 @@ TESTS_DIR = Path(__file__).resolve().parent
 
 # Tests whose verdict depends on today's date (API sunsets, compliance dates, provenance
 # stamps, re-verification ages).
-DATED_TESTS = ("test_api_versions", "test_benchmark_provenance", "test_compliance_dates",
+DATED_TESTS = ("test_api_versions", "test_benchmark_provenance", "test_compliance_dates", "test_crawler_log_report",
                "test_model_registry_dates", "test_npx_allowlist", "test_registry_record_agreement",
-               "test_platform_specs", "test_review_dates")
+               "test_paid_products", "test_platform_specs", "test_review_dates")
 
 sys.path.insert(0, str(TESTS_DIR))
 

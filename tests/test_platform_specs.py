@@ -45,7 +45,9 @@ STALE = [
     (r"5-15 relevant hashtags", "Instagram allows 5 hashtags"),
     (r"up to 3 min with some accounts", "Instagram reels run to 20 minutes"),
     (r"\| Duration \| Up to 90 seconds \|", "Facebook reels have no length limit"),
-    (r"\| Caption limit \| 4,000 characters \|", "TikTok's caption number is unresolved; 2,200 fits either"),
+    (r"\| Caption limit \| 4,000 characters \|", "TikTok's Content Posting API caps a video caption at 2,200"),
+    # A TikTok line that gives 4,000 without saying it is the photo description (3.41.0: three files did).
+    (r"(?i)tiktok(?!.*photo).*\b4,?000\b(?!.*photo)", "TikTok's 4,000 is a photo post's description; a video caption is 2,200"),
     (r"Instagram Feed Video \|", "Instagram videos post as reels (20 minutes)"),
 ]
 # The 2026-10-28 re-read, by section, since Meta Ads rightly keeps 30 MB further down the same file.
@@ -60,7 +62,13 @@ STALE_SPECS = [("linkedin", "article_chars", 120000, "LinkedIn says 125,000 (hel
 # Fields read at their vendor page on 2026-10-28; a later re-read may move the date on, never back.
 READ_2026_10_28 = [("linkedin", "post_chars"), ("linkedin", "article_chars"), ("linkedin", "image_max_mb"),
                    ("twitter", "post_chars"), ("twitter", "hashtags_advised"), ("twitter", "link_chars"),
-                   ("facebook", "image_max_mb"), ("bluesky", "post_chars")]
+                   ("facebook", "image_max_mb"), ("bluesky", "post_chars"),
+                   # 3.41.0: the two figures no Meta page states, the story rows, Bluesky's re-source, TikTok
+                   ("facebook", "post_chars"), ("facebook", "post_display_chars"), ("facebook", "story_video_seconds"),
+                   ("facebook", "story_photo_max_mb"), ("facebook", "story_text_chars_advised"),
+                   ("bluesky", "hashtags_advised"), ("bluesky", "extra_tags_cap"), ("tiktok", "caption_chars")]
+# A field whose value no vendor page states: the note says REPORTED, so a reader sees it.
+MUST_BE_REPORTED = [("facebook", "post_chars"), ("facebook", "post_display_chars"), ("tiktok", "caption_chars")]
 LIVE =["README.md", "AGENTS.md", "docs/*.md", "skills/**/*.md", "agents/*.md", "commands/*.md"]
 
 
@@ -186,6 +194,11 @@ class TestPlatformSpecs(unittest.TestCase):
                          specs["facebook"]["hashtags_advised"]["value"][1])
         self.assertEqual(formatter.PLATFORM_SPECS["linkedin"]["limits"]["article"]["chars"],
                          specs["linkedin"]["article_chars"]["value"])
+        # The Facebook story row: before 3.41.0 it took 5 hashtags and an unsourced 250 characters.
+        self.assertEqual(formatter.PLATFORM_SPECS["facebook"]["limits"]["story"]["hashtags"],
+                         specs["facebook"]["hashtags_advised"]["value"][1])
+        self.assertEqual(formatter.PLATFORM_SPECS["facebook"]["limits"]["story"]["chars"],
+                         specs["facebook"]["story_text_chars_advised"]["value"])
 
     def test_formatter_table_states_the_numbers_it_uses(self):
         # The import overwrites the table from the file, so a literal that differs is a number in the
@@ -211,6 +224,11 @@ class TestPlatformSpecs(unittest.TestCase):
             self.assertGreaterEqual(entry["verified_on"], "2026-10-28", f"{platform}.{field}")
             self.assertRegex(entry["source_url"], r"https://[^/]+/.+/.+", f"{platform}.{field} points at a site "
                                                                           f"root again, not the page read")
+        for platform, field in MUST_BE_REPORTED:
+            self.assertTrue(specs[platform][field]["note"].startswith("REPORTED"),
+                            f"{platform}.{field}: no vendor page states this value, so its note says REPORTED")
+        self.assertNotIn("docs.bsky.app", specs["bluesky"]["hashtags_advised"]["source_url"],
+                         "docs.bsky.app renders only with JavaScript; cite the lexicon")
 
     def test_plants(self):
         import tempfile

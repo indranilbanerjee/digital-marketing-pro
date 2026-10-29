@@ -2,7 +2,7 @@
 name: check
 description: "Run the scored pre-publish gate via eval-runner.py: claims, brand voice, compliance, AI tells. \"check this before we publish\""
 user-invocable: true
-argument-hint: "<file-or-content> [--full|--compliance] [--brand <slug>] [--evidence <path>] [--schema <name>]"
+argument-hint: "<file-or-content> [--full|--compliance|--goldfish] [--brand <slug>] [--evidence <path>] [--schema <name>]"
 allowed-tools: Read Bash Glob Grep
 ---
 
@@ -147,6 +147,28 @@ eval-runner.py returns the decision itself, in `decision`, with every flagged it
 - **BLOCKED** — at least one CRITICAL issue (for example a placeholder URL in a call to action, or a fabricated statistic in a headline), or the composite below the auto-reject threshold. Exit 3; the content cannot publish until fixed. A missing or invalid C2PA manifest on an AI-generated asset for an EU-targeted brand (the gate below) is also CRITICAL.
 
 The brand's thresholds, minimums and weights come from `/digital-marketing-pro:eval-config` and apply to every run. No script checks for a regulated industry's required disclaimer: review that by hand against the brand's guidelines.
+
+## Zero-context review of a client deliverable (`--goldfish`)
+
+The scored gate reads the text; it can't tell what a plan quietly depends on, because whoever wrote the plan knows. A reviewer that has seen nothing else, a goldfish, reads it the way the client will. Use this for proposals, plans, reports and summaries before they leave the agency.
+
+1. **Pack.** Write the review's whole input to one file:
+   ```bash
+   python "${CLAUDE_PLUGIN_ROOT}/scripts/goldfish-review.py" --action pack --deliverable plan.md --brief brief.md --brand {slug}
+   ```
+   The packet holds exactly three things: the deliverable, the brief it answers and the brand profile. No conversation summary, notes or other files go in. No brief? Ask for one; a few lines of what the client asked for will do.
+2. **Check.** `--action check --packet <path>` reads only the packet and lists, with line numbers:
+   - `unstated_figure`: a money figure (a budget, fee or forecast) that the brief and profile never state;
+   - `uncited_benchmark`: a benchmark rate (CTR, CPC, ROAS, conversion rate, "industry average") with no source on its line and no match in the brief or profile.
+
+   A figure the document marks as an assumption, an estimate or the plan's own target is stated, not hidden, and passes. Exit `3` means findings; `0` means none.
+3. **Review.** `--action prompt --packet <path>` returns the reviewer's prompt.
+   - On a host with subagents (Claude Code, Codex, Cursor, Copilot CLI), give it unchanged to the **quality-assurance** agent. Add nothing: no summary and no "for context". A reviewer handed anything but the packet is no longer zero-context.
+   - On a host without subagents (Hermes, OpenClaw), add `--no-subagents` and run the prompt in a fresh turn. Label the result **same-session review (weaker)**: the model has seen the work and may fill gaps from memory.
+   - The reviewer returns assumptions, unsourced numbers, contradictions with the brief or profile, and the client's likely first questions, each quoted exactly.
+4. **Answer in the document.** Fix each finding where the client will see it: state the assumption for the client to confirm, cite the source and its date, or cut the figure. Then pack and check again, so the packet matches what will be sent.
+
+What it proves, and what it doesn't: the check is deterministic, so it finds the same figures every run. The reviewer is a model, so its findings are a sample. "No findings" means it found none, not that there are none.
 
 ## AI-tell scans (advisory section, never scored)
 

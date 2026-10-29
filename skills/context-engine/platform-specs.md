@@ -23,6 +23,7 @@
 | Max file size (image) | 30 MB |
 | Hashtag limit | 5 (platform_specs.json: instagram.hashtags_cap); 3-5 recommended; keep them in the caption |
 | Algorithm priority signals | Saves, shares, comments, watch time, relationship closeness |
+| Viewer controls | "Your Algorithm" lets a viewer see and edit the topics behind their Reels recommendations (launched in the US on 2025-12-10, then reported in Explore; press coverage of Instagram's announcement). |
 | Best posting times | Tue-Thu 9-11 AM, Wed 11 AM, Fri 10-11 AM (local) |
 
 #### Instagram Reels
@@ -78,7 +79,7 @@
 | Resolution | 1080 x 1920 px minimum |
 | Video format | MP4, MOV, WebM |
 | Max file size | 10 GB (desktop), 287 MB (mobile) |
-| Caption limit | 2200 characters (platform_specs.json: tiktok.caption_chars); sources disagree (2,200 vs 4,000), so 2,200 fits either until an in-app check (owner to check in the app) |
+| Caption limit | 2200 characters (platform_specs.json: tiktok.caption_chars) for a video: TikTok's Content Posting API caps the caption at 2,200 UTF-16 runes. The 4,000 that third-party pages give is a photo post's description, 4000 characters (platform_specs.json: tiktok.photo_description_chars); a photo post's title takes 90 |
 | Hashtag limit | No hard limit; 3-5 relevant hashtags recommended |
 | Photo mode | Up to 35 images per carousel post |
 | Algorithm priority signals | Completion rate, rewatch rate, shares, comments, profile visits after viewing, content diversity score |
@@ -159,7 +160,7 @@
 
 | Spec | Value |
 |---|---|
-| Character limit | 63,206 |
+| Character limit | 63,206 (platform_specs.json: facebook.post_chars), reported: no Meta page states a limit, so write far shorter |
 | Optimal length | 40-80 characters for engagement |
 | Image dimensions | 1200 x 630 px (landscape), 1080 x 1080 px (square) |
 | Image format | JPEG, PNG, GIF (a Page photo upload also takes BMP and TIFF, nothing else) |
@@ -188,12 +189,14 @@
 
 | Spec | Value |
 |---|---|
-| Duration per slide | Up to 20 seconds (video) |
+| Video duration | 3 to 90 seconds (Meta's Page Stories API; platform_specs.json lists it as facebook.story_video_seconds). A reel shared as a story: 60 seconds at most |
 | Aspect ratio | 9:16 |
-| Resolution | 1080 x 1920 px |
-| Image format | JPEG, PNG |
-| Video format | MP4, MOV |
-| Max file size | 4 GB |
+| Resolution | 1080 x 1920 px recommended, 540 x 960 px minimum |
+| Image format | JPEG, PNG, GIF, BMP, TIFF |
+| Max photo size | 10 MB (platform_specs.json: facebook.story_photo_max_mb) |
+| Video format | MP4 |
+| Max video file size | Meta states none for a Page story (the 4 GB figure is for Stories ads, below) |
+| Story text | No Meta limit; keep it to about 250 characters (platform_specs.json: facebook.story_text_chars_advised) so it reads on a phone |
 | Text-safe zone | Center 1080 x 1420 px |
 | Lifespan | 24 hours |
 
@@ -306,6 +309,9 @@ Pinterest unified its formats into one Pin and stopped new Idea Pin creation (Pi
 | Video format | MP4, MOV |
 | Video aspect ratio | 9:16 or 1:1 |
 | Link preview | Supported |
+| Links per post | 5 (platform_specs.json: threads.links_cap); a post with more fails with `THREADS_API__LINK_LIMIT_EXCEEDED` (changelog, 2025-12-22) |
+| Text attachment | A post can carry a text attachment (changelog, 2025-10-03) |
+| Ghost posts | Available through the API since 2025-12-15 (changelog) |
 | Hashtag strategy | Topic tags (1 per post) |
 | Algorithm priority signals | Replies, reposts, engagement velocity, follower relationship |
 | Best posting times | Mon-Fri 8-10 AM, 12-1 PM (local) |
@@ -640,6 +646,17 @@ Pinterest unified its formats into one Pin and stopped new Idea Pin creation (Pi
 | Duration | Campaign-controlled |
 
 ---
+
+### X Ads
+
+The rules below rest on press and law-firm reports of X's 2025 notices; business.x.com does not load from here. Each is a row in `scripts/paid_products.json` with its source.
+
+| Spec | Value |
+|---|---|
+| Hashtags in ad text | None: an ad with a hashtag is rejected (reported, from 2025-06-27). Organic posts are unaffected |
+| Emoji | At most one in the ad copy or creative; more lowers the quality score and can raise the price (reported, July 2025; ads targeting only Japan or Korea are exempt) |
+| URLs | In the card, not in the ad text (reported, July 2025) |
+| Image formats | GIF, JPEG, PNG (as for organic posts above) |
 
 ### Pinterest Ads
 

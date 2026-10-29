@@ -69,6 +69,10 @@ A structured executive summary containing:
 - **Action items with owners**: Extracted from the strategic recommendations — a discrete list of next steps with assigned owners, deadlines, and success criteria so the summary drives action rather than just informing
 - **Methodology footnotes**: Brief explanation of how key metrics were calculated, which attribution model was used, and any adjustments made for seasonality, data gaps, or platform reporting discrepancies — ensuring the numbers are defensible if questioned
 
+## Before it goes to the client
+
+Run the zero-context review in `/digital-marketing-pro:check` (`--goldfish`). `goldfish-review.py` packs the deliverable, the brief and the brand profile into one file and nothing else, flags money figures and benchmark rates that nothing in the brief or profile supports, and writes the prompt for a reviewer that sees only that file. Answer each finding in the document itself (state the assumption for the client to confirm, cite the source, or cut the figure) before it is sent.
+
 ## Agents Used
 
 - **agency-operations** — Portfolio aggregation, executive formatting, multi-brand data consolidation, currency normalization, delivery channel formatting, and summary structure optimization

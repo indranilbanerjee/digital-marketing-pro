@@ -6,16 +6,16 @@ Run `/digital-marketing-pro:engagement` against each brand. Same 12-Part Strateg
 
 Open-source AI marketing plugin — **164 skills, 24 specialist agents, EU AI Act Article 50 ready, Cowork team-persistent**. Built for marketing agencies, in-house teams running 50–200 brands, and consultancies. Installs on **Claude Code** (CLI + IDE), **Anthropic Cowork**, **OpenAI Codex**, **Cursor 2.5+**, **GitHub Copilot CLI**, **Google Antigravity 2.0**, **Hermes Agent**, **OpenClaw**, and **Grok** + 35+ Agent Skills platforms. Created by [Indranil Banerjee](https://indranil.in) · [LinkedIn](https://www.linkedin.com/in/askneelnow/) · [X](https://x.com/askneelnow).
 
-[![Version](https://img.shields.io/badge/version-3.40.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.41.0-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=yellow)](https://github.com/indranilbanerjee/digital-marketing-pro/stargazers)
-[![Tests](https://img.shields.io/badge/tests-1027%2F1027%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-1063%2F1063%20passing-brightgreen.svg)](tests/)
 [![Platforms](https://img.shields.io/badge/platforms-9%20native%20%2B%2035%20Agent%20Skills-success.svg)](#works-on-40-agent-harnesses-via-the-agent-skills-open-standard)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Article%2050%20ready-darkred.svg)](skills/context-engine/compliance-rules.md)
 
 [![Built by Indranil "Neel" Banerjee — Neelverse Marketing Suite — Sponsor this project](docs/assets/author-banner.svg)](https://github.com/sponsors/indranilbanerjee)
 
-> 🆕 **Just shipped — v3.40.0 (October 28, 2026):** an audit release. A connector key goes only to its own vendor; brands can't overwrite each other; the quality gate applies your brand's settings and blocks on critical issues; audits say how you'll know a recommendation worked; and the platform facts were re-read at their source. Some behaviours are stricter: see the [upgrade guide](UPGRADE-GUIDE.md). [What's new](#whats-new) · [Changelog](CHANGELOG.md)
+> 🆕 **Just shipped — v3.41.0 (October 29, 2026):** a client deliverable can get a zero-context review before the client reads it; a report shows what AI crawlers actually did on your site, checked against the addresses each vendor publishes; new ad products wait on a dated watch list until their page is read; and TikTok's own reference settles its caption limit. [What's new](#whats-new) · [Changelog](CHANGELOG.md)
 
 ```bash
 # Install — one command (Claude Code 2.1.292 or newer)
@@ -64,6 +64,7 @@ Install, then ask in plain words. Each of these kinds of request reached the rig
 - **Send, publish or spend without your typed `yes`** (or a standing rule you approved). Writes it sends itself also need the single-use approval record above.
 - **Ask for an API key in the chat.** Connectors read keys from environment variables.
 - **Connect a service you did not set up.** No MCP server ships enabled and no hooks run.
+- **Send your access logs anywhere.** The crawler-log report reads them on your machine, prints no full IP address, and downloads only the vendors' public crawler address lists, when you ask.
 - **Remove or hide AI watermarks.** AI involvement is disclosed, with C2PA provenance where the format supports it.
 
 ### What it costs
@@ -204,7 +205,7 @@ Other marketing plugins exist, including Anthropic's own marketing plugin and co
 | AEO / GEO | **A 6-platform audit, including Google AI Mode** |
 | Where it runs | **9 native hosts**: Claude Code, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes, OpenClaw, Grok |
 | Live-write safety | **Single-use approval record for writes it sends itself; MCP writes: typed yes + host prompt** |
-| Tests | **1027 stdlib unittest** tests |
+| Tests | **1063 stdlib unittest** tests |
 | License | **MIT: no telemetry, no seats** |
 
 ---
@@ -301,7 +302,7 @@ Output: HTTP calls for the 8 executable connectors (Slack, HubSpot, Klaviyo, Sen
 
 ---
 
-## Supported surfaces (v3.40.0)
+## Supported surfaces (v3.41.0)
 
 | Platform | Install command | Manifest path | Status |
 |---|---|---|---|
@@ -413,6 +414,10 @@ If you run into a platform-specific install snag, file a [GitHub issue](https://
 
 ## What's new
 
+### v3.41.0 — a zero-context review, what AI crawlers actually did, and a watch list for ad products (October 29, 2026)
+
+Whoever writes a plan reads past what it assumes; the client doesn't. `/digital-marketing-pro:check --goldfish` packs the deliverable, its brief and the brand profile into one file and nothing else, flags any money figure the brief never states and any benchmark rate with no source, and gives a reviewer a prompt that names only that file. Client proposals, reports, plans and summaries now end with that step. The agent-readiness audit can also read the site's own access logs: `crawler-log-report.py` counts what the OpenAI, Anthropic, Perplexity, Google, Microsoft and Apple crawlers fetched, and checks each request against the addresses the vendor publishes, so a fake GPTBot shows up as spoofed. The logs never leave your machine, and the report prints no full IP address. New ad products (Meta's Andromeda, Google's campaign total budgets and AI Brief, TikTok's October announcements, X's ad-text rules and more) sit on a dated watch list that says whether each was read at its source or only reported, so a plan doesn't budget for something that isn't live. TikTok's developer reference settles the caption: 2,200 characters for a video; the 4,000 quoted elsewhere is a photo post's description. 1063 tests.
+
 ### v3.40.0 — an audit release: safer keys and brands, a gate that blocks, facts re-read at source (October 28, 2026)
 
 Outside audits and customer-journey tests on an installed copy of 3.39.1 found real problems, and this release fixes them. A Mailchimp key with a crafted ending could send itself to another host; now every connector key goes only to its own vendor, and no key, whether a connector's or a model provider's, follows a redirect. Creating a brand that already existed replaced its profile with a blank one, and brand names in Hindi, Chinese or emoji all shared one folder; both are now refused or kept apart, and no file a skill writes can land outside its brand. The quality gate never applied a brand's own settings; it does now, and it blocks a draft with a critical issue. Audits end with how you'll know each recommendation worked (a metric, a direction and a date), and the continuous-improvement loop checks them when they fall due. `connector-status.py --action probe` proves a key works with one read-only request. AI-visibility numbers come with their formula, and social-platform limits now live in one sourced file. Platform facts were re-read at their source: Instagram's 5-hashtag cap, Google Ads' data-driven default, Privacy Sandbox's retirement, YouTube's Shorts and monetisation rules, New York's synthetic-performer law and more. Some behaviours are stricter, so read the [upgrade guide](UPGRADE-GUIDE.md) before you upgrade a wrapper. 1027 tests.
@@ -420,10 +425,6 @@ Outside audits and customer-journey tests on an installed copy of 3.39.1 found r
 ### v3.39.1 — offline checks read the deprecations record too (October 27, 2026)
 
 When the model router can't reach a provider's live list, it checks a model you name against what ships with the plugin. Until now that meant only the model registry, not the deprecations page record that sits right beside it. So, offline, a model the vendor's page retires could slip through: OpenAI's o3, which isn't in the registry, or a Google model switched off in June. A model whose requests Google now hands to a newer one got no word about it either. The router now checks both and acts on the stricter, saying which one it followed. A plugin calling Google through Vertex AI, which retires models on its own timetable, can say the record doesn't apply. A provider list cut off at the page limit is now refused rather than used short, since a short list would make a model look withdrawn. 882 tests.
-
-### v3.39.0 — the model router reaches Google (October 27, 2026)
-
-The model router can now pick Google models the same way it picks Anthropic and OpenAI ones: from the list of models your key can use, by job, never by name. Google's list gives no retirement or release dates, so the router reads them from Google's deprecations page, recorded with the date it was read. That page gives the earliest possible shutdown dates and marks the models already switched off, and the router follows both. It never picks a model whose requests Google now sends to a different model. Your Google key goes only in a request header, never in a web address where logs would keep it. No DMP feature uses Google yet; the router ships here as the master copy that [SocialForge](https://github.com/indranilbanerjee/socialforge) uses for its photo indexing. One fix for all providers: when a retiring model's replacement comes from a vendor's deprecations page, the warning now says so instead of calling it the router's choice. The two can differ. The registry's drift report now also keeps the Google key out of web addresses and reads every page of each provider's list; it used to stop at the first page and wrongly flag models listed further on. 868 tests.
 
 Older releases are in [CHANGELOG.md](CHANGELOG.md).
 
@@ -524,7 +525,7 @@ Every skill answers to `/digital-marketing-pro:<skill-name>`. Five more are stan
 
 Every other skill works the same way — `:competitor-monitor`, `:churn-risk`, `:autopilot-status`, `:agency-dashboard`, `:aeo-audit`, `:geo-monitor`, `:c2pa-metadata`, `:client-onboarding`, `:journey-design` … see `/digital-marketing-pro:help` after install for the full list, or browse `skills/` in the repo.
 
-### 99 Python scripts (optional)
+### 101 Python scripts (optional)
 Plugin works fully without Python — all marketing knowledge, frameworks, agent capabilities, and skills work out of the box via the 178 reference knowledge files.
 
 | Mode | Size | Adds |
@@ -727,7 +728,7 @@ Yes. Each brand has its own `~/.claude-marketing/brands/<brand-slug>/` directory
 Skip to `/digital-marketing-pro:campaign-plan`. Every individual surface (campaign / SEO / content / competitor / email / report) is independently runnable. The full engagement is the canonical path, not the only path.
 
 **Q: Will this work on Codex / Cursor / Copilot CLI / Antigravity?**
-Yes — verified-real native manifests ship for all 9 surfaces (CC, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok). See [Supported surfaces](#supported-surfaces-v3400) above for per-platform install commands.
+Yes — verified-real native manifests ship for all 9 surfaces (CC, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes Agent, OpenClaw, Grok). See [Supported surfaces](#supported-surfaces-v3410) above for per-platform install commands.
 
 **Q: I run my team on Anthropic Cowork. Does brand state persist between sessions?**
 Yes — but you need to run `/digital-marketing-pro:cowork-setup` once per team first (v3.12.0). Cowork's per-session filesystem is ephemeral, and `${CLAUDE_PLUGIN_DATA}` is too ([open issue #51398](https://github.com/anthropics/claude-code/issues/51398)). The setup wizard routes brand profiles + plans + reports through a Google Drive MCP so everything survives across sessions and is shared across the team. Multi-team isolation via per-team folder names.
@@ -800,7 +801,7 @@ Use the direct repo form: `grok plugin install indranilbanerjee/digital-marketin
 ### General (any platform)
 
 **"Tests in `tests/` fail when I `git clone` locally"**
-Run `python tests/run_all.py` from the repo root. All 1027 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+; `scripts/setup.py` recommends 3.11 or newer, and the floor moves to 3.11 once Claude's Cowork environment does) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
+Run `python tests/run_all.py` from the repo root. All 1063 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.10+; `scripts/setup.py` recommends 3.11 or newer, and the floor moves to 3.11 once Claude's Cowork environment does) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
 
 **"`/digital-marketing-pro:doctor` shows my action as stub_unconfigured"**
 That action needs an MCP connector configured. Run `python scripts/connector-status.py --action setup-guide --name <connector-name>` for the exact setup snippet. Add it to your `.mcp.json` under `mcpServers`, restart your agent, and the action becomes `manifest_ready`. See [Connector-aware action resolver](#connector-aware-action-resolver) for the full readiness model.

@@ -84,6 +84,14 @@ STALE = {  # phrase -> why it is wrong
     'applicable 2 Aug': 'Article 50 has applied since 2 August 2026',
     'applies from 2 Aug': 'Article 50 has applied since 2 August 2026',
     'Article 50 readiness': 'Article 50 has applied since 2 August 2026',
+    # 3.41.0: TikTok's posting reference settles the caption; Facebook Stories are 3 to 90 seconds
+    'owner to check in the app': "TikTok's Content Posting API caps a video caption at 2,200",
+    'TikTok 4000-char': "TikTok's Content Posting API caps a video caption at 2,200",
+    '| Duration per slide | Up to 20 seconds (video) |': 'a Page story video is 3 to 90 seconds (Page Stories API)',
+    '| Facebook Stories | 9:16 | 20 seconds |': 'a Page story video is 3 to 90 seconds (Page Stories API)',
+    '| 4 GB | 20 seconds |': 'a Page story video is 3 to 90 seconds; Meta states no size',
+    '| Instagram Reels | 9:16 | 3 minutes |': 'Instagram reels run to 20 minutes (reported); keep to 3 for reach',
+    'Reels up to 3 min': 'Instagram reels run to 20 minutes (reported); keep to 3 for reach',
 }
 REQUIRED = [  # (file, phrase)
     ("skills/analytics-insights/privacy-first-measurement.md", "ad_user_data = denied"),
@@ -97,7 +105,12 @@ REQUIRED = [  # (file, phrase)
     ('skills/context-engine/platform-specs.md', 'Up to 15 per asset group'),
     ('skills/context-engine/platform-specs.md', 'Audience signals | Optional, and recommended'),
     ('skills/context-engine/platform-specs.md', '| Profile grid crop | 3:4.'),
-    ('skills/context-engine/platform-specs.md', '(owner to check in the app)'),
+    ('skills/context-engine/platform-specs.md', "TikTok's Content Posting API caps the caption at 2,200 UTF-16 runes"),
+    ('skills/context-engine/platform-specs.md', '| Links per post | 5 (platform_specs.json: threads.links_cap)'),
+    ('skills/context-engine/platform-specs.md', '| Ghost posts | Available through the API since 2025-12-15'),
+    ('skills/context-engine/platform-specs.md', '| Hashtags in ad text | None: an ad with a hashtag is rejected'),
+    ('skills/context-engine/platform-specs.md', '"Your Algorithm"'),
+    ('skills/ad-creative/SKILL.md', 'read the ad-text rows in `scripts/paid_products.json`'),
     ('skills/context-engine/platform-specs.md', 'with no minimum watch time'),
     ('skills/context-engine/platform-specs.md', '1,000 subscribers and 10 million qualified Shorts views in the last 90 days'),
     ('skills/content-engine/video-scripting.md', '"inauthentic content"'),
@@ -113,7 +126,7 @@ REQUIRED = [  # (file, phrase)
     ('skills/c2pa-metadata/SKILL.md', 'S.8420-A, signed 2025-12-11, in force 2026-06-09'),
     ('skills/c2pa-metadata/SKILL.md', '$1,000 for a first violation and $5,000 for each later one'),
     ('skills/c2pa-metadata/SKILL.md', '16 CFR Part 465, in force 2024-10-21'),
-    ('scripts/platform_specs.json', 'Owner to check in the app.'),
+    ('scripts/platform_specs.json', 'content-posting-api-reference-direct-post'),
     ('skills/c2pa-metadata/SKILL.md', 'until 2 December 2026 to mark their output under Article 50(2)'),
 ]
 

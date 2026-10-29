@@ -157,7 +157,7 @@ Other examples: `unilever-dove`, `nestle-nespresso`, `loreal-maybelline`.
 You: /digital-marketing-pro:switch-brand pg-tide
 You: Write a TikTok campaign concept for our new detergent pods
 
-(Output uses Tide's energetic/bold voice, CPG compliance, TikTok 4000-char specs,
+(Output uses Tide's energetic/bold voice, CPG compliance, TikTok's 2,200-character caption,
  references Persil and Arm & Hammer as competitive context)
 
 You: /digital-marketing-pro:switch-brand pg-pampers

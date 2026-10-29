@@ -44,7 +44,7 @@ digital-marketing-pro/
 │   ├── journey-orchestrator.md        # NEW in v2.1.0
 │   ├── quality-assurance.md           # NEW in v2.2.0
 │   └── localization-specialist.md     # NEW in v2.2.0
-├── scripts/                           # 99 Python scripts + requirements
+├── scripts/                           # 101 Python scripts + requirements
 │   ├── setup.py                       # Brand management, initialization
 │   ├── campaign-tracker.py            # Campaign persistence + violation tracking
 │   ├── adaptive-scorer.py             # Context-aware scoring weights
@@ -53,6 +53,7 @@ digital-marketing-pro/
 │   ├── social-post-formatter.py       # Platform validation (9 platforms)
 │   ├── competitor-scraper.py          # Public competitor data extraction
 │   ├── ai-visibility-checker.py       # AI answer engine visibility
+│   ├── crawler-log-report.py          # What AI crawlers fetched, from access logs, checked against vendor IP lists (v3.41.0)
 │   ├── connector-status.py            # Connector discovery and status reporting
 │   ├── email-preview.py               # Email rendering preview
 │   ├── headline-analyzer.py           # Headline effectiveness scoring
@@ -107,6 +108,7 @@ digital-marketing-pro/
 │   ├── claim-verifier.py            # Marketing claim verification (v2.2.0)
 │   ├── output-validator.py          # Content structure validation (v2.2.0)
 │   ├── eval-runner.py               # Master eval suite orchestrator (v2.2.0)
+│   ├── goldfish-review.py           # Zero-context review of a client deliverable: pack, check, prompt (v3.41.0)
 │   ├── quality-tracker.py           # Eval score tracking and regression (v2.2.0)
 │   ├── eval-config-manager.py       # Per-brand eval configuration (v2.2.0)
 │   ├── prompt-ab-tester.py          # Prompt variation quality comparison (v2.2.0)
@@ -423,7 +425,7 @@ When enabled, these three reference lifecycle hooks wrap a Claude Code session w
 
 ## 8. Script Architecture
 
-All 99 scripts in `scripts/` follow consistent conventions.
+All 101 scripts in `scripts/` follow consistent conventions.
 
 ### Conventions
 
@@ -872,6 +874,7 @@ The eval layer ensures content quality through automated multi-dimensional scori
 - **quality-tracker.py** — Persists eval scores, tracks trends, detects regression
 - **eval-config-manager.py** — Manages per-brand quality thresholds and weights
 - **prompt-ab-tester.py** — Tracks and compares quality across content variations
+- **goldfish-review.py** — A zero-context review of a client deliverable (`/digital-marketing-pro:check --goldfish`): one packet file holding only the deliverable, the brief and the brand profile; a deterministic check for unstated money figures and uncited benchmark rates (exit 3); and a reviewer prompt for the quality-assurance agent that names only the packet, with a labelled weaker form for hosts without subagents
 
 ### Eval Flow
 1. Content created by content-creator agent

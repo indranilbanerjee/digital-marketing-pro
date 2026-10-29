@@ -1,5 +1,11 @@
 # Digital Marketing Pro Upgrade Guide
 
+## Upgrading 3.40.0 → 3.41.0
+
+**Nothing migrates, and one script's output changes.** `social-post-formatter.py` now allows 3 hashtags on a Facebook story, not 5, the same advice as a Facebook post (`scripts/platform_specs.json`, facebook.hashtags_advised). A story's 250-character text limit is unchanged but is now labelled a practice: Meta states no limit for story text.
+
+Everything else is new and opt-in: `goldfish-review.py` (`/digital-marketing-pro:check --goldfish`), `crawler-log-report.py` (step 5 of `/digital-marketing-pro:agent-readiness-audit`; its `--refresh-ranges` is the only network call) and the ad-product watch list `scripts/paid_products.json`.
+
 ## Upgrading 3.39.1 → 3.40.0 (audit fixes)
 
 **Nothing migrates, and these behaviours are stricter.** Each one used to fail quietly or overwrite something; now it stops and says why. A wrapper or automation that relied on the old behaviour needs the change named here.
