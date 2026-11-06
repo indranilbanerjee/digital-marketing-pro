@@ -1449,7 +1449,7 @@ You: Check if our brand is being mentioned in ChatGPT responses
 
 **Connection:** HTTP MCP server at `https://mcp.cloro.dev/mcp` (Streamable HTTP). Copy the `cloro` entry from `.mcp.json.connectors-reference` into `.mcp.json`, then choose one way to authenticate:
 
-- OAuth: keep the entry as it is and sign in when Claude Code first connects.
+- OAuth: keep the entry as it is, then run `/mcp` in Claude Code, select `cloro` and sign in. The server lists its tools before sign-in, so Claude Code does not always ask you to sign in on its own.
 - API key: add a `headers` block, with the key in the `CLORO_API_KEY` environment variable:
 
 ```json
@@ -1476,7 +1476,7 @@ Without OAuth or the header, tool calls fail with an authentication error.
 }
 ```
 
-cloro is retiring these two endpoints, so the rules become unnecessary when the server stops listing them.
+The names assume the `.mcp.json` entry is named `cloro`. If you connect the server another way (a plugin or a user-scope server), the prefix changes; `/mcp` shows the tool names to use. Claude Code has no per-server allow list, so DMP cannot limit the server to the five tools above; the deny rules block the two tools DMP must not call. cloro is retiring these two endpoints, so the rules become unnecessary when the server stops listing them.
 
 **Executor:** no `connector_executor.py` action selects cloro. The skills call its MCP tools directly, so the resolver does not return a cloro manifest.
 
