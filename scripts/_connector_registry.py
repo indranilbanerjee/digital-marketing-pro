@@ -214,6 +214,8 @@ CONNECTOR_REGISTRY = {
                 "url": "https://mcp.cloro.dev/mcp",
                 "setup_note": ("API key as an 'Authorization: Bearer' header, or OAuth: run /mcp, "
                                "select cloro and sign in (Claude Code may not prompt on its own). "
+                               "In Cowork: Customize > Connectors, add cloro and set Authentication "
+                               "to 'Sign in when needed'. "
                                "Use only scrape_chatgpt, scrape_google_ai_mode, scrape_gemini, "
                                "scrape_google and list_countries; DMP does not use the other tools "
                                "the server lists. Each scrape call costs 5 to 7 credits."),
