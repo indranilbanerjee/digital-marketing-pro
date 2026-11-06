@@ -1447,13 +1447,38 @@ You: Check if our brand is being mentioned in ChatGPT responses
 
 **What it enables:** The answers that ChatGPT, Google AI Mode and Gemini give to a prompt, with the sources each answer cites, and Google results with the AI Overview and its sources, per country. Powers the `aeo-audit`, `geo-monitor` and `serp-tracker` commands with collected answers instead of manual prompt tests.
 
-**Connection:** HTTP MCP server at `https://mcp.cloro.dev/mcp` (Streamable HTTP). Copy the `cloro` entry from `.mcp.json.connectors-reference` into `.mcp.json`. No environment variables: send the API key as an `Authorization: Bearer` header, or sign in with OAuth on first use.
+**Connection:** HTTP MCP server at `https://mcp.cloro.dev/mcp` (Streamable HTTP). Copy the `cloro` entry from `.mcp.json.connectors-reference` into `.mcp.json`, then choose one way to authenticate:
+
+- OAuth: keep the entry as it is and sign in when Claude Code first connects.
+- API key: add a `headers` block, with the key in the `CLORO_API_KEY` environment variable:
+
+```json
+"cloro": {
+  "type": "http",
+  "url": "https://mcp.cloro.dev/mcp",
+  "headers": { "Authorization": "Bearer ${CLORO_API_KEY}" }
+}
+```
+
+Without OAuth or the header, tool calls fail with an authentication error.
 
 **Where to get credentials:**
 1. Create an account and an API key at [dashboard.cloro.dev/api-keys](https://dashboard.cloro.dev/api-keys?utm_source=digital-marketing-pro&utm_medium=byok)
 2. The free plan includes 500 credits a month. Each scrape call costs credits: ChatGPT 7, Google AI Mode 6, Gemini 6, Google Search 5, Google Search with AI Overview 7
 
-**Tools to use:** `scrape_chatgpt`, `scrape_google_ai_mode`, `scrape_gemini`, `scrape_google` (set `include.aioverview` for the AI Overview) and `list_countries`. The server lists other tools as well; DMP does not use them.
+**Tools to use:** `scrape_chatgpt`, `scrape_google_ai_mode`, `scrape_gemini`, `scrape_google` (set `include.aioverview` for the AI Overview) and `list_countries`. The server lists other tools as well; DMP does not use them. To block them in every workflow, add deny rules to `.claude/settings.json`:
+
+```json
+{
+  "permissions": {
+    "deny": ["mcp__cloro__scrape_copilot", "mcp__cloro__scrape_perplexity"]
+  }
+}
+```
+
+cloro is retiring these two endpoints, so the rules become unnecessary when the server stops listing them.
+
+**Executor:** no `connector_executor.py` action selects cloro. The skills call its MCP tools directly, so the resolver does not return a cloro manifest.
 
 **Example usage:**
 ```
