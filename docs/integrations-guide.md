@@ -1443,6 +1443,29 @@ You: Check if our brand is being mentioned in ChatGPT responses
 
 ---
 
+#### cloro (hosted MCP)
+
+**What it enables:** The answers that ChatGPT, Google AI Mode and Gemini give to a prompt, with the sources each answer cites, and Google results with the AI Overview and its sources, per country. Powers the `aeo-audit`, `geo-monitor` and `serp-tracker` commands with collected answers instead of manual prompt tests.
+
+**Connection:** HTTP MCP server at `https://mcp.cloro.dev/mcp` (Streamable HTTP). Copy the `cloro` entry from `.mcp.json.connectors-reference` into `.mcp.json`. No environment variables: send the API key as an `Authorization: Bearer` header, or sign in with OAuth on first use.
+
+**Where to get credentials:**
+1. Create an account and an API key at [dashboard.cloro.dev/api-keys](https://dashboard.cloro.dev/api-keys?utm_source=digital-marketing-pro&utm_medium=byok)
+2. The free plan includes 500 credits a month. Each scrape call costs credits: ChatGPT 7, Google AI Mode 6, Gemini 6, Google Search 5, Google Search with AI Overview 7
+
+**Tools to use:** `scrape_chatgpt`, `scrape_google_ai_mode`, `scrape_gemini`, `scrape_google` (set `include.aioverview` for the AI Overview) and `list_countries`. The server lists other tools as well; DMP does not use them.
+
+**Example usage:**
+```
+You: Ask ChatGPT, AI Mode and Gemini "best CRM for small agencies" in the US and tell me which sources each one cites
+→ Uses scrape_chatgpt, scrape_google_ai_mode and scrape_gemini (19 credits)
+
+You: Does Google show an AI Overview for "crm for agencies" in Germany, and does it cite our site?
+→ Uses scrape_google with include.aioverview (7 credits)
+```
+
+---
+
 ### Marketing Automation -- New Platforms (v2.1.0)
 
 v2.1.0 adds two enterprise marketing automation platforms, complementing the existing ActiveCampaign integration.

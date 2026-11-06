@@ -198,6 +198,7 @@ EXECUTE_PROFILES = {
     "amplitude":          {"oauth_only": True, "reason": "Amplitude HTTP API uses API key + secret — execute support TODO."},
     "similarweb":         {"oauth_only": True, "reason": "Similarweb API uses API key in query — execute support TODO."},
     "semrush":            {"oauth_only": True, "reason": "SEMrush uses API key in query — execute support TODO."},
+    "cloro":              {"oauth_only": True, "reason": "cloro is used through its hosted MCP server; use MCP path."},
     "moz":                {"oauth_only": True, "reason": "Moz requires HMAC-SHA1 signed requests; use MCP path."},
     "intercom":           {"oauth_only": True, "reason": "Intercom uses Bearer token — execute support TODO."},
     "canva":              {"oauth_only": True, "reason": "Canva Connect API requires OAuth2; use MCP path."},

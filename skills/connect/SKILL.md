@@ -31,7 +31,7 @@ The user must provide (or will be prompted for):
 
 3. **Present setup instructions based on transport type**:
 
-   **For HTTP connectors** (the registry-backed ones: Slack, Canva, Figma, HubSpot, Ahrefs, Similarweb, Klaviyo, Amplitude, Google Calendar, Gmail, and the official ad-platform servers `meta-ads`, `google-ads-mcp`, `amazon-ads-mcp`):
+   **For HTTP connectors** (the registry-backed ones: Slack, Canva, Figma, HubSpot, Ahrefs, Similarweb, cloro, Klaviyo, Amplitude, Google Calendar, Gmail, and the official ad-platform servers `meta-ads`, `google-ads-mcp`, `amazon-ads-mcp`):
    - **Nothing is pre-connected.** No `.mcp.json` ships (it is gitignored), so a fresh install has zero auto-connecting MCP servers — this is deliberate (it keeps Cowork and multi-tenant installs safe). These HTTP connectors are an **opt-in catalog**, documented in `.mcp.json.connectors-reference`.
    - To enable one, the user copies its block from `.mcp.json.connectors-reference` into their own `.mcp.json` (or adds it via `/digital-marketing-pro:add-integration`), then restarts the client. HTTP connectors need no API key in the file — once the server is added, Claude prompts for OAuth on first use.
    - Example: "Slack isn't connected yet. Copy the Slack block from `.mcp.json.connectors-reference` into your `.mcp.json` (or run `/digital-marketing-pro:add-integration slack`), restart, then run `/digital-marketing-pro:send-notification` — you'll be prompted to authorize Slack via OAuth."

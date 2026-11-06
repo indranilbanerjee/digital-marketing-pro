@@ -16,7 +16,7 @@ Plugins are **tool-agnostic** — they describe workflows in terms of categories
 | Advertising | `~~advertising` | Meta Ads AI Connectors (read/write), Google Ads MCP (read-only), Amazon Ads MCP (partners) | Unified ads MCPs (below) |
 | Product analytics | `~~product analytics` | Amplitude | Mixpanel, Google Analytics |
 | Knowledge base | `~~knowledge base` | Notion | Confluence, Guru |
-| SEO | `~~SEO` | Ahrefs, Similarweb | Semrush, Moz, DataForSEO, any SERP API (export file) |
+| SEO | `~~SEO` | Ahrefs, Similarweb, cloro (AI answers + AI Overview) | Semrush, Moz, DataForSEO, any SERP API (export file) |
 | Email marketing | `~~email marketing` | Klaviyo | Mailchimp, Brevo, Customer.io, SendGrid |
 | Calendar | `~~calendar` | Google Calendar | Outlook Calendar |
 | Email | `~~email` | Gmail | Outlook |

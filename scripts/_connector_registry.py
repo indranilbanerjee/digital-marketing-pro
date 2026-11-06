@@ -209,6 +209,17 @@ CONNECTOR_REGISTRY = {
                 "env_vars": [],
                 "skills_unlocked": ["competitor-analysis", "share-of-voice"],
             },
+            "cloro": {
+                "transport": "http",
+                "url": "https://mcp.cloro.dev/mcp",
+                "setup_note": ("API key as an 'Authorization: Bearer' header, or OAuth on first use. "
+                               "Use only scrape_chatgpt, scrape_google_ai_mode, scrape_gemini, "
+                               "scrape_google and list_countries; DMP does not use the other tools "
+                               "the server lists. Each scrape call costs 5 to 7 credits."),
+                "description": "cloro: ChatGPT, Google AI Mode and Gemini answers with cited sources; Google results with the AI Overview",
+                "env_vars": [],
+                "skills_unlocked": ["aeo-audit", "geo-monitor", "serp-tracker"],
+            },
             "semrush": {
                 "transport": "npx",
                 "package": None,
