@@ -1,6 +1,6 @@
 """scripts/goldfish-review.py: a zero-context review of a client deliverable (3.41.0).
 
-Borrow 1 of the 2026-10-27 ecosystem review, built the way Brain A asked: a reviewer is
+Borrow 1 of the 2026-10-27 ecosystem review: a reviewer is
 zero-context only if it is handed nothing but the deliverable, the brief and the brand profile,
 so the input is a file that holds exactly those three, and a test reads it. The two failures the
 Orchestrator named are planted: an unstated budget assumption and a made-up benchmark. A host

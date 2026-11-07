@@ -1,6 +1,6 @@
 """scripts/crawler-log-report.py: what AI crawlers did, from the site's own logs (3.41.0).
 
-The 2026-10-27 ecosystem review's borrow 3, built the way Brain A asked: robots.txt says what a
+The 2026-10-27 ecosystem review's borrow 3: robots.txt says what a
 crawler may fetch and the logs say what it did, but a user-agent string proves nothing, so each
 request is checked against the vendor's published addresses, which change weekly and so are
 downloaded (--refresh-ranges, the only network call) into a dated local cache, never shipped.
