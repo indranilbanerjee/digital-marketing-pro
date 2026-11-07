@@ -408,7 +408,9 @@ def get_execution_log(slug):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Approval lifecycle manager for Digital Marketing Pro")
+    # allow_abbrev=False: `--act approve` must not parse, so hooks/gate_live_writes.py sees every live step spelled out.
+    parser = argparse.ArgumentParser(description="Approval lifecycle manager for Digital Marketing Pro",
+                                     allow_abbrev=False)
     parser.add_argument("--brand", type=_common.path_component, required=True, help="Brand slug")
     parser.add_argument("--action", required=True,
                         choices=["create-approval", "create-standing", "list-pending", "approve", "reject",
@@ -431,7 +433,7 @@ def main():
 
     elif args.action == "create-standing":
         try:
-            data = json.loads(args.data or "")
+            data = _common.json_text(args.data or "", "--data")
         except json.JSONDecodeError:
             print(json.dumps({"error": "Provide --data with the standing-approval JSON"}))
             sys.exit(1)

@@ -23,6 +23,11 @@ Usage:
     python check_skill_contracts.py --json          # machine-readable report
     python check_skill_contracts.py --script foo.py # only invocations of one script
 
+It also fails on JSON typed inline in single quotes (`--data '{...}'`, `--channels '[...]'`) in any
+shipped markdown file outside CHANGELOG.md: such a payload often carries outside text (scraped titles,
+lead names, report text), and one single quote in it ends the quoting and runs the rest as shell.
+The docs write the JSON to a file with the Write tool and pass `--data "@{data_file}"` (3.42.0).
+
 Exit code: 0 when there are zero mismatches, 1 otherwise.
 """
 from __future__ import annotations
@@ -171,6 +176,30 @@ def validate_invocation(spec: dict, inv: dict, script: str) -> list[dict]:
     return problems
 
 
+# `--flag '{` or `--flag '[`: a JSON payload typed inline between single quotes.
+INLINE_JSON_RE = re.compile(r"--[a-z][a-z0-9-]* '[\{\[]")
+_SKIP_PARTS = {".git", "node_modules", "results", "__pycache__"}
+
+
+def inline_json_sites(text: str) -> list[tuple[int, str]]:
+    """(line number, line) for every single-quoted inline JSON option in a markdown text."""
+    return [(n, line.strip()) for n, line in enumerate(text.splitlines(), 1) if INLINE_JSON_RE.search(line)]
+
+
+def lint_inline_json(root: Path = PLUGIN_ROOT) -> list[dict]:
+    """Every shipped .md file except CHANGELOG.md (history) must pass JSON options through a file."""
+    found = []
+    for md in sorted(root.rglob("*.md")):
+        rel_parts = md.relative_to(root).parts
+        if md.name == "CHANGELOG.md" or set(rel_parts) & _SKIP_PARTS:
+            continue
+        text = md.read_text(encoding="utf-8-sig", errors="replace")
+        for n, line in inline_json_sites(text):
+            found.append({"script": "-", "kind": "inline-json", "detail": f"line {n}: write the JSON to a file "
+                          "and pass --flag \"@{file}\"", "file": "/".join(rel_parts), "snippet": line[:160]})
+    return found
+
+
 def lint(specs: dict[str, dict], only_script: str | None = None) -> list[dict]:
     doc_dirs = [PLUGIN_ROOT / "skills", PLUGIN_ROOT / "commands", PLUGIN_ROOT / "agents"]
     mismatches = []
@@ -205,6 +234,8 @@ def main() -> int:
     _common.ensure_utf8_stdout()
     specs = load_all_specs()
     mismatches = lint(specs, only_script=args.script)
+    if not args.script:
+        mismatches += lint_inline_json()
 
     if args.json:
         print(json.dumps({"mismatch_count": len(mismatches),

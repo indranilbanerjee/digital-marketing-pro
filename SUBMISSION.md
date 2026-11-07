@@ -23,7 +23,7 @@ Digital Marketing Pro is an end-to-end engagement methodology for marketing team
 
 The plugin ships 24 specialist agents (marketing-strategist, content-creator, seo-specialist, analytics-analyst, brand-guardian, media-buyer, growth-engineer, influencer-manager, competitive-intel, pr-outreach, email-specialist, cro-specialist, social-media-manager, execution-coordinator, performance-monitor-agent, crm-manager, memory-manager, agency-operations, marketing-scientist, market-intelligence, intelligence-curator, journey-orchestrator, quality-assurance, localization-specialist), 164 skills, 101 Python scripts, 5 top-level commands, 14 HTTP MCP connectors (opt-in), 16 industry profiles (pharma, BFSI, healthcare, legal, real estate, technology, B2B SaaS, e-commerce, consumer goods, education, and more), and 16 privacy-law jurisdictions including the EU AI Act Article 50 (C2PA provenance for AI-generated marketing assets, in force since 2 August 2026), DPDP Act Phase II (effective 13 Nov 2026), CCPA ADMT amendments, NY synthetic-performer law (S.8420-A), and the FTC Endorsement Guides and Consumer Reviews and Testimonials Rule.
 
-Built for digital marketing agencies managing 50–200 brands, in-house marketing teams with high content volume, content operations in regulated industries, and enterprise brands requiring consistent quality at scale. Multi-plugin coexistence by design (zero global hooks, zero auto-connecting MCP servers). Full Cowork compatibility — all 14 connectors are HTTP, Python scripts run natively.
+Built for digital marketing agencies managing 50–200 brands, in-house marketing teams with high content volume, content operations in regulated industries, and enterprise brands requiring consistent quality at scale. Multi-plugin coexistence by design (no lifecycle hooks, one PreToolUse gate that runs only for the plugin's own live-write scripts, zero auto-connecting MCP servers). Full Cowork compatibility — all 14 connectors are HTTP, Python scripts run natively.
 
 ## 3. Category
 
@@ -114,7 +114,7 @@ Each brand has its own `~/.claude-marketing/brands/<brand-slug>/` directory with
 
 - All 14 HTTP MCP connectors work in both Claude Code and Cowork.
 - All 101 Python scripts run natively in Cowork (Cowork is the Anthropic Desktop computer-use product with local filesystem access).
-- Plugin ships zero global hooks (`hooks/hooks.json` is empty) and zero auto-connecting MCP servers (no `.mcp.json` ships; connectors are opt-in via `/digital-marketing-pro:connect`). Multi-plugin coexistence by design.
+- Plugin ships one hook: `hooks/gate_live_writes.py`, a PreToolUse check that runs only for shell commands naming `approval-manager.py` or `connector_executor.py` and makes the host ask before each live-write step, no lifecycle hooks, and zero auto-connecting MCP servers (no `.mcp.json` ships; connectors are opt-in via `/digital-marketing-pro:connect`). Multi-plugin coexistence by design.
 - HTTP-only stack means no stdio/npx dependencies are required; `.mcp.json.example` offers runnable `npx` entries only for vendor-published npm packages pinned to an exact version (Claude Code only), and the Pipedream/Composio/Zapier/Make.com aggregator paths in `.mcp.json.connectors-reference` cover the rest (Cowork-compatible).
 
 ## 10. Verified-badge eligibility (optional second tier)

@@ -470,6 +470,8 @@ def main():
 
     args = parser.parse_args()
 
+    _common.resolve_file_options(args, ('conditions', 'context'))  # --x "@file" / - (3.42.0)
+
     # Resolve per-action --min-confidence defaults (None = not provided, so an
     # explicit 0.3 is no longer mistaken for "use the playbook default").
     if args.min_confidence is None:

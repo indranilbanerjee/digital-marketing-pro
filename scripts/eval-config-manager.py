@@ -404,6 +404,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
+    _common.resolve_file_options(args, ('weights',))  # --x "@file" / - (3.42.0)
 
     slug = _common.slugify_brand(resolve_brand(args.brand))
 

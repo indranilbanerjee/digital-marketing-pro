@@ -430,7 +430,7 @@ def main():
             print(json.dumps({"error": "Provide --loops JSON array"}))
             sys.exit(1)
         try:
-            loops = json.loads(args.loops)
+            loops = _common.json_text(args.loops, "--loops")
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --loops"}))
             sys.exit(1)
@@ -443,7 +443,7 @@ def main():
             print(json.dumps({"error": "Provide --data JSON with metrics and business_model"}))
             sys.exit(1)
         try:
-            data = json.loads(args.data)
+            data = _common.json_text(args.data, "--data")
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --data"}))
             sys.exit(1)
@@ -457,7 +457,7 @@ def main():
             print(json.dumps({"error": "Provide --stages JSON array"}))
             sys.exit(1)
         try:
-            stages = json.loads(args.stages)
+            stages = _common.json_text(args.stages, "--stages")
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --stages"}))
             sys.exit(1)
@@ -468,7 +468,7 @@ def main():
             print(json.dumps({"error": "Provide --loops JSON array"}))
             sys.exit(1)
         try:
-            loops = json.loads(args.loops)
+            loops = _common.json_text(args.loops, "--loops")
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --loops"}))
             sys.exit(1)

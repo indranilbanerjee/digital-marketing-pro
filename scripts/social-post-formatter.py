@@ -320,7 +320,8 @@ def format_for_platform(text, platform, content_type="post"):
 
 def main():
     parser = argparse.ArgumentParser(description="Format content for social media platforms")
-    parser.add_argument("--text", required=True, help="Content text to format")
+    parser.add_argument("--text", required=True,
+                        help="Content text to format: inline, @<file> (write outside text to a file first) or - (stdin)")
     parser.add_argument("--platform", required=True,
                         choices=list(PLATFORM_SPECS.keys()),
                         help="Target social media platform")
@@ -328,6 +329,7 @@ def main():
                         choices=["post", "reel", "story", "thread", "article"],
                         help="Content type (default: post)")
     args = parser.parse_args()
+    args.text = _common.arg_text(args.text, "--text", text=True)
 
     if not args.text.strip():
         print(json.dumps({"error": "Text cannot be empty"}))

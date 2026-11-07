@@ -36,11 +36,13 @@ jobs:
       pull-requests: write
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      # This job holds TESSL_API_KEY and a token that can write PR comments, so what it runs is pinned:
+      # the action by commit (v4.4.0) and the CLI by exact version. Bump both on purpose, never implicitly.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4.4.0
         with:
           fetch-depth: 0          # tessl review diffs SKILL.md changes vs the base branch
       - name: Install Tessl CLI
-        run: npm install -g @tessl/cli
+        run: npm install -g --ignore-scripts @tessl/cli@0.119.0
       - name: Review changed skills
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -425,7 +425,7 @@ def main():
     data = {}
     if args.data:
         try:
-            data = json.loads(args.data)
+            data = _common.json_text(args.data, "--data")
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --data."}))
             sys.exit(1)

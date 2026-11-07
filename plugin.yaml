@@ -16,7 +16,7 @@
 # the skills/ directory and exposes every SKILL.md to Hermes via ctx.register_skill().
 
 name: digital-marketing-pro
-version: 3.41.0
+version: 3.42.0
 description: >-
   Open-source AI marketing plugin for agencies & in-house teams. 164 skills,
   24 specialist agents, 12-Part Strategy Flow, Cowork team-persistent, EU AI
@@ -29,8 +29,8 @@ homepage: https://github.com/indranilbanerjee/digital-marketing-pro
 # Every skill directory under skills/ is auto-registered at register() time.
 provides_tools: []
 
-# We don't register any Hermes lifecycle hooks (zero global hooks policy across
-# all platforms — same as our Claude Code hooks/hooks.json which ships empty).
+# We don't register any Hermes lifecycle hooks. (Claude Code's hooks/hooks.json holds one
+# PreToolUse gate for the plugin's own live-write scripts and nothing else.)
 provides_hooks: []
 
 # No environment variables required at install time. Brand state lives at

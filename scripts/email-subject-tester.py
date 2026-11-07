@@ -332,6 +332,7 @@ def main():
         help="Brand slug for context (optional)",
     )
     args = parser.parse_args()
+    _common.resolve_file_options(args, ('subjects',))  # --x "@file" / - (3.42.0)
 
     # Parse input: try JSON array first, fall back to single string
     raw = args.subjects.strip()

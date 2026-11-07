@@ -375,7 +375,7 @@ def main():
             print(json.dumps({"error": "Provide --data with report sections JSON"}))
             sys.exit(1)
         try:
-            data = json.loads(args.data)
+            data = _common.json_text(args.data, "--data")
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --data"}))
             sys.exit(1)
@@ -416,7 +416,7 @@ def main():
         set_data = None
         if args.set_theme:
             try:
-                set_data = json.loads(args.set_theme)
+                set_data = _common.json_text(args.set_theme, "--set-theme")
             except json.JSONDecodeError:
                 print(json.dumps({"error": "Invalid JSON in --set"}))
                 sys.exit(1)

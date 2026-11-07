@@ -269,8 +269,10 @@ The Performance Report command follows a structured process:
 
 Every time a performance report is generated, the data can be saved for future reference:
 
-```
-campaign-tracker.py --brand greenpeak-outdoors --action save-performance --data '{
+The snapshot is written to a file first (with the Write tool), never typed inline in the command:
+
+```json
+{
   "campaign_id": "post-purchase-email-20260301",
   "period": "Q2 2026",
   "metrics": {
@@ -278,7 +280,11 @@ campaign-tracker.py --brand greenpeak-outdoors --action save-performance --data 
     "repeat_purchase_rate": 22,
     "loyalty_enrollment": 12
   }
-}'
+}
+```
+
+```
+campaign-tracker.py --brand greenpeak-outdoors --action save-performance --data "@{data_file}"
 ```
 
 The `campaign-tracker.py` script stores these in `~/.claude-marketing/brands/greenpeak-outdoors/performance/`, creating a time-series of snapshots that future reports can reference for trend analysis. You do not need to run this manually — the plugin handles it when you generate a performance report.

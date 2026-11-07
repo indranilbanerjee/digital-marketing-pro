@@ -17,7 +17,8 @@ digital-marketing-pro/
 ├── .mcp.json                          # NOT shipped (gitignored) — zero auto-connecting MCPs
 ├── .mcp.json.example                  # opt-in entries for vendor-published npm packages only, pinned
 ├── hooks/
-│   └── hooks.json                     # ships EMPTY {"hooks":{}} — zero global hooks
+│   ├── hooks.json                     # one PreToolUse gate (live-write steps only), nothing else
+│   └── gate_live_writes.py            # the gate: host asks before prepare / approve / fire
 ├── commands/                          # 5 top-level commands
 ├── agents/                            # 24 specialist agents
 │   ├── marketing-strategist.md
@@ -171,7 +172,7 @@ SKILL.md files serve as workflow definitions. Each one specifies:
 - **What to output** -- structured deliverable format
 - **Which agents to invoke** -- specialist agents required for this workflow
 
-`hooks.json` *can* define a session lifecycle (SessionStart, PreToolUse, SessionEnd) that wraps workflows with brand context injection and compliance checking, but ships **empty** (`{"hooks":{}}`) by default — see Section 7. The reference configuration lives in `hooks/hooks-reference.example.json`.
+`hooks.json` *can* define a session lifecycle (SessionStart, PreToolUse, SessionEnd) that wraps workflows with brand context injection and compliance checking, but ships only the live-write gate (`gate_live_writes.py`, since 3.42.0) — see Section 7. The reference configuration lives in `hooks/hooks-reference.example.json`.
 
 Together, SKILL.md files (and any hooks the user opts back in) form the "instructions" layer that the AI agent reads and follows.
 
@@ -390,7 +391,7 @@ The shared intelligence layer lives at `skills/context-engine/` and provides ref
 
 ## 7. Hook System
 
-> **Shipped state (v3.1.0+):** `hooks/hooks.json` ships **empty** (`{"hooks":{}}`) — the plugin registers **zero** global hooks. Claude Code plugin hooks have no per-directory or per-project scoping, so an always-on hook would fire on *every* operation in *every* project, not just DMP work. The three lifecycle hooks below document the **reference** behavior preserved in `hooks/hooks-reference.example.json`; those responsibilities now live at other layers (per-agent brand-compliance instructions, manual `python "${CLAUDE_PLUGIN_ROOT}/scripts/setup.py"` invocation, and per-agent MCP-write approval flows). Copy an entry from the reference file into the `hooks` object to opt back in.
+> **Shipped state (v3.42.0+):** `hooks/hooks.json` registers **one** hook, a PreToolUse gate whose `if` filters run it only for shell commands that name `approval-manager.py` or `connector_executor.py`; it answers "ask" for the prepare, approve, create-standing and fire steps so the host prompts even when an allow rule matches. No lifecycle hook (v3.1.0+ removed them all). Claude Code plugin hooks have no per-directory or per-project scoping, so an always-on hook would fire on *every* operation in *every* project, not just DMP work. The three lifecycle hooks below document the **reference** behavior preserved in `hooks/hooks-reference.example.json`; those responsibilities now live at other layers (per-agent brand-compliance instructions, manual `python "${CLAUDE_PLUGIN_ROOT}/scripts/setup.py"` invocation, and per-agent MCP-write approval flows). Copy an entry from the reference file into the `hooks` object to opt back in.
 
 When enabled, these three reference lifecycle hooks wrap a Claude Code session with brand context injection, compliance checking, and insight persistence.
 

@@ -17,6 +17,9 @@ Usage:
 import argparse
 import json
 import sys
+import os as _os
+sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+import _common  # noqa: E402  (arg_text: --x @file / - for JSON options)
 
 for _stream in (sys.stdout, sys.stderr):  # UTF-8 output, even where a Windows pipe defaults to cp1252
     try:
@@ -303,6 +306,7 @@ def main():
                         choices=["lead_gen", "signup", "contact", "checkout", "application"],
                         help="Form type for benchmarking (default: lead_gen)")
     args = parser.parse_args()
+    _common.resolve_file_options(args, ('fields',))  # --x "@file" / - (3.42.0)
 
     # --- Input validation ---
     if not args.fields and not args.file:

@@ -522,7 +522,7 @@ def main():
         urls.append(args.url.strip())
     if args.urls:
         try:
-            parsed = json.loads(args.urls)
+            parsed = _common.json_text(args.urls, "--urls")
             if isinstance(parsed, list):
                 urls.extend([u.strip() for u in parsed if isinstance(u, str) and u.strip()])
             else:

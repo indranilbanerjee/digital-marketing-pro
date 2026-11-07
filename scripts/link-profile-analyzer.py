@@ -499,7 +499,7 @@ def main():
             sys.exit(1)
     else:
         try:
-            links_raw = json.loads(args.links)
+            links_raw = _common.json_text(args.links, "--links")
         except json.JSONDecodeError as exc:
             json.dump({"error": f"Invalid JSON in --links: {exc}"}, sys.stdout, indent=2)
             print()

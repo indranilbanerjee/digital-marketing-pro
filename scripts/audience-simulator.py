@@ -755,6 +755,8 @@ def main():
 
     args = parser.parse_args()
 
+    _common.resolve_file_options(args, ('segments', 'questions', 'variants', 'price_points'))  # --x "@file" / - (3.42.0)
+
     if args.action == "create-panel":
         if not args.panel_name or not args.segments:
             print(json.dumps({"error": "Provide --panel-name and --segments"}))

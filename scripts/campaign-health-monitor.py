@@ -689,7 +689,7 @@ def main():
             print(json.dumps({"error": "Provide --metrics JSON"}))
             sys.exit(1)
         try:
-            metrics = json.loads(args.metrics)
+            metrics = _common.json_text(args.metrics, "--metrics")
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --metrics"}))
             sys.exit(1)
@@ -703,7 +703,7 @@ def main():
             print(json.dumps({"error": "Provide --campaigns JSON array"}))
             sys.exit(1)
         try:
-            campaigns = json.loads(args.campaigns)
+            campaigns = _common.json_text(args.campaigns, "--campaigns")
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --campaigns"}))
             sys.exit(1)
@@ -737,7 +737,7 @@ def main():
             print(json.dumps({"error": "Provide --guardrails JSON"}))
             sys.exit(1)
         try:
-            guardrails = json.loads(args.guardrails)
+            guardrails = _common.json_text(args.guardrails, "--guardrails")
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --guardrails"}))
             sys.exit(1)

@@ -473,6 +473,8 @@ def main():
 
     args = parser.parse_args()
 
+    _common.resolve_file_options(args, ('data', 'performance_history'))  # --x "@file" / - (3.42.0)
+
     def _parse_json(raw, label="--data"):
         try:
             return json.loads(raw)

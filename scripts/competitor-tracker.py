@@ -461,7 +461,7 @@ def main():
     parser.add_argument("--platform", choices=MENTION_PLATFORMS + AD_PLATFORMS,
                         help="Platform (track-mentions, track-ads)")
     parser.add_argument("--sentiment", choices=SENTIMENTS, help="Mention sentiment")
-    parser.add_argument("--content", help="Description or content text")
+    parser.add_argument("--content", help="Description or content text: inline, @<file> (scraped text goes through a file) or - (stdin)")
     parser.add_argument("--ad-type", choices=AD_TYPES, help="Ad type (track-ads)")
     parser.add_argument("--since", help="Start date YYYY-MM-DD (alert-summary)")
     parser.add_argument("--outcome", choices=OUTCOMES, help="Win or loss (win-loss)")
@@ -469,6 +469,8 @@ def main():
     parser.add_argument("--reason", help="Win/loss reason")
     parser.add_argument("--segment", help="Market segment (win-loss)")
     args = parser.parse_args()
+    _common.resolve_file_options(args, ('data',))  # --x "@file" / - (3.42.0)
+    args.content = _common.arg_text(args.content, "--content", text=True)
 
     if args.action == "save-baseline":
         if not args.competitor or not args.url or not args.data:

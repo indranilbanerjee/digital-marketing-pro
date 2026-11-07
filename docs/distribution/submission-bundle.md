@@ -84,4 +84,4 @@ require re-scan, re-review, re-publish per release.
   current build before publishing.
 - Scripts require Python 3.10+.
 
-> **ChatGPT directory ZIP (checked 2026-10-04):** OpenAI's submission rules state "No app references or lifecycle hooks permitted." Our `hooks/hooks.json` is empty, but leave the `hooks/` directory out of the uploaded ZIP to remove any ambiguity. Requires a verified identity and the org permission "Apps Management Write". Source: https://developers.openai.com/plugins/deploy/submission
+> **ChatGPT directory ZIP (checked 2026-10-04):** OpenAI's submission rules state "No app references or lifecycle hooks permitted." Our `hooks/hooks.json` holds only the Claude Code live-write gate (a PreToolUse check, not a lifecycle hook); leave the `hooks/` directory out of the uploaded ZIP. Requires a verified identity and the org permission "Apps Management Write". Source: https://developers.openai.com/plugins/deploy/submission

@@ -296,6 +296,7 @@ def main():
         help="Target social media platform",
     )
     args = parser.parse_args()
+    _common.resolve_file_options(args, ('hashtags',))  # --x "@file" / - (3.42.0)
 
     tags = parse_hashtags(args.hashtags)
     if not tags:

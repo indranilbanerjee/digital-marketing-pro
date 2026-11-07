@@ -408,7 +408,7 @@ def main():
     args = parser.parse_args()
 
     try:
-        data = json.loads(args.data)
+        data = _common.json_text(args.data, "--data")
     except json.JSONDecodeError as e:
         print(json.dumps({"error": f"Invalid JSON in --data: {str(e)}"}))
         sys.exit(1)

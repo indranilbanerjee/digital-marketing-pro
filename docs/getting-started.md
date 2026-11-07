@@ -522,7 +522,7 @@ The methodology is supported by 23 reference documents in `skills/context-engine
 
 Digital Marketing Pro can operate across three lifecycle phases in a Claude Code or Cowork session. Understanding this lifecycle helps you get the most out of the plugin.
 
-> **Note (v3.1+):** These three lifecycle hooks ship **disabled** (`hooks/hooks.json` is empty) so the plugin never interferes with non-marketing work in other projects. The reference configuration is preserved in `hooks/hooks-reference.example.json` — copy the entries you want back into `hooks/hooks.json` to get the automatic behavior described below. With hooks off, the same outcomes are available on demand: brand context loads when a skill runs (or via `/digital-marketing-pro:status`), content is checked by the content-producer agents' built-in hallucination gate, and you save insights with `/digital-marketing-pro:sync-memory`.
+> **Note (v3.1+):** These three lifecycle hooks ship **disabled** (`hooks/hooks.json` holds only the live-write gate, which runs for nothing else) so the plugin never interferes with non-marketing work in other projects. The reference configuration is preserved in `hooks/hooks-reference.example.json` — copy the entries you want back into `hooks/hooks.json` to get the automatic behavior described below. With hooks off, the same outcomes are available on demand: brand context loads when a skill runs (or via `/digital-marketing-pro:status`), content is checked by the content-producer agents' built-in hallucination gate, and you save insights with `/digital-marketing-pro:sync-memory`.
 
 ### Phase 1: Session Start
 

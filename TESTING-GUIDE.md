@@ -105,7 +105,7 @@ mv ~/.claude-marketing ~/.claude-marketing.before-test
 - [ ] `scripts/` — 101 Python scripts
 - [ ] `.mcp.json` — not shipped (gitignored); zero auto-connecting MCPs
 - [ ] `.mcp.json.example` — runnable entries only for vendor-published npm packages, pinned (`tests/test_npx_allowlist.py`)
-- [ ] `hooks/hooks.json` — ships `{"hooks":{}}` (zero global hooks)
+- [ ] `hooks/hooks.json` — ships only the PreToolUse live-write gate (`gate_live_writes.py`)
 - [ ] `docs/` — 16 documentation guides
 - [ ] `CONNECTORS.md` — Connector reference with `~~category` placeholders
 
@@ -422,10 +422,12 @@ DM Pro has 101 Python scripts. Test key scripts that are critical to plugin oper
 
 ## 7. Hook Tests
 
-**DM Pro ships ZERO global hooks.** `hooks/hooks.json` is `{"hooks":{}}` and has been since **v3.1.0** — global hooks fire in *every* project (not just DMP contexts), so they were removed for safe multi-plugin coexistence. There is nothing to exercise at the hook layer, and a fresh install must show an empty hooks config.
+**DM Pro ships no lifecycle hooks** (removed in **v3.1.0**: global hooks fire in *every* project, not just DMP contexts). Since **3.42.0** it ships exactly one PreToolUse hook, the live-write gate: its `if` filters run it only for shell commands that name `approval-manager.py` or `connector_executor.py`, and it makes the host ask before the prepare, approve, create-standing and fire steps.
 
-**Test — confirm hooks ship empty:**
-- [ ] `hooks/hooks.json` contains exactly `{"hooks":{}}` (no SessionStart / PreToolUse / PostToolUse / SessionEnd entries)
+**Test — confirm the hook layer:**
+- [ ] `hooks/hooks.json` holds only the PreToolUse gate (no SessionStart / PostToolUse / SessionEnd entries)
+- [ ] In the default permission mode, `/digital-marketing-pro:execute-action ... --execute`, then `approval-manager.py ... --action approve`, each shows a permission prompt labelled `[plugin:digital-marketing-pro]`, even after "Yes, and don't ask again" on an earlier one
+- [ ] `git status`, or any command not naming those two scripts, runs with no DMP hook output
 - [ ] Starting a session does NOT auto-run any DMP hook (no surprise banner, no auto-write, no dependency check firing on its own)
 
 The behaviors a hook layer *could* enforce are instead enforced **inside the skills and agents**. Test them there, not at the hook layer:
@@ -454,7 +456,7 @@ Every execution skill carries an in-body **`## Execution gate`** — it presents
 
 ### 7.3 Optional — re-enabling lifecycle hooks
 
-Users who *want* the former lifecycle behavior can copy `hooks/hooks-reference.example.json` into `hooks/hooks.json` at **user scope** (never ship it globally). If you do, re-run the original SessionStart / PreToolUse / SessionEnd checks — but the shipped default is empty and that is the supported configuration.
+Users who *want* the former lifecycle behavior can copy `hooks/hooks-reference.example.json` into `hooks/hooks.json` at **user scope** (never ship it globally). If you do, re-run the original SessionStart / PreToolUse / SessionEnd checks — but the shipped default is the live-write gate alone and that is the supported configuration.
 
 ---
 
@@ -618,7 +620,7 @@ Run this after any changes to verify nothing is broken.
 
 ### Hooks
 
-- [ ] `hooks/hooks.json` ships `{"hooks":{}}` — no hook fires (this is correct)
+- [ ] `hooks/hooks.json` ships only the live-write gate — no hook fires on ordinary commands (this is correct)
 - [ ] Brand compliance is enforced by skills/agents (brand-guardian, /check), not a hook
 - [ ] External-write approval is enforced by each execution skill's `## Execution gate`, not a hook
 - [ ] Session insights are saved by skills (e.g. sync-memory / save-knowledge), not a SessionEnd hook
@@ -632,7 +634,7 @@ section once pinned v3.17.0 for thirteen releases). Verify against the sources o
       badge (enforced by `tests/test_release_consistency.py`)
 - [ ] Root Agent Plugins `plugin.json` carries the same version (enforced by
       `tests/test_agent_plugins_portability.py`)
-- [ ] `hooks/hooks.json` ships `{"hooks":{}}` (empty; no version string to sync)
+- [ ] `hooks/hooks.json` ships only the live-write gate (no version string to sync)
 - [ ] Marketplace entry version matches (checked by the marketplace repo's own suite)
 - [ ] Skill / agent / command / script counts in every live doc match the filesystem —
       run `python -m pytest tests/test_doc_counts.py` instead of counting by hand
@@ -653,7 +655,7 @@ If time is limited, test in this order:
 | 3 | `/campaign-plan` command | 3.2 | Validates core strategic skill |
 | 4 | `/seo-audit` command | 3.3 | Validates technical analysis |
 | 5 | `/digital-marketing-pro:help` and `/digital-marketing-pro:integrations` | 4 | Validates help accuracy and connector status |
-| 6 | Hook config check (ships empty) | 7 | Confirms zero global hooks; guardrails are skill-enforced |
+| 6 | Hook config check (live-write gate only) | 7 | Confirms no lifecycle hooks; the gate prompts before live writes |
 | 7 | Key skills (one per module) | 4 | Validates breadth of skill coverage |
 | 8 | MCP connectors | 8 | Requires external service accounts |
 | 9 | Agent registration | 5 | Verify all 24 registered |
@@ -684,13 +686,15 @@ python scripts/engagement-state.py status --brand "test-brand" --id "2026-q2"
 # Expect: current_part = "1", parts[1].status = "in_progress"
 
 # Test 3: Stone fact intake
+# write with the Write tool first: {fact_json_file} holds {"category":"company","fact":"Founded 2018","source":"client statement"}
 python scripts/engagement-state.py add-stone-fact --brand "test-brand" --id "2026-q2" \
-  --fact-json '{"category":"company","fact":"Founded 2018","source":"client statement"}'
+  --fact-json "@{fact_json_file}"
 # Expect: {"status": "ok", "action": "stone_fact_added", "id": "stone-001"}
 
 # Test 4: Opinion hypothesis intake
+# write with the Write tool first: {hypothesis_json_file} holds {"category":"positioning","hypothesis":"H","client_evidence":"E","research_question":"Q"}
 python scripts/engagement-state.py add-opinion --brand "test-brand" --id "2026-q2" \
-  --hypothesis-json '{"category":"positioning","hypothesis":"H","client_evidence":"E","research_question":"Q"}'
+  --hypothesis-json "@{hypothesis_json_file}"
 # Expect: {"status": "ok", "action": "opinion_added", "id": "opinion-001"}
 
 # Test 5: Mark Part 1 complete; current_part should auto-advance to 2

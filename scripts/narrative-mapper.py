@@ -514,6 +514,8 @@ def main():
     parser.add_argument("--since", help="Filter snapshots since date (narrative-trend)")
 
     args = parser.parse_args()
+
+    _common.resolve_file_options(args, ('data',))  # --x "@file" / - (3.42.0)
     args.brand = _common.slugify_brand(args.brand)
 
     if args.action == "map-landscape":

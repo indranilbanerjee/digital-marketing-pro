@@ -332,7 +332,7 @@ def main():
             result = {"error": "--data required (JSON)"}
         else:
             try:
-                result = write_cowork_config(json.loads(args.data))
+                result = write_cowork_config(_common.json_text(args.data, "--data"))
             except json.JSONDecodeError as e:
                 result = {"error": f"invalid JSON in --data: {e}"}
     elif args.action == "profile-needs-upload":

@@ -181,7 +181,7 @@ Anthropic ships a [marketing plugin](https://github.com/anthropics/knowledge-wor
 | Campaign tracking | No | Yes (200-entry rolling buffer) |
 | Adaptive scoring | No | Yes (industry + model + goal adjustments) |
 | Multi-brand switching | No | Yes |
-| Hook system | No | Opt-in (ships empty; reference SessionStart/PreToolUse/SessionEnd config preserved) |
+| Hook system | No | One PreToolUse gate for live-write steps; lifecycle hooks opt-in (reference SessionStart/PreToolUse/SessionEnd config preserved) |
 
 The Anthropic plugin is a good starting point for light marketing use. Digital Marketing Pro is built for marketing professionals and agencies who need persistent brand intelligence, compliance automation, and deep domain expertise.
 

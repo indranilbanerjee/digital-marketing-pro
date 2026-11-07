@@ -984,7 +984,8 @@ if __name__ == "__main__":
         except Exception:
             pass
 
-    parser = argparse.ArgumentParser(description=__doc__)
+    # allow_abbrev=False: `--exec` must not parse as --execute, so hooks/gate_live_writes.py sees every live step.
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     # --action / --brand are NOT required: the --list-* flags must be reachable
     # without them (M1). Requiredness is enforced below only for execution.
     parser.add_argument("--action", help="action_id to execute")
@@ -1040,7 +1041,7 @@ if __name__ == "__main__":
     # Guard the JSON parse so a malformed --data reports cleanly instead of
     # crashing with an uncaught traceback (M1).
     try:
-        data = json.loads(args.data) if args.data else None
+        data = _common.json_text(args.data, "--data") if args.data else None
     except json.JSONDecodeError as exc:
         print(json.dumps({"error": f"invalid JSON in --data: {exc}"}, indent=2))
         sys.exit(1)

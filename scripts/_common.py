@@ -641,12 +641,57 @@ def _kind_of(value) -> str:
     return "null" if value is None else type(value).__name__
 
 
+def arg_text(value, name: str = "--data", text: bool = False):
+    """The text of a command-line option given inline, as `@<path>`, or as `-` (standard input).
+
+    `@<path>` reads that file (UTF-8; a BOM is dropped; `~` is expanded) and `-` reads stdin; any other
+    value is returned unchanged, and None stays None. Skills write a payload that carries outside text
+    (scraped titles, lead names, report text) to a file with the Write tool and pass `--data @<file>`,
+    so the text never becomes part of a shell command: before 3.42.0 the docs had the model type
+    `--data '{...}'`, and a single quote in that text closed the quoting and ran the rest as shell.
+    JSON never starts with `@`, so inline JSON is never mistaken for a path. An unreadable file prints
+    {"error": ...} and exits 2. For a free-text option (`text=True`) a value such as "@acme thanks" may be
+    meant literally, so there `@<path>` is read only when that file exists."""
+    if value is None:
+        return None
+    if value == "-":
+        return sys.stdin.read()
+    if isinstance(value, str) and value.startswith("@"):
+        path = Path(value[1:]).expanduser()
+        if text and not path.is_file():
+            return value
+        try:
+            return path.read_text(encoding="utf-8-sig")
+        except (OSError, UnicodeDecodeError) as exc:
+            _input_error(f"{name}: cannot read {path}: {exc}")
+    return value
+
+
+def resolve_file_options(args, names) -> None:
+    """Replace each named option on an argparse Namespace with its arg_text (`@<path>` / `-` / inline).
+
+    For scripts that parse their JSON or text options further down: one call after parse_args() and
+    every documented `--flag "@{file}"` works without touching each parse site."""
+    for dest in names:
+        value = getattr(args, dest, None)
+        if isinstance(value, str):
+            setattr(args, dest, arg_text(value, "--" + dest.replace("_", "-")))
+
+
+def json_text(value, name: str = "--data"):
+    """json.loads of a command-line option given inline, as `@<path>` or as `-` (see arg_text), with no
+    shape check. Raises json.JSONDecodeError (a ValueError) on invalid JSON, like json.loads."""
+    return json.loads(arg_text(value, name))
+
+
 def json_arg(value, name: str, expect=dict, items=None):
     """Parse a JSON command-line option and check its shape, or print {"error": ...} and exit 2.
 
-    `expect` is the top-level type (dict, list, or a tuple of them); `items` the type every element
-    of a list must have. Before 3.40.0, null, a list or a string where an object was expected
-    ended 15 scripts in AttributeError or TypeError."""
+    The value may be inline JSON, `@<path>` or `-` (see arg_text). `expect` is the top-level type
+    (dict, list, or a tuple of them); `items` the type every element of a list must have. Before
+    3.40.0, null, a list or a string where an object was expected ended 15 scripts in AttributeError
+    or TypeError."""
+    value = arg_text(value, name)
     try:
         data = json.loads(value)
     except (TypeError, ValueError) as exc:

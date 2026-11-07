@@ -355,7 +355,7 @@ def main():
             sys.exit(1)
     else:
         try:
-            historical = json.loads(args.historical)
+            historical = _common.json_text(args.historical, "--historical")
         except json.JSONDecodeError as exc:
             json.dump({"error": f"Invalid JSON in --historical: {exc}"}, sys.stdout, indent=2)
             print()
@@ -415,7 +415,7 @@ def main():
     seasonality = None
     if args.seasonality:
         try:
-            seasonality = json.loads(args.seasonality)
+            seasonality = _common.json_text(args.seasonality, "--seasonality")
             if not isinstance(seasonality, dict):
                 json.dump({"error": "Seasonality must be a JSON object"}, sys.stdout, indent=2)
                 print()

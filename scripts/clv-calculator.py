@@ -18,6 +18,9 @@ Usage:
 import argparse
 import json
 import sys
+import os as _os
+sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+import _common  # noqa: E402  (arg_text: --x @file / - for JSON options)
 
 for _stream in (sys.stdout, sys.stderr):  # UTF-8 output, even where a Windows pipe defaults to cp1252
     try:
@@ -227,7 +230,7 @@ def run_cohort(args):
         return {"error": "Cohort model requires --segments JSON array"}
 
     try:
-        segments = json.loads(args.segments)
+        segments = _common.json_text(args.segments, "--segments")
     except json.JSONDecodeError as exc:
         return {"error": f"Invalid JSON in --segments: {exc}"}
 

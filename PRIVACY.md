@@ -12,7 +12,7 @@
 
 ## Network endpoints and credentials
 
-Nothing connects on install: there are no hooks and no `.mcp.json` ships. A script opens a network connection only when you, or a skill you invoked, run it, and only to the endpoints below.
+Nothing connects on install: no `.mcp.json` ships, and the one hook (a local check that makes Claude Code ask before a live write) makes no network call. A script opens a network connection only when you, or a skill you invoked, run it, and only to the endpoints below.
 
 | What | When | Endpoint | Credential |
 |---|---|---|---|
@@ -46,7 +46,7 @@ No script installs Python packages on its own. When one is missing, the script p
 
 ## Actions under a standing approval
 
-Campaign autopilot (`skills/context-engine/self-healing-ops-guide.md`) proposes every correction and waits for your typed `yes` by default (`allowed_actions` is empty). You can pre-authorise specific guardrailed corrections (pause an ad or ad set, lower a bid by up to 15%, lower a daily budget by up to 20%, pause or resume a campaign whose landing page is down) only through `set-guardrails` with a standing approval you approved: scoped to those actions, capped per day, at most 30 days, every use logged; at the cap, autopilot goes back to proposing. Budget increases, targeting and bidding-strategy changes, creative swaps and pausing an account always need your approval. These corrections run through the ad platform's MCP tools, so the cap is kept by the agent and logged by `campaign-health-monitor.py`, not enforced by the platform. Guardrails written before 3.35.0 that already list actions keep working as written; to return to propose-only, run `python "${CLAUDE_PLUGIN_ROOT}/scripts/campaign-health-monitor.py" --action set-guardrails --brand {slug} --guardrails '{"allowed_actions": []}'`.
+Campaign autopilot (`skills/context-engine/self-healing-ops-guide.md`) proposes every correction and waits for your typed `yes` by default (`allowed_actions` is empty). You can pre-authorise specific guardrailed corrections (pause an ad or ad set, lower a bid by up to 15%, lower a daily budget by up to 20%, pause or resume a campaign whose landing page is down) only through `set-guardrails` with a standing approval you approved: scoped to those actions, capped per day, at most 30 days, every use logged; at the cap, autopilot goes back to proposing. Budget increases, targeting and bidding-strategy changes, creative swaps and pausing an account always need your approval. These corrections run through the ad platform's MCP tools, so the cap is kept by the agent and logged by `campaign-health-monitor.py`, not enforced by the platform. Guardrails written before 3.35.0 that already list actions keep working as written; to return to propose-only, run `python "${CLAUDE_PLUGIN_ROOT}/scripts/campaign-health-monitor.py" --action set-guardrails --brand {slug} --guardrails "@{guardrails_file}"` (`{guardrails_file}` holds `{"allowed_actions": []}`: write it with the Write tool first, then pass the path).
 
 > **Script location.** If your host does not set `${CLAUDE_PLUGIN_ROOT}`, the scripts are in this plugin's `scripts/` folder, next to `skills/`. Run them with Python 3.10 or newer: `python`, or `python3` where `python` is not found (macOS, many Linux systems).
 

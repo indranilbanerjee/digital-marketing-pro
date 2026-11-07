@@ -450,7 +450,7 @@ def main():
             print(json.dumps({"error": "Provide --signals JSON"}))
             sys.exit(1)
         try:
-            signals = json.loads(args.signals)
+            signals = _common.json_text(args.signals, "--signals")
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --signals"}))
             sys.exit(1)
@@ -461,7 +461,7 @@ def main():
             print(json.dumps({"error": "Provide --data JSON array"}))
             sys.exit(1)
         try:
-            data = json.loads(args.data)
+            data = _common.json_text(args.data, "--data")
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --data"}))
             sys.exit(1)
@@ -492,7 +492,7 @@ def main():
             print(json.dumps({"error": "Provide --data JSON with cohorts"}))
             sys.exit(1)
         try:
-            data = json.loads(args.data)
+            data = _common.json_text(args.data, "--data")
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --data"}))
             sys.exit(1)

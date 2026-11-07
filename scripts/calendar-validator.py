@@ -392,7 +392,7 @@ def main():
             sys.exit(1)
     else:
         try:
-            raw_entries = json.loads(args.calendar)
+            raw_entries = _common.json_text(args.calendar, "--calendar")
         except json.JSONDecodeError as exc:
             json.dump({"error": f"Invalid JSON: {exc}"}, sys.stdout, indent=2)
             print()

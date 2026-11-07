@@ -491,8 +491,8 @@ def main():
             print(json.dumps({"error": "Provide --transitions JSON array"}))
             sys.exit(1)
         try:
-            states = json.loads(args.states)
-            transitions = json.loads(args.transitions)
+            states = _common.json_text(args.states, "--states")
+            transitions = _common.json_text(args.transitions, "--transitions")
         except json.JSONDecodeError:
             print(json.dumps({"error": "Invalid JSON in --states or --transitions"}))
             sys.exit(1)
@@ -520,7 +520,7 @@ def main():
         data = None
         if args.data:
             try:
-                data = json.loads(args.data)
+                data = _common.json_text(args.data, "--data")
             except json.JSONDecodeError:
                 print(json.dumps({"error": "Invalid JSON in --data"}))
                 sys.exit(1)

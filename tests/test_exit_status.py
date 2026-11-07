@@ -277,11 +277,31 @@ class TestNoScriptWaitsForInput(unittest.TestCase):
                 out.append(node.lineno)
         return sorted(set(out))
 
+    # The one explicit read: _common.arg_text reads stdin only when an option's value is `-`
+    # (`--data -`), which the caller types on purpose (3.42.0, JSON through a file or stdin).
+    ALLOWED = {("_common.py", "arg_text")}
+
+    @classmethod
+    def allowed_lines(cls, name, tree):
+        out = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef) and (name, node.name) in cls.ALLOWED:
+                out.update(range(node.lineno, node.end_lineno + 1))
+        return out
+
     def test_no_script_reads_stdin_or_prompts(self):
         bad = []
         for p in sorted(SCRIPTS_DIR.glob("*.py")):
-            bad += [f"{p.name}:{ln}" for ln in self.waits(ast.parse(p.read_text(encoding="utf-8-sig")))]
+            tree = ast.parse(p.read_text(encoding="utf-8-sig"))
+            allowed = self.allowed_lines(p.name, tree)
+            bad += [f"{p.name}:{ln}" for ln in self.waits(tree) if ln not in allowed]
         self.assertEqual(bad, [], "\n  ".join(bad))
+
+    def test_arg_text_reads_stdin_only_for_a_dash(self):
+        src = (SCRIPTS_DIR / "_common.py").read_text(encoding="utf-8-sig").replace("\r\n", "\n")
+        body = src[src.index("def arg_text("):src.index("def resolve_file_options(")]
+        self.assertIn('if value == "-":\n        return sys.stdin.read()', body)
+        self.assertEqual(body.count("sys.stdin"), 1)
 
     def test_plant(self):
         tree = ast.parse("key = input('API key: ')\nimport getpass\ns = getpass.getpass()\n"

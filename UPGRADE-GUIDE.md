@@ -1,5 +1,16 @@
 # Digital Marketing Pro Upgrade Guide
 
+## Upgrading 3.41.0 → 3.42.0
+
+**Nothing migrates. Four behaviours change, all for safety.**
+
+- **The send, publish, launch and sync skills start only when you run them.** `send-email-campaign`, `send-sms`, `send-notification`, `send-report`, `publish-blog`, `schedule-social`, `launch-ad-campaign`, `launch-campaign`, `crm-sync`, `lead-import`, `pipeline-update`, `segment-audience`, `data-import`, `data-export`, `live-dashboard`, `redirect-manager`, `seo-implement`, `credential-switch` and the `execute-action` command are `disable-model-invocation: true`. Asked in plain words, Claude names the command for you to run, for example `/digital-marketing-pro:send-email-campaign`. Each skill's typed `yes` is unchanged.
+- **Claude Code asks before each live-write step.** The plugin now ships one hook, `hooks/gate_live_writes.py`. It runs only for commands that name `approval-manager.py` or `connector_executor.py` and answers "ask" for prepare (`--execute`, `--prepare-batch`), `approve`, `create-standing` and fire (`--approval-id`), so you see a prompt even if you saved "Yes, and don't ask again" for the executor. It needs Python on `PATH` as `python3` or `python`, like the scripts themselves.
+- **Fewer commands run without a prompt.** Skills that listed bare `Bash` in `allowed-tools` now pre-approve only the named local scripts they run (`dm-status.py`, `engagement-state.py`, `performance-monitor.py` and the like); anything else prompts. `growth-plan`, `yearly-planner`, `four-core-documents` and `commands/engagement.md` pre-approve no shell command at all.
+- **`approval-manager.py` and `connector_executor.py` refuse shortened options.** `--exec` or `--act` now exit 2; write `--execute` and `--action` in full.
+
+New, and backward compatible: every JSON option accepts `@<path>` (a file, UTF-8) or `-` (stdin) as well as inline JSON, and the docs now write the JSON to a file first (`--data "@{data_file}"`). `social-post-formatter.py --text` and `competitor-tracker.py --content` accept `@<path>` too (a value that is not an existing file is kept as text). The connector catalogue marks who runs each endpoint (`_operator`), and its `make-com` entry sends the token as an `Authorization: Bearer` header instead of in the URL; if you copied the old URL form, it still works, but it puts the token in logs.
+
 ## Upgrading 3.40.0 → 3.41.0
 
 **Nothing migrates, and one script's output changes.** `social-post-formatter.py` now allows 3 hashtags on a Facebook story, not 5, the same advice as a Facebook post (`scripts/platform_specs.json`, facebook.hashtags_advised). A story's 250-character text limit is unchanged but is now labelled a practice: Meta states no limit for story text.
