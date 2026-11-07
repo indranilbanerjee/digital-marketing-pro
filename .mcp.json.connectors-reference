@@ -54,7 +54,7 @@
       "type": "http",
       "url": "https://mcp.cloro.dev/mcp",
       "_auth": "API key in header (Authorization: Bearer KEY), or OAuth on first connect. Free plan: 500 credits a month",
-      "_purpose": "AI answer visibility: ChatGPT, Google AI Mode and Gemini answers with their cited sources, and Google results with the AI Overview, per country. Use only scrape_chatgpt, scrape_google_ai_mode, scrape_gemini, scrape_google and list_countries; DMP does not use the other tools the server lists. Each scrape call is billed in credits (ChatGPT 7, AI Mode 6, Gemini 6, Google 5, Google with AI Overview 7)",
+      "_purpose": "AI answer visibility: ChatGPT, Google AI Mode, Bing AI Mode and Gemini answers with their cited sources, and Google results with the AI Overview, per country. Use only scrape_chatgpt, scrape_google_ai_mode, scrape_bing_aimode, scrape_gemini, scrape_google and list_countries; DMP does not use the other tools the server lists. Each scrape call is billed in credits (ChatGPT 7, Google AI Mode 6, Bing AI Mode 6, Gemini 6, Google 5, Google with AI Overview 7)",
       "_transport": "Streamable HTTP",
       "_source": "https://cloro.dev/docs/integrations/mcp?utm_source=digital-marketing-pro&utm_medium=byok",
       "_checked": "2026-11-05"
