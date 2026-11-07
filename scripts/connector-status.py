@@ -227,7 +227,8 @@ def setup_guide(name):
                     # Official servers with their own auth/hosting rules: the
                     # generic "no keys needed" line would be wrong for them.
                     guide["steps"] = [s for s in guide["steps"]
-                                      if not s.startswith("No API keys")]
+                                      if not s.startswith("No API keys")
+                                      and "will prompt you to authorize" not in s]
                     guide["steps"].append(conn["setup_note"])
                 if "<" in conn.get("url", ""):
                     guide["steps"] = [s for s in guide["steps"]

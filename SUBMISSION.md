@@ -94,7 +94,7 @@ Each brand has its own `~/.claude-marketing/brands/<brand-slug>/` directory with
 
 - **Repo:** github.com/indranilbanerjee/digital-marketing-pro — owned by GitHub user @indranilbanerjee (the submitter)
 - **Marketplace:** github.com/indranilbanerjee/neels-plugins — same owner
-- **Domains referenced:** none — plugin does not host any first-party API. All MCP connectors point to third-party services (Anthropic, Notion, Slack, Canva, Figma, HubSpot, Amplitude, Ahrefs, Similarweb, Klaviyo, Google, Gmail, Stripe, Asana, Webflow). Ownership of those services is held by their respective companies and the plugin only accesses them via official OAuth / HTTP MCP endpoints — no scraping, no credential interception, no impersonation.
+- **Domains referenced:** none — plugin does not host any first-party API. All MCP connectors point to third-party services (Anthropic, Notion, Slack, Canva, Figma, HubSpot, Amplitude, Ahrefs, Similarweb, cloro, Klaviyo, Google, Gmail, Stripe, Asana, Webflow). Ownership of those services is held by their respective companies and the plugin only accesses them via official OAuth / HTTP MCP endpoints — no scraping, no credential interception, no impersonation.
 - **Trademarks:** "Digital Marketing Pro" and "Neelverse" are submitter's marks. No third-party trademarks used in the plugin name, command names, or UI strings.
 
 ## 8. Compliance with Anthropic Software Directory Policy

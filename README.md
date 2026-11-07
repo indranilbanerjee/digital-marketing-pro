@@ -183,7 +183,7 @@ See the [Multi-Brand & Agency Guide](docs/multi-brand-guide.md) for the multi-cl
 |---|---|---|
 | 🏢 **Marketing agency** managing 50–200 brands | `/digital-marketing-pro:engagement` per brand, then `/digital-marketing-pro:cowork-setup` for team Drive persistence | Same 12-Part Strategy Flow audited across every brand. Portfolio health and budget pacing per brand via `:agency-dashboard` (it adds an AI-cost line only from a `/usage` output you paste; it cannot read usage itself). |
 | 👔 **In-house marketing team** (B2B SaaS · e-commerce · fintech · healthtech) | `/digital-marketing-pro:engagement` once to anchor strategy, then `:content-engine` + `:campaign-plan` for ongoing work | A single canonical strategy doc, monthly stakeholder reports via `:performance-report`, content + campaigns that tie back to the strategy instead of drifting. |
-| 🚀 **Marketing automation builder** (n8n · Zapier · Make · Pipedream · custom) | `/digital-marketing-pro:doctor` to see what's wired, `:execute-action` to fire real API calls | 8 verified HTTP connectors executing end-to-end (Slack · HubSpot · Klaviyo · SendGrid · Brevo · Customer.io · Mailchimp · Ahrefs); 28 OAuth connectors via MCP manifest. Stdlib only, no third-party deps. |
+| 🚀 **Marketing automation builder** (n8n · Zapier · Make · Pipedream · custom) | `/digital-marketing-pro:doctor` to see what's wired, `:execute-action` to fire real API calls | 8 verified HTTP connectors executing end-to-end (Slack · HubSpot · Klaviyo · SendGrid · Brevo · Customer.io · Mailchimp · Ahrefs); 29 OAuth connectors via MCP manifest. Stdlib only, no third-party deps. |
 | 💼 **Solo consultant** or freelance marketer | `/digital-marketing-pro:engagement` per client | Same depth on every project. Installs on Codex / Cursor / Copilot CLI / Antigravity if you don't live in Claude. |
 | 📈 **Growth team** / product marketer | `:funnel-architect` → `:analytics-insights` → `:attribution-model` → `:churn-risk` → `:cohort-analysis` | Journey design + measurement + retention + churn — all aligned to the strategy document, not isolated outputs. MMM + incrementality testing baked in. |
 | 🛡 **Compliance-led marketer** (EU · UK · India · Brazil · California) | `/digital-marketing-pro:check` before publishing anything | C2PA content provenance, EU AI Act Article 50 disclosure, GDPR + CCPA + DPDPA + LGPD across 16 jurisdictions, deepfake disclosure clauses on every AI creative brief. |
@@ -201,7 +201,7 @@ Other marketing plugins exist, including Anthropic's own marketing plugin and co
 | Agencies | **Per-brand state, brand switching and an agency dashboard** |
 | Compliance | **EU AI Act Article 50 (C2PA + AI disclosure) and 16 privacy jurisdictions** |
 | Teams on Cowork | **Persistence through a Drive MCP** |
-| Real API execution | **8 connectors live, 28 manifest-ready** for the MCP path |
+| Real API execution | **8 connectors live, 29 manifest-ready** for the MCP path |
 | AEO / GEO | **A 6-platform audit, including Google AI Mode** |
 | Where it runs | **9 native hosts**: Claude Code, Cowork, Codex, Cursor, Copilot CLI, Antigravity, Hermes, OpenClaw, Grok |
 | Live-write safety | **Single-use approval record for writes it sends itself; MCP writes: typed yes + host prompt** |
@@ -521,7 +521,7 @@ Every skill answers to `/digital-marketing-pro:<skill-name>`. Five more are stan
 | `/digital-marketing-pro:resume` | Resume an interrupted long workflow from the last checkpoint |
 | `/digital-marketing-pro:output-folder` | Print + open the visible output folder for a brand |
 | `/digital-marketing-pro:doctor` | Per-action readiness diagnostic (which campaign-audit / launch-campaign actions are live vs need connector setup) |
-| `/digital-marketing-pro:execute-action` | Actually fire an action against its real API (stdlib `urllib`, no third-party deps). 8 verified connectors execute end-to-end; 28 OAuth-only or MCP-only connectors fall back to the MCP path with the manifest still returned. |
+| `/digital-marketing-pro:execute-action` | Actually fire an action against its real API (stdlib `urllib`, no third-party deps). 8 verified connectors execute end-to-end; 29 OAuth-only or MCP-only connectors fall back to the MCP path with the manifest still returned. |
 | `/digital-marketing-pro:cowork-setup` | (v3.12.0) One-shot Cowork team setup — wires DMP through a Drive MCP so brand state survives across Cowork sessions |
 | `/digital-marketing-pro:keyword-cluster` | Pillar + spokes content cluster from seed keywords with SERP-overlap clustering and 4-gate quality scorecard |
 | `/digital-marketing-pro:backlink-gap` | Competitor backlink gap audit with priority scoring (DR + overlap + traffic + topical) |
@@ -538,7 +538,7 @@ Plugin works fully without Python — all marketing knowledge, frameworks, agent
 | **Lite** (`python scripts/setup.py --install lite`) | ~15 MB | Brand-voice scoring, content quality scoring, readability analysis |
 | **Full** (`python -m pip install -r scripts/requirements.txt`, exact pins) | ~50 MB | Competitor scraping, QR generation, AI visibility API checking, GEO tracking, C2PA signing |
 
-### 35 HTTP MCP connectors
+### 36 HTTP MCP connectors
 Ready-to-copy entries in `.mcp.json.connectors-reference`: first-party servers such as Notion · Slack · Canva · Figma · HubSpot · Amplitude · Ahrefs · SimilarWeb · Klaviyo · Google Calendar · Gmail · Stripe · Asana · Webflow, plus official ad-platform, image and video, and aggregator MCPs. `.mcp.json.example` adds 3 vendor npx entries.
 
 These are an **opt-in catalog** — no `.mcp.json` ships (it is gitignored), so nothing auto-connects; enable only the ones you need. All HTTP, all Cowork-compatible. For services without first-party HTTP MCPs (Google Sheets, Drive, Salesforce, etc.), see `.mcp.json.connectors-reference` for **Pipedream / Composio / Zapier / Make.com** aggregator paths.
@@ -590,7 +590,7 @@ Check what's live in your environment any time:
 
 **Test coverage:** the resolver's action layer ships tests in `tests/test_connector_resolver.py`. A fuller 27-scenario development harness (14 actions × unconfigured / configured / local-execution variants) was used while building this out, but it is a dev tool and is not shipped in the repo.
 
-**Implementation:** `scripts/_connector_registry.py` (catalog of 36 connectors, 11 categories, `is_connector_configured()` probe) + `scripts/connector_resolver.py` (`ACTION_SPECS` map + per-action manifest builders + local executors) + `scripts/action-doctor.py` (the doctor command's underlying script).
+**Implementation:** `scripts/_connector_registry.py` (catalog of 37 connectors, 11 categories, `is_connector_configured()` probe) + `scripts/connector_resolver.py` (`ACTION_SPECS` map + per-action manifest builders + local executors) + `scripts/action-doctor.py` (the doctor command's underlying script).
 
 ### v3.7.11 — actions can actually fire HTTP requests from Python
 
@@ -609,7 +609,7 @@ The v3.7.10 resolver returned a manifest of "what would be sent." v3.7.11 adds `
 | Mailchimp | `MAILCHIMP_API_KEY` | `GET /3.0/automations` (Basic auth, dc from suffix) |
 | Ahrefs | `AHREFS_API_KEY` | `GET /v3/site-explorer/metrics` |
 
-**Requires the MCP path (28 OAuth-only or MCP-only connectors):** Google Ads, Meta Marketing, LinkedIn Marketing, LinkedIn Publishing, TikTok Ads, Twitter/X, Gmail, Google Calendar, Google Analytics, Google Search Console, Meta Graph, Salesforce, Pipedrive, Zoho CRM, Buffer, Hootsuite, Cision, Muckrack, Amplitude, Similarweb, SEMrush, Moz, Intercom, Canva, Figma, plus the official ad-platform MCP servers Meta Ads AI Connectors, Google Ads MCP (read-only) and Amazon Ads MCP. For all of these, the resolver still returns `manifest_ready` so you can see the exact HTTP shape Claude's MCP tool will send — Python just can't execute the OAuth flow itself.
+**Requires the MCP path (29 OAuth-only or MCP-only connectors):** Google Ads, Meta Marketing, LinkedIn Marketing, LinkedIn Publishing, TikTok Ads, Twitter/X, Gmail, Google Calendar, Google Analytics, Google Search Console, Meta Graph, Salesforce, Pipedrive, Zoho CRM, Buffer, Hootsuite, Cision, Muckrack, Amplitude, Similarweb, cloro, SEMrush, Moz, Intercom, Canva, Figma, plus the official ad-platform MCP servers Meta Ads AI Connectors, Google Ads MCP (read-only) and Amazon Ads MCP. For all of these, the resolver still returns `manifest_ready` so you can see the exact HTTP shape Claude's MCP tool will send — Python just can't execute the OAuth flow itself. cloro is an exception: no action selects it, because the skills call its MCP tools directly.
 
 **Safety gates (updated in v3.35.0):** read ops auto-execute with `--execute`; write ops need a matching approved, single-use approval record (`--approval-id`), see [Safety and approvals](#safety-and-approvals); missing env vars block with `setup_hint_credential`; unresolved `{VAR}` placeholders block before the request fires. Every fired call logs to `~/.claude-marketing/brands/{brand}/executions/`.
 
